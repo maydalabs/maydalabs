@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
+export const metadata: Metadata = {
+  title: "Contact – Book a 15 min fit check",
+  description:
+    "Book a short fit check call or email Emayda with a snapshot of your traffic, stack, and goals to see whether a Scan, Sprint, or Growth Loop makes sense.",
+};
+
 export default function ContactPage() {
+
   return (
     <div className="page">
       <h1 className="page-title">Contact</h1>

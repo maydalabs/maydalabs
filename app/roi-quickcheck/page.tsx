@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
+export const metadata: Metadata = {
+  title: "Advanced ROI Quickcheck – Emayda",
+  description:
+    "Advanced ROI Quickcheck to estimate extra revenue from small lifts in conversion or close rate, and see which Emayda program usually fits your scenario.",
+};
+
 export default function AdvancedRoiPage() {
+
   return (
     <div className="page">
       <h1 className="page-title">Advanced ROI Quickcheck</h1>

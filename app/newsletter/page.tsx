@@ -1,4 +1,13 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Newsletter – Notes on growth and lifecycle",
+  description:
+    "Emayda’s occasional newsletter with tactical notes on funnels, tracking, CRO, and lifecycle for digital brands, SaaS, and service firms.",
+};
+
 export default function NewsletterPage() {
+
   return (
     <div className="page">
       <h1 className="page-title">Newsletter</h1>

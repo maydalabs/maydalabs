@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
+export const metadata: Metadata = {
+  title: "Programs – Baseline Scan, Momentum Sprint, Growth Loop",
+  description:
+    "Three ways to work with Emayda: a Baseline Scan diagnostic, a 6–8 week Momentum Sprint, and an ongoing Growth Loop for steady experiments and lifecycle work.",
+};
+
 export default function ProgramsPage() {
+
   return (
     <div className="page">
       <header>

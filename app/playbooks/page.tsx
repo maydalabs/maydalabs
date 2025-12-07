@@ -1,4 +1,13 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Playbooks – Funnels, tracking, and lifecycle",
+  description:
+    "Short, practical playbooks from Emayda for fixing common growth problems – tracking sanity checks, funnel tuning, and lifecycle flows.",
+};
+
 export default function PlaybooksPage() {
+
   return (
     <div className="page">
       <h1 className="page-title">Playbooks</h1>

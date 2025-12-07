@@ -1,4 +1,13 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy policy – Emayda",
+  description:
+    "High-level overview of how Emayda handles website analytics, form submissions, email lists, and client project data.",
+};
+
 export default function PrivacyPage() {
+
   return (
     <div className="page">
       <h1 className="page-title">Privacy policy</h1>

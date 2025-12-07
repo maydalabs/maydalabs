@@ -1,4 +1,13 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Projects – Selected growth work",
+  description:
+    "Selected Emayda projects and case microsites across ecommerce, SaaS, and services – the evolution of the original /projects gallery.",
+};
+
 export default function ProjectsPage() {
+
   return (
     <div className="page">
       <header>

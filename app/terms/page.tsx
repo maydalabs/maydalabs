@@ -1,4 +1,13 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms – Emayda",
+  description:
+    "Basic terms for using the Emayda site and engaging with Emayda as a growth partner.",
+};
+
 export default function TermsPage() {
+
   return (
     <div className="page">
       <h1 className="page-title">Terms</h1>

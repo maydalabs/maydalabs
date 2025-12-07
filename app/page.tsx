@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
+export const metadata: Metadata = {
+  title: "Emayda – Growth partner for digital brands",
+  description:
+    "Emayda helps digital brands, SaaS, and service firms turn underperforming traffic into meetings, clients, and revenue with clean tracking, focused CRO sprints, and lifecycle systems.",
+};
+
 export default function HomePage() {
+
   return (
     <div className="home">
             {/* HERO */}

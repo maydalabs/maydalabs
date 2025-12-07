@@ -1,4 +1,13 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About – Emayda growth partner",
+  description:
+    "Emayda is a focused growth partner for digital brands, combining CRO, analytics, and lifecycle systems with a bias for shipping and clear communication.",
+};
+
 export default function AboutPage() {
+
   return (
     <div className="page">
       <h1 className="page-title">About Emayda</h1>
