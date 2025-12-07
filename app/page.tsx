@@ -3,20 +3,21 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <div className="home">
-      {/* HERO */}
+            {/* HERO */}
       <section className="home-hero">
         <div className="home-hero-grid">
           <div className="home-hero-copy">
             <p className="home-hero-kicker">
-              GROWTH PARTNER · BUILT FOR DIGITAL BRANDS
+              GROWTH PARTNER · DIGITAL-FIRST BRANDS
             </p>
             <h1 className="home-hero-title">
               Turn underperforming traffic into meetings, clients, and revenue.
             </h1>
             <p className="home-hero-subtitle">
-              Emayda helps digital brands, SaaS, and service firms turn
-              &ldquo;okay traffic&rdquo; into compounding revenue with clean
-              tracking, focused CRO sprints, and AI-powered lifecycle systems.
+              Emayda works with digital brands, SaaS, and service firms who
+              already have visitors—but need clean tracking, focused CRO
+              sprints, and AI-assisted lifecycle systems to turn that traffic
+              into revenue.
             </p>
 
             <div className="home-hero-ctas">
@@ -29,8 +30,9 @@ export default function HomePage() {
             </div>
 
             <p className="home-hero-proof">
-              Previously: built and scaled revenue systems for eCommerce and
-              Bitcoin-native brands; now available as a focused growth partner.
+              Led by an operator who&apos;s built and scaled revenue systems for
+              ecommerce and Bitcoin-native brands—now available as a focused
+              growth partner instead of a big agency.
             </p>
           </div>
 
@@ -86,43 +88,47 @@ export default function HomePage() {
 
       {/* ICP STRIP */}
       <section className="home-icp">
-        <h2 className="home-section-title">Who Emayda is for</h2>
+        <h2 className="home-section-title">Who this is for</h2>
         <p className="home-section-intro">
-          Digital brands and teams who already have visitors, but know their
-          funnel and follow-up aren&apos;t doing them justice.
+          Teams who already have traffic—but know their funnel, follow-up, and
+          tracking are leaving money on the table.
         </p>
         <div className="home-icp-grid">
           <div className="icp-card">
             <h3>Commerce &amp; product brands</h3>
             <p>
-              Stores and product companies with steady traffic but 1–3%
-              conversion and patchy tracking.
+              DTC stores and product companies with steady traffic but 1–3%
+              conversion, patchy tracking, and no real testing cadence.
             </p>
           </div>
           <div className="icp-card">
             <h3>SaaS &amp; platforms</h3>
             <p>
               Apps where the leaks live between sign-up, activation, and
-              upgrade—online and in-product.
+              upgrade—across the website, in-product, and lifecycle.
             </p>
           </div>
           <div className="icp-card">
             <h3>Service firms &amp; practices</h3>
             <p>
               Agencies, studios, and law firms whose website and funnels should
-              be feeding more qualified consultations.
+              be feeding more qualified consultations instead of just looking
+              “nice”.
             </p>
           </div>
         </div>
       </section>
 
-      {/* PROGRAMS TEASER */}
+
+            {/* PROGRAMS TEASER */}
       <section className="home-programs">
         <div className="home-programs-header">
           <h2 className="home-section-title">Pick your starting point.</h2>
           <p className="home-section-intro">
-            Most teams begin with a Momentum Sprint. Baseline Scan is a lower
-            commitment on-ramp; Growth Loop keeps the wins compounding.
+            Most teams start with a Momentum Sprint. Baseline Scan is a lighter
+            on-ramp when you know something&apos;s off but aren&apos;t sure
+            where to begin. Growth Loop keeps the wins compounding once the
+            basics are fixed.
           </p>
         </div>
 
@@ -132,16 +138,17 @@ export default function HomePage() {
             <div className="program-tag">Diagnostic</div>
             <h3>Baseline Scan</h3>
             <p className="program-subtitle">
-              For teams who know something&apos;s off but don&apos;t know where
-              to start.
+              For teams who want clarity first: what&apos;s working, what&apos;s
+              broken, and where the biggest upside is hiding.
             </p>
             <ul className="program-list">
               <li>Deep review of tracking, funnels, and key flows.</li>
               <li>Plain-English report on where you&apos;re leaking revenue.</li>
-              <li>Prioritized 6–12 week growth roadmap.</li>
+              <li>Prioritised 6–12 week growth roadmap you can execute.</li>
             </ul>
             <p className="program-meta">
-              Fixed fee. Rolled into a Momentum Sprint if we work together.
+              One-time fixed fee. Credited against a Momentum Sprint if we keep
+              working together.
             </p>
             <Link href="/programs" className="program-link">
               Learn more
@@ -155,7 +162,8 @@ export default function HomePage() {
             </div>
             <h3>Momentum Sprint</h3>
             <p className="program-subtitle">
-              6–8 weeks to fix the worst leaks, ship tests, and upgrade flows.
+              6–8 weeks to clean up tracking, fix the worst leaks, and ship
+              changes that actually move revenue.
             </p>
             <ul className="program-list">
               <li>Clean tracking and a reliable baseline for your funnel.</li>
@@ -166,7 +174,8 @@ export default function HomePage() {
               </li>
             </ul>
             <p className="program-meta">
-              Duration: 6–8 weeks · Engagement: fixed scope &amp; fee.
+              Duration: 6–8 weeks. Fixed scope &amp; fee, clear success metrics
+              agreed up front.
             </p>
             <div className="program-actions">
               <Link href="https://calendly.com/" className="btn btn-primary">
@@ -183,8 +192,8 @@ export default function HomePage() {
             <div className="program-tag">Ongoing growth</div>
             <h3>Growth Loop</h3>
             <p className="program-subtitle">
-              For teams who want a steady testing &amp; lifecycle cadence, not
-              one-off fixes.
+              For teams who want a steady testing and lifecycle cadence after
+              the first Sprint, not one-off projects.
             </p>
             <ul className="program-list">
               <li>Monthly experiment cycles on key pages and flows.</li>
@@ -192,7 +201,8 @@ export default function HomePage() {
               <li>Monthly report plus quarterly reset on priorities.</li>
             </ul>
             <p className="program-meta">
-              Duration: 3+ months · Rhythm: monthly cycles.
+              Duration: 3+ months. Monthly engagement with a clear workload and
+              room to pause after each cycle.
             </p>
             <Link href="/programs" className="program-link">
               Learn more
@@ -201,30 +211,44 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ROI QUICKCHECK TEASER */}
+
+            {/* ROI QUICKCHECK TEASER */}
       <section className="home-roi">
         <div className="home-roi-inner">
           <div>
-            <h2 className="home-section-title">Turn more visitors into clients.</h2>
+            <h2 className="home-section-title">
+              Sanity-check your upside before you change anything.
+            </h2>
             <p className="home-section-intro">
-              Use the ROI Quickcheck to estimate the upside from a small lift in
-              conversion or close rate before you touch anything.
+              Use the Advanced ROI Quickcheck to plug in your AOV, sessions, and
+              conversion rate and see what a small lift could mean in real
+              revenue.
             </p>
             <ul className="home-roi-list">
-              <li>AOV, sessions, current CR, and target lift inputs.</li>
-              <li>Extra revenue per month and per year.</li>
-              <li>Suggestion on which program makes most sense.</li>
+              <li>
+                Inputs: AOV, monthly sessions, current conversion rate, and a
+                target lift or scenario.
+              </li>
+              <li>
+                Outputs: extra revenue per month and per year, plus a simple
+                payback window.
+              </li>
+              <li>
+                Suggestion on where to start: Baseline Scan, Momentum Sprint, or
+                Growth Loop.
+              </li>
             </ul>
           </div>
           <div className="home-roi-cta">
             <Link href="/roi-quickcheck" className="btn btn-secondary">
-              Open advanced ROI calculator
+              Open ROI Quickcheck
             </Link>
           </div>
         </div>
       </section>
 
-      {/* CASE SPOTLIGHT PLACEHOLDER */}
+
+      {/* CASE SPOTLIGHT */}
       <section className="home-case">
         <div className="home-case-inner">
           <div>
@@ -253,6 +277,13 @@ export default function HomePage() {
                 <li>Lifecycle flows built on clean events.</li>
               </ul>
             </article>
+          </div>
+
+          {/* NEW CTA → projects page */}
+          <div style={{ marginTop: "1rem" }}>
+            <Link href="/projects" className="btn btn-secondary">
+              View all projects
+            </Link>
           </div>
         </div>
       </section>

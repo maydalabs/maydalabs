@@ -3,138 +3,275 @@ import Link from "next/link";
 export default function ProgramsPage() {
   return (
     <div className="page">
-      <header className="home-programs-header">
-        <h1 className="page-title">Pick your starting point.</h1>
+      <header>
+        <h1 className="page-title">Programs</h1>
         <p className="page-intro">
-          Most teams begin with a Momentum Sprint. Baseline Scan is a lighter
-          on-ramp when you know something&apos;s off but aren&apos;t sure where
-          to start. Growth Loop keeps the wins compounding once the basics are
-          fixed.
+          Three ways to work together, depending on how clear your situation is
+          and how fast you want to move: Baseline Scan, Momentum Sprint, and
+          Growth Loop.
         </p>
         <p className="page-note">
-          All work is fixed-scope, outcome-focused, and designed for digital
-          brands that get real business from their website and funnels.
+          Most teams start with a Momentum Sprint. Baseline Scan is a lighter
+          diagnostic when you know something&apos;s off but aren&apos;t sure
+          where to begin. Growth Loop is for teams who want a steady cadence of
+          experiments and lifecycle work after the first lift.
         </p>
       </header>
 
-      {/* Main program grid */}
+      {/* Program grid – same visual style as homepage, more detail */}
       <section className="home-programs">
         <div className="home-programs-grid">
           {/* Baseline Scan */}
           <article className="program-card">
-            <span className="program-tag">Diagnostic</span>
-            <h2 className="page-title" style={{ fontSize: "1.25rem" }}>
+            <div className="program-tag">Diagnostic</div>
+            <h2 className="home-section-title" style={{ fontSize: "1.25rem" }}>
               Baseline Scan
             </h2>
             <p className="program-subtitle">
-              For teams who know something&apos;s wrong but don&apos;t know
-              where to start.
+              One-time diagnostic for teams who want clarity first: what&apos;s
+              working, what&apos;s broken, and where the biggest upside is
+              hiding.
             </p>
+
+            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+              Best for
+            </h3>
             <ul className="program-list">
-              <li>Deep review of tracking, funnels, and key flows.</li>
-              <li>Plain-English report on where you&apos;re leaking revenue.</li>
-              <li>Prioritised 6–12 week growth roadmap you can execute with or
-                  without us.</li>
+              <li>
+                You have &quot;okay&quot; traffic but flat revenue or weak
+                conversion.
+              </li>
+              <li>
+                Tracking is half-broken and you don&apos;t fully trust your
+                numbers.
+              </li>
+              <li>
+                You want a clear 6–12 week plan before committing to a full
+                Sprint.
+              </li>
             </ul>
+
+            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+              What we do
+            </h3>
+            <ul className="program-list">
+              <li>Audit tracking (GA4, pixels, key events) and fix basics.</li>
+              <li>
+                Review key funnels and flows: homepage, product/offer pages,
+                forms, checkout or sign-up.
+              </li>
+              <li>
+                Map out the current lifecycle: abandon, post-purchase, onboarding,
+                win-back.
+              </li>
+            </ul>
+
+            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+              What you leave with
+            </h3>
+            <ul className="program-list">
+              <li>
+                Plain-English summary of what&apos;s holding back conversion and
+                revenue.
+              </li>
+              <li>
+                Prioritised 6–12 week roadmap with specific changes and tests.
+              </li>
+              <li>
+                A call to walk through the findings and answer questions.
+              </li>
+            </ul>
+
             <p className="program-meta">
-              <strong>Best for:</strong> teams with “okay traffic” but stuck
-              conversion and patchy tracking.
+              <strong>Format:</strong> one-time fixed fee. If we move into a
+              Momentum Sprint, the Scan fee is credited against it.
             </p>
-            <p className="program-meta">
-              <strong>Typical timeline:</strong> 2–3 weeks. Fixed fee. Can roll
-              into a Momentum Sprint.
-            </p>
-            <div className="program-actions">
-              <Link href="/contact" className="btn btn-secondary">
-                Talk about a Scan
-              </Link>
-            </div>
+
+            <Link href="/pricing" className="program-link">
+              See how pricing works
+            </Link>
           </article>
 
-          {/* Momentum Sprint – flagship */}
+          {/* Momentum Sprint */}
           <article className="program-card program-card--primary">
-            <span className="program-tag program-tag--primary">
+            <div className="program-tag program-tag--primary">
               Flagship engagement
-            </span>
-            <h2 className="page-title" style={{ fontSize: "1.25rem" }}>
+            </div>
+            <h2 className="home-section-title" style={{ fontSize: "1.25rem" }}>
               Momentum Sprint
             </h2>
             <p className="program-subtitle">
-              6–8 weeks to fix the worst leaks, ship high-impact tests, and
-              upgrade your lifecycle base.
+              6–8 weeks to clean up tracking, fix the worst leaks, and ship
+              changes that actually move revenue.
             </p>
+
+            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+              Best for
+            </h3>
             <ul className="program-list">
-              <li>Clean tracking and a reliable baseline for your funnel.</li>
-              <li>3–5 high-impact UX, copy, or flow changes shipped.</li>
               <li>
-                Core lifecycle flows live (abandon flows, post-purchase,
-                win-back, etc.).
+                You already have meaningful traffic and a working product or
+                offer.
+              </li>
+              <li>
+                You&apos;re sick of small tweaks and want a focused push on the
+                highest-impact parts of the funnel.
+              </li>
+              <li>
+                You&apos;re ready to give access and make fast decisions for 6–8
+                weeks.
               </li>
             </ul>
+
+            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+              What we do
+            </h3>
+            <ul className="program-list">
+              <li>
+                Finalise tracking and baseline metrics so we&apos;re not flying
+                blind.
+              </li>
+              <li>
+                Ship 3–5 high-impact UX, copy, or flow changes on key pages
+                (homepage, PDP/offer, forms, checkout/sign-up).
+              </li>
+              <li>
+                Stand up core lifecycle flows: abandon, post-purchase, win-back,
+                or onboarding depending on your model.
+              </li>
+            </ul>
+
+            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+              What you leave with
+            </h3>
+            <ul className="program-list">
+              <li>
+                Cleaner, more reliable analytics and funnel reporting you can
+                keep using.
+              </li>
+              <li>
+                Shipped changes with measured impact on conversion or revenue.
+              </li>
+              <li>
+                A simple framework for ongoing experiments and lifecycle work.
+              </li>
+            </ul>
+
             <p className="program-meta">
-              <strong>Best for:</strong> digital brands ready to move from
-              “random tweaks” to focused experiments.
+              <strong>Format:</strong> 6–8 week project with a fixed scope &amp;
+              fee, agreed up front. Clear success metrics; weekly updates in
+              plain English.
             </p>
-            <p className="program-meta">
-              <strong>Typical timeline:</strong> 6–8 weeks. Fixed scope &amp;
-              fee, clear success metrics agreed up front.
-            </p>
+
             <div className="program-actions">
-              <Link href="/contact" className="btn btn-primary">
+              <Link href="https://calendly.com/" className="btn btn-primary">
                 Talk about a Sprint
               </Link>
-              <Link href="/roi-quickcheck" className="program-link">
-                Estimate the upside first →
+              <Link href="/pricing" className="program-link">
+                View pricing structure
               </Link>
             </div>
           </article>
 
           {/* Growth Loop */}
           <article className="program-card">
-            <span className="program-tag">Ongoing growth</span>
-            <h2 className="page-title" style={{ fontSize: "1.25rem" }}>
+            <div className="program-tag">Ongoing growth</div>
+            <h2 className="home-section-title" style={{ fontSize: "1.25rem" }}>
               Growth Loop
             </h2>
             <p className="program-subtitle">
-              For teams who want a steady testing &amp; lifecycle cadence, not
-              one-off fixes.
+              Ongoing engagement for teams who want a steady testing and
+              lifecycle cadence after the first Sprint, not one-off projects.
             </p>
+
+            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+              Best for
+            </h3>
             <ul className="program-list">
-              <li>Monthly experiment cycles on key pages and flows.</li>
-              <li>AI-assisted lifecycle campaigns and segmentation.</li>
-              <li>Monthly report plus quarterly reset on priorities.</li>
+              <li>
+                You&apos;ve seen the impact of the first changes and want to
+                keep compounding.
+              </li>
+              <li>
+                You don&apos;t have the bandwidth for an in-house experimentation
+                and lifecycle team.
+              </li>
+              <li>
+                You care more about consistent progress than massive quarterly
+                overhauls.
+              </li>
             </ul>
+
+            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+              What we do every month
+            </h3>
+            <ul className="program-list">
+              <li>
+                Plan and run experiment cycles on priority pages and flows.
+              </li>
+              <li>
+                Iterate lifecycle campaigns and segmentation with AI assistance
+                where useful.
+              </li>
+              <li>
+                Review performance, adjust focus, and reset priorities each
+                quarter.
+              </li>
+            </ul>
+
+            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+              What you get
+            </h3>
+            <ul className="program-list">
+              <li>
+                A consistent testing rhythm instead of random one-off changes.
+              </li>
+              <li>
+                Lifecycle that keeps up with how people actually use your
+                product or service.
+              </li>
+              <li>
+                Clear reporting on what&apos;s moving the needle and what&apos;s
+                noise.
+              </li>
+            </ul>
+
             <p className="program-meta">
-              <strong>Best for:</strong> brands that have product–market fit and
-              need compounding CRO + lifecycle work.
+              <strong>Format:</strong> month-to-month engagement with a clearly
+              defined workload. Easy to pause after any cycle.
             </p>
-            <p className="program-meta">
-              <strong>Typical timeline:</strong> 3+ months. Rhythm: monthly
-              cycles with clear test backlogs.
-            </p>
-            <div className="program-actions">
-              <Link href="/contact" className="btn btn-secondary">
-                Talk about Growth Loop
-              </Link>
-            </div>
+
+            <Link href="/contact" className="program-link">
+              Ask about Growth Loop
+            </Link>
           </article>
         </div>
       </section>
 
-      {/* Fit check strip */}
-      <section className="home-roi">
-        <div className="home-roi-inner">
+      {/* Help choose */}
+      <section className="home-faq">
+        <div className="home-faq-inner">
           <div>
             <h2 className="home-section-title">
               Not sure which program fits?
             </h2>
             <p className="home-section-intro">
-              Book a quick 15-minute fit check. We&apos;ll look at your current
-              funnel, ask a few questions about traffic and revenue, and suggest
-              where to start—Baseline Scan, a Sprint, or something else.
+              A quick 15 minute fit check is usually enough to decide whether we
+              start with a Scan, go straight into a Sprint, or design something
+              custom.
             </p>
           </div>
-          <div className="home-roi-cta">
+          <div>
+            <ul className="home-faq-list">
+              <li>
+                We&apos;ll look at your current funnel and main channels of
+                traffic.
+              </li>
+              <li>
+                You&apos;ll get an honest view if we&apos;re a good match—and if
+                not, what to do instead.
+              </li>
+            </ul>
             <Link href="/contact" className="btn btn-primary">
               Book a 15&nbsp;min fit check
             </Link>
