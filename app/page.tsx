@@ -2,16 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Emayda – Growth partner for digital brands",
+  title: "Mayda Labs – Growth partner for digital-first brands",
   description:
-    "Emayda helps digital brands, SaaS, and service firms turn underperforming traffic into meetings, clients, and revenue with clean tracking, focused CRO sprints, and lifecycle systems.",
+    "Mayda Labs works with digital brands, SaaS, and service firms who already have traffic but need clean tracking, focused CRO sprints, and lifecycle systems to turn that traffic into revenue.",
 };
 
 export default function HomePage() {
-
   return (
     <div className="home">
-            {/* HERO */}
+      {/* HERO */}
       <section className="home-hero">
         <div className="home-hero-grid">
           <div className="home-hero-copy">
@@ -22,7 +21,7 @@ export default function HomePage() {
               Turn underperforming traffic into meetings, clients, and revenue.
             </h1>
             <p className="home-hero-subtitle">
-              Emayda works with digital brands, SaaS, and service firms who
+              Mayda Labs works with digital brands, SaaS, and service firms who
               already have visitors—but need clean tracking, focused CRO
               sprints, and AI-assisted lifecycle systems to turn that traffic
               into revenue.
@@ -46,6 +45,11 @@ export default function HomePage() {
 
           <div className="home-hero-console">
             <div className="console-card console-card-main">
+              <div className="console-status-row">
+                <span className="console-status-label">Revenue console</span>
+                <span className="console-status-pill">Live</span>
+              </div>
+
               <div className="console-row">
                 <span className="console-label">Traffic</span>
                 <span className="console-value">42,000 sessions / mo</span>
@@ -64,8 +68,8 @@ export default function HomePage() {
                 <span className="console-number">$2,880 / month</span>
               </div>
               <p className="console-hint">
-                Based on a modest lift in close rate. We&apos;ll validate this
-                in your Baseline Scan.
+                Based on a modest lift in close rate. We&apos;ll validate this in your
+                Baseline Scan.
               </p>
             </div>
 
@@ -127,8 +131,7 @@ export default function HomePage() {
         </div>
       </section>
 
-
-            {/* PROGRAMS TEASER */}
+      {/* PROGRAMS TEASER */}
       <section className="home-programs">
         <div className="home-programs-header">
           <h2 className="home-section-title">Pick your starting point.</h2>
@@ -219,8 +222,7 @@ export default function HomePage() {
         </div>
       </section>
 
-
-            {/* ROI QUICKCHECK TEASER */}
+      {/* ROI QUICKCHECK TEASER */}
       <section className="home-roi">
         <div className="home-roi-inner">
           <div>
@@ -254,7 +256,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
 
       {/* CASE SPOTLIGHT */}
       <section className="home-case">

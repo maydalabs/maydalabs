@@ -23,7 +23,7 @@ export function SiteHeader() {
     <header className="site-header">
       <div className="site-header-inner">
         <Link href="/" className="site-logo">
-          Emayda
+          Mayda Labs
         </Link>
 
         <nav className="site-nav-desktop">

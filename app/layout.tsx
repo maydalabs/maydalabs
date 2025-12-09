@@ -5,9 +5,9 @@ import { AnnouncementStrip } from "../components/AnnouncementStrip";
 import { SiteFooter } from "../components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "Emayda – Sustainable growth partner for digital brands",
+  title: "Mayda Labs – Growth partner for digital-first brands",
   description:
-    "Emayda helps digital brands, SaaS, and service firms turn underperforming traffic into meetings, clients, and revenue with clean tracking, focused CRO sprints, and lifecycle systems.",
+    "Mayda Labs helps digital brands, SaaS, and service firms turn underperforming traffic into meetings, clients, and revenue with clean tracking, focused CRO sprints, and lifecycle systems.",
 };
 
 export default function RootLayout({
