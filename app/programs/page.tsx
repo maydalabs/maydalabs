@@ -4,21 +4,23 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Programs – Baseline Scan, Momentum Sprint, Growth Loop",
   description:
-    "Three ways to work with Emayda: a Baseline Scan diagnostic, a 6–8 week Momentum Sprint, and an ongoing Growth Loop for steady experiments and lifecycle work.",
+    "Three ways to work with Mayda Labs: a Baseline Scan diagnostic, a 6–8 week Momentum Sprint, and an ongoing Growth Loop for steady experiments and lifecycle work.",
 };
 
 export default function ProgramsPage() {
-
   return (
-    <div className="page">
-      <header>
-        <h1 className="page-title">Programs</h1>
-        <p className="page-intro">
+    <div className="space-y-16 md:space-y-20">
+      {/* Header */}
+      <header className="space-y-3">
+        <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
+          Programs
+        </h1>
+        <p className="max-w-2xl text-sm text-muted sm:text-[0.95rem]">
           Three ways to work together, depending on how clear your situation is
           and how fast you want to move: Baseline Scan, Momentum Sprint, and
           Growth Loop.
         </p>
-        <p className="page-note">
+        <p className="max-w-3xl text-xs text-muted sm:text-sm">
           Most teams start with a Momentum Sprint. Baseline Scan is a lighter
           diagnostic when you know something&apos;s off but aren&apos;t sure
           where to begin. Growth Loop is for teams who want a steady cadence of
@@ -26,28 +28,29 @@ export default function ProgramsPage() {
         </p>
       </header>
 
-      {/* Program grid – same visual style as homepage, more detail */}
-      <section className="home-programs">
-        <div className="home-programs-grid">
+      {/* Program grid */}
+      <section className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-3">
           {/* Baseline Scan */}
-          <article className="program-card">
-            <div className="program-tag">Diagnostic</div>
-            <h2 className="home-section-title" style={{ fontSize: "1.25rem" }}>
+          <article className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-5 text-sm">
+            <div className="inline-flex items-center rounded-full border border-border px-2 py-[3px] text-[0.7rem] uppercase tracking-[0.14em] text-muted">
+              Diagnostic
+            </div>
+            <h2 className="text-[1.15rem] font-semibold text-foreground">
               Baseline Scan
             </h2>
-            <p className="program-subtitle">
+            <p className="text-muted">
               One-time diagnostic for teams who want clarity first: what&apos;s
               working, what&apos;s broken, and where the biggest upside is
               hiding.
             </p>
 
-            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+            <h3 className="mt-3 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-muted">
               Best for
             </h3>
-            <ul className="program-list">
+            <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
               <li>
-                You have &quot;okay&quot; traffic but flat revenue or weak
-                conversion.
+                You have “okay” traffic but flat revenue or weak conversion.
               </li>
               <li>
                 Tracking is half-broken and you don&apos;t fully trust your
@@ -59,25 +62,25 @@ export default function ProgramsPage() {
               </li>
             </ul>
 
-            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+            <h3 className="mt-3 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-muted">
               What we do
             </h3>
-            <ul className="program-list">
+            <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
               <li>Audit tracking (GA4, pixels, key events) and fix basics.</li>
               <li>
                 Review key funnels and flows: homepage, product/offer pages,
                 forms, checkout or sign-up.
               </li>
               <li>
-                Map out the current lifecycle: abandon, post-purchase, onboarding,
-                win-back.
+                Map out the current lifecycle: abandon, post-purchase,
+                onboarding, win-back.
               </li>
             </ul>
 
-            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+            <h3 className="mt-3 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-muted">
               What you leave with
             </h3>
-            <ul className="program-list">
+            <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
               <li>
                 Plain-English summary of what&apos;s holding back conversion and
                 revenue.
@@ -90,33 +93,39 @@ export default function ProgramsPage() {
               </li>
             </ul>
 
-            <p className="program-meta">
-              <strong>Format:</strong> one-time fixed fee. If we move into a
-              Momentum Sprint, the Scan fee is credited against it.
+            <p className="mt-3 text-[0.8rem] text-muted">
+              <strong className="font-semibold text-foreground">
+                Format:
+              </strong>{" "}
+              one-time fixed fee. If we move into a Momentum Sprint, the Scan
+              fee is credited against it.
             </p>
 
-            <Link href="/pricing" className="program-link">
+            <Link
+              href="/pricing"
+              className="mt-2 text-[0.86rem] text-mayda-teal hover:underline"
+            >
               See how pricing works
             </Link>
           </article>
 
           {/* Momentum Sprint */}
-          <article className="program-card program-card--primary">
-            <div className="program-tag program-tag--primary">
+          <article className="flex flex-col gap-3 rounded-xl border border-mayda-teal bg-surface-alt/70 p-5 text-sm shadow-soft">
+            <div className="inline-flex items-center rounded-full border border-mayda-teal px-2 py-[3px] text-[0.7rem] uppercase tracking-[0.14em] text-mayda-teal">
               Flagship engagement
             </div>
-            <h2 className="home-section-title" style={{ fontSize: "1.25rem" }}>
+            <h2 className="text-[1.15rem] font-semibold text-foreground">
               Momentum Sprint
             </h2>
-            <p className="program-subtitle">
+            <p className="text-muted">
               6–8 weeks to clean up tracking, fix the worst leaks, and ship
               changes that actually move revenue.
             </p>
 
-            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+            <h3 className="mt-3 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-muted">
               Best for
             </h3>
-            <ul className="program-list">
+            <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
               <li>
                 You already have meaningful traffic and a working product or
                 offer.
@@ -131,10 +140,10 @@ export default function ProgramsPage() {
               </li>
             </ul>
 
-            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+            <h3 className="mt-3 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-muted">
               What we do
             </h3>
-            <ul className="program-list">
+            <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
               <li>
                 Finalise tracking and baseline metrics so we&apos;re not flying
                 blind.
@@ -149,10 +158,10 @@ export default function ProgramsPage() {
               </li>
             </ul>
 
-            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+            <h3 className="mt-3 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-muted">
               What you leave with
             </h3>
-            <ul className="program-list">
+            <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
               <li>
                 Cleaner, more reliable analytics and funnel reporting you can
                 keep using.
@@ -165,37 +174,47 @@ export default function ProgramsPage() {
               </li>
             </ul>
 
-            <p className="program-meta">
-              <strong>Format:</strong> 6–8 week project with a fixed scope &amp;
-              fee, agreed up front. Clear success metrics; weekly updates in
-              plain English.
+            <p className="mt-3 text-[0.8rem] text-muted">
+              <strong className="font-semibold text-foreground">
+                Format:
+              </strong>{" "}
+              6–8 week project with a fixed scope &amp; fee, agreed up front.
+              Clear success metrics; weekly updates in plain English.
             </p>
 
-            <div className="program-actions">
-              <Link href="https://calendly.com/" className="btn btn-primary">
+            <div className="mt-2 flex flex-wrap gap-3">
+              <Link
+                href="https://calendly.com/"
+                className="inline-flex items-center justify-center rounded-full border border-mayda-teal bg-mayda-teal/20 px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-mayda-teal/30"
+              >
                 Talk about a Sprint
               </Link>
-              <Link href="/pricing" className="program-link">
+              <Link
+                href="/pricing"
+                className="text-[0.86rem] text-mayda-teal hover:underline"
+              >
                 View pricing structure
               </Link>
             </div>
           </article>
 
           {/* Growth Loop */}
-          <article className="program-card">
-            <div className="program-tag">Ongoing growth</div>
-            <h2 className="home-section-title" style={{ fontSize: "1.25rem" }}>
+          <article className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-5 text-sm">
+            <div className="inline-flex items-center rounded-full border border-border px-2 py-[3px] text-[0.7rem] uppercase tracking-[0.14em] text-muted">
+              Ongoing growth
+            </div>
+            <h2 className="text-[1.15rem] font-semibold text-foreground">
               Growth Loop
             </h2>
-            <p className="program-subtitle">
+            <p className="text-muted">
               Ongoing engagement for teams who want a steady testing and
               lifecycle cadence after the first Sprint, not one-off projects.
             </p>
 
-            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+            <h3 className="mt-3 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-muted">
               Best for
             </h3>
-            <ul className="program-list">
+            <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
               <li>
                 You&apos;ve seen the impact of the first changes and want to
                 keep compounding.
@@ -210,10 +229,10 @@ export default function ProgramsPage() {
               </li>
             </ul>
 
-            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+            <h3 className="mt-3 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-muted">
               What we do every month
             </h3>
-            <ul className="program-list">
+            <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
               <li>
                 Plan and run experiment cycles on priority pages and flows.
               </li>
@@ -227,10 +246,10 @@ export default function ProgramsPage() {
               </li>
             </ul>
 
-            <h3 className="page-note" style={{ marginTop: "0.75rem" }}>
+            <h3 className="mt-3 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-muted">
               What you get
             </h3>
-            <ul className="program-list">
+            <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
               <li>
                 A consistent testing rhythm instead of random one-off changes.
               </li>
@@ -244,12 +263,18 @@ export default function ProgramsPage() {
               </li>
             </ul>
 
-            <p className="program-meta">
-              <strong>Format:</strong> month-to-month engagement with a clearly
-              defined workload. Easy to pause after any cycle.
+            <p className="mt-3 text-[0.8rem] text-muted">
+              <strong className="font-semibold text-foreground">
+                Format:
+              </strong>{" "}
+              month-to-month engagement with a clearly defined workload. Easy to
+              pause after any cycle.
             </p>
 
-            <Link href="/contact" className="program-link">
+            <Link
+              href="/contact"
+              className="mt-2 text-[0.86rem] text-mayda-teal hover:underline"
+            >
               Ask about Growth Loop
             </Link>
           </article>
@@ -257,20 +282,20 @@ export default function ProgramsPage() {
       </section>
 
       {/* Help choose */}
-      <section className="home-faq">
-        <div className="home-faq-inner">
-          <div>
-            <h2 className="home-section-title">
+      <section>
+        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface-alt/70 p-5 sm:flex-row sm:items-start sm:justify-between sm:p-6">
+          <div className="space-y-2">
+            <h2 className="text-lg font-semibold text-foreground sm:text-xl">
               Not sure which program fits?
             </h2>
-            <p className="home-section-intro">
+            <p className="max-w-xl text-sm text-muted sm:text-[0.95rem]">
               A quick 15 minute fit check is usually enough to decide whether we
               start with a Scan, go straight into a Sprint, or design something
               custom.
             </p>
           </div>
-          <div>
-            <ul className="home-faq-list">
+          <div className="space-y-2 text-sm text-muted">
+            <ul className="ml-4 list-disc space-y-1">
               <li>
                 We&apos;ll look at your current funnel and main channels of
                 traffic.
@@ -280,7 +305,10 @@ export default function ProgramsPage() {
                 not, what to do instead.
               </li>
             </ul>
-            <Link href="/contact" className="btn btn-primary">
+            <Link
+              href="https://calendly.com/"
+              className="mt-2 inline-flex items-center justify-center rounded-full border border-mayda-teal bg-mayda-teal/20 px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-mayda-teal/30"
+            >
               Book a 15&nbsp;min fit check
             </Link>
           </div>

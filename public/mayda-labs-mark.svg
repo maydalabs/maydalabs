@@ -1,0 +1,48 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="40"
+  height="40"
+  viewBox="0 0 40 40"
+>
+  <defs>
+    <linearGradient id="ml-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1020" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="ml-bars" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#1f3b4a" />
+      <stop offset="100%" stop-color="#60a4ba" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer tile -->
+  <rect
+    x="3"
+    y="3"
+    width="34"
+    height="34"
+    rx="10"
+    fill="url(#ml-bg)"
+    stroke="#1f2933"
+    stroke-width="1.2"
+  />
+
+  <!-- Growth bars -->
+  <rect x="11" y="21" width="4.4" height="9" rx="2.2" fill="url(#ml-bars)" />
+  <rect x="18" y="17" width="4.4" height="13" rx="2.2" fill="url(#ml-bars)" />
+  <rect x="25" y="13" width="4.4" height="17" rx="2.2" fill="url(#ml-bars)" />
+
+  <!-- Signal curve -->
+  <path
+    d="M10 16 C 14 12.5, 19 12.5, 23.5 14.2 C 26 15.2, 28.4 17, 30.5 19.5"
+    fill="none"
+    stroke="#64748b"
+    stroke-width="1.3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.9"
+  />
+
+  <!-- Signal dot -->
+  <circle cx="29.8" cy="18.9" r="1.5" fill="#60a4ba" />
+</svg>

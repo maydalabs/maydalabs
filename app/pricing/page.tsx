@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-
   title: "Pricing – Fixed-scope growth programs",
   description:
     "Simple, outcome-focused pricing: one-time Baseline Scan, fixed-fee Momentum Sprints, and a clear monthly Growth Loop retainer with no black-box retainers.",
@@ -10,15 +9,18 @@ export const metadata: Metadata = {
 
 export default function PricingPage() {
   return (
-    <div className="page">
-      <header>
-        <h1 className="page-title">Pricing</h1>
-        <p className="page-intro">
+    <div className="space-y-16 md:space-y-20">
+      {/* Header */}
+      <header className="space-y-3">
+        <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
+          Pricing
+        </h1>
+        <p className="max-w-2xl text-sm text-muted sm:text-[0.95rem]">
           Simple, outcome-focused pricing. No black-box retainers, no surprise
           scope creep. Each engagement has a clear scope, timeline, and fee we
           agree on before work starts.
         </p>
-        <p className="page-note">
+        <p className="max-w-3xl text-xs text-muted sm:text-sm">
           Exact numbers depend on your funnel complexity and surfaces (web,
           product, lifecycle), but the structure below is how every engagement
           is priced.
@@ -26,19 +28,21 @@ export default function PricingPage() {
       </header>
 
       {/* Program pricing view */}
-      <section className="home-programs">
-        <div className="home-programs-grid">
+      <section className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-3">
           {/* Baseline Scan */}
-          <article className="program-card">
-            <span className="program-tag">Diagnostic</span>
-            <h2 className="page-title" style={{ fontSize: "1.25rem" }}>
+          <article className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-5 text-sm">
+            <span className="inline-flex items-center rounded-full border border-border px-2 py-[3px] text-[0.7rem] uppercase tracking-[0.14em] text-muted">
+              Diagnostic
+            </span>
+            <h2 className="text-[1.15rem] font-semibold text-foreground">
               Baseline Scan
             </h2>
-            <p className="program-subtitle">
+            <p className="text-muted">
               Fixed-fee diagnostic for teams who want clarity before committing
               to a Sprint or ongoing work.
             </p>
-            <ul className="program-list">
+            <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
               <li>One-time fee covering audit, analysis, and roadmap.</li>
               <li>
                 Includes a walkthrough call and a documented 6–12 week plan.
@@ -48,25 +52,28 @@ export default function PricingPage() {
                 against it.
               </li>
             </ul>
-            <p className="program-meta">
-              <strong>Ideal when:</strong> you know something&apos;s off but
-              don&apos;t yet know whether a full Sprint makes sense.
+            <p className="mt-3 text-[0.8rem] text-muted">
+              <strong className="font-semibold text-foreground">
+                Ideal when:
+              </strong>{" "}
+              you know something&apos;s off but don&apos;t yet know whether a
+              full Sprint makes sense.
             </p>
           </article>
 
           {/* Momentum Sprint */}
-          <article className="program-card program-card--primary">
-            <span className="program-tag program-tag--primary">
+          <article className="flex flex-col gap-3 rounded-xl border border-mayda-teal bg-surface-alt/70 p-5 text-sm shadow-soft">
+            <span className="inline-flex items-center rounded-full border border-mayda-teal px-2 py-[3px] text-[0.7rem] uppercase tracking-[0.14em] text-mayda-teal">
               Flagship engagement
             </span>
-            <h2 className="page-title" style={{ fontSize: "1.25rem" }}>
+            <h2 className="text-[1.15rem] font-semibold text-foreground">
               Momentum Sprint
             </h2>
-            <p className="program-subtitle">
+            <p className="text-muted">
               6–8 week fixed-scope engagement to clean up tracking, fix the
               worst leaks, and ship high-impact changes.
             </p>
-            <ul className="program-list">
+            <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
               <li>
                 Flat project fee based on funnel complexity and surfaces
                 touched.
@@ -80,23 +87,28 @@ export default function PricingPage() {
                 mid-point or completion.
               </li>
             </ul>
-            <p className="program-meta">
-              <strong>Ideal when:</strong> you have meaningful traffic and want
-              a focused push, not a vague “retainer”.
+            <p className="mt-3 text-[0.8rem] text-muted">
+              <strong className="font-semibold text-foreground">
+                Ideal when:
+              </strong>{" "}
+              you have meaningful traffic and want a focused push, not a vague
+              “retainer”.
             </p>
           </article>
 
           {/* Growth Loop */}
-          <article className="program-card">
-            <span className="program-tag">Ongoing growth</span>
-            <h2 className="page-title" style={{ fontSize: "1.25rem" }}>
+          <article className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-5 text-sm">
+            <span className="inline-flex items-center rounded-full border border-border px-2 py-[3px] text-[0.7rem] uppercase tracking-[0.14em] text-muted">
+              Ongoing growth
+            </span>
+            <h2 className="text-[1.15rem] font-semibold text-foreground">
               Growth Loop
             </h2>
-            <p className="program-subtitle">
+            <p className="text-muted">
               Monthly engagement for teams who want a consistent testing and
               lifecycle cadence after a Sprint.
             </p>
-            <ul className="program-list">
+            <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
               <li>
                 Monthly retainer tied to a clear experiment and lifecycle
                 workload.
@@ -109,36 +121,52 @@ export default function PricingPage() {
                 Easy to pause after any cycle; no long-term lock-in contracts.
               </li>
             </ul>
-            <p className="program-meta">
-              <strong>Ideal when:</strong> you&apos;ve seen the impact of a
-              Sprint and want compounding gains rather than one-off projects.
+            <p className="mt-3 text-[0.8rem] text-muted">
+              <strong className="font-semibold text-foreground">
+                Ideal when:
+              </strong>{" "}
+              you&apos;ve seen the impact of a Sprint and want compounding gains
+              rather than one-off projects.
             </p>
           </article>
         </div>
       </section>
 
       {/* How billing works */}
-      <section className="home-roi">
-        <div className="home-roi-inner">
-          <div>
-            <h2 className="home-section-title">How billing works.</h2>
-            <ul className="home-roi-list">
+      <section>
+        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface-alt/70 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="space-y-2">
+            <h2 className="text-lg font-semibold text-foreground sm:text-xl">
+              How billing works.
+            </h2>
+            <ul className="ml-4 list-disc space-y-1 text-sm text-muted">
               <li>
-                <strong>No surprise retainers.</strong> We agree the scope,
-                timeline, and fee before work starts.
+                <strong className="font-semibold text-foreground">
+                  No surprise retainers.
+                </strong>{" "}
+                We agree the scope, timeline, and fee before work starts.
               </li>
               <li>
-                <strong>Simple structure.</strong> Baseline Scan is one-time;
-                Sprints are fixed-fee; Growth Loop is monthly.
+                <strong className="font-semibold text-foreground">
+                  Simple structure.
+                </strong>{" "}
+                Baseline Scan is one-time; Sprints are fixed-fee; Growth Loop is
+                monthly.
               </li>
               <li>
-                <strong>Payment options.</strong> Standard bank/card payments,
-                with the option to pay via Bitcoin for teams who prefer it.
+                <strong className="font-semibold text-foreground">
+                  Payment options.
+                </strong>{" "}
+                Standard bank/card payments, with the option to pay via Bitcoin
+                for teams who prefer it.
               </li>
             </ul>
           </div>
-          <div className="home-roi-cta">
-            <Link href="/roi-quickcheck" className="btn btn-secondary">
+          <div className="pt-2 sm:pt-0">
+            <Link
+              href="/roi-quickcheck"
+              className="inline-flex items-center justify-center rounded-full border border-mayda-teal bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-background/80"
+            >
               Estimate your upside first
             </Link>
           </div>
@@ -146,19 +174,22 @@ export default function PricingPage() {
       </section>
 
       {/* Fit check CTA */}
-      <section className="home-faq">
-        <div className="home-faq-inner">
-          <div>
-            <h2 className="home-section-title">
+      <section>
+        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="space-y-2">
+            <h2 className="text-lg font-semibold text-foreground sm:text-xl">
               Want actual numbers for your case?
             </h2>
-            <p className="home-section-intro">
+            <p className="max-w-xl text-sm text-muted sm:text-[0.95rem]">
               A quick 15-minute fit check is usually enough to give you a
               realistic fee range for a Scan, Sprint, or Growth Loop.
             </p>
           </div>
           <div>
-            <Link href="/contact" className="btn btn-primary">
+            <Link
+              href="https://calendly.com/"
+              className="inline-flex items-center justify-center rounded-full border border-mayda-teal bg-mayda-teal/20 px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-mayda-teal/30"
+            >
               Book a 15&nbsp;min fit check
             </Link>
           </div>

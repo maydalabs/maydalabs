@@ -17,13 +17,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <div className="site">
+      <body className="bg-background text-foreground antialiased">
+        <div className="flex min-h-screen flex-col">
           <AnnouncementStrip />
           <SiteHeader />
-          <div className="site-inner">
-            <main className="site-main">{children}</main>
-          </div>
+          <main className="flex-1">
+            <div className="mx-auto max-w-5xl px-4 pb-12 pt-8 md:px-6 md:pt-12">
+              {children}
+            </div>
+          </main>
           <SiteFooter />
         </div>
       </body>

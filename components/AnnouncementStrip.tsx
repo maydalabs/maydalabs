@@ -31,26 +31,33 @@ export function AnnouncementStrip() {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setIndex((prev) => (prev + 1) % ANNOUNCEMENTS.length);
-    }, 8000); // 8s per slide – calm
+    const id = setInterval(
+      () => setIndex((prev) => (prev + 1) % ANNOUNCEMENTS.length),
+      8000
+    );
     return () => clearInterval(id);
   }, []);
 
   return (
-    <div className="announcement">
-      <div className="announcement-inner">
-        <div className="announcement-window">
+    <div className="border-b border-border bg-surface/95 text-[0.78rem] text-muted">
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-2 px-4 py-2 md:px-6">
+        {/* Sliding window */}
+        <div className="relative flex-1 overflow-hidden">
           <div
-            className="announcement-track"
+            className="flex transition-transform duration-300 ease-out"
             style={{ transform: `translateX(-${index * 100}%)` }}
           >
             {ANNOUNCEMENTS.map((item) => (
-              <div key={item.label} className="announcement-item">
-                <span className="announcement-label">{item.label}</span>
+              <div
+                key={item.label}
+                className="flex min-w-full items-center gap-2"
+              >
+                <span className="inline-flex items-center rounded-full border border-border px-2 py-[2px] text-[0.65rem] uppercase tracking-[0.16em] text-foreground">
+                  {item.label}
+                </span>
                 <Link
                   href={item.href}
-                  className="announcement-text announcement-text-link"
+                  className="truncate border-b border-dotted border-slate-500/70 pb-[1px] text-muted transition-colors hover:border-transparent hover:text-foreground"
                 >
                   {item.text}
                 </Link>
@@ -59,8 +66,12 @@ export function AnnouncementStrip() {
           </div>
         </div>
 
-        <div className="announcement-cta">
-          <Link href="https://calendly.com/" className="announcement-link">
+        {/* Right-side CTA */}
+        <div className="ml-auto w-full flex-shrink-0 md:w-auto md:ml-4">
+          <Link
+            href="https://calendly.com/"
+            className="inline-flex w-full items-center justify-center rounded-full border border-mayda-teal bg-mayda-teal/10 px-3 py-1.5 text-[0.78rem] font-medium text-foreground shadow-sm hover:bg-mayda-teal/20 md:w-auto"
+          >
             Book a 15min fit check
           </Link>
         </div>
