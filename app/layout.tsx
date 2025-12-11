@@ -17,15 +17,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-background text-foreground antialiased">
-        <div className="flex min-h-screen flex-col">
+      <body className="min-h-screen text-foreground antialiased mayda-aurora-bg">
+        <div className="flex min-h-screen flex-col overflow-hidden">
           <AnnouncementStrip />
           <SiteHeader />
+
           <main className="flex-1">
-            <div className="mx-auto max-w-5xl px-4 pb-12 pt-8 md:px-6 md:pt-12">
+            <div className="px-4 pb-12 pt-8 sm:px-6 lg:px-10">
               {children}
             </div>
           </main>
+
           <SiteFooter />
         </div>
       </body>

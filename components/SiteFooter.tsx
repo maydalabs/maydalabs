@@ -6,8 +6,8 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border bg-background/95 text-muted">
-      <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-8 md:px-6 md:py-10">
+    <footer className="border-t border-border/70 bg-transparent text-muted">
+      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-8 md:px-6 md:py-10 lg:max-w-7xl">
         {/* Top CTA strip */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -20,14 +20,14 @@ export function SiteFooter() {
           </div>
           <Link
             href="https://calendly.com/"
-            className="inline-flex items-center justify-center rounded-full border border-mayda-teal bg-mayda-teal/20 px-4 py-2 text-xs font-medium text-foreground shadow-sm hover:bg-mayda-teal/30"
+            className="inline-flex items-center justify-center rounded-full border border-mayda-teal bg-mayda-teal/15 px-4 py-2 text-xs font-medium text-foreground shadow-sm hover:bg-mayda-teal/25"
           >
             Book a 15min fit check
           </Link>
         </div>
 
         {/* Email capture */}
-        <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-surface px-4 py-4 shadow-soft sm:px-5 sm:py-5">
+        <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-border/80 bg-surface/80 px-4 py-4 shadow-soft sm:px-5 sm:py-5">
           <div className="space-y-1">
             <h4 className="text-sm font-semibold text-foreground">
               Subscribe to tactical notes.
@@ -44,7 +44,7 @@ export function SiteFooter() {
             <input
               type="email"
               placeholder="you@email.com"
-              className="flex-1 rounded-full border border-border bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-mayda-teal/60"
+              className="flex-1 rounded-full border border-border bg-surface-alt/80 px-3 py-2 text-xs text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-mayda-teal/60"
             />
             <button
               type="submit"

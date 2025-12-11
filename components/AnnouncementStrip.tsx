@@ -29,20 +29,29 @@ const ANNOUNCEMENTS: AnnouncementItem[] = [
 
 export function AnnouncementStrip() {
   const [index, setIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
+  // Auto-advance, but pause when hovered
   useEffect(() => {
+    if (isHovered) return;
+
     const id = setInterval(
       () => setIndex((prev) => (prev + 1) % ANNOUNCEMENTS.length),
       8000
     );
+
     return () => clearInterval(id);
-  }, []);
+  }, [isHovered]);
 
   return (
-    <div className="border-b border-border bg-surface/95 text-[0.78rem] text-muted">
+    <div className="border-b border-border/70 bg-background/80 text-[0.78rem] text-muted backdrop-blur">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-2 px-4 py-2 md:px-6">
         {/* Sliding window */}
-        <div className="relative flex-1 overflow-hidden">
+        <div
+          className="relative flex-1 overflow-hidden"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
           <div
             className="flex transition-transform duration-300 ease-out"
             style={{ transform: `translateX(-${index * 100}%)` }}
@@ -67,7 +76,7 @@ export function AnnouncementStrip() {
         </div>
 
         {/* Right-side CTA */}
-        <div className="ml-auto w-full flex-shrink-0 md:w-auto md:ml-4">
+        <div className="ml-auto w-full flex-shrink-0 md:ml-4 md:w-auto">
           <Link
             href="https://calendly.com/"
             className="inline-flex w-full items-center justify-center rounded-full border border-mayda-teal bg-mayda-teal/10 px-3 py-1.5 text-[0.78rem] font-medium text-foreground shadow-sm hover:bg-mayda-teal/20 md:w-auto"

@@ -21,12 +21,11 @@ export function SiteHeader() {
     href === "/" ? pathname === "/" : pathname?.startsWith(href);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 md:max-w-5xl md:px-6 md:py-4">
+    <header className="sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:px-6 md:py-4 lg:max-w-7xl">
         {/* Logo */}
         <Link href="/" className="group flex items-center gap-3">
           <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl border border-border bg-surface-alt/60 shadow-sm group-hover:border-mayda-teal group-hover:shadow-[0_0_0_1px_rgba(96,164,186,0.4)]">
-            {/* If you created /mayda-labs-mark.svg, this will show it. */}
             <Image
               src="/mayda-labs-mark.svg"
               alt="Mayda Labs mark"
@@ -74,6 +73,7 @@ export function SiteHeader() {
           onClick={() => setOpen((v) => !v)}
           className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface-alt md:hidden"
           aria-label="Toggle navigation"
+          aria-expanded={open}
         >
           <span className="sr-only">Toggle navigation</span>
           <span
@@ -92,7 +92,7 @@ export function SiteHeader() {
       {/* Mobile nav */}
       {open && (
         <nav className="border-t border-border bg-background/98 px-4 pb-4 pt-2 md:hidden">
-          <div className="mx-auto flex max-w-5xl flex-col gap-1">
+          <div className="mx-auto flex max-w-6xl flex-col gap-1 lg:max-w-7xl">
             {navItems.map((item) => (
               <Link
                 key={item.href}

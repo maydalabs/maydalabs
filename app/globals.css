@@ -81,13 +81,25 @@ body {
   padding: 0;
 }
 
-/* Base typography + background driven by tokens */
+/* Base typography – actual background handled by .mayda-aurora-bg */
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Global aurora background for the whole app.
+   Applied via className="mayda-aurora-bg" on <body> in app/layout.tsx */
+.mayda-aurora-bg {
+  background-color: #020617;
+  background-image:
+    radial-gradient(circle at 0% 0%, #020617 0, #020617 40%, transparent 70%),
+    radial-gradient(circle at 100% 0%, rgba(56, 189, 248, 0.26) 0, transparent 55%),
+    radial-gradient(circle at 50% 120%, rgba(34, 197, 94, 0.18) 0, transparent 65%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 /* Basic link behavior */
@@ -100,7 +112,7 @@ a:hover {
   text-decoration: none;
 }
 
-/* Make main at least viewport height */
+/* Layout height is handled by the flex wrapper in RootLayout */
 main {
-  min-height: 100vh;
+  min-height: 0;
 }
