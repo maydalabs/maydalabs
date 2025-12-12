@@ -2,26 +2,30 @@
 
 /* 
   Mayda Labs design tokens – global CSS variables
-  Dark-first design, similar philosophy to AirBTC.
+  Dark-first design.
 */
 
 /* Base tokens on :root (dark mode by default) */
 :root {
   /* Brand palette */
-  --mayda-navy: #020617;
-  --mayda-navy-soft: #050816;
-  --mayda-teal: #60a4ba;
+  --mayda-navy: #020617;         /* near slate-950 */
+  --mayda-navy-soft: #050816;    /* slightly lifted */
+  --mayda-teal: #60a4ba;         /* primary accent */
   --mayda-teal-soft: #7fc0d4;
   --mayda-ink: #f9fafb;
 
   /* Semantic tokens (dark-first) */
   --background: var(--mayda-navy);
   --foreground: var(--mayda-ink);
-  --surface: #020617;
-  --surface-alt: #050816;
-  --muted: #9ca3af;
-  --border: #1f2937;
+  --surface: #020617;            /* base surface */
+  --surface-alt: #050816;        /* slightly lighter / elevated */
+  --muted: #94a3b8;              /* slate-400ish */
+  --border: #1f2937;             /* slate-800ish */
   --ring: var(--mayda-teal);
+
+  /* Card / elevated hints (used via Tailwind utilities where needed) */
+  --surface-card: #020617;
+  --surface-card-alt: #020617;
 }
 
 /* Optional light mode override (for later) */
@@ -115,4 +119,76 @@ a:hover {
 /* Layout height is handled by the flex wrapper in RootLayout */
 main {
   min-height: 0;
+}
+
+/* Logo belt marquee */
+.logos-marquee-row {
+  width: max-content;
+  animation: logos-marquee 32s linear infinite;
+}
+
+.logos-marquee-row-2 {
+  animation-duration: 40s;
+  animation-direction: reverse;
+}
+
+/* Base: show marquee, hide grid */
+.logos-marquee-wrapper {
+  display: block;
+}
+.logos-grid {
+  display: none;
+}
+
+/* Reduced motion: kill animation + show static grid instead */
+@media (prefers-reduced-motion: reduce) {
+  .logos-marquee-row {
+    animation: none;
+    transform: none;
+  }
+
+  .logos-marquee-wrapper {
+    display: none;
+  }
+
+  .logos-grid {
+    display: grid;
+  }
+}
+
+@keyframes logos-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes case-ken-burns {
+  0% {
+    transform: scale(1.04) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(1.08) translate3d(0.6%, 0.6%, 0);
+  }
+  100% {
+    transform: scale(1.05) translate3d(0, 0, 0);
+  }
+}
+
+.case-ken-burns {
+  animation: case-ken-burns 18s ease-in-out infinite;
+  transform-origin: 50% 55%;
+}
+
+/* ROI numeric inputs – hide native spinners; we’ll draw our own */
+input.roi-input[type="number"] {
+  appearance: textfield;
+}
+
+input.roi-input[type="number"]::-webkit-inner-spin-button,
+input.roi-input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

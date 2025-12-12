@@ -5,9 +5,9 @@ import { AnnouncementStrip } from "../components/AnnouncementStrip";
 import { SiteFooter } from "../components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "Mayda Labs – Growth partner for digital-first brands",
+  title: "MaydaLabs – Growth partner for digital-first brands",
   description:
-    "Mayda Labs helps digital brands, SaaS, and service firms turn underperforming traffic into meetings, clients, and revenue with clean tracking, focused CRO sprints, and lifecycle systems.",
+    "MaydaLabs helps digital brands, SaaS, and service firms turn underperforming traffic into meetings, clients, and revenue with clean tracking, focused CRO sprints, and lifecycle systems.",
 };
 
 export default function RootLayout({
@@ -18,12 +18,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen text-foreground antialiased mayda-aurora-bg">
-        <div className="flex min-h-screen flex-col overflow-hidden">
+        <div className="flex min-h-screen flex-col">
+          {/* Slim status strip – scrolls away */}
           <AnnouncementStrip />
+
+          {/* Sticky main header */}
           <SiteHeader />
 
           <main className="flex-1">
-            <div className="px-4 pb-12 pt-8 sm:px-6 lg:px-10">
+            <div className="mx-auto max-w-6xl px-4 pb-12 pt-8 sm:px-6 lg:max-w-7xl lg:px-8">
               {children}
             </div>
           </main>

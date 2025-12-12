@@ -1,29 +1,33 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 type AnnouncementItem = {
-  label: string;
+  label: string; // internal key / pill text
   text: string;
-  href: string;
+  href?: string;
+  kind?: "default" | "bitcoin";
 };
 
 const ANNOUNCEMENTS: AnnouncementItem[] = [
-  {
-    label: "Fit check",
-    text: "Free 15min call. We’ll identify 2–3 quick wins.",
-    href: "https://calendly.com/", // TODO: real Calendly link
-  },
   {
     label: "ROI quickcheck",
     text: "Estimate your upside before you change anything.",
     href: "/roi-quickcheck",
   },
   {
-    label: "Bitcoin-friendly",
-    text: "Pay via Bitcoin or card. Built for modern stacks.",
+    label: "Free",
+    text: "Book a 15min fit check.",
+    href: "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=announcement-strip",
+  },
+  {
+    // label is just the key here, pill hidden
+    label: "Bitcoin",
+    text: "Accepting payments in Bitcoin.",
     href: "/pricing",
+    kind: "bitcoin",
   },
 ];
 
@@ -31,58 +35,84 @@ export function AnnouncementStrip() {
   const [index, setIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Auto-advance, but pause when hovered
+  // Auto-advance, pause on hover
   useEffect(() => {
     if (isHovered) return;
 
-    const id = setInterval(
-      () => setIndex((prev) => (prev + 1) % ANNOUNCEMENTS.length),
-      8000
-    );
+    const id = setInterval(() => {
+      setIndex((prev) => (prev + 1) % ANNOUNCEMENTS.length);
+    }, 4500);
 
     return () => clearInterval(id);
   }, [isHovered]);
 
   return (
-    <div className="border-b border-border/70 bg-background/80 text-[0.78rem] text-muted backdrop-blur">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-2 px-4 py-2 md:px-6">
-        {/* Sliding window */}
+    <div className="border-b border-slate-800/80 bg-slate-950/40 text-[0.75rem] text-slate-400 backdrop-blur">
+      <div className="mx-auto flex min-h-[34px] max-w-6xl items-center justify-center px-4 sm:px-6">
         <div
-          className="relative flex-1 overflow-hidden"
+          className="relative flex w-full max-w-2xl overflow-hidden"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
+          aria-live="polite"
         >
           <div
-            className="flex transition-transform duration-300 ease-out"
+            className="flex w-full transition-transform duration-300 ease-out"
             style={{ transform: `translateX(-${index * 100}%)` }}
           >
-            {ANNOUNCEMENTS.map((item) => (
-              <div
-                key={item.label}
-                className="flex min-w-full items-center gap-2"
-              >
-                <span className="inline-flex items-center rounded-full border border-border px-2 py-[2px] text-[0.65rem] uppercase tracking-[0.16em] text-foreground">
-                  {item.label}
-                </span>
-                <Link
-                  href={item.href}
-                  className="truncate border-b border-dotted border-slate-500/70 pb-[1px] text-muted transition-colors hover:border-transparent hover:text-foreground"
-                >
-                  {item.text}
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
+            {ANNOUNCEMENTS.map((item) => {
+              const isBitcoin = item.kind === "bitcoin";
 
-        {/* Right-side CTA */}
-        <div className="ml-auto w-full flex-shrink-0 md:ml-4 md:w-auto">
-          <Link
-            href="https://calendly.com/"
-            className="inline-flex w-full items-center justify-center rounded-full border border-mayda-teal bg-mayda-teal/10 px-3 py-1.5 text-[0.78rem] font-medium text-foreground shadow-sm hover:bg-mayda-teal/20 md:w-auto"
-          >
-            Book a 15min fit check
-          </Link>
+              const content = (
+                <div className="flex min-w-full items-center justify-center gap-3 px-2">
+                  {/* Left: pill or BTC icon */}
+                  <span className="inline-flex items-center gap-2">
+                    {!isBitcoin && (
+                      <span className="inline-flex items-center rounded-full border border-slate-700 bg-slate-900/80 px-2 py-[2px] text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-teal-200">
+                        {item.label}
+                      </span>
+                    )}
+
+                    {isBitcoin && (
+                      <span className="inline-flex h-4 w-4 items-center justify-center">
+                        <Image
+                          src="/btc-logo.png"
+                          alt="Bitcoin"
+                          width={16}
+                          height={16}
+                          className="opacity-80"
+                        />
+                      </span>
+                    )}
+                  </span>
+
+                  {/* Main text */}
+                  <span className="text-[0.78rem] font-medium text-slate-200">
+                    {item.text}
+                  </span>
+                </div>
+              );
+
+              return (
+                <div
+                  key={item.label}
+                  className="flex min-w-full justify-center"
+                >
+                  {item.href ? (
+                    <Link
+                      href={item.href}
+                      className="group inline-flex items-center justify-center hover:text-teal-200"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {content}
+                    </Link>
+                  ) : (
+                    content
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
