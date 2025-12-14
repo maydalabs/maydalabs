@@ -35,7 +35,7 @@ const brandLogos: LogoItem[] = [
 const stackLogos: LogoItem[] = [
   { name: "Shopify", src: "/logos/stack/shopify.png", alt: "Shopify" },
   { name: "WooCommerce", src: "/logos/stack/woocommerce.png", alt: "WooCommerce" },
-  { name: "Next.js", src: "/logos/stack/nextjs.png", alt: "Next.js" },
+  { name: "Next.js", src: "/logos/stack/next.png", alt: "Next.js" },
   { name: "Vercel", src: "/logos/stack/vercel.png", alt: "Vercel" },
   { name: "Supabase", src: "/logos/stack/supabase.png", alt: "Supabase" },
   { name: "AWS", src: "/logos/stack/aws.png", alt: "AWS" },
