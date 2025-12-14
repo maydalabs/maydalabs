@@ -10,7 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/about",
     "/contact",
     "/roi-quickcheck",
-    "/projects",
+    "/case-studies",
     "/playbooks",
     "/newsletter",
     "/privacy",

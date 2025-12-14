@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="space-y-16 md:space-y-20">
+    <>
       <HeroSection />
       <LogoBeltSection />
       <CaseSpotlights />
@@ -27,6 +27,6 @@ export default function HomePage() {
       <HowWeWorkSection />
       <GuaranteeRail />
       <FaqSection />
-    </div>
+    </>
   );
 }

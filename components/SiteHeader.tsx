@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 const FIT_CHECK_URL =
-  "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=header";
+  "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=discovery-call-header";
 
 // Canonical primary CTA – matches ProgramsSection
 const headerCtaClasses =
@@ -16,6 +16,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false); // mobile menu
   const [scrolled, setScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0); // 0–1
   const [openMenu, setOpenMenu] = useState<"programs" | "resources" | null>(
     null
   );
@@ -42,20 +43,26 @@ export function SiteHeader() {
     }, 180);
   };
 
-  // Scroll shadow – header is sticky on scroll
+  // Scroll shadow + background tint + progress
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 4) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
+      const y = window.scrollY;
+      const doc = document.documentElement;
+      const max =
+        doc.scrollHeight - window.innerHeight > 0
+          ? doc.scrollHeight - window.innerHeight
+          : 1;
+
+      setScrolled(y > 4);
+      setScrollProgress(Math.min(1, Math.max(0, y / max)));
     };
 
     handleScroll();
     window.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
     };
   }, []);
 
@@ -75,7 +82,7 @@ export function SiteHeader() {
     !!pathname && programsPaths.some((p) => pathname.startsWith(p));
   const isResourcesActive =
     !!pathname && resourcesPaths.some((p) => pathname.startsWith(p));
-  const isResultsActive = pathname?.startsWith("/projects");
+  const isCaseStudiesActive = pathname?.startsWith("/case-studies");
   const isAboutActive = pathname?.startsWith("/about");
   const isContactActive = pathname?.startsWith("/contact");
 
@@ -84,23 +91,23 @@ export function SiteHeader() {
 
   return (
     <header
-      className={`sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur transition-shadow ${
-        scrolled ? "shadow-[0_16px_40px_rgba(0,0,0,0.6)]" : ""
-      }`}
+      className={`sticky top-0 z-40 border-b border-slate-800/70 backdrop-blur-sm transition-shadow ${
+        scrolled || open
+          ? "bg-slate-950/75 shadow-[0_16px_40px_rgba(0,0,0,0.6)]"
+          : "bg-transparent"
+      } relative`}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:px-6 md:py-4 lg:max-w-7xl">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:px-6 md:py-4 lg:max-w-7xl lg:px-8">
         {/* Logo */}
         <Link href="/" className="group flex items-center gap-3">
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-slate-800 bg-slate-900/70 shadow-sm group-hover:border-teal-300 group-hover:shadow-[0_0_0_1px_rgba(94,234,212,0.4)]">
-            <Image
-              src="/mayda-labs-mark.svg"
-              alt="MaydaLabs mark"
-              width={24}
-              height={24}
-              className="opacity-95"
-            />
-          </span>
-          <span className="text-sm font-semibold uppercase tracking-[0.16em] text-slate-100">
+          <Image
+            src="/mayda-labs-mark.svg"
+            alt="MaydaLabs"
+            width={40}
+            height={40}
+            className="h-10 w-10 opacity-95 transition duration-150 group-hover:drop-shadow-[0_0_18px_rgba(94,234,212,0.9)]"
+          />
+          <span className="text-[0.8rem] font-semibold uppercase tracking-[0.16em] text-slate-100 md:text-sm">
             MaydaLabs
           </span>
         </Link>
@@ -174,16 +181,16 @@ export function SiteHeader() {
             )}
           </div>
 
-          {/* Results */}
+          {/* Case studies */}
           <Link
             href="/case-studies"
             className={`${desktopLinkBase} ${
-              isResultsActive
+              isCaseStudiesActive
                 ? "bg-slate-900/80 text-slate-50"
                 : "hover:bg-slate-900/60 hover:text-slate-50"
             }`}
           >
-            Case Studies
+            Case studies
           </Link>
 
           {/* Resources dropdown */}
@@ -251,7 +258,7 @@ export function SiteHeader() {
 
           {/* Header CTA */}
           <Link href={FIT_CHECK_URL} className={headerCtaClasses}>
-            Book a 15-min fit check
+            Book a discovery call
           </Link>
         </nav>
 
@@ -264,24 +271,40 @@ export function SiteHeader() {
           aria-expanded={open}
         >
           <span className="sr-only">Toggle navigation</span>
-          <span
-            className={`block h-[2px] w-4 rounded-full bg-slate-100 transition-transform ${
-              open ? "translate-y-[3px] rotate-45" : ""
-            }`}
-          />
-          <span
-            className={`block h-[2px] w-4 rounded-full bg-slate-100 transition-transform ${
-              open ? "-translate-y-[3px] -rotate-45" : "mt-[3px]"
-            }`}
-          />
+          {/* Proper 3-line hamburger → X */}
+          <span className="relative flex h-4 w-4 flex-col items-center justify-between">
+            <span
+              className={`block h-[2px] w-full rounded-full bg-slate-100 transition-transform ${
+                open ? "translate-y-[6px] rotate-45" : ""
+              }`}
+            />
+            <span
+              className={`block h-[2px] w-full rounded-full bg-slate-100 transition-all ${
+                open ? "opacity-0" : ""
+              }`}
+            />
+            <span
+              className={`block h-[2px] w-full rounded-full bg-slate-100 transition-transform ${
+                open ? "-translate-y-[6px] -rotate-45" : ""
+              }`}
+            />
+          </span>
         </button>
       </div>
 
-      {/* Mobile nav (flattened, no dropdowns) */}
+      {/* Scroll progress bar – desktop only */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-[2px] md:block">
+        <div
+          className="h-full origin-left bg-teal-400/80 transition-[transform] duration-150 ease-out"
+          style={{ transform: `scaleX(${scrollProgress})` }}
+        />
+      </div>
+
+      {/* Mobile nav (flattened) */}
       {open && (
         <nav className="border-t border-slate-800 bg-slate-950/98 px-4 pb-4 pt-2 md:hidden">
           <div className="mx-auto flex max-w-6xl flex-col gap-2 lg:max-w-7xl">
-            {/* Programs + pricing + ROI */}
+            {/* Programs */}
             <p className="mt-1 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
               Programs
             </p>
@@ -291,27 +314,6 @@ export function SiteHeader() {
               className="rounded-md px-1 py-1.5 text-sm text-slate-300 hover:bg-slate-900/70 hover:text-slate-50"
             >
               Programs overview
-            </Link>
-            <Link
-              href="/programs#baseline-scan"
-              onClick={() => setOpen(false)}
-              className="rounded-md px-1 py-1.5 text-sm text-slate-300 hover:bg-slate-900/70 hover:text-slate-50"
-            >
-              Baseline Scan
-            </Link>
-            <Link
-              href="/programs#momentum-sprint"
-              onClick={() => setOpen(false)}
-              className="rounded-md px-1 py-1.5 text-sm text-slate-300 hover:bg-slate-900/70 hover:text-slate-50"
-            >
-              Momentum Sprint
-            </Link>
-            <Link
-              href="/programs#growth-loop"
-              onClick={() => setOpen(false)}
-              className="rounded-md px-1 py-1.5 text-sm text-slate-300 hover:bg-slate-900/70 hover:text-slate-50"
-            >
-              Growth Loop
             </Link>
             <Link
               href="/pricing"
@@ -328,16 +330,16 @@ export function SiteHeader() {
               Advanced ROI Quickcheck
             </Link>
 
-            {/* Results */}
+            {/* Case studies */}
             <p className="mt-3 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
-              Results
+              Case studies
             </p>
             <Link
-              href="/projects"
+              href="/case-studies"
               onClick={() => setOpen(false)}
               className="rounded-md px-1 py-1.5 text-sm text-slate-300 hover:bg-slate-900/70 hover:text-slate-50"
             >
-              Selected projects
+              View case studies
             </Link>
 
             {/* Resources */}
@@ -384,7 +386,7 @@ export function SiteHeader() {
               onClick={() => setOpen(false)}
               className={`${headerCtaClasses} mt-3 justify-center`}
             >
-              Book a 15-min fit check
+              Book a discovery call
             </Link>
           </div>
         </nav>

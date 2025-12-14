@@ -26,6 +26,10 @@
   /* Card / elevated hints (used via Tailwind utilities where needed) */
   --surface-card: #020617;
   --surface-card-alt: #020617;
+
+  /* Approx combined height of announcement strip + header.
+     Tweak if you adjust those heights later. */
+  --chrome-height: 5.75rem;
 }
 
 /* Optional light mode override (for later) */
@@ -192,3 +196,287 @@ input.roi-input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+/* ========================= */
+/* Hero layout & animations  */
+/* ========================= */
+
+/* Hero heading */
+.hero-heading {
+  font-size: clamp(2.8rem, 3.4vw + 1rem, 4rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  color: #f9fafb;
+}
+
+/* Simple load / reveal animation for hero columns */
+.hero-fade-in-left,
+.hero-fade-in-right {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: hero-fade-up 650ms ease-out forwards;
+}
+
+.hero-fade-in-right {
+  animation-delay: 0.12s;
+}
+
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Flow arcs behind the console */
+.hero-flow-layer {
+  position: absolute;
+  inset: -32px -80px -8px;
+  pointer-events: none;
+  z-index: -10;
+}
+
+/* Base arc style */
+.hero-flow-arc {
+  position: absolute;
+  height: 2px;
+  border-radius: 999px;
+  background-image: linear-gradient(
+    90deg,
+    rgba(15, 23, 42, 0),
+    rgba(148, 163, 184, 0.25),
+    rgba(96, 164, 186, 0.7),
+    rgba(15, 23, 42, 0)
+  );
+  background-size: 220% 100%;
+  opacity: 0.35;
+  animation: hero-flow-shimmer 22s linear infinite;
+}
+
+/* Individual arcs – tuned for desktop; mobile is simplified below */
+.hero-flow-arc-1 {
+  left: -12%;
+  right: 18%;
+  top: 68%;
+  transform: translate3d(0, 0, 0) rotate(-6deg);
+  animation-duration: 26s;
+}
+
+.hero-flow-arc-2 {
+  left: -5%;
+  right: 10%;
+  top: 52%;
+  transform: translate3d(0, 0, 0) rotate(-3deg);
+  animation-duration: 22s;
+}
+
+.hero-flow-arc-3 {
+  left: 0%;
+  right: 2%;
+  top: 36%;
+  transform: translate3d(0, 0, 0) rotate(-1deg);
+  animation-duration: 19s;
+}
+
+/* Nodes that pulse on the arcs */
+.hero-flow-node {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--mayda-teal-soft);
+  box-shadow: 0 0 0 0 rgba(96, 164, 186, 0.45);
+  opacity: 0.8;
+  animation: hero-node-pulse 2.8s ease-in-out infinite;
+}
+
+.hero-flow-node::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(96, 164, 186, 0.36), transparent);
+  opacity: 0.6;
+}
+
+/* Node positions */
+.hero-flow-node-1 {
+  left: 8%;
+  top: 64%;
+  animation-delay: 0.2s;
+}
+
+.hero-flow-node-2 {
+  left: 42%;
+  top: 52%;
+  animation-delay: 0.9s;
+}
+
+.hero-flow-node-3 {
+  right: 12%;
+  top: 40%;
+  animation-delay: 1.6s;
+}
+
+/* Console “live” dot */
+.hero-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.65);
+  animation: hero-live-pulse 3s ease-out infinite;
+}
+
+/* Metric bars animate in on load */
+.hero-metric-bar,
+.hero-metric-area {
+  opacity: 0;
+  transform: scaleY(0.7) translateY(6px);
+  transform-origin: bottom;
+  animation: hero-bar-rise 700ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+.hero-metric-area {
+  animation-delay: 0.08s;
+}
+
+/* Animations */
+@keyframes hero-flow-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 120% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes hero-node-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+    box-shadow: 0 0 0 0 rgba(96, 164, 186, 0.45);
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+    box-shadow: 0 0 0 10px rgba(96, 164, 186, 0);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+    box-shadow: 0 0 0 0 rgba(96, 164, 186, 0);
+  }
+}
+
+@keyframes hero-live-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.65);
+  }
+  40% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+@keyframes hero-bar-rise {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.7) translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1) translateY(0);
+  }
+}
+
+/* Mobile adjustments for flow arcs */
+@media (max-width: 768px) {
+  .hero-flow-layer {
+    inset: -16px -32px -4px;
+  }
+
+  .hero-flow-arc-1 {
+    left: -10%;
+    right: 20%;
+    top: 60%;
+    transform: translate3d(0, 0, 0) rotate(-4deg);
+  }
+
+  .hero-flow-arc-2 {
+    left: -4%;
+    right: 8%;
+    top: 46%;
+    transform: translate3d(0, 0, 0) rotate(-2deg);
+  }
+
+  .hero-flow-arc-3 {
+    display: none;
+  }
+
+  .hero-flow-node-3 {
+    display: none;
+  }
+}
+
+/* Respect reduced motion for all hero animations */
+@media (prefers-reduced-motion: reduce) {
+  .hero-fade-in-left,
+  .hero-fade-in-right,
+  .hero-flow-arc,
+  .hero-flow-node,
+  .hero-live-dot,
+  .hero-metric-bar,
+  .hero-metric-area {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Logo belt – subtle scan line over both rails */
+.logos-scanline {
+  background: linear-gradient(
+    90deg,
+    transparent 0,
+    rgba(148, 163, 184, 0.35) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  transform: translateX(-20%);
+  animation: logos-scanline-move 5s linear infinite;
+}
+
+@keyframes logos-scanline-move {
+  0% {
+    opacity: 0;
+    transform: translateX(-20%);
+  }
+  10% {
+    opacity: 0.45;
+  }
+  40% {
+    opacity: 0.7;
+  }
+  70% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(120%);
+  }
+}
+

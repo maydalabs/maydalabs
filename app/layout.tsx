@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen text-foreground antialiased mayda-aurora-bg">
+      <body className="min-h-screen overflow-x-hidden text-foreground antialiased mayda-aurora-bg">
         <div className="flex min-h-screen flex-col">
           {/* Slim status strip – scrolls away */}
           <AnnouncementStrip />
