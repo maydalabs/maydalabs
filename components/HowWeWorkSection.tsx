@@ -16,9 +16,9 @@ const STEPS: Step[] = [
     timeframe: "Days 0–2",
     oneLiner: "Align goals, constraints, and success metrics.",
     bullets: [
-      "Baseline conversion/close rate and channel mix",
-      "Stack-ranked checklist for the first 2 weeks",
-      "Approval windows ≤48h to keep velocity"
+      "Baseline conversion / close rate and channel mix.",
+      "Stack-ranked checklist for the first 2 weeks.",
+      "Approval windows ≤48h to keep velocity."
     ]
   },
   {
@@ -27,9 +27,9 @@ const STEPS: Step[] = [
     timeframe: "Weeks 1–2",
     oneLiner: "Ship visible progress in days, not months.",
     bullets: [
-      "Foundation fixes first (speed, tracking, UX)",
-      "Quick wins across funnel steps (add-to-cart / sign-up / booking)",
-      "Weekly demo with notes + next actions"
+      "Foundation fixes first (speed, tracking, UX).",
+      "Quick wins across funnel steps (add-to-cart / sign-up / booking).",
+      "Weekly demo with notes + next actions."
     ]
   },
   {
@@ -38,20 +38,20 @@ const STEPS: Step[] = [
     timeframe: "Weeks 2–4",
     oneLiner: "Measure the lift, not the busywork.",
     bullets: [
-      "A/B micro-tests on high-leverage steps",
-      "Tracking & attribution verified end-to-end",
-      "Weekly insights report with “next bets”"
+      "A/B micro-tests on high-leverage steps.",
+      "Tracking & attribution verified end-to-end.",
+      "Weekly insights report with clear “next bets”."
     ]
   },
   {
     id: 4,
     title: "Compound",
-    timeframe: "4/8/12 Weeks",
+    timeframe: "4 / 8 / 12 weeks",
     oneLiner: "Keep the growth loop running.",
     bullets: [
-      "Lifecycle / nurture + paid testing cadence",
-      "Always-on CRO roadmap with monthly experiments",
-      "Quarterly strategy review to reset priorities"
+      "Lifecycle / nurture + paid testing cadence.",
+      "Always-on CRO roadmap with monthly experiments.",
+      "Quarterly strategy review to reset priorities."
     ]
   }
 ];
@@ -69,8 +69,8 @@ interface HowWeWorkSectionProps {
 export function HowWeWorkSection({
   id = "how-we-work",
   heading = "How we work",
-  subheading = "Plan clearly. Ship fast. Prove and compound.",
-  primaryCtaLabel = "Book a 15-min fit check",
+  subheading = "Plan clearly. Ship fast. Prove what worked, then compound.",
+  primaryCtaLabel = "Book a discovery call",
   primaryCtaHref = "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=how-we-work",
   secondaryLabel = "See which program fits",
   secondaryHref = "#programs"
@@ -83,11 +83,11 @@ export function HowWeWorkSection({
     <section
       id={id}
       aria-label={heading}
-      className="relative border-t border-slate-800 py-16 sm:py-24"
+      className="relative py-16 sm:py-24"
     >
       <div className="mx-auto flex max-w-6xl flex-col px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <header className="mx-auto mb-6 max-w-3xl text-center">
+        <header className="mx-auto mb-4 max-w-3xl text-center">
           <p className="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-slate-400">
             Delivery rhythm
           </p>
@@ -101,13 +101,13 @@ export function HowWeWorkSection({
 
         {/* Desktop rail line */}
         <div className="pointer-events-none relative hidden h-0 md:block">
-          <div className="pointer-events-none absolute left-0 right-0 top-8 mx-auto h-px max-w-6xl bg-slate-800/70" />
+          <div className="pointer-events-none absolute left-0 right-0 top-6 mx-auto h-px max-w-5xl bg-slate-800/40" />
         </div>
 
         {/* Cards grid / mobile swipe */}
         <div
           className="
-            relative mt-6
+            relative mt-4
             flex gap-4 overflow-x-auto pb-4
             text-sm text-slate-50
             md:grid md:grid-cols-4 md:gap-6 md:overflow-visible md:pb-0
@@ -126,7 +126,7 @@ export function HowWeWorkSection({
               aria-describedby={`${id}-d${step.id}`}
               className="
                 relative flex min-h-[190px] flex-[0_0_82%] flex-col gap-2
-                rounded-2xl border border-slate-800 bg-slate-950/70
+                rounded-2xl border border-slate-800/80 bg-slate-900/75
                 p-5 shadow-[0_18px_45px_rgba(2,6,23,0.8)] backdrop-blur
                 transition-transform duration-150 ease-out
                 hover:-translate-y-1 hover:border-teal-300/70 hover:shadow-[0_26px_80px_rgba(15,23,42,0.95)]
@@ -198,7 +198,7 @@ export function HowWeWorkSection({
           {secondaryHref && (
             <a
               href={secondaryHref}
-              className="text-xs font-medium text-slate-300 underline underline-offset-4 decoration-teal-400/80 hover:text-teal-300"
+              className="text-xs font-medium text-slate-300 underline-offset-4 hover:underline hover:text-teal-300"
             >
               {secondaryLabel}
             </a>

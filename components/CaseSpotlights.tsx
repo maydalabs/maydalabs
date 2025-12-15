@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { primaryCtaClasses } from "@/components/ProgramsSection";
 
@@ -22,35 +23,10 @@ type CaseSlide = {
   imageMobile?: string;
 };
 
+const DISCOVERY_CALL_URL =
+  "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=discovery-call";
+
 const SLIDES: CaseSlide[] = [
-  {
-    id: "bitcredit",
-    label: "Case spotlight",
-    client: "Bitcredit Protocol",
-    headline: "Trade finance that clears in Bitcoin.",
-    summary:
-      "We helped Bitcredit turn a complex BTC-settled trade-finance flow into something exporters and lenders actually want to use.",
-    kpis: [
-      { value: "+21%", label: "avg margin per deal" },
-      { value: "–13d", label: "time-to-cash vs baseline" },
-      { value: "$3.4m", label: "BTC-settled pipeline / 90d" },
-    ],
-    quote:
-      "This finally feels like a product, not a collection of experiments glued together.",
-    quoteAuthor: "Co-founder, Bitcredit",
-    primaryCta: {
-      label: "Book a 15min fit check",
-      href: "https://calendly.com/emayda/15min",
-    },
-    secondaryCta: {
-      label: "Read full case",
-      href: "/cases/bitcredit",
-    },
-    cardSide: "right",
-    overlayOpacity: 0.7,
-    imageDesktop: "/images/cases/bitcredit-desktop.jpg",
-    imageMobile: "/images/cases/bitcredit-mobile.jpg",
-  },
   {
     id: "airbtc",
     label: "Case spotlight",
@@ -67,11 +43,11 @@ const SLIDES: CaseSlide[] = [
       "They didn’t just design screens—they shipped a booking flow we can actually grow on.",
     quoteAuthor: "Founder, AirBTC",
     primaryCta: {
-      label: "Book a 15min fit check",
-      href: "https://calendly.com/emayda/15min",
+      label: "Book a discovery call",
+      href: DISCOVERY_CALL_URL,
     },
     secondaryCta: {
-      label: "Read full case",
+      label: "View case",
       href: "/cases/airbtc",
     },
     cardSide: "left",
@@ -80,60 +56,85 @@ const SLIDES: CaseSlide[] = [
     imageMobile: "/images/cases/airbtc-mobile.jpg",
   },
   {
-    id: "aryaminer",
+    id: "satoshi-gazette",
     label: "Case spotlight",
-    client: "AryaMiner",
-    headline: "Launches that don’t die after Black Friday.",
+    client: "Satoshi Gazette",
+    headline: "Bitcoin news desk built like a product.",
     summary:
-      "We rebuilt AryaMiner’s promo engine around clean tracking, segmented campaigns, and reusable launch playbooks.",
+      "Editorial consoles, submission flows, and internal tools for a Bitcoin-only news desk.",
     kpis: [
-      { value: "5.2x", label: "BF/CM revenue vs prior year" },
-      { value: "70k+", label: "email subs re-activated" },
-      { value: "+62%", label: "paid traffic ROAS" },
+      { value: "4", label: "operator consoles" },
+      { value: "3", label: "submission paths" },
+      { value: "1", label: "internal assistant" },
     ],
-    quote:
-      "For the first time we know what actually moved the needle instead of guessing.",
-    quoteAuthor: "Head of Marketing, AryaMiner",
+    quote: "Feels like an internal tool we actually want to use every day.",
+    quoteAuthor: "Editorial lead, Satoshi Gazette",
     primaryCta: {
-      label: "Book a 15min fit check",
-      href: "https://calendly.com/emayda/15min",
+      label: "Book a discovery call",
+      href: DISCOVERY_CALL_URL,
     },
     secondaryCta: {
-      label: "Read full case",
-      href: "/cases/aryaminer",
+      label: "View case",
+      href: "/cases/satoshi-gazette",
     },
     cardSide: "right",
     overlayOpacity: 0.7,
-    imageDesktop: "/images/cases/aryaminer-desktop.jpg",
-    imageMobile: "/images/cases/aryaminer-mobile.jpg",
+    imageDesktop: "/images/cases/satoshi-gazette-desktop.jpg",
+    imageMobile: "/images/cases/satoshi-gazette-mobile.jpg",
   },
   {
-    id: "lifecycle-stack",
+    id: "coin-mining-central",
     label: "Case spotlight",
-    client: "Lifecycle Stack",
-    headline: "Lifecycle that compounds instead of nags.",
+    client: "Coin Mining Central",
+    headline: "High-ticket hardware flows that don’t stall out.",
     summary:
-      "We designed and implemented a full lifecycle system—onboarding, winbacks, replenishment, and VIP—tracked back to revenue.",
+      "Tightened the ASIC buyer journey from price discovery to structured enquiry and follow-up.",
     kpis: [
-      { value: "+19%", label: "repeat purchase rate / 90d" },
-      { value: "+28%", label: "email-attributed revenue" },
-      { value: "12", label: "live journeys in production" },
+      { value: "End-to-end", label: "quote → order flow" },
+      { value: "Structured", label: "ASIC product specs" },
+      { value: "Playbooks", label: "for high-ticket leads" },
     ],
-    quote:
-      "Churn finally moved. Customers upgrade instead of quietly drifting away.",
-    quoteAuthor: "VP Growth, DTC brand",
+    quote: "The sales flow finally matched the size and complexity of what we sell.",
+    quoteAuthor: "Director, Coin Mining Central",
     primaryCta: {
-      label: "Book a 15min fit check",
-      href: "https://calendly.com/emayda/15min",
+      label: "Book a discovery call",
+      href: DISCOVERY_CALL_URL,
     },
     secondaryCta: {
-      label: "Read full case",
-      href: "/cases/lifecycle-stack",
+      label: "View case",
+      href: "/cases/coin-mining-central",
     },
     cardSide: "left",
-    overlayOpacity: 0.6,
-    imageDesktop: "/images/cases/lifecycle-desktop.jpg",
-    imageMobile: "/images/cases/lifecycle-mobile.jpg",
+    overlayOpacity: 0.7,
+    imageDesktop: "/images/cases/coin-mining-central-desktop.jpg",
+    imageMobile: "/images/cases/coin-mining-central-mobile.jpg",
+  },
+  {
+    id: "independent-check",
+    label: "Case spotlight",
+    client: "Independent Check",
+    headline: "Due-diligence that behaves like a product.",
+    summary:
+      "Structured intake, report workflows, and lifecycle touchpoints around each independent check.",
+    kpis: [
+      { value: "Structured", label: "intake + briefs" },
+      { value: "Single", label: "console for checks" },
+      { value: "Repeatable", label: "follow-up sequences" },
+    ],
+    quote: "The process feels like a product, not one-off consulting.",
+    quoteAuthor: "Founder, Independent Check",
+    primaryCta: {
+      label: "Book a discovery call",
+      href: DISCOVERY_CALL_URL,
+    },
+    secondaryCta: {
+      label: "View case",
+      href: "/cases/independent-check",
+    },
+    cardSide: "right",
+    overlayOpacity: 0.65,
+    imageDesktop: "/images/cases/independent-check-desktop.jpg",
+    imageMobile: "/images/cases/independent-check-mobile.jpg",
   },
 ];
 
@@ -215,17 +216,17 @@ export function CaseSpotlights() {
       aria-label="Case spotlights"
       className="relative"
     >
-      {/* Kicker aligned with main container */}
-      <div className="mx-auto flex max-w-6xl items-center justify-center px-4 pt-8 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-muted">
+      {/* Kicker aligned with main container – match hero style */}
+      <div className="mx-auto flex max-w-6xl items-center justify-center px-4 pt-4 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-slate-400">
         Selected work
       </div>
 
-      {/* Full-bleed, full-height stage – no section bg, just images + scrim */}
+      {/* Full-bleed, full-height stage (no extra bg, images do the work) */}
       <div
         ref={stageRef}
-        className="relative left-1/2 mt-4 w-screen -translate-x-1/2 overflow-hidden"
+        className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden"
         style={{
-          minHeight: "100vh",
+          minHeight: "calc(100vh - var(--chrome-height))",
         }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -261,7 +262,7 @@ export function CaseSpotlights() {
                 isActive ? "opacity-100" : "pointer-events-none opacity-0"
               }`}
             >
-              {/* Background image */}
+              {/* Background image – full bleed with Ken Burns */}
               <div className="absolute inset-0">
                 <div className="absolute inset-0">
                   <Image
@@ -303,7 +304,7 @@ export function CaseSpotlights() {
                     <p className="mb-1 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-mayda-teal-soft">
                       {slide.label}
                     </p>
-                    <p className="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-muted">
+                    <p className="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted">
                       {slide.client}
                     </p>
                     <h2 className="text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl md:text-[32px] md:leading-snug">
@@ -344,7 +345,7 @@ export function CaseSpotlights() {
                       </figure>
                     )}
 
-                    {/* CTAs */}
+                    {/* CTAs – hero-consistent primary label */}
                     <div className="mt-5 flex flex-wrap gap-3">
                       <a
                         href={slide.primaryCta.href}

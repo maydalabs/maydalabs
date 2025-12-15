@@ -15,7 +15,7 @@ declare global {
   }
 }
 
-type TierId = "momentum" | "foundation" | "scale";
+type TierId = "baseline-scan" | "momentum-sprint" | "growth-loop";
 
 type Tier = {
   id: TierId;
@@ -35,64 +35,62 @@ type Tier = {
 
 const TIERS: Tier[] = [
   {
-    id: "foundation",
+    id: "baseline-scan",
     name: "Baseline Scan",
     price: "$3,900",
-    oneLiner: "Audit your flows, stack, and data before you touch anything.",
+    oneLiner: "Audit your flows, stack, and data before changing anything.",
     bestFor:
-      "Teams that want a fast, objective read on what’s slowing conversion down.",
+      "Teams that want an objective read on what’s slowing conversion down.",
     timeline: "2–3 weeks",
     tag: "Diagnostic + roadmap",
     bullets: [
-      "Performance and UX scan across key flows (home, PDP/LP, checkout, booking).",
-      "Tracking and analytics audit so numbers match reality (events, pixels, GA4).",
-      "Prioritized roadmap showing where to start and what to ignore."
+      "Performance + UX scan across key flows (home, PDP/LP, checkout, booking).",
+      "Analytics + tracking verified so events, pixels, and GA4 match reality.",
+      "Prioritized roadmap: what to fix first, what to ignore."
     ],
-    outcome:
-      "A clear, prioritized roadmap so you stop guessing and know where to push first.",
+    outcome: "Leave with a clear, ranked plan instead of a vague audit.",
     proof: "Core Web Vitals green across key templates.",
     secondaryLabel: "View Baseline Scan",
     secondaryHref: "/programs#baseline-scan"
   },
   {
-    id: "momentum",
+    id: "momentum-sprint",
     name: "Momentum Sprint",
     price: "$2,900",
     badge: "Most teams start here",
     oneLiner: "Fix conversion bottlenecks and ship measurable wins fast.",
     bestFor:
-      "Teams with steady traffic but weak conversion (≈1–3%) from UX, speed, or data issues.",
+      "Brands with traffic but weak conversion (≈1–3%) from UX, speed, or data gaps.",
     timeline: "3–4 weeks",
     tag: "CRO & UX sprint",
     bullets: [
-      "Turn Baseline Scan insights into 8–12 concrete fixes across key flows.",
+      "Turn Baseline Scan findings into 8–12 specific fixes.",
       "Remove friction in pricing, forms, checkout, and booking steps.",
-      "Speed-tune key pages: scripts, assets, and layout shifts under control.",
-      "Focused A/B tests on the highest-impact steps only."
+      "Speed-tune key pages so they load fast and feel lighter.",
+      "Run focused A/Bs on the few steps that actually move revenue."
     ],
-    outcome:
-      "A tested CRO playbook and a batch of measurable wins in under a month.",
+    outcome: "Leave with a tested CRO playbook and shipped wins in <4 weeks.",
     proof: "+24% add-to-cart in 30 days.",
     secondaryLabel: "View Momentum Sprint",
     secondaryHref: "/programs#momentum-sprint"
   },
   {
-    id: "scale",
+    id: "growth-loop",
     name: "Growth Loop",
     price: "$3,900/mo",
-    oneLiner: "Compounding growth with lifecycle, paid, and always-on CRO.",
+    oneLiner: "Compound growth across lifecycle, paid, and CRO.",
     bestFor:
       "Teams doing ~$50k+/mo who want LTV lift and cleaner CAC, not random spikes.",
     timeline: "10–12 weeks min.",
     tag: "Ongoing growth system",
     bullets: [
-      "Lifecycle flows that compound retention and revenue (abandon, onboard, win-back, VIP).",
-      "2–3 clean experiments/month across pricing, pages, offers, and funnel steps.",
-      "Paid social/search sprints with tight creative ↔ landing sync and attribution.",
-      "Monthly CRO cadence so tests and learnings don’t stall after launch."
+      "Lifecycle flows that stack retention (abandon, onboard, win-back, VIP).",
+      "2–3 structured experiments/month across offers, pages, and funnel steps.",
+      "Paid social/search sprints with clean creative ↔ landing sync.",
+      "Monthly CRO + analytics cadence so momentum doesn’t stall."
     ],
     outcome:
-      "A 90-day growth operating system with ongoing, measurable tests and lifecycle touchpoints.",
+      "Leave with a 90-day growth operating rhythm, not one-off campaigns.",
     proof: "+9% AOV in 30 days.",
     secondaryLabel: "View Growth Loop",
     secondaryHref: "/programs#growth-loop"
@@ -102,60 +100,58 @@ const TIERS: Tier[] = [
 type FeatureRow = {
   label: string;
   momentum: boolean;
-  foundation: boolean;
-  scale: boolean;
+  baseline: boolean;
+  growthLoop: boolean;
 };
 
 const FEATURES: FeatureRow[] = [
   {
     label: "Performance pass (Core Web Vitals on key pages)",
     momentum: true,
-    foundation: true,
-    scale: false
+    baseline: true,
+    growthLoop: false
   },
   {
     label: "Checkout / billing / booking configured right",
     momentum: false,
-    foundation: true,
-    scale: true
+    baseline: true,
+    growthLoop: true
   },
   {
     label: "CRO/UX audit → prioritized quick-win backlog",
     momentum: true,
-    foundation: true,
-    scale: true
+    baseline: true,
+    growthLoop: true
   },
   {
     label: "A/B micro-tests on high-impact steps",
     momentum: true,
-    foundation: false,
-    scale: true
+    baseline: false,
+    growthLoop: true
   },
   {
-    label:
-      "Lifecycle baseline (abandon, onboard, post-purchase / win-back)",
+    label: "Lifecycle baseline (abandon, onboard, post-purchase / win-back)",
     momentum: false,
-    foundation: false,
-    scale: true
+    baseline: false,
+    growthLoop: true
   },
   {
     label: "Paid test sprints (creative + landing sync)",
     momentum: false,
-    foundation: false,
-    scale: true
+    baseline: false,
+    growthLoop: true
   },
   {
-    label:
-      "Analytics verified end-to-end (GA4, pixels, CRM/ads)",
+    label: "Analytics verified end-to-end (GA4, pixels, CRM/ads)",
     momentum: true,
-    foundation: true,
-    scale: true
+    baseline: true,
+    growthLoop: true
   },
   {
     label: "Owner docs + launch checklist",
     momentum: false,
-    foundation: true,
-    scale: false
+    baseline: true,
+    growthLoop: false
   }
 ];
 
@@ -178,9 +174,9 @@ const ADDONS: Addon[] = [
 
 // Same icon set as ProgramsSection (smaller, inline)
 const tierIconSrc: Record<TierId, string> = {
-  momentum: "/icons/momentum.svg",
-  foundation: "/icons/foundation.svg",
-  scale: "/icons/scale.svg"
+  "baseline-scan": "/icons/program-baseline-scan.svg",
+  "momentum-sprint": "/icons/program-momentum-sprint.svg",
+  "growth-loop": "/icons/program-growth-loop.svg"
 };
 
 function trackPricingEvent(payload: Record<string, unknown>) {
@@ -189,8 +185,12 @@ function trackPricingEvent(payload: Record<string, unknown>) {
   window.dataLayer.push(payload);
 }
 
-// Desktop order: Baseline – Momentum – Growth (Momentum in the middle)
-const desktopTierOrder: TierId[] = ["foundation", "momentum", "scale"];
+// Desktop order: Baseline Scan – Momentum Sprint – Growth Loop
+const desktopTierOrder: TierId[] = [
+  "baseline-scan",
+  "momentum-sprint",
+  "growth-loop"
+];
 
 const tiersById: Record<TierId, Tier> = TIERS.reduce((acc, tier) => {
   acc[tier.id] = tier;
@@ -207,23 +207,19 @@ export function PricingSection() {
   };
 
   return (
-    <section
-      id="pricing"
-      aria-label="Pricing"
-      className="border-t border-slate-800/70 py-16 sm:py-24"
-    >
+    <section id="pricing" aria-label="Pricing" className="py-16 sm:py-24">
       <div className="mx-auto flex w-full max-w-6xl flex-col px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <header className="mx-auto max-w-2xl text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-400">
+          <p className="text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-slate-400">
             Transparent, fixed scopes
           </p>
           <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">
             Simple, outcome-focused pricing.
           </h2>
           <p className="mt-3 text-balance text-sm text-slate-300 sm:text-base">
-            Choose a diagnostic, a sprint, or an ongoing growth loop. Clear
-            scopes, no surprise retainers.
+            Pick a diagnostic, a sprint, or a growth loop. Clear scopes, no
+            surprise retainers.
           </p>
         </header>
 
@@ -233,7 +229,7 @@ export function PricingSection() {
             <PricingCard
               key={id}
               tier={tiersById[id]}
-              isFeatured={id === "momentum"}
+              isFeatured={id === "momentum-sprint"}
             />
           ))}
         </div>
@@ -242,7 +238,10 @@ export function PricingSection() {
         <div className="mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 md:hidden">
           {TIERS.map((tier) => (
             <div key={tier.id} className="min-w-[85%] snap-center">
-              <PricingCard tier={tier} isFeatured={tier.id === "momentum"} />
+              <PricingCard
+                tier={tier}
+                isFeatured={tier.id === "momentum-sprint"}
+              />
             </div>
           ))}
         </div>
@@ -271,29 +270,29 @@ export function PricingSection() {
           </button>
         </div>
 
-        {/* Inclusions table */}
+        {/* Inclusions table (collapsed by default) */}
         {openPanel === "inclusions" && (
           <div className="mt-4 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/80 shadow-[0_18px_45px_rgba(2,6,23,0.7)]">
             <div className="grid grid-cols-4 border-b border-slate-800 bg-slate-950/80 text-[12px] font-semibold text-slate-100">
-              <div className="px-3 py-2 text-left">Inclusions</div>
-              <div className="px-3 py-2 text-center">Baseline Scan</div>
-              <div className="px-3 py-2 text-center">Momentum Sprint</div>
-              <div className="px-3 py-2 text-center">Growth Loop</div>
+              <div className="px-3 py-1.5 text-left">Inclusions</div>
+              <div className="px-3 py-1.5 text-center">Baseline Scan</div>
+              <div className="px-3 py-1.5 text-center">Momentum Sprint</div>
+              <div className="px-3 py-1.5 text-center">Growth Loop</div>
             </div>
             <div className="grid grid-cols-4 text-[12px] text-slate-300">
               {FEATURES.map((row) => (
                 <React.Fragment key={row.label}>
-                  <div className="border-t border-slate-800 bg-slate-950/80 px-3 py-2 font-medium text-slate-100">
+                  <div className="border-t border-slate-800 bg-slate-950/80 px-3 py-1.5 font-medium text-slate-100">
                     {row.label}
                   </div>
-                  <div className="border-t border-slate-800 px-3 py-2 text-center">
-                    {row.foundation ? "✓" : "—"}
+                  <div className="border-t border-slate-800 px-3 py-1.5 text-center">
+                    {row.baseline ? "✓" : "—"}
                   </div>
-                  <div className="border-t border-slate-800 px-3 py-2 text-center">
+                  <div className="border-t border-slate-800 px-3 py-1.5 text-center">
                     {row.momentum ? "✓" : "—"}
                   </div>
-                  <div className="border-t border-slate-800 px-3 py-2 text-center">
-                    {row.scale ? "✓" : "—"}
+                  <div className="border-t border-slate-800 px-3 py-1.5 text-center">
+                    {row.growthLoop ? "✓" : "—"}
                   </div>
                 </React.Fragment>
               ))}
@@ -316,7 +315,7 @@ export function PricingSection() {
                   {addon.href ? (
                     <Link
                       href={addon.href}
-                      className="flex h-full flex-col items-center justify-center gap-1 px-6 py-4 text-center text-sm font-semibold text-slate-50"
+                      className="flex h-full flex-col items-center justify-center gap-1 px-5 py-3 text-center text-sm font-semibold text-slate-50"
                       onClick={() =>
                         trackPricingEvent({
                           event: "addon_click",
@@ -331,7 +330,7 @@ export function PricingSection() {
                       </span>
                     </Link>
                   ) : (
-                    <div className="flex h-full flex-col items-center justify-center gap-1 px-6 py-4 text-center text-sm font-semibold text-slate-50">
+                    <div className="flex h-full flex-col items-center justify-center gap-1 px-5 py-3 text-center text-sm font-semibold text-slate-50">
                       <span>{addon.title}</span>
                       <span className="mt-1 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-medium text-slate-400">
                         {addon.note}
@@ -361,8 +360,11 @@ export function PricingSection() {
               })
             }
           >
-            Not sure where to start? Book a 15-min fit check—Free
+            Not sure where to start? Book a 15-min discovery call—Free
           </Link>
+          <p className="mt-1 text-[11px] font-semibold text-slate-500">
+            Kickoff in 7 days or we comp your first week.
+          </p>
         </div>
       </div>
     </section>
@@ -377,20 +379,20 @@ function TierIcon({
   isFeatured?: boolean;
 }) {
   const gradient =
-    id === "momentum"
+    id === "momentum-sprint"
       ? "from-emerald-400 via-emerald-300 to-teal-200"
-      : id === "foundation"
+      : id === "baseline-scan"
       ? "from-sky-400 via-cyan-300 to-teal-200"
       : "from-indigo-400 via-violet-400 to-fuchsia-300";
 
   const src = tierIconSrc[id];
 
   const alt =
-    id === "momentum"
-      ? "Momentum program icon"
-      : id === "foundation"
-      ? "Foundation program icon"
-      : "Scale program icon";
+    id === "momentum-sprint"
+      ? "Momentum Sprint program icon"
+      : id === "baseline-scan"
+      ? "Baseline Scan program icon"
+      : "Growth Loop program icon";
 
   const maskStyle: CSSProperties = {
     WebkitMaskImage: `url(${src})`,
@@ -406,7 +408,7 @@ function TierIcon({
   const sizeClasses = "h-6 w-6";
 
   const featuredGlow =
-    isFeatured && id === "momentum"
+    isFeatured && id === "momentum-sprint"
       ? "md:drop-shadow-[0_0_14px_rgba(34,211,238,0.55)]"
       : "";
 
@@ -520,7 +522,7 @@ function PricingCard({
             })
           }
         >
-          Book a 15-min fit check
+          Book a discovery call
         </Link>
 
         {tier.secondaryHref && tier.secondaryLabel && (
@@ -532,11 +534,6 @@ function PricingCard({
           </Link>
         )}
       </div>
-
-      {/* Risk note */}
-      <p className="mt-3 text-center text-[11px] font-semibold text-slate-500">
-        Kickoff in 7 days or we comp your first week.
-      </p>
     </article>
   );
 }

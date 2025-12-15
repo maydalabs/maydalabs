@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 
-type ProgramId = "momentum" | "foundation" | "scale";
+type ProgramId = "baseline-scan" | "momentum-sprint" | "growth-loop";
 
 type Program = {
   id: ProgramId;
@@ -22,41 +22,41 @@ const baseFitCheckUrl =
 
 const programs: Program[] = [
   {
-    id: "foundation",
+    id: "baseline-scan",
     name: "Baseline Scan",
-    oneLiner: "Audit your flows, stack, and data before you touch anything.",
+    oneLiner: "Audit flows, stack, and data before scaling spend.",
     bestFor:
-      "Teams that want a fast, objective read on what’s slowing conversion down.",
+      "Teams that want an objective map of what’s slowing conversion down.",
     chips: ["2–3 weeks", "Diagnostic + roadmap"],
     price: "$3,900",
     bullets: [
-      "Performance and UX scan across key flows (home, PDP/LP, checkout, booking).",
-      "Tracking and analytics audit so numbers match reality (events, pixels, GA4).",
-      "Prioritized roadmap showing where to start and what to ignore."
+      "Review key funnels end-to-end (home, PDP/LP, checkout, booking).",
+      "Fix tracking so events, pixels, and GA4 match reality.",
+      "Deliver a prioritized roadmap of what to fix first and what to ignore."
     ],
     detailsHref: "/programs#baseline-scan",
     fitCheckHref: `${baseFitCheckUrl}Baseline+Scan`
   },
   {
-    id: "momentum",
+    id: "momentum-sprint",
     name: "Momentum Sprint",
     badge: "Most teams start here",
     oneLiner: "Fix conversion bottlenecks and ship measurable wins fast.",
-    bestFor:
-      "Teams with traffic but weak conversion (≈1–3%) because of UX, speed, or data issues.",
+    bestFor: "Teams with traffic but weak conversion (≈1–3%).",
     chips: ["3–4 weeks", "CRO & UX sprint"],
     price: "$2,900",
     bullets: [
-      "Remove friction in key flows (pricing, forms, booking, checkout).",
-      "Streamline assets/scripts for lighter, faster key pages.",
-      "Verify tracking and run focused A/Bs on high-impact steps."
+      "Remove friction in high-intent flows (pricing, forms, booking, checkout).",
+      "Lighten pages and scripts for faster, cleaner experiences.",
+      "Run focused A/Bs on the 2–3 highest-impact steps."
     ],
     detailsHref: "/programs#momentum-sprint",
     fitCheckHref: `${baseFitCheckUrl}Momentum+Sprint`,
-    tagline: "Most teams start with a Momentum Sprint, then graduate into Growth Loop."
+    tagline:
+      "Most teams start with a Momentum Sprint, then graduate into Growth Loop."
   },
   {
-    id: "scale",
+    id: "growth-loop",
     name: "Growth Loop",
     oneLiner: "Turn growth into a repeatable operating system.",
     bestFor:
@@ -66,7 +66,7 @@ const programs: Program[] = [
     bullets: [
       "Automate lifecycle flows that compound retention and revenue.",
       "Run structured paid + creative tests with clean attribution.",
-      "Keep a monthly CRO + analytics cadence that compounds over time."
+      "Keep a monthly CRO + analytics cadence so compounding doesn’t stall."
     ],
     detailsHref: "/programs#growth-loop",
     fitCheckHref: `${baseFitCheckUrl}Growth+Loop`
@@ -79,13 +79,17 @@ export const primaryCtaClasses =
 
 // Icons under /public/icons/*.svg (solid black glyphs)
 const programIconSrc: Record<ProgramId, string> = {
-  momentum: "/icons/momentum.svg",
-  foundation: "/icons/foundation.svg",
-  scale: "/icons/scale.svg"
+  "baseline-scan": "/icons/baseline-scan.svg",
+  "momentum-sprint": "/icons/momentum-sprint.svg",
+  "growth-loop": "/icons/growth-loop.svg"
 };
 
 // Desktop order: Baseline Scan – Momentum Sprint – Growth Loop (Momentum in the middle)
-const desktopProgramOrder: ProgramId[] = ["foundation", "momentum", "scale"];
+const desktopProgramOrder: ProgramId[] = [
+  "baseline-scan",
+  "momentum-sprint",
+  "growth-loop"
+];
 
 // Helper: index programs by id for ordering
 const programsById: Record<ProgramId, Program> = programs.reduce(
@@ -101,77 +105,76 @@ export function ProgramsSection() {
     <section
       id="programs"
       aria-label="Programs"
-      className="flex min-h-screen items-center py-16 sm:py-24"
+      className="flex items-center pb-16 pt-16 sm:pb-20 sm:pt-20 lg:min-h-[calc(100vh-var(--chrome-height))]"
     >
       <div className="mx-auto flex w-full max-w-6xl flex-col px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <header className="mx-auto max-w-3xl text-center">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+          <p className="mb-3 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-slate-400">
             Ways to grow
           </p>
           <h2 className="text-balance text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">
             Pick your starting point.
           </h2>
           <p className="mt-3 text-sm font-medium leading-relaxed text-slate-300 sm:text-base">
-            Baseline Scan shows you where you&apos;re leaking. Momentum Sprint fixes
-            the biggest bottlenecks. Growth Loop turns wins into a repeatable
-            system across lifecycle, paid, and CRO.
+            Three ways to work together: a fast audit, a focused sprint, or an
+            operating system.
           </p>
           <p className="mt-2 text-xs font-medium text-slate-400 sm:text-sm">
-            Most teams run a Momentum Sprint first, then evolve into Growth Loop.
+            Most teams start with Momentum Sprint, then evolve into Growth Loop.
           </p>
         </header>
 
         {/* Desktop / tablet grid */}
-        <div className="mt-10 hidden gap-6 md:grid md:grid-cols-3">
+        <div className="mt-8 hidden gap-6 md:grid md:grid-cols-3">
           {desktopProgramOrder.map((id) => (
             <ProgramCard
               key={id}
               program={programsById[id]}
-              isFeatured={id === "momentum"}
+              isFeatured={id === "momentum-sprint"}
             />
           ))}
         </div>
 
         {/* Mobile swipe deck (Momentum first in data order) */}
-        <div className="mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 md:hidden">
+        <div className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 md:hidden">
           {programs.map((program) => (
             <div key={program.id} className="min-w-[85%] snap-center">
               <ProgramCard
                 program={program}
-                isFeatured={program.id === "momentum"}
+                isFeatured={program.id === "momentum-sprint"}
               />
             </div>
           ))}
         </div>
 
-        {/* Bridge fit-check strip */}
-        <div className="mt-10 rounded-2xl border border-slate-800 bg-slate-900/70 px-4 py-4 text-sm text-slate-200 shadow-[0_18px_45px_rgba(2,6,23,0.7)] backdrop-blur sm:px-6 sm:py-5">
+        {/* Bridge discovery-call strip */}
+        <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/70 px-4 py-3 text-sm text-slate-200 shadow-[0_18px_45px_rgba(2,6,23,0.7)] backdrop-blur sm:px-6 sm:py-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1 text-center sm:text-left">
               <p className="font-medium text-slate-50">
-                Not sure which program fits?
+                Not sure where to start?
               </p>
               <p className="text-sm text-slate-300">
-                Book a 15-min fit check and we&apos;ll recommend a starting point — most teams
-                start with a Momentum Sprint.
+                Book a short discovery call and we&apos;ll recommend a program.
+                Most teams start with Momentum Sprint.
               </p>
             </div>
             <div className="flex justify-center sm:justify-end">
               <a
-                href="https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=fit-check&utm_content=programs-section"
+                href="https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=discovery-call&utm_content=programs-section"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={primaryCtaClasses}
               >
-                Book a 15-min fit check
+                Book a discovery call
               </a>
             </div>
           </div>
         </div>
 
         <p className="mt-3 text-center text-[0.78rem] font-medium uppercase tracking-[0.18em] text-slate-500">
-          Kickoff in 7 days or we comp your first week.
+          Kickoff within 7 days or the first week is on us.
         </p>
       </div>
     </section>
@@ -186,7 +189,7 @@ function ProgramCard({
   isFeatured?: boolean;
 }) {
   const baseCardClasses =
-    "group flex h-full flex-col rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_18px_45px_rgba(2,6,23,0.65)] backdrop-blur-md transition-transform duration-150 hover:-translate-y-1 hover:border-teal-300/60 hover:shadow-[0_26px_70px_rgba(15,23,42,0.9)]";
+    "group flex h-full flex-col rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-[0_18px_45px_rgba(2,6,23,0.65)] backdrop-blur-md transition-transform duration-150 hover:-translate-y-1 hover:border-teal-300/60 hover:shadow-[0_26px_70px_rgba(15,23,42,0.9)] sm:p-6";
 
   const featuredClasses =
     "md:scale-[1.03] md:border-teal-400/80 md:bg-slate-900/90 md:shadow-[0_26px_80px_rgba(15,23,42,0.95)]";
@@ -210,7 +213,7 @@ function ProgramCard({
       </div>
 
       {/* Icon + title */}
-      <div className="mt-5 flex flex-col items-center text-center">
+      <div className="mt-4 flex flex-col items-center text-center sm:mt-5">
         <ProgramIcon id={program.id} isFeatured={isFeatured} />
         <h3 className="mt-4 text-lg font-semibold tracking-tight text-slate-50 sm:text-xl">
           {program.name}
@@ -224,13 +227,11 @@ function ProgramCard({
           <span className="font-semibold uppercase tracking-[0.16em] text-slate-400">
             Best for
           </span>{" "}
-          <span className="font-medium text-slate-300">
-            {program.bestFor}
-          </span>
+          <span className="font-medium text-slate-300">{program.bestFor}</span>
         </p>
 
         {/* Chips */}
-        <ul className="mt-4 flex flex-wrap items-center justify-center gap-2 text-[0.78rem]">
+        <ul className="mt-3 flex flex-wrap items-center justify-center gap-2 text-[0.78rem]">
           {program.chips.map((chip) => (
             <li
               key={chip}
@@ -250,7 +251,7 @@ function ProgramCard({
       </div>
 
       {/* Bullets */}
-      <ul className="mt-5 space-y-2 text-left text-sm leading-relaxed text-slate-300">
+      <ul className="mt-4 space-y-2 text-left text-sm leading-relaxed text-slate-300 sm:mt-5">
         {program.bullets.map((item) => (
           <li key={item} className="flex gap-2">
             <span className="mt-1 inline-flex h-4 w-4 flex-none items-center justify-center rounded-full bg-emerald-500/12 text-[0.6rem] text-emerald-300">
@@ -262,14 +263,14 @@ function ProgramCard({
       </ul>
 
       {/* CTAs */}
-      <div className="mt-6 flex flex-col items-center gap-2">
+      <div className="mt-5 flex flex-col items-center gap-2 sm:mt-6">
         <Link
           href={program.fitCheckHref}
           target="_blank"
           rel="noopener noreferrer"
           className={primaryCtaClasses + " w-full sm:w-auto"}
         >
-          Book a 15-min fit check
+          Book a discovery call
         </Link>
         <Link
           href={program.detailsHref}
@@ -291,18 +292,18 @@ function ProgramIcon({
   isFeatured?: boolean;
 }) {
   const gradient =
-    id === "momentum"
+    id === "momentum-sprint"
       ? "from-emerald-400 via-emerald-300 to-teal-200"
-      : id === "foundation"
+      : id === "baseline-scan"
       ? "from-sky-400 via-cyan-300 to-teal-200"
       : "from-indigo-400 via-violet-400 to-fuchsia-300";
 
   const src = programIconSrc[id];
 
   const alt =
-    id === "momentum"
+    id === "momentum-sprint"
       ? "Momentum Sprint icon"
-      : id === "foundation"
+      : id === "baseline-scan"
       ? "Baseline Scan icon"
       : "Growth Loop icon";
 
@@ -317,14 +318,11 @@ function ProgramIcon({
     maskPosition: "center"
   };
 
-  // Momentum + Baseline slightly scaled up to visually match Growth Loop
   const sizeClasses =
-    id === "scale"
-      ? "h-12 w-12"
-      : "h-12 w-12 transform scale-110";
+    id === "growth-loop" ? "h-12 w-12" : "h-12 w-12 transform scale-110";
 
   const featuredGlow =
-    isFeatured && id === "momentum"
+    isFeatured && id === "momentum-sprint"
       ? "md:drop-shadow-[0_0_18px_rgba(34,211,238,0.55)]"
       : "";
 

@@ -8,8 +8,8 @@ const DEFAULT_PLEDGES = [
   "Owner docs + launch checklist",
   "NDA + least-privilege access",
   "Fixed-scope sprints",
-  "Clean tracking & weekly demo",
-  "Same-day replies (≤24h)",
+  "Clean tracking + weekly demo with next steps",
+  "Same-day replies (≤24h on weekdays)",
   "Pause or cancel between sprints"
 ];
 
@@ -23,19 +23,24 @@ interface GuaranteeRailProps {
 export function GuaranteeRail({
   id = "guarantee",
   pledges = DEFAULT_PLEDGES,
-  ctaLabel = "Book a 15-min fit check",
-  ctaHref = "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=guarantee_rail"
+  // Canonical CTA: discovery call (matches header/hero)
+  ctaLabel = "Book a discovery call",
+  ctaHref = "https://calendly.com/emayda-info/discovery-call"
 }: GuaranteeRailProps) {
   const [open, setOpen] = useState(false);
 
   // duplicate once for seamless loop
   const allPledges = [...pledges, ...pledges];
 
+  const handleToggleDetails = () => {
+    setOpen((prev) => !prev);
+  };
+
   return (
     <section
       id={id}
       aria-label="Service guarantees and working pledges"
-      className="relative border-t border-slate-800/70 py-4 sm:py-5"
+      className="relative py-4 sm:py-5"
     >
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 sm:px-6 lg:px-8">
         {/* Left: badge + details */}
@@ -45,10 +50,13 @@ export function GuaranteeRail({
           </span>
           <button
             type="button"
-            onClick={() => setOpen(true)}
+            onClick={handleToggleDetails}
+            aria-haspopup="dialog"
+            aria-expanded={open}
+            aria-controls={`${id}-dialog`}
             className="inline-flex w-max border-b border-teal-400/80 pb-[2px] text-[12px] font-semibold text-slate-100 hover:text-teal-100"
           >
-            What&apos;s included
+            {open ? "Hide details" : "What's included"}
           </button>
         </div>
 
@@ -73,15 +81,20 @@ export function GuaranteeRail({
 
       {/* Modal */}
       {open && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/80 px-4 backdrop-blur">
+        <div
+          className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/80 px-4 backdrop-blur"
+          role="dialog"
+          aria-modal="true"
+          id={`${id}-dialog`}
+        >
           <div className="relative w-full max-w-xl rounded-2xl border border-slate-800 bg-slate-950/90 shadow-[0_28px_90px_rgba(2,6,23,0.95)]">
             <header className="flex items-center justify-between gap-3 border-b border-slate-800 bg-slate-950/90 px-4 py-3">
               <h3 className="text-sm font-semibold text-slate-50">
-                What&apos;s included in the guarantee
+                {"What's included in the guarantee"}
               </h3>
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={handleToggleDetails}
                 aria-label="Close"
                 className="grid h-7 w-7 place-items-center rounded-full border border-slate-700 bg-slate-900/80 text-sm font-semibold text-slate-200 hover:border-slate-500 hover:text-slate-50"
               >
@@ -90,6 +103,11 @@ export function GuaranteeRail({
             </header>
 
             <div className="space-y-4 px-4 py-4 text-sm text-slate-100">
+              <p className="text-[13px] text-slate-200">
+                If we miss the agreed weekly checklist for reasons on our side,
+                we work an extra week at no cost.
+              </p>
+
               <ul className="space-y-2 text-[13px]">
                 <li className="relative pl-4">
                   <span className="absolute left-0 top-[2px] text-[11px] text-emerald-400">
@@ -110,22 +128,26 @@ export function GuaranteeRail({
                     ✓
                   </span>
                   <strong className="text-slate-50">Exclusions:</strong>{" "}
-                  Missing access/assets, force majeure, mid-sprint scope changes.
+                  Missing access/assets, force majeure, or mid-sprint scope
+                  changes.
                 </li>
                 <li className="relative pl-4">
                   <span className="absolute left-0 top-[2px] text-[11px] text-emerald-400">
                     ✓
                   </span>
                   <strong className="text-slate-50">Remedy:</strong>{" "}
-                  One additional week at no cost, scheduled next sprint.
+                  One additional week at no cost, scheduled in the next sprint,
+                  as long as you met your side of the checklist.
                 </li>
               </ul>
 
               <div className="border-t border-slate-800 pt-3 text-[12px] text-slate-300">
-                <span className="font-semibold text-slate-100">Process layer:</span>
-                <ul className="mt-1 list-disc pl-5 space-y-1">
+                <span className="font-semibold text-slate-100">
+                  Process layer:
+                </span>
+                <ul className="mt-1 list-disc space-y-1 pl-5">
                   <li>Least-privilege access; NDA available on request.</li>
-                  <li>Weekly demo + decision log so nothing gets “lost”.</li>
+                  <li>Weekly demo + decision log so nothing gets lost.</li>
                   <li>KPIs agreed and tracking verified end-to-end.</li>
                 </ul>
               </div>
@@ -134,7 +156,7 @@ export function GuaranteeRail({
             <footer className="flex items-center justify-end gap-3 border-t border-slate-800 px-4 py-3">
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={handleToggleDetails}
                 className="rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-200 hover:border-slate-500 hover:text-slate-50"
               >
                 Close

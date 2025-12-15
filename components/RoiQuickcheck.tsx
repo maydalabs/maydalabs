@@ -8,7 +8,7 @@ import type { CSSProperties } from "react";
 import { primaryCtaClasses } from "./ProgramsSection";
 
 type Mode = "ecom" | "svc";
-type ProgramKey = "foundation" | "momentum" | "scale";
+type ProgramKey = "baseline-scan" | "momentum-sprint" | "growth-loop";
 
 interface Program {
   key: ProgramKey;
@@ -19,8 +19,8 @@ interface Program {
 }
 
 const PROGRAMS: Record<ProgramKey, Program> = {
-  foundation: {
-    key: "foundation",
+  "baseline-scan": {
+    key: "baseline-scan",
     name: "Baseline Scan",
     price: "$3,900",
     timeline: "2–3 weeks",
@@ -30,8 +30,8 @@ const PROGRAMS: Record<ProgramKey, Program> = {
       "Analytics & pixels verified end-to-end (GA4, ads, CRM).",
     ],
   },
-  momentum: {
-    key: "momentum",
+  "momentum-sprint": {
+    key: "momentum-sprint",
     name: "Momentum Sprint",
     price: "$2,900",
     timeline: "3–4 weeks",
@@ -41,8 +41,8 @@ const PROGRAMS: Record<ProgramKey, Program> = {
       "Micro-tests and changes shipped weekly instead of “someday”.",
     ],
   },
-  scale: {
-    key: "scale",
+  "growth-loop": {
+    key: "growth-loop",
     name: "Growth Loop",
     price: "$3,900/mo",
     timeline: "10–12 weeks",
@@ -56,9 +56,9 @@ const PROGRAMS: Record<ProgramKey, Program> = {
 
 // Same glyphs as Programs/Pricing
 const programIconSrc: Record<ProgramKey, string> = {
-  momentum: "/icons/momentum.svg",
-  foundation: "/icons/foundation.svg",
-  scale: "/icons/scale.svg",
+  "baseline-scan": "/icons/baseline-scan.svg",
+  "momentum-sprint": "/icons/momentum-sprint.svg",
+  "growth-loop": "/icons/growth-loop.svg",
 };
 
 const USD = "USD";
@@ -118,9 +118,9 @@ interface RoiQuickcheckProps {
 // Small inline program icon for the recommendation row
 function ProgramIconInline({ id }: { id: ProgramKey }) {
   const gradient =
-    id === "momentum"
+    id === "momentum-sprint"
       ? "from-emerald-400 via-emerald-300 to-teal-200"
-      : id === "foundation"
+      : id === "baseline-scan"
       ? "from-sky-400 via-cyan-300 to-teal-200"
       : "from-indigo-400 via-violet-400 to-fuchsia-300";
 
@@ -149,8 +149,8 @@ function ProgramIconInline({ id }: { id: ProgramKey }) {
 export function RoiQuickcheckSection({
   heading = "Estimate your upside before you change anything.",
   subheading = "Directional, back-of-the-envelope math for what a small conversion or close-rate lift could mean in real dollars.",
-  primaryCtaLabel = "Book a 15-min fit check",
-  primaryCtaHref = "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=roi-quickcheck",
+  primaryCtaLabel = "Book a discovery call",
+  primaryCtaHref = "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=discovery-call&ref=roi-quickcheck",
   advancedHref = "/roi-quickcheck",
   resultsEmail = "hello@maydalabs.com",
 }: RoiQuickcheckProps) {
@@ -268,14 +268,14 @@ export function RoiQuickcheckSection({
         extraPerMonth >= 6000 || (sessions >= 15000 && aov >= 100);
       const lowFunnel = cr < 1.5 || sessions < 6000;
 
-      let programKey: ProgramKey = "momentum";
+      let programKey: ProgramKey = "momentum-sprint";
       if (highHead) {
-        programKey = "scale";
+        programKey = "growth-loop";
       } else if (lowFunnel) {
         if (cr < 1.2 && sessions < 4000 && aov < 80) {
-          programKey = "foundation";
+          programKey = "baseline-scan";
         } else {
-          programKey = "momentum";
+          programKey = "momentum-sprint";
         }
       }
 
@@ -306,14 +306,14 @@ export function RoiQuickcheckSection({
         extraPerMonth >= 8000 || (leads >= 80 && deal >= 1500);
       const lowFunnel = close < 12 || leads < 50;
 
-      let programKey: ProgramKey = "momentum";
+      let programKey: ProgramKey = "momentum-sprint";
       if (highHead) {
-        programKey = "scale";
+        programKey = "growth-loop";
       } else if (lowFunnel) {
         if (close < 10 && leads < 40) {
-          programKey = "foundation";
+          programKey = "baseline-scan";
         } else {
-          programKey = "momentum";
+          programKey = "momentum-sprint";
         }
       }
 
@@ -371,24 +371,18 @@ export function RoiQuickcheckSection({
     let guard = "";
 
     if (mode === "ecom") {
-      if (traffic < 1500 && newRate >= 1) {
+      if (traffic < 1500) {
+        guard = "Heads up: at under ~1.5k sessions/month, estimates get noisy.";
+      } else if (newRate > 7) {
         guard =
-          "Note: results can be noisy at very low traffic (<1.5k sessions/mo).";
-      }
-      if (newRate > 7) {
-        guard = guard
-          ? `${guard} Also, CR is already high; gains may come from AOV/LTV + experimentation.`
-          : "CR looks high; gains may come from AOV/LTV + experimentation.";
+          "CR is already high; upside may be more in AOV/LTV than raw CR.";
       }
     } else {
-      if (traffic < 40 && newRate >= 5) {
+      if (traffic < 40) {
+        guard = "Heads up: at under ~40 leads/month, estimates get noisy.";
+      } else if (newRate > 40) {
         guard =
-          "Note: results can be noisy at very low lead volume (<40 leads/mo).";
-      }
-      if (newRate > 40) {
-        guard = guard
-          ? `${guard} Also, close rate is already high; focus on lead quality/AOV and tests.`
-          : "Close rate looks high; focus on lead quality/AOV and tests.";
+          "Close rate is already high; upside may be more in deal size and lead quality.";
       }
     }
 
@@ -484,15 +478,6 @@ export function RoiQuickcheckSection({
     } catch {
       alert("Could not copy results, sorry. You can select and copy manually.");
     }
-  }
-
-  function handleEmail() {
-    const subject = encodeURIComponent("ROI quickcheck results");
-    const body = encodeURIComponent(
-      `${summaryText}\n\n— Sent from the ROI quickcheck widget`,
-    );
-    const mailto = `mailto:${resultsEmail}?subject=${subject}&body=${body}`;
-    window.location.href = mailto;
   }
 
   function handleAdvancedClick() {
@@ -886,13 +871,6 @@ export function RoiQuickcheckSection({
               >
                 Copy results
               </button>
-              <button
-                type="button"
-                onClick={handleEmail}
-                className="rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1.5 text-[11px] font-semibold text-slate-200 transition hover:border-slate-500 hover:text-slate-50"
-              >
-                Email us your results
-              </button>
             </div>
           </aside>
 
@@ -952,13 +930,13 @@ export function RoiQuickcheckSection({
                   </div>
                 </div>
                 <span className="inline-flex items-center rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                  Confidence 80%
+                  Model confidence: ~80%
                 </span>
               </div>
               <p className="mt-2 text-xs font-medium text-slate-300">
                 {mode === "ecom"
-                  ? "Solid traffic with room to improve conversion quickly."
-                  : "Good demand—optimize handoff and close rate for quick wins."}
+                  ? "You’ve got traffic; the fastest upside is fixing conversion first."
+                  : "You’ve got demand; the upside is in handoff and close rate."}
               </p>
               <ul className="mt-3 space-y-2 text-sm font-medium text-slate-200">
                 {program.bullets.slice(0, 3).map((b) => (
@@ -991,8 +969,11 @@ export function RoiQuickcheckSection({
               </button>
             </div>
             <p className="mt-2 text-[11px] font-medium text-slate-400">
-              15–20 minutes. We’ll validate your assumptions and sanity-check
-              the math.
+              15–20 minutes. We’ll sanity-check your inputs and the math
+              together.
+            </p>
+            <p className="mt-1 text-[11px] font-medium text-slate-500">
+              Prefer email? You can send your numbers to {resultsEmail}.
             </p>
           </div>
         </div>

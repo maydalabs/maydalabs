@@ -49,17 +49,20 @@ export interface SiteFooterProps {
   stickyCtaEnabled?: boolean;
   stickyCtaLabel?: string;
   stickyCtaHref?: string;
+
+  /** Optional: bring the top fade back if you ever want it */
+  showTopFade?: boolean;
 }
 
 const DEFAULT_COLUMNS: FooterColumn[] = [
   {
     title: "Programs",
     links: [
-      { label: "Baseline Scan", href: "/programs/foundation" },
-      { label: "Momentum Sprint", href: "/programs/momentum" },
-      { label: "Growth Loop", href: "/programs/scale" },
+      { label: "Baseline Scan", href: "/programs/baseline-scan" },
+      { label: "Momentum Sprint", href: "/programs/momentum-sprint" },
+      { label: "Growth Loop", href: "/programs/growth-loop" },
       { label: "Pricing", href: "/pricing" },
-      { label: "ROI quickcheck", href: "/roi" },
+      { label: "ROI quickcheck", href: "/roi-quickcheck" },
     ],
   },
   {
@@ -101,9 +104,9 @@ const DEFAULT_POLICIES: FooterLink[] = [
 
 export function SiteFooter({
   brandName = "Mayda Labs",
-  ctaText = "Free 15-min fit check. We’ll identify 2–3 quick wins and a clear path.",
-  ctaLabel = "Book a 15-min fit check",
-  ctaHref = "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=footer-main",
+  ctaText = "Free 15-min discovery call. We’ll identify 2–3 quick wins and a clear path.",
+  ctaLabel = "Book a discovery call",
+  ctaHref = "https://calendly.com/emayda-info/discovery-call?utm_source=maydalabs&utm_medium=website&utm_campaign=footer-main",
 
   showCtaBand = true,
 
@@ -121,8 +124,10 @@ export function SiteFooter({
   socials = [],
 
   stickyCtaEnabled = true,
-  stickyCtaLabel = "Book a 15-min fit check",
+  stickyCtaLabel = "Book a discovery call",
   stickyCtaHref,
+
+  showTopFade = false,
 }: SiteFooterProps) {
   const pathname = usePathname();
   const [email, setEmail] = React.useState("");
@@ -147,7 +152,7 @@ export function SiteFooter({
     if (!email.trim()) return;
     setNlStatus("loading");
 
-    // Wire this up to your real newsletter endpoint later.
+    // TODO: wire to real newsletter endpoint
     setTimeout(() => {
       setNlStatus("ok");
     }, 600);
@@ -166,9 +171,10 @@ export function SiteFooter({
   const stickyHref = stickyCtaHref ?? ctaHref;
 
   return (
-    <footer className="relative border-t border-border/70 bg-surface text-muted">
-      {/* Soft fade into footer */}
-      <div className="pointer-events-none absolute inset-x-0 -top-24 h-24 bg-gradient-to-b from-surface/90 via-surface/40 to-transparent" />
+    <footer className="relative bg-surface text-muted">
+      {showTopFade && (
+        <div className="pointer-events-none absolute inset-x-0 -top-24 h-24 bg-gradient-to-b from-surface/90 via-surface/40 to-transparent" />
+      )}
 
       <div className="relative mx-auto max-w-6xl px-4 pb-8 pt-4 sm:px-6 lg:px-8 lg:pb-10">
         {/* CTA band */}

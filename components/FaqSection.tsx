@@ -10,79 +10,79 @@ type FaqItem = {
 
 const DEFAULT_ITEMS: FaqItem[] = [
   {
+    question: "What happens on the discovery call?",
+    answer:
+      "We review your numbers (traffic, conversion rate, AOV, channels), walk your key flows, and map where Baseline Scan, Momentum Sprint, or Growth Loop has the most leverage. You leave with a draft checklist and next steps, not a generic pitch.",
+  },
+  {
     question: "What if we don’t see results?",
     answer:
-      "We set KPIs up front and review weekly. If we miss the agreed checklist on time, we’ll make it right the following sprint.",
+      "We agree KPIs and a weekly checklist up front. If we miss the agreed checklist for reasons on our side, we work an extra week at no cost in the next sprint. We don’t promise a specific uplift, but we do commit to clean tracking and work that shows up in your analytics.",
+  },
+  {
+    question: "Which program should we start with?",
+    answer:
+      "Most teams start with a Momentum Sprint. Baseline Scan is best when tracking is messy, the site is slow, or you want an objective read before changing anything. Growth Loop is for teams with steady volume who want an ongoing test cadence, not one-off projects.",
   },
   {
     question: "What access do you need?",
     answer:
-      "Usually: Shopify or your core platform, analytics, ad accounts (if applicable), and your ESP / CRM. We keep everything least-privilege.",
+      "Typically: Shopify or your core platform, analytics (GA4 and any dashboards), ad accounts if we’re touching paid, and your ESP / CRM. We keep everything least-privilege and document what we change so your team can maintain it.",
   },
   {
-    question: "Do you support international stores?",
+    question: "Do you work with non-Shopify or headless stacks?",
     answer:
-      "Yes — multi-currency, multi-market, and multi-language setups. We’ll confirm edge cases in the discovery sprint.",
+      "Yes. We work with custom themes, headless frontends like Next.js, and mixed setups. We only recommend headless when performance, content, or scale justify the extra complexity.",
   },
   {
-    question: "What about post-launch support?",
+    question: "Do you support international or multi-store setups?",
     answer:
-      "You can book follow-on sprints or a light retainer for polish, iteration, and experiments.",
+      "Yes. We’re comfortable with multi-currency, multi-market, and multi-language stores. In the discovery sprint we map taxes, shipping, and regional edge cases before we touch live flows.",
+  },
+  {
+    question: "Who actually does the work?",
+    answer:
+      "You work directly with a small senior team, not a rotating pod of juniors. Strategy, UX, and implementation stay tight so decisions and changes don’t get lost between teams.",
+  },
+  {
+    question: "Do you replace our dev or marketing team?",
+    answer:
+      "No. We either plug into your existing dev and marketing teams, or act as a fractional product/growth team when you don’t have one yet. The goal is to make your in-house team more effective, not redundant.",
   },
   {
     question: "How do you report results?",
     answer:
-      "Weekly insights, decision logs, and KPI snapshots so you can see what shipped and what moved.",
-  },
-  {
-    question: "Do you work with custom themes or stacks?",
-    answer:
-      "Yes. We ship performance-first builds and refactors that pass Core Web Vitals and keep your brand intact.",
-  },
-  {
-    question: "Where do we communicate?",
-    answer:
-      "Weekly calls, async updates, and a shared workspace (usually Notion + your preferred chat).",
-  },
-  {
-    question: "Will you migrate our data?",
-    answer:
-      "We handle products, customers, orders, redirects, and pixels where it makes sense for the project scope.",
-  },
-  {
-    question: "Do you sign NDAs?",
-    answer:
-      "Yes — send yours or use our standard mutual NDA. We’re used to working under NDA with internal teams.",
-  },
-  {
-    question: "Do you replace our dev team?",
-    answer:
-      "No. We either partner with your internal devs or act as a fractional team when you don’t have one yet.",
-  },
-  {
-    question: "Can you run our paid campaigns?",
-    answer:
-      "Inside Growth Loop we can own creative sprints and paid testing, tied into the same CRO cadence.",
+      "Weekly insights with a simple decision log, KPI snapshots, and links to what shipped. You can see what changed, why we did it, and how it moved the numbers.",
   },
   {
     question: "How do sprints work?",
     answer:
-      "1–2 week cycles with prioritized checklists, clear owners, and demos every Friday.",
+      "We work in 1–2 week sprints with a prioritized checklist, clear owners, and a demo every Friday. You always know what’s in progress, what’s blocked, and what’s next.",
   },
   {
-    question: "Who owns the code/design?",
+    question: "What about post-launch support?",
     answer:
-      "You do. Everything lives in your repos and design files. We keep things clean so your team can maintain them.",
+      "You can book follow-on sprints for more fixes and experiments, or move into a Growth Loop cadence for ongoing CRO, lifecycle, and paid testing.",
   },
   {
-    question: "Do you work with headless?",
+    question: "Can you run our paid campaigns?",
     answer:
-      "Selective. We’ll recommend headless only when the performance, scale, or content needs justify the extra complexity.",
+      "Inside Growth Loop we can own creative sprints and paid testing, tied directly into the same CRO cadence and analytics. We’re not a big media-buy retainer; tests stay focused and measurable.",
   },
   {
-    question: "What payment terms do you use?",
+    question: "Will you migrate our data?",
     answer:
-      "Per-sprint or monthly; card or invoice. We’ll confirm terms in the proposal.",
+      "We handle products, customers, orders, redirects, and key tracking where it makes sense for the scope. Exact migrations are defined in the proposal so there are no surprises.",
+  },
+  {
+    question: "Who owns the code and design assets?",
+    answer:
+      "You do. Code lives in your repos, designs live in your files. We keep things performant and maintainable so your team can work on them after we’re done.",
+  },
+  {
+    question: "Do you sign NDAs?",
+    answer:
+      "Yes. We can use your paper or our standard mutual NDA. We’re used to working under NDA with internal teams and with sensitive performance data.",
   },
 ];
 
@@ -130,14 +130,14 @@ export interface FaqSectionProps {
 
 export function FaqSection({
   id = "faq",
-  heading = "FAQ",
-  subheading = "Quick answers to common questions.",
+  heading = "Questions about working with us?",
+  subheading = "Quick answers on programs, access, timelines, and what to expect before you book a discovery call.",
   items = DEFAULT_ITEMS,
   note,
   showSearch = true,
   showControls = true,
   mobileMax = 5,
-  searchPlaceholder = "Search questions…",
+  searchPlaceholder = "Search questions (results, access, sprints…)",
 }: FaqSectionProps) {
   const [query, setQuery] = React.useState("");
   const detailsRefs = React.useRef<HTMLDetailsElement[]>([]);
@@ -174,6 +174,8 @@ export function FaqSection({
     });
   }, [items, normalizedQuery]);
 
+  const hits = filtered.length;
+
   // fire search analytics
   React.useEffect(() => {
     if (!normalizedQuery) return;
@@ -181,9 +183,9 @@ export function FaqSection({
       event: "faq_search",
       section: "faq",
       query: normalizedQuery,
-      hits: filtered.length,
+      hits,
     });
-  }, [normalizedQuery, filtered.length]);
+  }, [normalizedQuery, hits]);
 
   function escapeRegex(s: string): string {
     return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -208,7 +210,7 @@ export function FaqSection({
           className="rounded bg-teal-400/20 px-0.5 text-teal-100"
         >
           {match[0]}
-        </mark>,
+        </mark>
       );
       lastIndex = end;
     }
@@ -235,10 +237,7 @@ export function FaqSection({
   const hasResults = filtered.length > 0;
 
   return (
-    <section
-      id={id}
-      className="scroll-mt-24 py-16 text-slate-50 sm:py-24"
-    >
+    <section id={id} className="scroll-mt-24 py-16 text-slate-50 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <header className="mx-auto mb-6 grid max-w-3xl gap-3 text-center">
