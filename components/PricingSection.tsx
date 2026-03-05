@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import * as React from "react";
-import type { CSSProperties } from "react";
 import { primaryCtaClasses } from "./ProgramsSection";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
 
@@ -169,13 +168,6 @@ const ADDONS: Addon[] = [
     note: "$350–$800 each"
   }
 ];
-
-// Same icon set as ProgramsSection (smaller, inline)
-const tierIconSrc: Record<TierId, string> = {
-  "baseline-scan": "/icons/program-baseline-scan.svg",
-  "momentum-sprint": "/icons/program-momentum-sprint.svg",
-  "growth-loop": "/icons/program-growth-loop.svg"
-};
 
 function trackPricingEvent(payload: Record<string, unknown>) {
   if (typeof window === "undefined") return;
@@ -376,15 +368,6 @@ function TierIcon({
   id: TierId;
   isFeatured?: boolean;
 }) {
-  const gradient =
-    id === "momentum-sprint"
-      ? "from-emerald-400 via-emerald-300 to-teal-200"
-      : id === "baseline-scan"
-      ? "from-sky-400 via-cyan-300 to-teal-200"
-      : "from-indigo-400 via-violet-400 to-fuchsia-300";
-
-  const src = tierIconSrc[id];
-
   const alt =
     id === "momentum-sprint"
       ? "Momentum Sprint program icon"
@@ -392,18 +375,12 @@ function TierIcon({
       ? "Baseline Scan program icon"
       : "Growth Loop program icon";
 
-  const maskStyle: CSSProperties = {
-    WebkitMaskImage: `url(${src})`,
-    maskImage: `url(${src})`,
-    WebkitMaskRepeat: "no-repeat",
-    maskRepeat: "no-repeat",
-    WebkitMaskSize: "contain",
-    maskSize: "contain",
-    WebkitMaskPosition: "center",
-    maskPosition: "center"
-  };
-
-  const sizeClasses = "h-6 w-6";
+  const iconTone =
+    id === "momentum-sprint"
+      ? "border-emerald-300/40 text-emerald-200"
+      : id === "baseline-scan"
+      ? "border-sky-300/40 text-sky-200"
+      : "border-violet-300/40 text-violet-200";
 
   const featuredGlow =
     isFeatured && id === "momentum-sprint"
@@ -411,12 +388,64 @@ function TierIcon({
       : "";
 
   return (
-    <div
+    <span
       role="img"
       aria-label={alt}
-      style={maskStyle}
-      className={`bg-gradient-to-tr ${gradient} ${sizeClasses} ${featuredGlow}`}
-    />
+      className={`inline-flex h-8 w-8 items-center justify-center rounded-lg border bg-slate-950/80 ${iconTone} ${featuredGlow}`}
+    >
+      <ProgramGlyph id={id} className="h-4 w-4" />
+    </span>
+  );
+}
+
+function ProgramGlyph({ id, className }: { id: TierId; className: string }) {
+  if (id === "baseline-scan") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        className={className}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="6" />
+        <path d="m20 20-4.2-4.2" />
+      </svg>
+    );
+  }
+
+  if (id === "momentum-sprint") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        className={className}
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path d="M13.2 2 5 13h5.3L9.8 22 19 11h-5.3L13.2 2Z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M7 7h7a4 4 0 1 1 0 8H9" />
+      <path d="m7 7 2.5-2.5M7 7l2.5 2.5" />
+      <path d="M17 17h-7a4 4 0 1 1 0-8h5" />
+      <path d="m17 17-2.5 2.5M17 17l-2.5-2.5" />
+    </svg>
   );
 }
 

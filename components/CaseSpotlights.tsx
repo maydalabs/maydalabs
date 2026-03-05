@@ -5,6 +5,7 @@ import Link from "next/link";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { primaryCtaClasses } from "@/components/ProgramsSection";
+import { getCaseImageSource } from "@/lib/assets";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
 
 type CaseSlide = {
@@ -140,6 +141,39 @@ const SLIDES: CaseSlide[] = [
 
 const AUTOPLAY_MS = 8000;
 
+function CaseImagePlaceholder({
+  client,
+  headline,
+  className,
+  isActive
+}: {
+  client: string;
+  headline: string;
+  className: string;
+  isActive: boolean;
+}) {
+  return (
+    <div
+      aria-hidden="true"
+      className={`absolute inset-0 items-end overflow-hidden ${className}`}
+    >
+      <div
+        className={`absolute inset-0 bg-[radial-gradient(110%_90%_at_20%_15%,rgba(45,212,191,0.18),transparent_55%),radial-gradient(90%_120%_at_85%_20%,rgba(59,130,246,0.22),transparent_60%),linear-gradient(135deg,rgba(2,6,23,0.98),rgba(15,23,42,0.92))] ${
+          isActive ? "case-ken-burns" : ""
+        }`}
+      />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_20%,rgba(2,6,23,0.75)_72%,rgba(2,6,23,0.95)_100%)]" />
+      <div className="relative z-[1] m-6 max-w-md rounded-2xl border border-slate-700/80 bg-slate-900/70 px-4 py-3 shadow-[0_20px_60px_rgba(2,6,23,0.7)] backdrop-blur-sm">
+        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-300">
+          Visual preview coming soon
+        </p>
+        <p className="mt-1 text-sm font-semibold text-slate-50">{client}</p>
+        <p className="mt-1 text-xs text-slate-300">{headline}</p>
+      </div>
+    </div>
+  );
+}
+
 export function CaseSpotlights() {
   const [active, setActive] = useState(0);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -251,6 +285,10 @@ export function CaseSpotlights() {
               : overlay >= 0.65
               ? "from-slate-950/70"
               : "from-slate-950/60";
+          const desktopAsset = getCaseImageSource(slide.imageDesktop);
+          const mobileAsset = getCaseImageSource(
+            slide.imageMobile ?? slide.imageDesktop
+          );
 
           return (
             <article
@@ -265,26 +303,44 @@ export function CaseSpotlights() {
               {/* Background image – full bleed with Ken Burns */}
               <div className="absolute inset-0">
                 <div className="absolute inset-0">
-                  <Image
-                    src={slide.imageDesktop}
-                    alt=""
-                    fill
-                    priority={index === 0}
-                    sizes="100vw"
-                    className={`hidden h-full w-full object-cover md:block ${
-                      isActive ? "case-ken-burns" : ""
-                    }`}
-                  />
-                  <Image
-                    src={slide.imageMobile ?? slide.imageDesktop}
-                    alt=""
-                    fill
-                    priority={index === 0}
-                    sizes="100vw"
-                    className={`h-full w-full object-cover md:hidden ${
-                      isActive ? "case-ken-burns" : ""
-                    }`}
-                  />
+                  {desktopAsset.kind === "image" ? (
+                    <Image
+                      src={desktopAsset.src}
+                      alt=""
+                      fill
+                      priority={index === 0}
+                      sizes="100vw"
+                      className={`hidden h-full w-full object-cover md:block ${
+                        isActive ? "case-ken-burns" : ""
+                      }`}
+                    />
+                  ) : (
+                    <CaseImagePlaceholder
+                      client={slide.client}
+                      headline={slide.headline}
+                      className="hidden md:flex"
+                      isActive={isActive}
+                    />
+                  )}
+                  {mobileAsset.kind === "image" ? (
+                    <Image
+                      src={mobileAsset.src}
+                      alt=""
+                      fill
+                      priority={index === 0}
+                      sizes="100vw"
+                      className={`h-full w-full object-cover md:hidden ${
+                        isActive ? "case-ken-burns" : ""
+                      }`}
+                    />
+                  ) : (
+                    <CaseImagePlaceholder
+                      client={slide.client}
+                      headline={slide.headline}
+                      className="flex md:hidden"
+                      isActive={isActive}
+                    />
+                  )}
                 </div>
 
                 {/* Scrim */}

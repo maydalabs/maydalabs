@@ -57,6 +57,8 @@ export default function ContactPage() {
               <div>
                 <Link
                   href={CONTACT_INTRO_CALL_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center justify-center rounded-full border border-mayda-teal bg-mayda-teal/20 px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-mayda-teal/30"
                 >
                   Book a 15-min Intro Call

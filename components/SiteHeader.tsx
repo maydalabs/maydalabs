@@ -257,7 +257,12 @@ export function SiteHeader() {
           </Link>
 
           {/* Header CTA */}
-          <Link href={HEADER_INTRO_CALL_URL} className={headerCtaClasses}>
+          <Link
+            href={HEADER_INTRO_CALL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={headerCtaClasses}
+          >
             Book a 15-min Intro Call
           </Link>
         </nav>
@@ -383,6 +388,8 @@ export function SiteHeader() {
             {/* Mobile CTA */}
             <Link
               href={HEADER_INTRO_CALL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => setOpen(false)}
               className={`${headerCtaClasses} mt-3 justify-center`}
             >
