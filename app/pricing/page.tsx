@@ -1,210 +1,376 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { primaryCtaClasses } from "@/components/ProgramsSection";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
 
-export const metadata: Metadata = {
-  title: "Pricing – Fixed-scope growth programs",
-  description:
-    "Simple, outcome-focused pricing: one-time Baseline Scan, fixed-fee Momentum Sprints, and a clear monthly Growth Loop retainer with no black-box retainers.",
+type Tier = {
+  slug: "baseline-scan" | "momentum-sprint" | "growth-loop";
+  name: "Baseline Scan" | "Momentum Sprint" | "Growth Loop";
+  bestFor: string;
+  outcomes: string[];
+  includes: string[];
+  timeline: string;
+  programHref: string;
 };
 
-const PRICING_INTRO_CALL_URL = getIntroCallUrl("pricing");
+const TIERS: Tier[] = [
+  {
+    slug: "baseline-scan",
+    name: "Baseline Scan",
+    bestFor: "You need clarity before investing in bigger execution.",
+    outcomes: [
+      "Pinpoint the top conversion leaks in your current funnel.",
+      "Get analytics and tracking aligned to reality.",
+      "Leave with a ranked 6–12 week action plan."
+    ],
+    includes: [
+      "Funnel + journey audit (web, checkout, forms, booking)",
+      "Tracking pass (GA4, pixels, CRM events)",
+      "Priority matrix: fix now / later / ignore",
+      "Owner walkthrough call + handoff notes"
+    ],
+    timeline: "Typical timeline: 2–3 weeks",
+    programHref: "/programs#baseline-scan"
+  },
+  {
+    slug: "momentum-sprint",
+    name: "Momentum Sprint",
+    bestFor: "You already have traffic and need measurable lift fast.",
+    outcomes: [
+      "Ship high-impact fixes on drop-off steps.",
+      "Improve conversion rate with focused experiments.",
+      "Create a repeatable sprint rhythm for weekly wins."
+    ],
+    includes: [
+      "Prioritized implementation backlog",
+      "Conversion UX and speed fixes",
+      "2–3 high-leverage tests on critical funnel points",
+      "Weekly demo + decision log",
+      "Clean attribution checks before measuring lift"
+    ],
+    timeline: "Typical timeline: 3–4 weeks",
+    programHref: "/programs#momentum-sprint"
+  },
+  {
+    slug: "growth-loop",
+    name: "Growth Loop",
+    bestFor: "You want compounding growth, not one-off projects.",
+    outcomes: [
+      "Improve retention and LTV through lifecycle systems.",
+      "Run a stable monthly experimentation cadence.",
+      "Keep paid, CRO, and measurement in one operating rhythm."
+    ],
+    includes: [
+      "Lifecycle flow design + implementation",
+      "Monthly experiment planning and execution",
+      "Landing/offer iteration tied to channel performance",
+      "Tracking QA and reporting cadence",
+      "Quarterly priority reset with your team"
+    ],
+    timeline: "Typical timeline: 10–12 week minimum runway",
+    programHref: "/programs#growth-loop"
+  }
+];
+
+const PRICING_HERO_URL = getIntroCallUrl("pricing_hero");
+const PRICING_GUARANTEE_URL = getIntroCallUrl("pricing_guarantee");
+const PRICING_BOTTOM_URL = getIntroCallUrl("pricing_bottom");
+
+export const metadata: Metadata = {
+  title: "Pricing – Choose the right growth program",
+  description:
+    "Choose between Baseline Scan, Momentum Sprint, and Growth Loop with clear fit, scope, timelines, and next steps.",
+};
 
 export default function PricingPage() {
   return (
     <div className="space-y-16 md:space-y-20">
-      {/* Header */}
       <section>
-        <div className="mx-auto max-w-6xl space-y-3 lg:max-w-7xl">
+        <div className="mx-auto max-w-6xl space-y-4 lg:max-w-7xl">
           <p className="text-[0.75rem] font-medium uppercase tracking-[0.18em] text-muted">
-            PRICING · FIXED-SCOPE PROGRAMS
+            Pricing · Choose your starting point
           </p>
-          <h1 className="text-2xl font-semibold text-foreground sm:text-3xl md:text-4xl">
-            Simple, outcome-focused pricing.
+          <h1 className="max-w-3xl text-2xl font-semibold text-foreground sm:text-3xl md:text-4xl">
+            Pick the right program to turn traffic into measurable revenue.
           </h1>
-          <p className="max-w-2xl text-sm text-muted sm:text-[0.95rem]">
-            No black-box retainers, no surprise scope creep. Each engagement has
-            a clear scope, timeline, and fee agreed before work starts.
+          <p className="max-w-3xl text-sm text-muted sm:text-[0.95rem]">
+            Clear scope, clear ownership, clear next steps. No vague retainer
+            promises.
           </p>
-          <p className="max-w-3xl text-xs text-muted sm:text-sm">
-            Exact numbers depend on your funnel complexity and surfaces (web,
-            product, lifecycle), but the structure below is how every engagement
-            is priced.
-          </p>
+          <ul className="ml-5 list-disc space-y-1 text-sm text-muted">
+            <li>Implementation-first, not advisory-only decks.</li>
+            <li>Tracking and attribution are validated before wins are claimed.</li>
+            <li>Weekly cadence with documented decisions and priorities.</li>
+          </ul>
+          <div className="flex flex-wrap gap-3 pt-1">
+            <Link
+              href={PRICING_HERO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={primaryCtaClasses}
+            >
+              Book a 15-min Intro Call
+            </Link>
+            <Link
+              href="/roi-quickcheck"
+              className="inline-flex items-center justify-center rounded-full border border-border bg-surface-alt px-4 py-2 text-sm font-medium text-foreground hover:bg-surface-alt/80"
+            >
+              Estimate ROI first
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Program pricing view */}
       <section>
-        <div className="mx-auto max-w-6xl lg:max-w-7xl">
+        <div className="mx-auto max-w-6xl space-y-4 lg:max-w-7xl">
+          <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
+            How to choose quickly
+          </h2>
           <div className="grid gap-4 md:grid-cols-3">
-            {/* Baseline Scan */}
-            <article className="flex flex-col gap-3 rounded-2xl border border-border bg-surface/85 p-5 text-sm sm:p-6">
-              <span className="inline-flex items-center rounded-full border border-border px-2 py-[3px] text-[0.7rem] uppercase tracking-[0.14em] text-muted">
-                Diagnostic
-              </span>
-              <h2 className="text-[1.15rem] font-semibold text-foreground">
-                Baseline Scan
-              </h2>
-              <p className="text-muted">
-                Fixed-fee diagnostic for teams who want clarity before committing
-                to a Sprint or ongoing work.
+            <article className="rounded-2xl border border-border bg-surface/85 p-5 text-sm">
+              <p className="font-semibold text-foreground">
+                If you&apos;re unsure what&apos;s broken:
               </p>
-              <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
-                <li>One-time fee covering audit, analysis, and roadmap.</li>
-                <li>
-                  Includes a walkthrough call and a documented 6–12 week plan.
-                </li>
-                <li>
-                  If you move into a Momentum Sprint, the Scan fee is credited
-                  against it.
-                </li>
-              </ul>
-              <p className="mt-3 text-[0.8rem] text-muted">
-                <strong className="font-semibold text-foreground">
-                  Ideal when:
-                </strong>{" "}
-                you know something&apos;s off but don&apos;t yet know whether a
-                full Sprint makes sense.
+              <p className="mt-1 text-muted">
+                Start with <strong className="text-foreground">Baseline Scan</strong>.
               </p>
             </article>
-
-            {/* Momentum Sprint */}
-            <article className="flex flex-col gap-3 rounded-2xl border border-mayda-teal bg-surface-alt/80 p-5 text-sm shadow-soft sm:p-6">
-              <span className="inline-flex items-center rounded-full border border-mayda-teal px-2 py-[3px] text-[0.7rem] uppercase tracking-[0.14em] text-mayda-teal">
-                Flagship engagement
-              </span>
-              <h2 className="text-[1.15rem] font-semibold text-foreground">
-                Momentum Sprint
-              </h2>
-              <p className="text-muted">
-                6–8 week fixed-scope engagement to clean up tracking, fix the
-                worst leaks, and ship high-impact changes.
+            <article className="rounded-2xl border border-border bg-surface/85 p-5 text-sm">
+              <p className="font-semibold text-foreground">
+                If you have traffic but low conversion:
               </p>
-              <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
-                <li>
-                  Flat project fee based on funnel complexity and surfaces
-                  touched.
-                </li>
-                <li>
-                  Scope, deliverables, and success metrics are agreed before we
-                  start.
-                </li>
-                <li>
-                  Payment typically split: deposit at kickoff, remainder at
-                  mid-point or completion.
-                </li>
-              </ul>
-              <p className="mt-3 text-[0.8rem] text-muted">
-                <strong className="font-semibold text-foreground">
-                  Ideal when:
-                </strong>{" "}
-                you have meaningful traffic and want a focused push, not a vague
-                “retainer”.
+              <p className="mt-1 text-muted">
+                Start with <strong className="text-foreground">Momentum Sprint</strong>.
               </p>
             </article>
-
-            {/* Growth Loop */}
-            <article className="flex flex-col gap-3 rounded-2xl border border-border bg-surface/85 p-5 text-sm sm:p-6">
-              <span className="inline-flex items-center rounded-full border border-border px-2 py-[3px] text-[0.7rem] uppercase tracking-[0.14em] text-muted">
-                Ongoing growth
-              </span>
-              <h2 className="text-[1.15rem] font-semibold text-foreground">
-                Growth Loop
-              </h2>
-              <p className="text-muted">
-                Monthly engagement for teams who want a consistent testing and
-                lifecycle cadence after a Sprint.
+            <article className="rounded-2xl border border-border bg-surface/85 p-5 text-sm">
+              <p className="font-semibold text-foreground">
+                If you need ongoing growth execution:
               </p>
-              <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
-                <li>
-                  Monthly retainer tied to a clear experiment and lifecycle
-                  workload.
-                </li>
-                <li>
-                  Quarterly scope review to adjust focus as the business and data
-                  change.
-                </li>
-                <li>
-                  Easy to pause after any cycle; no long-term lock-in contracts.
-                </li>
-              </ul>
-              <p className="mt-3 text-[0.8rem] text-muted">
-                <strong className="font-semibold text-foreground">
-                  Ideal when:
-                </strong>{" "}
-                you&apos;ve seen the impact of a Sprint and want compounding gains
-                rather than one-off projects.
+              <p className="mt-1 text-muted">
+                Start with <strong className="text-foreground">Growth Loop</strong>.
               </p>
             </article>
           </div>
         </div>
       </section>
 
-      {/* How billing works */}
+      <section>
+        <div className="mx-auto max-w-6xl space-y-4 lg:max-w-7xl">
+          <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
+            Packages
+          </h2>
+          <div className="grid gap-4 md:grid-cols-3">
+            {TIERS.map((tier) => {
+              const ctaHref = getIntroCallUrl(`pricing_${tier.slug}`, {
+                utm_term: tier.slug
+              });
+
+              return (
+                <article
+                  key={tier.slug}
+                  className="flex flex-col gap-3 rounded-2xl border border-border bg-surface/85 p-5 text-sm"
+                >
+                  <h3 className="text-lg font-semibold text-foreground">
+                    {tier.name}
+                  </h3>
+                  <p className="text-muted">
+                    <span className="font-semibold text-foreground">
+                      Best for:
+                    </span>{" "}
+                    {tier.bestFor}
+                  </p>
+
+                  <div>
+                    <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-muted">
+                      Outcomes
+                    </p>
+                    <ul className="ml-4 mt-1 list-disc space-y-1 text-muted">
+                      {tier.outcomes.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-muted">
+                      What&apos;s included
+                    </p>
+                    <ul className="ml-4 mt-1 list-disc space-y-1 text-muted">
+                      {tier.includes.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
+                    {tier.timeline}
+                  </p>
+
+                  <div className="mt-2 flex flex-col items-start gap-2">
+                    <Link
+                      href={ctaHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={primaryCtaClasses}
+                    >
+                      Book a 15-min Intro Call
+                    </Link>
+                    <Link
+                      href={tier.programHref}
+                      className="text-xs font-semibold text-muted underline-offset-4 hover:text-foreground hover:underline"
+                    >
+                      View full program details
+                    </Link>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       <section>
         <div className="mx-auto max-w-6xl lg:max-w-7xl">
-          <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface-alt/80 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-            <div className="space-y-2">
+          <div className="grid gap-4 md:grid-cols-2">
+            <article className="rounded-2xl border border-border bg-surface/85 p-5 text-sm">
               <h2 className="text-lg font-semibold text-foreground sm:text-xl">
-                How billing works.
+                Included
               </h2>
-              <ul className="ml-4 list-disc space-y-1 text-sm text-muted">
-                <li>
-                  <strong className="font-semibold text-foreground">
-                    No surprise retainers.
-                  </strong>{" "}
-                  We agree the scope, timeline, and fee before work starts.
-                </li>
-                <li>
-                  <strong className="font-semibold text-foreground">
-                    Simple structure.
-                  </strong>{" "}
-                  Baseline Scan is one-time; Sprints are fixed-fee; Growth Loop
-                  is monthly.
-                </li>
-                <li>
-                  <strong className="font-semibold text-foreground">
-                    Payment options.
-                  </strong>{" "}
-                  Standard bank/card payments, with the option to pay via Bitcoin
-                  for teams who prefer it.
-                </li>
+              <ul className="ml-4 mt-3 list-disc space-y-1 text-muted">
+                <li>Hands-on implementation, not just recommendations.</li>
+                <li>Tracking and attribution QA before reporting wins.</li>
+                <li>Structured experimentation cadence with clear owners.</li>
+                <li>Weekly updates and next-step prioritization.</li>
+                <li>Handoff notes so your team can maintain momentum.</li>
               </ul>
-            </div>
-            <div className="pt-2 sm:pt-0">
+            </article>
+            <article className="rounded-2xl border border-border bg-surface/85 p-5 text-sm">
+              <h2 className="text-lg font-semibold text-foreground sm:text-xl">
+                Not included
+              </h2>
+              <ul className="ml-4 mt-3 list-disc space-y-1 text-muted">
+                <li>Running your entire ads account indefinitely.</li>
+                <li>Random feature development outside agreed scope.</li>
+                <li>Unlimited revisions without prioritization.</li>
+                <li>“Growth theater” metrics without implementation proof.</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div className="mx-auto max-w-6xl rounded-2xl border border-border bg-surface/85 p-5 sm:p-6 lg:max-w-7xl">
+          <div className="space-y-3">
+            <h2 className="text-lg font-semibold text-foreground sm:text-xl">
+              Guarantee and risk reversal
+            </h2>
+            <p className="max-w-3xl text-sm text-muted">
+              If we miss agreed delivery items for reasons on our side, we work
+              an extra week at no cost. Scope and decisions stay visible in a
+              shared weekly checklist.
+            </p>
+            <div className="pt-1">
               <Link
-                href="/roi-quickcheck"
-                className="inline-flex items-center justify-center rounded-full border border-mayda-teal bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-background/80"
+                href={PRICING_GUARANTEE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={primaryCtaClasses}
               >
-                Estimate your upside first
+                Book a 15-min Intro Call
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Fit check CTA */}
       <section>
-        <div className="mx-auto max-w-6xl lg:max-w-7xl">
-          <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface/85 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-            <div className="space-y-2">
+        <div className="mx-auto max-w-6xl rounded-2xl border border-border bg-surface-alt/80 p-5 text-sm text-muted lg:max-w-7xl">
+          BTC-friendly payments available.
+        </div>
+      </section>
+
+      <section>
+        <div className="mx-auto max-w-6xl space-y-4 lg:max-w-7xl">
+          <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
+            Pricing FAQ
+          </h2>
+          <div className="space-y-3">
+            <details className="rounded-xl border border-border bg-surface/80 p-4">
+              <summary className="cursor-pointer text-sm font-semibold text-foreground">
+                How fast can we expect impact?
+              </summary>
+              <p className="mt-2 text-sm text-muted">
+                Most teams see first measurable movement during Momentum Sprint
+                once tracking and high-friction steps are fixed.
+              </p>
+            </details>
+            <details className="rounded-xl border border-border bg-surface/80 p-4">
+              <summary className="cursor-pointer text-sm font-semibold text-foreground">
+                What do you need from our side?
+              </summary>
+              <p className="mt-2 text-sm text-muted">
+                Access to analytics/tools, one decision-maker, and reasonable
+                review windows so work does not stall.
+              </p>
+            </details>
+            <details className="rounded-xl border border-border bg-surface/80 p-4">
+              <summary className="cursor-pointer text-sm font-semibold text-foreground">
+                What happens after we book?
+              </summary>
+              <p className="mt-2 text-sm text-muted">
+                We run a short fit call, confirm scope and timeline, then send a
+                clear plan with deliverables before kickoff.
+              </p>
+            </details>
+            <details className="rounded-xl border border-border bg-surface/80 p-4">
+              <summary className="cursor-pointer text-sm font-semibold text-foreground">
+                What if we&apos;re not a fit?
+              </summary>
+              <p className="mt-2 text-sm text-muted">
+                We’ll tell you directly and share the best next step, even if
+                that means not hiring us yet.
+              </p>
+            </details>
+            <details className="rounded-xl border border-border bg-surface/80 p-4">
+              <summary className="cursor-pointer text-sm font-semibold text-foreground">
+                Contract and cancellation?
+              </summary>
+              <p className="mt-2 text-sm text-muted">
+                Scope is fixed per engagement. Growth Loop is reviewed cycle by
+                cycle and can be paused between cycles.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div className="mx-auto max-w-6xl rounded-2xl border border-border bg-surface/85 p-5 sm:p-6 lg:max-w-7xl">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="space-y-1">
               <h2 className="text-lg font-semibold text-foreground sm:text-xl">
-                Want actual numbers for your case?
+                Ready to choose the right starting point?
               </h2>
-              <p className="max-w-xl text-sm text-muted sm:text-[0.95rem]">
-                A quick 15-minute intro call is usually enough to give you a
-                realistic fee range for a Scan, Sprint, or Growth Loop.
+              <p className="text-sm text-muted">
+                We&apos;ll pressure-test fit, numbers, and scope in 15 minutes.
               </p>
             </div>
-            <div>
+            <div className="flex flex-wrap gap-3">
               <Link
-                href={PRICING_INTRO_CALL_URL}
+                href={PRICING_BOTTOM_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-full border border-mayda-teal bg-mayda-teal/20 px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-mayda-teal/30"
+                className={primaryCtaClasses}
               >
                 Book a 15-min Intro Call
+              </Link>
+              <Link
+                href="/programs"
+                className="inline-flex items-center justify-center rounded-full border border-border bg-surface-alt px-4 py-2 text-sm font-medium text-foreground hover:bg-surface-alt/80"
+              >
+                View programs
               </Link>
             </div>
           </div>

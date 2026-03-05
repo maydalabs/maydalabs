@@ -1,112 +1,110 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { primaryCtaClasses } from "@/components/ProgramsSection";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
 
 export const metadata: Metadata = {
   title: "Contact – Book a 15-min Intro Call",
   description:
-    "Book a short intro call or email Mayda Labs with a snapshot of your traffic, stack, and goals to see whether a Scan, Sprint, or Growth Loop makes sense.",
+    "Book a short intro call with Mayda Labs to review bottlenecks, numbers, and the right next growth step.",
 };
 
-const CONTACT_INTRO_CALL_URL = getIntroCallUrl("contact");
+const CONTACT_HERO_URL = getIntroCallUrl("contact_hero");
+const CONTACT_BOTTOM_URL = getIntroCallUrl("contact_bottom");
 
 export default function ContactPage() {
   return (
     <div className="space-y-16 md:space-y-20">
-      {/* Intro */}
       <section>
         <div className="mx-auto max-w-6xl space-y-4 lg:max-w-7xl">
-          <div className="space-y-3">
-            <p className="text-[0.75rem] font-medium uppercase tracking-[0.18em] text-muted">
-              CONTACT · MAYDA LABS
-            </p>
-            <h1 className="text-2xl font-semibold text-foreground sm:text-3xl md:text-4xl">
-              Let&apos;s figure out if we&apos;re a fit.
-            </h1>
-            <p className="max-w-2xl text-sm text-muted sm:text-[0.95rem]">
-              Easiest way to start is a short intro call. If you prefer
-              email, send a quick snapshot of your traffic, stack, and goals and
-              we&apos;ll take it from there.
-            </p>
-          </div>
+          <p className="text-[0.75rem] font-medium uppercase tracking-[0.18em] text-muted">
+            Contact · Mayda Labs
+          </p>
+          <h1 className="text-2xl font-semibold text-foreground sm:text-3xl md:text-4xl">
+            Book a short intro call.
+          </h1>
+          <p className="max-w-2xl text-sm text-muted sm:text-[0.95rem]">
+            In 15 minutes, we&apos;ll pressure-test fit and identify the fastest
+            next move for your funnel.
+          </p>
+          <Link
+            href={CONTACT_HERO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={primaryCtaClasses}
+          >
+            Book a 15-min Intro Call
+          </Link>
         </div>
       </section>
 
-      {/* Fit check + email options */}
       <section>
-        <div className="mx-auto max-w-6xl space-y-6 lg:max-w-7xl">
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-            {/* Fit check strip */}
-            <article className="flex flex-col justify-between gap-4 rounded-2xl border border-border bg-surface/85 p-5 sm:p-6">
-              <div className="space-y-2">
-                <h2 className="text-lg font-semibold text-foreground sm:text-xl">
-                  Book a 15-min Intro Call.
-                </h2>
-                <p className="max-w-xl text-sm text-muted sm:text-[0.95rem]">
-                  We&apos;ll look at your current funnel, ask a few focused
-                  questions, and tell you in plain English whether a Scan,
-                  Sprint, or Growth Loop makes sense – or if you&apos;re better
-                  off doing something else first.
-                </p>
-                <ul className="ml-4 list-disc space-y-1 text-sm text-muted">
-                  <li>No sales script, no pressure.</li>
-                  <li>We can screen-share if it&apos;s useful.</li>
-                  <li>You leave with 2–3 concrete ideas, either way.</li>
-                </ul>
-              </div>
-              <div>
-                <Link
-                  href={CONTACT_INTRO_CALL_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center rounded-full border border-mayda-teal bg-mayda-teal/20 px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-mayda-teal/30"
-                >
-                  Book a 15-min Intro Call
-                </Link>
-              </div>
-            </article>
+        <div className="mx-auto max-w-6xl space-y-4 lg:max-w-7xl">
+          <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
+            What we&apos;ll cover in 15 minutes
+          </h2>
+          <ul className="ml-5 list-disc space-y-1 text-sm text-muted">
+            <li>Your current numbers and where signal quality breaks down.</li>
+            <li>The biggest bottleneck in conversion, handoff, or retention.</li>
+            <li>The most realistic next step: Scan, Sprint, or Growth Loop.</li>
+          </ul>
+        </div>
+      </section>
 
-            {/* Email + what to include */}
-            <article className="flex flex-col gap-4 rounded-2xl border border-border bg-surface-alt/85 p-5 sm:p-6">
-              <div className="space-y-2">
-                <h2 className="text-lg font-semibold text-foreground sm:text-xl">
-                  Prefer email instead?
-                </h2>
-                <p className="max-w-xl text-sm text-muted sm:text-[0.95rem]">
-                  Send a short note with a few basics and we&apos;ll reply with
-                  thoughts and next steps.
-                </p>
-                <p className="text-sm text-muted">
-                  Email:{" "}
-                  <a
-                    href="mailto:hello@emayda.com"
-                    className="font-medium text-mayda-teal hover:underline"
-                  >
-                    hello@emayda.com
-                  </a>{" "}
-                  (can be updated later to match the final Mayda Labs domain).
-                </p>
-              </div>
+      <section>
+        <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-2 lg:max-w-7xl">
+          <article className="rounded-2xl border border-border bg-surface/85 p-5 text-sm">
+            <h2 className="text-lg font-semibold text-foreground sm:text-xl">
+              What happens after
+            </h2>
+            <ul className="ml-4 mt-3 list-disc space-y-1 text-muted">
+              <li>
+                If there&apos;s fit: we recommend the right program and confirm scope,
+                timeline, and next steps.
+              </li>
+              <li>
+                If there&apos;s no fit: you still leave with 2–3 practical ideas and a
+                better direction.
+              </li>
+            </ul>
+          </article>
+          <article className="rounded-2xl border border-border bg-surface/85 p-5 text-sm">
+            <h2 className="text-lg font-semibold text-foreground sm:text-xl">
+              Prefer email?
+            </h2>
+            <p className="mt-3 text-muted">
+              You can also reach us directly at{" "}
+              <a
+                href="mailto:info@maydalabs.com"
+                className="font-semibold text-mayda-teal hover:underline"
+              >
+                info@maydalabs.com
+              </a>
+              .
+            </p>
+          </article>
+        </div>
+      </section>
 
-              <div className="space-y-2 text-sm text-muted">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
-                  Useful things to include
-                </p>
-                <ul className="ml-4 list-disc space-y-1">
-                  <li>
-                    Your website / product URL and rough monthly sessions.
-                  </li>
-                  <li>
-                    What you&apos;re trying to grow (revenue, MRR, qualified
-                    leads, something else).
-                  </li>
-                  <li>
-                    Anything you already know is broken (tracking, mobile UX,
-                    lifecycle, etc.).
-                  </li>
-                </ul>
-              </div>
-            </article>
+      <section>
+        <div className="mx-auto max-w-6xl rounded-2xl border border-border bg-surface/85 p-5 sm:p-6 lg:max-w-7xl">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground sm:text-xl">
+                Ready to talk through your case?
+              </h2>
+              <p className="text-sm text-muted">
+                We&apos;ll keep it direct and actionable.
+              </p>
+            </div>
+            <Link
+              href={CONTACT_BOTTOM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={primaryCtaClasses}
+            >
+              Book a 15-min Intro Call
+            </Link>
           </div>
         </div>
       </section>

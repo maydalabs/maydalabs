@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { primaryCtaClasses } from "./ProgramsSection";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
@@ -87,6 +87,14 @@ function toNumber(raw: string, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
+function toOptionalNumber(raw: string | null): number | null {
+  if (!raw) return null;
+  const cleaned = raw.replace(/,/g, "").trim();
+  if (!cleaned) return null;
+  const n = Number(cleaned);
+  return Number.isFinite(n) ? n : null;
+}
+
 function stepNumber(raw: string, delta: number, fallback: number) {
   const base = toNumber(raw, fallback);
   const next = Math.max(0, base + delta);
@@ -114,6 +122,9 @@ interface RoiQuickcheckProps {
   primaryCtaHref?: string;
   advancedHref?: string;
   resultsEmail?: string;
+  prefillFromSearch?: boolean;
+  showPrefillSourceNote?: boolean;
+  showAdvancedLinkButton?: boolean;
 }
 
 // Small inline program icon for the recommendation row
@@ -154,8 +165,13 @@ export function RoiQuickcheckSection({
   primaryCtaHref = getIntroCallUrl("roi"),
   advancedHref = "/roi-quickcheck",
   resultsEmail = "hello@maydalabs.com",
+  prefillFromSearch = false,
+  showPrefillSourceNote = false,
+  showAdvancedLinkButton = true
 }: RoiQuickcheckProps) {
+  const hasAppliedQueryPrefill = useRef(false);
   const [mode, setMode] = useState<Mode>("ecom");
+  const [prefillSource, setPrefillSource] = useState<string | null>(null);
 
   // eCom inputs
   const [aovInput, setAovInput] = useState<string>(
@@ -222,6 +238,56 @@ export function RoiQuickcheckSection({
       // ignore
     }
   }, []);
+
+  // Query param prefill support for /roi-quickcheck.
+  useEffect(() => {
+    if (!prefillFromSearch) return;
+    if (typeof window === "undefined") return;
+    if (hasAppliedQueryPrefill.current) return;
+    hasAppliedQueryPrefill.current = true;
+
+    const queryParams = new URLSearchParams(window.location.search);
+
+    const source = queryParams.get("src");
+    if (source) setPrefillSource(source);
+
+    const modeParam = queryParams.get("mode");
+
+    const aovParam = toOptionalNumber(queryParams.get("aov"));
+    const sessionsParam = toOptionalNumber(queryParams.get("sessions"));
+    const crParam = toOptionalNumber(queryParams.get("cr"));
+
+    const dealParam = toOptionalNumber(queryParams.get("deal"));
+    const leadsParam = toOptionalNumber(queryParams.get("leads"));
+    const closeParam = toOptionalNumber(queryParams.get("close"));
+    const liftParam = toOptionalNumber(queryParams.get("lift"));
+
+    const hasEcomParams =
+      aovParam !== null || sessionsParam !== null || crParam !== null;
+    const hasSvcParams =
+      dealParam !== null || leadsParam !== null || closeParam !== null;
+
+    if (modeParam === "svc") {
+      setMode("svc");
+    } else if (modeParam === "ecom") {
+      setMode("ecom");
+    } else if (hasSvcParams && !hasEcomParams) {
+      setMode("svc");
+    }
+
+    if (aovParam !== null) setAovInput(String(Math.max(0, Math.round(aovParam))));
+    if (sessionsParam !== null)
+      setSessionsInput(String(Math.max(0, Math.round(sessionsParam))));
+    if (crParam !== null) setCrInput(String(Math.max(0, crParam)));
+
+    if (dealParam !== null)
+      setDealInput(String(Math.max(0, Math.round(dealParam))));
+    if (leadsParam !== null)
+      setLeadsInput(String(Math.max(0, Math.round(leadsParam))));
+    if (closeParam !== null) setCloseInput(String(Math.max(0, closeParam)));
+
+    if (liftParam !== null) setLift(Math.max(0, liftParam));
+  }, [prefillFromSearch]);
 
   // Persist to localStorage
   useEffect(() => {
@@ -501,6 +567,11 @@ export function RoiQuickcheckSection({
           <p className="mt-3 text-sm text-muted sm:text-base">
             {subheading}
           </p>
+          {showPrefillSourceNote && prefillSource === "roi_widget" && (
+            <p className="mt-3 inline-flex rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1 text-[0.72rem] font-medium text-slate-200">
+              Prefilled from Quickcheck — tweak inputs to match your numbers.
+            </p>
+          )}
         </header>
 
         {/* Layout: calc + results */}
@@ -957,13 +1028,15 @@ export function RoiQuickcheckSection({
               >
                 {primaryCtaLabel}
               </Link>
-              <button
-                type="button"
-                onClick={handleAdvancedClick}
-                className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-transparent px-5 py-2 text-xs font-medium text-slate-200 transition hover:bg-slate-900/70"
-              >
-                Open advanced ROI calculator →
-              </button>
+              {showAdvancedLinkButton && (
+                <button
+                  type="button"
+                  onClick={handleAdvancedClick}
+                  className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-transparent px-5 py-2 text-xs font-medium text-slate-200 transition hover:bg-slate-900/70"
+                >
+                  Open advanced ROI calculator →
+                </button>
+              )}
             </div>
             <p className="mt-2 text-[11px] font-medium text-slate-400">
               15–20 minutes. We’ll sanity-check your inputs and the math

@@ -1,144 +1,192 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { primaryCtaClasses } from "@/components/ProgramsSection";
+import { getIntroCallUrl } from "@/lib/marketingLinks";
 
-export const metadata: Metadata = {
-  title: "Projects – Selected growth work",
-  description:
-    "Selected Mayda Labs projects and case microsites across ecommerce, SaaS, and services – the evolution of the original /projects gallery.",
+type CaseCard = {
+  slug: string;
+  title: string;
+  context: string;
+  work: string[];
+  result: string[];
 };
 
-export default function ProjectsPage() {
+const CASE_HERO_URL = getIntroCallUrl("case_hero");
+const CASE_BOTTOM_URL = getIntroCallUrl("case_bottom");
+
+const CASES: CaseCard[] = [
+  {
+    slug: "dtc-checkout-recovery",
+    title: "DTC checkout recovery sprint",
+    context: "Established ecommerce brand with steady traffic and weak checkout completion.",
+    work: [
+      "Mapped drop-off points across product, cart, and checkout states.",
+      "Implemented focused UX and speed fixes tied to purchase intent."
+    ],
+    result: [
+      "Double-digit lift on key checkout steps within the sprint window.",
+      "Cleaner conversion measurement after tracking repair."
+    ]
+  },
+  {
+    slug: "saas-activation-flow",
+    title: "SaaS activation flow cleanup",
+    context: "B2B product with sign-ups but inconsistent onboarding activation.",
+    work: [
+      "Reworked onboarding sequence around real product events.",
+      "Built lifecycle nudges aligned to activation milestones."
+    ],
+    result: [
+      "Early activation moved up meaningfully in the first 30 days.",
+      "Team gained a clearer baseline for trial-to-paid decisions."
+    ]
+  },
+  {
+    slug: "services-lead-handoff",
+    title: "Services lead handoff optimization",
+    context: "Service firm with lead volume but low qualified consultations.",
+    work: [
+      "Simplified contact and qualification flow from first click to call.",
+      "Added structured follow-up rules for no-response and no-show scenarios."
+    ],
+    result: [
+      "More qualified conversations from the same traffic base.",
+      "Less leakage between form submit and scheduled call."
+    ]
+  },
+  {
+    slug: "retention-lifecycle-foundation",
+    title: "Retention lifecycle foundation",
+    context: "Growth-stage team lacking a reliable lifecycle operating system.",
+    work: [
+      "Built core post-purchase and win-back lifecycle flows.",
+      "Linked lifecycle reporting to weekly decision cadence."
+    ],
+    result: [
+      "Improved repeat-engagement trend after initial rollout.",
+      "Faster iteration cycles due to clearer signal quality."
+    ]
+  }
+];
+
+export const metadata: Metadata = {
+  title: "Case Studies – Outcomes and implementation proof",
+  description:
+    "Selected Mayda Labs case snapshots focused on context, execution, and measured outcomes.",
+};
+
+export default function CaseStudiesPage() {
   return (
     <div className="space-y-16 md:space-y-20">
-      {/* Header */}
-      <header>
-        <div className="mx-auto max-w-6xl space-y-3 lg:max-w-7xl">
-          <p className="text-[0.75rem] font-medium uppercase tracking-[0.18em] text-muted">
-            PROJECTS
-          </p>
-          <h1 className="text-2xl font-semibold text-foreground sm:text-3xl md:text-4xl">
-            Selected projects
-          </h1>
-          <p className="max-w-2xl text-sm text-muted sm:text-[0.95rem]">
-            A few recent projects across ecommerce, SaaS, and services. Full
-            microsites and deeper write-ups will live here as Mayda Labs
-            publishes more work.
-          </p>
-          <p className="max-w-3xl text-xs text-muted sm:text-sm">
-            These are representative examples – numbers are directional, but the
-            shape of the work is exactly what we do in a Baseline Scan, Momentum
-            Sprint, or Growth Loop.
-          </p>
-        </div>
-      </header>
-
-      {/* Cases grid */}
       <section>
-        <div className="mx-auto max-w-6xl lg:max-w-7xl">
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Ecommerce case */}
-            <article className="flex flex-col gap-3 rounded-xl border border-border bg-surface/85 p-5 text-sm">
-              <p className="text-[0.75rem] uppercase tracking-[0.14em] text-muted">
-                Ecommerce brand · Momentum Sprint
-              </p>
-              <h2 className="text-[1.1rem] font-semibold text-foreground">
-                From stalled traffic to reliable revenue.
-              </h2>
-              <p className="text-muted">
-                Mid-sized DTC brand with decent traffic but flat revenue, messy
-                tracking, and no real lifecycle flows.
-              </p>
-              <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
-                <li>+28% conversion rate on core product funnels.</li>
-                <li>+19% average order value via offer and UX changes.</li>
-                <li>$84k extra revenue in 90 days vs prior period.</li>
-              </ul>
-              <p className="text-[0.8rem] text-muted">
-                <span className="font-semibold text-foreground">Scope:</span>{" "}
-                Baseline Scan + 8-week Momentum Sprint. Work: tracking cleanup,
-                product page + cart experiments, new post-purchase and win-back
-                flows.
-              </p>
-            </article>
+        <div className="mx-auto max-w-6xl space-y-4 lg:max-w-7xl">
+          <p className="text-[0.75rem] font-medium uppercase tracking-[0.18em] text-muted">
+            Case studies
+          </p>
+          <h1 className="max-w-3xl text-2xl font-semibold text-foreground sm:text-3xl md:text-4xl">
+            Outcomes, not fluff.
+          </h1>
+          <p className="max-w-3xl text-sm text-muted sm:text-[0.95rem]">
+            Snapshot views of recent engagement types: context, what we changed,
+            and what moved.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href={CASE_HERO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={primaryCtaClasses}
+            >
+              Book a 15-min Intro Call
+            </Link>
+            <Link
+              href="/programs"
+              className="inline-flex items-center justify-center rounded-full border border-border bg-surface-alt px-4 py-2 text-sm font-medium text-foreground hover:bg-surface-alt/80"
+            >
+              View programs
+            </Link>
+          </div>
+        </div>
+      </section>
 
-            {/* SaaS case */}
-            <article className="flex flex-col gap-3 rounded-xl border border-border bg-surface/85 p-5 text-sm">
-              <p className="text-[0.75rem] uppercase tracking-[0.14em] text-muted">
-                SaaS platform · Momentum Sprint
-              </p>
-              <h2 className="text-[1.1rem] font-semibold text-foreground">
-                Activation and upgrade working together.
-              </h2>
-              <p className="text-muted">
-                B2B SaaS with strong sign-up volume but weak activation and no
-                structured experiments around upgrade triggers.
-              </p>
-              <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
-                <li>+17% trial-to-activated users within 14 days.</li>
-                <li>+11% upgrade rate in the first 30 days.</li>
-                <li>Lifecycle flows driven by clean product events.</li>
-              </ul>
-              <p className="text-[0.8rem] text-muted">
-                <span className="font-semibold text-foreground">Scope:</span>{" "}
-                6-week Momentum Sprint. Work: event mapping, onboarding flow
-                redesign, in-app nudges, lifecycle emails tied to real
-                behaviour.
-              </p>
-            </article>
+      <section>
+        <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-2 lg:max-w-7xl">
+          {CASES.map((item) => (
+            <article
+              key={item.slug}
+              className="flex flex-col gap-3 rounded-2xl border border-border bg-surface/85 p-5 text-sm"
+            >
+              <h2 className="text-lg font-semibold text-foreground">{item.title}</h2>
 
-            {/* Services / practice case */}
-            <article className="flex flex-col gap-3 rounded-xl border border-border bg-surface/85 p-5 text-sm">
-              <p className="text-[0.75rem] uppercase tracking-[0.14em] text-muted">
-                Service firm &amp; practice · Growth Loop
-              </p>
-              <h2 className="text-[1.1rem] font-semibold text-foreground">
-                Turning visits into qualified consultations.
-              </h2>
-              <p className="text-muted">
-                Boutique service firm relying on referrals and a dated site;
-                wanted the website and content to drive predictable leads.
-              </p>
-              <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
-                <li>2.3× more qualified consultation requests per month.</li>
-                <li>Clearer positioning and offer structure on key pages.</li>
-                <li>
-                  New lead capture and nurture flows supporting outbound and
-                  content.
-                </li>
-              </ul>
-              <p className="text-[0.8rem] text-muted">
-                <span className="font-semibold text-foreground">Scope:</span>{" "}
-                Baseline Scan + ongoing Growth Loop. Work: site restructuring,
-                offer clarity, form and funnel experiments, lifecycle and
-                content cadence.
-              </p>
-            </article>
+              <div>
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-muted">
+                  Context
+                </p>
+                <p className="mt-1 text-muted">{item.context}</p>
+              </div>
 
-            {/* Bitcoin-native case */}
-            <article className="flex flex-col gap-3 rounded-xl border border-border bg-surface/85 p-5 text-sm">
-              <p className="text-[0.75rem] uppercase tracking-[0.14em] text-muted">
-                Bitcoin-native brand · Mixed scope
-              </p>
-              <h2 className="text-[1.1rem] font-semibold text-foreground">
-                Modern funnels for a Bitcoin-first audience.
-              </h2>
-              <p className="text-muted">
-                Bitcoin-native project needing modern UX, clearer funnels, and
-                lifecycle systems that respect how their audience buys and
-                interacts.
-              </p>
-              <ul className="ml-4 list-disc space-y-1 text-[0.9rem] text-muted">
-                <li>New site structure focused on actions, not noise.</li>
-                <li>Cohesive measurement across web, email, and product.</li>
-                <li>
-                  Lifecycle flows tuned for a global, high-signal audience.
-                </li>
-              </ul>
-              <p className="text-[0.8rem] text-muted">
-                <span className="font-semibold text-foreground">Scope:</span>{" "}
-                custom mix of Scan, Sprint, and advisory. This is the shape of
-                work for more complex, multi-surface products.
-              </p>
+              <div>
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-muted">
+                  What we did
+                </p>
+                <ul className="ml-4 mt-1 list-disc space-y-1 text-muted">
+                  {item.work.map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-muted">
+                  Result
+                </p>
+                <ul className="ml-4 mt-1 list-disc space-y-1 text-muted">
+                  {item.result.map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="pt-1">
+                <Link
+                  href={getIntroCallUrl("case_card", { utm_term: item.slug })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={primaryCtaClasses}
+                >
+                  Book a 15-min Intro Call
+                </Link>
+              </div>
             </article>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <div className="mx-auto max-w-6xl text-sm text-muted lg:max-w-7xl">
+          More case writeups coming — visuals are being refreshed.
+        </div>
+      </section>
+
+      <section>
+        <div className="mx-auto max-w-6xl rounded-2xl border border-border bg-surface/85 p-5 sm:p-6 lg:max-w-7xl">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground sm:text-xl">
+                Want to discuss a similar scenario?
+              </h2>
+              <p className="text-sm text-muted">
+                We&apos;ll walk through fit, likely gains, and the right entry point.
+              </p>
+            </div>
+            <Link
+              href={CASE_BOTTOM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={primaryCtaClasses}
+            >
+              Book a 15-min Intro Call
+            </Link>
           </div>
         </div>
       </section>
