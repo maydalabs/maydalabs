@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getIntroCallUrl } from "@/lib/marketingLinks";
 
 export const metadata: Metadata = {
   title: "Pricing – Fixed-scope growth programs",
   description:
     "Simple, outcome-focused pricing: one-time Baseline Scan, fixed-fee Momentum Sprints, and a clear monthly Growth Loop retainer with no black-box retainers.",
 };
+
+const PRICING_INTRO_CALL_URL = getIntroCallUrl("pricing");
 
 export default function PricingPage() {
   return (
@@ -190,16 +193,16 @@ export default function PricingPage() {
                 Want actual numbers for your case?
               </h2>
               <p className="max-w-xl text-sm text-muted sm:text-[0.95rem]">
-                A quick 15-minute fit check is usually enough to give you a
+                A quick 15-minute intro call is usually enough to give you a
                 realistic fee range for a Scan, Sprint, or Growth Loop.
               </p>
             </div>
             <div>
               <Link
-                href="https://calendly.com/"
+                href={PRICING_INTRO_CALL_URL}
                 className="inline-flex items-center justify-center rounded-full border border-mayda-teal bg-mayda-teal/20 px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-mayda-teal/30"
               >
-                Book a 15&nbsp;min fit check
+                Book a 15-min Intro Call
               </Link>
             </div>
           </div>

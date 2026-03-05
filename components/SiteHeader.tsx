@@ -4,9 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { getIntroCallUrl } from "@/lib/marketingLinks";
 
-const FIT_CHECK_URL =
-  "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=discovery-call-header";
+const HEADER_INTRO_CALL_URL = getIntroCallUrl("header");
 
 // Canonical primary CTA – matches ProgramsSection
 const headerCtaClasses =
@@ -257,8 +257,8 @@ export function SiteHeader() {
           </Link>
 
           {/* Header CTA */}
-          <Link href={FIT_CHECK_URL} className={headerCtaClasses}>
-            Book a discovery call
+          <Link href={HEADER_INTRO_CALL_URL} className={headerCtaClasses}>
+            Book a 15-min Intro Call
           </Link>
         </nav>
 
@@ -382,11 +382,11 @@ export function SiteHeader() {
 
             {/* Mobile CTA */}
             <Link
-              href={FIT_CHECK_URL}
+              href={HEADER_INTRO_CALL_URL}
               onClick={() => setOpen(false)}
               className={`${headerCtaClasses} mt-3 justify-center`}
             >
-              Book a discovery call
+              Book a 15-min Intro Call
             </Link>
           </div>
         </nav>

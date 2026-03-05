@@ -4,9 +4,7 @@ import Link from "next/link";
 import * as React from "react";
 import type { CSSProperties } from "react";
 import { primaryCtaClasses } from "./ProgramsSection";
-
-const FIT_CHECK_URL =
-  "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=pricing";
+import { getIntroCallUrl } from "@/lib/marketingLinks";
 
 // Let TypeScript know about dataLayer without using `any`
 declare global {
@@ -349,7 +347,7 @@ export function PricingSection() {
             Prices exclude VAT. Flexible invoicing for UK/EU/US.
           </p>
           <Link
-            href={FIT_CHECK_URL}
+            href={getIntroCallUrl("pricing")}
             target="_blank"
             rel="noopener noreferrer"
             className={primaryCtaClasses}
@@ -360,7 +358,7 @@ export function PricingSection() {
               })
             }
           >
-            Not sure where to start? Book a 15-min discovery call—Free
+            Book a 15-min Intro Call
           </Link>
           <p className="mt-1 text-[11px] font-semibold text-slate-500">
             Kickoff in 7 days or we comp your first week.
@@ -509,7 +507,7 @@ function PricingCard({
       {/* CTAs */}
       <div className="mt-6 flex flex-col items-center gap-3">
         <Link
-          href={FIT_CHECK_URL}
+          href={getIntroCallUrl("pricing", { utm_term: tier.id })}
           target="_blank"
           rel="noopener noreferrer"
           className={primaryCtaClasses + " w-full sm:w-auto"}
@@ -522,7 +520,7 @@ function PricingCard({
             })
           }
         >
-          Book a discovery call
+          Book a 15-min Intro Call
         </Link>
 
         {tier.secondaryHref && tier.secondaryLabel && (

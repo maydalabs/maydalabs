@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getIntroCallUrl } from "@/lib/marketingLinks";
 
 export const metadata: Metadata = {
-  title: "Contact – Book a 15 min fit check",
+  title: "Contact – Book a 15-min Intro Call",
   description:
-    "Book a short fit check call or email Mayda Labs with a snapshot of your traffic, stack, and goals to see whether a Scan, Sprint, or Growth Loop makes sense.",
+    "Book a short intro call or email Mayda Labs with a snapshot of your traffic, stack, and goals to see whether a Scan, Sprint, or Growth Loop makes sense.",
 };
+
+const CONTACT_INTRO_CALL_URL = getIntroCallUrl("contact");
 
 export default function ContactPage() {
   return (
@@ -21,7 +24,7 @@ export default function ContactPage() {
               Let&apos;s figure out if we&apos;re a fit.
             </h1>
             <p className="max-w-2xl text-sm text-muted sm:text-[0.95rem]">
-              Easiest way to start is a short fit check call. If you prefer
+              Easiest way to start is a short intro call. If you prefer
               email, send a quick snapshot of your traffic, stack, and goals and
               we&apos;ll take it from there.
             </p>
@@ -37,7 +40,7 @@ export default function ContactPage() {
             <article className="flex flex-col justify-between gap-4 rounded-2xl border border-border bg-surface/85 p-5 sm:p-6">
               <div className="space-y-2">
                 <h2 className="text-lg font-semibold text-foreground sm:text-xl">
-                  Book a 15&nbsp;min fit check.
+                  Book a 15-min Intro Call.
                 </h2>
                 <p className="max-w-xl text-sm text-muted sm:text-[0.95rem]">
                   We&apos;ll look at your current funnel, ask a few focused
@@ -53,10 +56,10 @@ export default function ContactPage() {
               </div>
               <div>
                 <Link
-                  href="https://calendly.com/"
+                  href={CONTACT_INTRO_CALL_URL}
                   className="inline-flex items-center justify-center rounded-full border border-mayda-teal bg-mayda-teal/20 px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-mayda-teal/30"
                 >
-                  Book a 15&nbsp;min fit check
+                  Book a 15-min Intro Call
                 </Link>
               </div>
             </article>

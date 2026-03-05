@@ -5,6 +5,7 @@ import Link from "next/link";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { primaryCtaClasses } from "@/components/ProgramsSection";
+import { getIntroCallUrl } from "@/lib/marketingLinks";
 
 type CaseSlide = {
   id: string;
@@ -23,8 +24,7 @@ type CaseSlide = {
   imageMobile?: string;
 };
 
-const DISCOVERY_CALL_URL =
-  "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=discovery-call";
+const CASE_INTRO_CALL_URL = getIntroCallUrl("case");
 
 const SLIDES: CaseSlide[] = [
   {
@@ -43,8 +43,8 @@ const SLIDES: CaseSlide[] = [
       "They didn’t just design screens—they shipped a booking flow we can actually grow on.",
     quoteAuthor: "Founder, AirBTC",
     primaryCta: {
-      label: "Book a discovery call",
-      href: DISCOVERY_CALL_URL,
+      label: "Book a 15-min Intro Call",
+      href: CASE_INTRO_CALL_URL,
     },
     secondaryCta: {
       label: "View case",
@@ -70,8 +70,8 @@ const SLIDES: CaseSlide[] = [
     quote: "Feels like an internal tool we actually want to use every day.",
     quoteAuthor: "Editorial lead, Satoshi Gazette",
     primaryCta: {
-      label: "Book a discovery call",
-      href: DISCOVERY_CALL_URL,
+      label: "Book a 15-min Intro Call",
+      href: CASE_INTRO_CALL_URL,
     },
     secondaryCta: {
       label: "View case",
@@ -97,8 +97,8 @@ const SLIDES: CaseSlide[] = [
     quote: "The sales flow finally matched the size and complexity of what we sell.",
     quoteAuthor: "Director, Coin Mining Central",
     primaryCta: {
-      label: "Book a discovery call",
-      href: DISCOVERY_CALL_URL,
+      label: "Book a 15-min Intro Call",
+      href: CASE_INTRO_CALL_URL,
     },
     secondaryCta: {
       label: "View case",
@@ -124,8 +124,8 @@ const SLIDES: CaseSlide[] = [
     quote: "The process feels like a product, not one-off consulting.",
     quoteAuthor: "Founder, Independent Check",
     primaryCta: {
-      label: "Book a discovery call",
-      href: DISCOVERY_CALL_URL,
+      label: "Book a 15-min Intro Call",
+      href: CASE_INTRO_CALL_URL,
     },
     secondaryCta: {
       label: "View case",

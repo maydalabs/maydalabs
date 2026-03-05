@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { primaryCtaClasses } from "@/components/ProgramsSection";
+import { getIntroCallUrl } from "@/lib/marketingLinks";
 
-const DISCOVERY_CALL_URL =
-  "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=discovery-call-hero";
+const HERO_INTRO_CALL_URL = getIntroCallUrl("hero");
 
 export function HeroSection() {
   return (
@@ -40,12 +40,12 @@ export function HeroSection() {
             {/* CTAs */}
             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
               <Link
-                href={DISCOVERY_CALL_URL}
+                href={HERO_INTRO_CALL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={primaryCtaClasses}
               >
-                Book a discovery call
+                Book a 15-min Intro Call
               </Link>
 
               <Link

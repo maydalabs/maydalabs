@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import { primaryCtaClasses } from "./ProgramsSection";
+import { getIntroCallUrl } from "@/lib/marketingLinks";
 
 type Mode = "ecom" | "svc";
 type ProgramKey = "baseline-scan" | "momentum-sprint" | "growth-loop";
@@ -149,8 +150,8 @@ function ProgramIconInline({ id }: { id: ProgramKey }) {
 export function RoiQuickcheckSection({
   heading = "Estimate your upside before you change anything.",
   subheading = "Directional, back-of-the-envelope math for what a small conversion or close-rate lift could mean in real dollars.",
-  primaryCtaLabel = "Book a discovery call",
-  primaryCtaHref = "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=discovery-call&ref=roi-quickcheck",
+  primaryCtaLabel = "Book a 15-min Intro Call",
+  primaryCtaHref = getIntroCallUrl("roi"),
   advancedHref = "/roi-quickcheck",
   resultsEmail = "hello@maydalabs.com",
 }: RoiQuickcheckProps) {
@@ -462,11 +463,7 @@ export function RoiQuickcheckSection({
       url.searchParams.set("lift", lift.toFixed(1));
     }
 
-    if (!url.searchParams.has("utm_source")) {
-      url.searchParams.set("utm_source", "home");
-      url.searchParams.set("utm_medium", "roi_quick");
-      url.searchParams.set("utm_campaign", "roi_widget");
-    }
+    url.searchParams.set("src", "roi_widget");
 
     return url.toString();
   }

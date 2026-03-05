@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { getIntroCallUrl } from "@/lib/marketingLinks";
 
 type ProgramId = "baseline-scan" | "momentum-sprint" | "growth-loop";
 
@@ -17,9 +18,6 @@ type Program = {
   tagline?: string;
 };
 
-const baseFitCheckUrl =
-  "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=programs&program=";
-
 const programs: Program[] = [
   {
     id: "baseline-scan",
@@ -35,7 +33,10 @@ const programs: Program[] = [
       "Deliver a prioritized roadmap of what to fix first and what to ignore."
     ],
     detailsHref: "/programs#baseline-scan",
-    fitCheckHref: `${baseFitCheckUrl}Baseline+Scan`
+    fitCheckHref: getIntroCallUrl("programs", {
+      program: "Baseline Scan",
+      utm_term: "baseline-scan"
+    })
   },
   {
     id: "momentum-sprint",
@@ -51,7 +52,10 @@ const programs: Program[] = [
       "Run focused A/Bs on the 2–3 highest-impact steps."
     ],
     detailsHref: "/programs#momentum-sprint",
-    fitCheckHref: `${baseFitCheckUrl}Momentum+Sprint`,
+    fitCheckHref: getIntroCallUrl("programs", {
+      program: "Momentum Sprint",
+      utm_term: "momentum-sprint"
+    }),
     tagline:
       "Most teams start with a Momentum Sprint, then graduate into Growth Loop."
   },
@@ -69,7 +73,10 @@ const programs: Program[] = [
       "Keep a monthly CRO + analytics cadence so compounding doesn’t stall."
     ],
     detailsHref: "/programs#growth-loop",
-    fitCheckHref: `${baseFitCheckUrl}Growth+Loop`
+    fitCheckHref: getIntroCallUrl("programs", {
+      program: "Growth Loop",
+      utm_term: "growth-loop"
+    })
   }
 ];
 
@@ -156,18 +163,18 @@ export function ProgramsSection() {
                 Not sure where to start?
               </p>
               <p className="text-sm text-slate-300">
-                Book a short discovery call and we&apos;ll recommend a program.
+                Book a short intro call and we&apos;ll recommend a program.
                 Most teams start with Momentum Sprint.
               </p>
             </div>
             <div className="flex justify-center sm:justify-end">
               <a
-                href="https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=discovery-call&utm_content=programs-section"
+                href={getIntroCallUrl("programs")}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={primaryCtaClasses}
               >
-                Book a discovery call
+                Book a 15-min Intro Call
               </a>
             </div>
           </div>
@@ -270,7 +277,7 @@ function ProgramCard({
           rel="noopener noreferrer"
           className={primaryCtaClasses + " w-full sm:w-auto"}
         >
-          Book a discovery call
+          Book a 15-min Intro Call
         </Link>
         <Link
           href={program.detailsHref}

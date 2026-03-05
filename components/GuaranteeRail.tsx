@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { primaryCtaClasses } from "./ProgramsSection";
+import { getIntroCallUrl } from "@/lib/marketingLinks";
 
 const DEFAULT_PLEDGES = [
   "Owner docs + launch checklist",
@@ -23,9 +24,8 @@ interface GuaranteeRailProps {
 export function GuaranteeRail({
   id = "guarantee",
   pledges = DEFAULT_PLEDGES,
-  // Canonical CTA: discovery call (matches header/hero)
-  ctaLabel = "Book a discovery call",
-  ctaHref = "https://calendly.com/emayda-info/discovery-call"
+  ctaLabel = "Book a 15-min Intro Call",
+  ctaHref = getIntroCallUrl("guarantee")
 }: GuaranteeRailProps) {
   const [open, setOpen] = useState(false);
 

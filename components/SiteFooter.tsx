@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { primaryCtaClasses } from "./ProgramsSection";
+import { getIntroCallUrl } from "@/lib/marketingLinks";
 
 type FooterLink = { label: string; href: string };
 type FooterColumn = {
@@ -58,9 +59,7 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
   {
     title: "Programs",
     links: [
-      { label: "Baseline Scan", href: "/programs/baseline-scan" },
-      { label: "Momentum Sprint", href: "/programs/momentum-sprint" },
-      { label: "Growth Loop", href: "/programs/growth-loop" },
+      { label: "View programs", href: "/programs" },
       { label: "Pricing", href: "/pricing" },
       { label: "ROI quickcheck", href: "/roi-quickcheck" },
     ],
@@ -70,19 +69,14 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
     links: [
       { label: "Case studies", href: "/case-studies" },
       { label: "Playbooks", href: "/playbooks" },
-      { label: "Blog", href: "/blog" },
       { label: "Newsletter", href: "/newsletter" },
-      { label: "Contact", href: "/contact" },
     ],
   },
   {
     title: "Company",
     links: [
       { label: "About", href: "/about" },
-      { label: "Careers", href: "/careers" },
-      { label: "Press", href: "/press" },
-      { label: "Partners", href: "/partners" },
-      { label: "Status", href: "/status" },
+      { label: "Contact", href: "/contact" },
     ],
   },
   {
@@ -90,9 +84,6 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
     links: [
       { label: "Privacy", href: "/privacy" },
       { label: "Terms", href: "/terms" },
-      { label: "Refunds", href: "/refunds" },
-      { label: "Security", href: "/security" },
-      { label: "DPA", href: "/dpa" },
     ],
   },
 ];
@@ -104,9 +95,9 @@ const DEFAULT_POLICIES: FooterLink[] = [
 
 export function SiteFooter({
   brandName = "Mayda Labs",
-  ctaText = "Free 15-min discovery call. We’ll identify 2–3 quick wins and a clear path.",
-  ctaLabel = "Book a discovery call",
-  ctaHref = "https://calendly.com/emayda-info/discovery-call?utm_source=maydalabs&utm_medium=website&utm_campaign=footer-main",
+  ctaText = "Free 15-min intro call. We’ll identify 2–3 quick wins and a clear path.",
+  ctaLabel = "Book a 15-min Intro Call",
+  ctaHref = getIntroCallUrl("footer"),
 
   showCtaBand = true,
 
@@ -124,8 +115,8 @@ export function SiteFooter({
   socials = [],
 
   stickyCtaEnabled = true,
-  stickyCtaLabel = "Book a discovery call",
-  stickyCtaHref,
+  stickyCtaLabel = "Book a 15-min Intro Call",
+  stickyCtaHref = getIntroCallUrl("sticky"),
 
   showTopFade = false,
 }: SiteFooterProps) {

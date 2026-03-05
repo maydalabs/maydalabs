@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { primaryCtaClasses } from "./ProgramsSection";
+import { getIntroCallUrl } from "@/lib/marketingLinks";
 
 type Step = {
   id: number;
@@ -70,9 +71,9 @@ export function HowWeWorkSection({
   id = "how-we-work",
   heading = "How we work",
   subheading = "Plan clearly. Ship fast. Prove what worked, then compound.",
-  primaryCtaLabel = "Book a discovery call",
-  primaryCtaHref = "https://calendly.com/emayda-info/fit-check?utm_source=maydalabs&utm_medium=website&utm_campaign=how-we-work",
-  secondaryLabel = "See which program fits",
+  primaryCtaLabel = "Book a 15-min Intro Call",
+  primaryCtaHref = getIntroCallUrl("programs"),
+  secondaryLabel = "View programs",
   secondaryHref = "#programs"
 }: HowWeWorkSectionProps) {
   const primaryIsExternal =
