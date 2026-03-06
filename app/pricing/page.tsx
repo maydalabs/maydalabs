@@ -84,16 +84,16 @@ export const metadata: Metadata = {
 
 export default function PricingPage() {
   return (
-    <div className="space-y-16 md:space-y-20">
+    <div className="mayda-page-stack">
       <section>
         <div className="mx-auto max-w-6xl space-y-4 lg:max-w-7xl">
-          <p className="text-[0.75rem] font-medium uppercase tracking-[0.18em] text-muted">
+          <p className="mayda-kicker">
             Pricing · Choose your starting point
           </p>
-          <h1 className="max-w-3xl text-2xl font-semibold text-foreground sm:text-3xl md:text-4xl">
+          <h1 className="mayda-section-title max-w-3xl text-foreground sm:text-3xl md:text-4xl">
             Pick the right program to turn traffic into measurable revenue.
           </h1>
-          <p className="max-w-3xl text-sm text-muted sm:text-[0.95rem]">
+          <p className="mayda-section-copy max-w-3xl text-sm sm:text-[0.95rem]">
             Clear scope, clear ownership, clear next steps. No vague retainer
             promises.
           </p>

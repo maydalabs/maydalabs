@@ -186,16 +186,14 @@ const PROGRAM_FAQ = [
 
 export default function ProgramsPage() {
   return (
-    <div className="space-y-16 md:space-y-20">
+    <div className="mayda-page-stack">
       <section>
         <div className="mx-auto max-w-6xl space-y-5 lg:max-w-7xl">
-          <p className="text-[0.75rem] font-medium uppercase tracking-[0.18em] text-muted">
-            PROGRAMS
-          </p>
-          <h1 className="max-w-4xl text-3xl font-semibold leading-tight text-foreground sm:text-4xl md:text-5xl">
+          <p className="mayda-kicker">Programs</p>
+          <h1 className="mayda-section-title max-w-4xl text-foreground sm:text-4xl md:text-5xl">
             Turn existing traffic into measurable revenue, faster.
           </h1>
-          <p className="max-w-3xl text-sm text-muted sm:text-base">
+          <p className="mayda-section-copy max-w-3xl text-sm sm:text-base">
             Mayda Labs helps digital teams fix tracking, remove conversion
             friction, and ship growth systems that keep compounding.
           </p>

@@ -84,25 +84,23 @@ export function HowWeWorkSection({
     <section
       id={id}
       aria-label={heading}
-      className="relative py-16 sm:py-24"
+      className="mayda-section relative"
     >
       <div className="mx-auto flex max-w-6xl flex-col px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <header className="mx-auto mb-4 max-w-3xl text-center">
-          <p className="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-slate-400">
-            Delivery rhythm
-          </p>
-          <h2 className="text-balance text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">
+          <p className="mayda-kicker mb-2">Delivery rhythm</p>
+          <h2 className="mayda-section-title text-foreground">
             {heading}
           </h2>
-          <p className="mt-3 text-sm text-slate-300 sm:text-base">
+          <p className="mayda-section-copy mt-3 text-sm sm:text-base">
             {subheading}
           </p>
         </header>
 
         {/* Desktop rail line */}
         <div className="pointer-events-none relative hidden h-0 md:block">
-          <div className="pointer-events-none absolute left-0 right-0 top-6 mx-auto h-px max-w-5xl bg-slate-800/40" />
+          <div className="pointer-events-none absolute left-0 right-0 top-6 mx-auto h-px max-w-5xl bg-border" />
         </div>
 
         {/* Cards grid / mobile swipe */}
@@ -110,14 +108,14 @@ export function HowWeWorkSection({
           className="
             relative mt-4
             flex gap-4 overflow-x-auto pb-4
-            text-sm text-slate-50
+            text-sm text-foreground
             md:grid md:grid-cols-4 md:gap-6 md:overflow-visible md:pb-0
           "
           role="list"
         >
           {/* gradient edge hints only on mobile */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-slate-950 to-transparent md:hidden" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-slate-950 to-transparent md:hidden" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-background to-transparent md:hidden" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent md:hidden" />
 
           {STEPS.map((step) => (
             <article
@@ -127,44 +125,44 @@ export function HowWeWorkSection({
               aria-describedby={`${id}-d${step.id}`}
               className="
                 relative flex min-h-[190px] flex-[0_0_82%] flex-col gap-2
-                rounded-2xl border border-slate-800/80 bg-slate-900/75
-                p-5 shadow-[0_18px_45px_rgba(2,6,23,0.8)] backdrop-blur
+                rounded-2xl border border-border bg-surface-card
+                p-5 shadow-[0_18px_45px_rgba(2,6,23,0.62)] backdrop-blur
                 transition-transform duration-150 ease-out
-                hover:-translate-y-1 hover:border-teal-300/70 hover:shadow-[0_26px_80px_rgba(15,23,42,0.95)]
+                hover:-translate-y-1 hover:border-mayda-teal/45 hover:bg-surface-card-alt/94 hover:shadow-[0_24px_64px_rgba(2,6,23,0.76)]
                 md:flex-[0_0_auto] md:min-w-0
               "
             >
               {/* Step badge */}
               <span
                 aria-hidden="true"
-                className="absolute left-4 top-4 grid h-6 w-6 place-items-center rounded-full border border-slate-700 bg-slate-900/90 text-[11px] font-semibold text-slate-100"
+                className="absolute left-4 top-4 grid h-6 w-6 place-items-center rounded-full border border-border bg-surface-card-alt/94 text-[11px] font-semibold text-foreground"
               >
                 {step.id}
               </span>
 
               <h3
                 id={`${id}-t${step.id}`}
-                className="pl-7 text-base font-semibold tracking-tight text-slate-50"
+                className="pl-7 text-base font-semibold tracking-tight text-foreground"
               >
                 {step.title}
               </h3>
 
-              <div className="ml-7 inline-flex w-max items-center rounded-full border border-slate-800 bg-slate-900/80 px-2.5 py-1 text-[11px] font-medium text-slate-300">
+              <div className="ml-7 inline-flex w-max items-center rounded-full border border-border bg-surface-card-alt/92 px-2.5 py-1 text-[11px] font-medium text-muted">
                 {step.timeframe}
               </div>
 
               <p
                 id={`${id}-d${step.id}`}
-                className="mt-2 text-[13px] font-medium leading-snug text-slate-200"
+                className="mt-2 text-[13px] font-medium leading-snug text-foreground/88"
               >
                 {step.oneLiner}
               </p>
 
               {step.bullets.length > 0 && (
-                <ul className="mt-3 grid gap-1.5 text-[13px] font-medium text-slate-300">
+                <ul className="mt-3 grid gap-1.5 text-[13px] font-medium text-muted">
                   {step.bullets.map((b) => (
                     <li key={b} className="relative pl-4">
-                      <span className="absolute left-0 top-0 text-[11px] text-emerald-400">
+                      <span className="absolute left-0 top-0 text-[11px] text-mayda-teal-soft">
                         ✓
                       </span>
                       {b}
@@ -199,7 +197,7 @@ export function HowWeWorkSection({
           {secondaryHref && (
             <a
               href={secondaryHref}
-              className="text-xs font-medium text-slate-300 underline-offset-4 hover:underline hover:text-teal-300"
+              className="text-xs font-medium text-muted underline-offset-4 hover:text-mayda-teal-soft hover:underline"
             >
               {secondaryLabel}
             </a>

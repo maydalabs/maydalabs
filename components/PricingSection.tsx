@@ -197,17 +197,15 @@ export function PricingSection() {
   };
 
   return (
-    <section id="pricing" aria-label="Pricing" className="py-16 sm:py-24">
+    <section id="pricing" aria-label="Pricing" className="mayda-section">
       <div className="mx-auto flex w-full max-w-6xl flex-col px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <header className="mx-auto max-w-2xl text-center">
-          <p className="text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-slate-400">
-            Transparent, fixed scopes
-          </p>
-          <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">
+          <p className="mayda-kicker">Transparent, fixed scopes</p>
+          <h2 className="mayda-section-title mt-3 text-foreground">
             Simple, outcome-focused pricing.
           </h2>
-          <p className="mt-3 text-balance text-sm text-slate-300 sm:text-base">
+          <p className="mayda-section-copy mt-3 text-sm sm:text-base">
             Pick a diagnostic, a sprint, or a growth loop. Clear scopes, no
             surprise retainers.
           </p>
@@ -241,8 +239,8 @@ export function PricingSection() {
           <button
             type="button"
             onClick={() => togglePanel("inclusions")}
-            className={`inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/80 px-3.5 py-2 text-[12px] font-semibold text-slate-100 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-              openPanel === "inclusions" ? "border-teal-400/70 shadow-md" : ""
+            className={`inline-flex items-center gap-2 rounded-full border border-border bg-surface-card px-3.5 py-2 text-[12px] font-semibold text-foreground shadow-sm transition hover:-translate-y-0.5 hover:border-mayda-teal/45 hover:shadow-md ${
+              openPanel === "inclusions" ? "border-mayda-teal/55 shadow-md" : ""
             }`}
             aria-expanded={openPanel === "inclusions"}
           >
@@ -251,8 +249,8 @@ export function PricingSection() {
           <button
             type="button"
             onClick={() => togglePanel("addons")}
-            className={`inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/80 px-3.5 py-2 text-[12px] font-semibold text-slate-100 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-              openPanel === "addons" ? "border-teal-400/70 shadow-md" : ""
+            className={`inline-flex items-center gap-2 rounded-full border border-border bg-surface-card px-3.5 py-2 text-[12px] font-semibold text-foreground shadow-sm transition hover:-translate-y-0.5 hover:border-mayda-teal/45 hover:shadow-md ${
+              openPanel === "addons" ? "border-mayda-teal/55 shadow-md" : ""
             }`}
             aria-expanded={openPanel === "addons"}
           >
@@ -262,26 +260,26 @@ export function PricingSection() {
 
         {/* Inclusions table (collapsed by default) */}
         {openPanel === "inclusions" && (
-          <div className="mt-4 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/80 shadow-[0_18px_45px_rgba(2,6,23,0.7)]">
-            <div className="grid grid-cols-4 border-b border-slate-800 bg-slate-950/80 text-[12px] font-semibold text-slate-100">
+          <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-surface-card shadow-[0_18px_45px_rgba(2,6,23,0.58)]">
+            <div className="grid grid-cols-4 border-b border-border bg-surface-card-alt/95 text-[12px] font-semibold text-foreground">
               <div className="px-3 py-1.5 text-left">Inclusions</div>
               <div className="px-3 py-1.5 text-center">Baseline Scan</div>
               <div className="px-3 py-1.5 text-center">Momentum Sprint</div>
               <div className="px-3 py-1.5 text-center">Growth Loop</div>
             </div>
-            <div className="grid grid-cols-4 text-[12px] text-slate-300">
+            <div className="grid grid-cols-4 text-[12px] text-muted">
               {FEATURES.map((row) => (
                 <React.Fragment key={row.label}>
-                  <div className="border-t border-slate-800 bg-slate-950/80 px-3 py-1.5 font-medium text-slate-100">
+                  <div className="border-t border-border bg-surface-card-alt/95 px-3 py-1.5 font-medium text-foreground">
                     {row.label}
                   </div>
-                  <div className="border-t border-slate-800 px-3 py-1.5 text-center">
+                  <div className="border-t border-border px-3 py-1.5 text-center">
                     {row.baseline ? "✓" : "—"}
                   </div>
-                  <div className="border-t border-slate-800 px-3 py-1.5 text-center">
+                  <div className="border-t border-border px-3 py-1.5 text-center">
                     {row.momentum ? "✓" : "—"}
                   </div>
-                  <div className="border-t border-slate-800 px-3 py-1.5 text-center">
+                  <div className="border-t border-border px-3 py-1.5 text-center">
                     {row.growthLoop ? "✓" : "—"}
                   </div>
                 </React.Fragment>
@@ -293,19 +291,19 @@ export function PricingSection() {
         {/* Add-ons */}
         {openPanel === "addons" && (
           <div className="mt-4">
-            <h3 className="mb-3 text-center text-sm font-semibold text-slate-50">
+            <h3 className="mb-3 text-center text-sm font-semibold text-foreground">
               Add-ons
             </h3>
             <ul className="grid gap-3 sm:grid-cols-2">
               {ADDONS.map((addon) => (
                 <li
                   key={addon.title}
-                  className="rounded-xl border border-slate-800 bg-slate-900/80 shadow-[0_18px_45px_rgba(2,6,23,0.7)]"
+                  className="rounded-xl border border-border bg-surface-card shadow-[0_18px_45px_rgba(2,6,23,0.52)]"
                 >
                   {addon.href ? (
                     <Link
                       href={addon.href}
-                      className="flex h-full flex-col items-center justify-center gap-1 px-5 py-3 text-center text-sm font-semibold text-slate-50"
+                      className="flex h-full flex-col items-center justify-center gap-1 px-5 py-3 text-center text-sm font-semibold text-foreground"
                       onClick={() =>
                         trackPricingEvent({
                           event: "addon_click",
@@ -315,14 +313,14 @@ export function PricingSection() {
                       }
                     >
                       <span>{addon.title}</span>
-                      <span className="mt-1 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-medium text-slate-400">
+                      <span className="mt-1 rounded-full border border-border bg-surface-card-alt/94 px-3 py-1 text-[11px] font-medium text-muted">
                         {addon.note}
                       </span>
                     </Link>
                   ) : (
-                    <div className="flex h-full flex-col items-center justify-center gap-1 px-5 py-3 text-center text-sm font-semibold text-slate-50">
+                    <div className="flex h-full flex-col items-center justify-center gap-1 px-5 py-3 text-center text-sm font-semibold text-foreground">
                       <span>{addon.title}</span>
-                      <span className="mt-1 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-medium text-slate-400">
+                      <span className="mt-1 rounded-full border border-border bg-surface-card-alt/94 px-3 py-1 text-[11px] font-medium text-muted">
                         {addon.note}
                       </span>
                     </div>
@@ -335,7 +333,7 @@ export function PricingSection() {
 
         {/* Bottom note + CTA */}
         <div className="mt-8 flex flex-col items-center gap-3 text-center">
-          <p className="text-[11px] font-medium text-slate-400">
+          <p className="text-[11px] font-medium text-muted">
             Prices exclude VAT. Flexible invoicing for UK/EU/US.
           </p>
           <Link
@@ -352,7 +350,7 @@ export function PricingSection() {
           >
             Book a 15-min Intro Call
           </Link>
-          <p className="mt-1 text-[11px] font-semibold text-slate-500">
+          <p className="mt-1 text-[11px] font-semibold text-muted/70">
             Kickoff in 7 days or we comp your first week.
           </p>
         </div>
@@ -457,10 +455,10 @@ function PricingCard({
   isFeatured?: boolean;
 }) {
   const baseCardClasses =
-    "group flex h-full flex-col rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-[0_18px_45px_rgba(2,6,23,0.7)] backdrop-blur-md transition-transform duration-150 hover:-translate-y-1 hover:border-teal-300/60 hover:shadow-[0_26px_70px_rgba(15,23,42,0.9)]";
+    "group flex h-full flex-col rounded-2xl border border-border bg-surface-card p-6 shadow-[0_18px_45px_rgba(2,6,23,0.58)] backdrop-blur-md transition-transform duration-150 hover:-translate-y-1 hover:border-mayda-teal/45 hover:bg-surface-card-alt/94 hover:shadow-[0_24px_64px_rgba(2,6,23,0.72)]";
 
   const featuredClasses =
-    "md:scale-[1.03] md:border-teal-400/80 md:bg-slate-900/95 md:shadow-[0_26px_80px_rgba(15,23,42,0.95)]";
+    "md:scale-[1.02] md:border-mayda-teal/60 md:bg-surface-card-alt/96 md:shadow-[0_26px_74px_rgba(2,6,23,0.78)]";
 
   return (
     <article
@@ -471,12 +469,12 @@ function PricingCard({
       <div className="flex items-center justify-between gap-3 text-xs">
         <div className="flex flex-1 items-center gap-2">
           {tier.badge && (
-            <span className="inline-flex items-center rounded-full bg-slate-900 px-2.5 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-slate-200">
+            <span className="inline-flex items-center rounded-full border border-border bg-surface-card-alt/94 px-2.5 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-muted">
               {tier.badge}
             </span>
           )}
         </div>
-        <span className="inline-flex items-center rounded-full bg-slate-950/90 px-3 py-1 text-[0.7rem] font-semibold text-slate-50 shadow-[0_10px_28px_rgba(15,23,42,0.8)]">
+        <span className="inline-flex items-center rounded-full border border-border bg-surface-card-alt/96 px-3 py-1 text-[0.7rem] font-semibold text-foreground shadow-[0_10px_28px_rgba(2,6,23,0.4)]">
           {tier.price}
         </span>
       </div>
@@ -484,35 +482,36 @@ function PricingCard({
       {/* Icon + title inline */}
       <div className="mt-4 flex items-center justify-center gap-2 text-center">
         <TierIcon id={tier.id} isFeatured={isFeatured} />
-        <h3 className="text-lg font-semibold tracking-tight text-slate-50">
+        <h3 className="text-lg font-semibold tracking-tight text-foreground">
           {tier.name}
         </h3>
       </div>
 
       {/* Copy */}
-      <p className="mt-2 text-center text-sm font-medium text-slate-300">
+      <p className="mt-2 text-center text-sm font-medium text-muted">
         {tier.oneLiner}
       </p>
 
-      <p className="mt-2 text-center text-[13px] font-medium text-slate-400">
-        <span className="font-semibold">Best for:</span> {tier.bestFor}
+      <p className="mt-2 text-center text-[13px] font-medium text-muted">
+        <span className="font-semibold text-foreground/88">Best for:</span>{" "}
+        {tier.bestFor}
       </p>
 
       {/* Chips */}
       <div className="mt-3 flex flex-wrap justify-center gap-2">
-        <span className="inline-flex items-center rounded-full border border-slate-700 bg-slate-950/80 px-2.5 py-1 text-[11px] font-semibold text-slate-200">
+        <span className="inline-flex items-center rounded-full border border-border bg-surface-card-alt/94 px-2.5 py-1 text-[11px] font-semibold text-foreground/90">
           {tier.timeline}
         </span>
-        <span className="inline-flex items-center rounded-full border border-slate-700 bg-slate-950/80 px-2.5 py-1 text-[11px] font-semibold text-slate-200">
+        <span className="inline-flex items-center rounded-full border border-border bg-surface-card-alt/94 px-2.5 py-1 text-[11px] font-semibold text-foreground/90">
           {tier.tag}
         </span>
       </div>
 
       {/* Bullets */}
-      <ul className="mt-4 space-y-2 text-sm text-slate-300">
+      <ul className="mt-4 space-y-2 text-sm text-muted">
         {tier.bullets.map((item, i) => (
           <li key={i} className="flex gap-2 text-left">
-            <span className="mt-[3px] inline-block text-[11px] font-bold text-emerald-300">
+            <span className="mt-[3px] inline-block text-[11px] font-bold text-mayda-teal-soft">
               ✓
             </span>
             <span>{item}</span>
@@ -521,9 +520,9 @@ function PricingCard({
       </ul>
 
       {/* Outcome / proof */}
-      <div className="mt-4 space-y-2 text-xs text-slate-400">
+      <div className="mt-4 space-y-2 text-xs text-muted">
         <p>
-          <span className="font-semibold text-slate-300">
+          <span className="font-semibold text-foreground/88">
             What you leave with:
           </span>{" "}
           {tier.outcome}
@@ -555,7 +554,7 @@ function PricingCard({
         {tier.secondaryHref && tier.secondaryLabel && (
           <Link
             href={tier.secondaryHref}
-            className="text-[12px] font-semibold text-slate-300 underline-offset-4 hover:text-teal-300 hover:underline"
+            className="text-[12px] font-semibold text-muted underline-offset-4 hover:text-mayda-teal-soft hover:underline"
           >
             {tier.secondaryLabel}
           </Link>

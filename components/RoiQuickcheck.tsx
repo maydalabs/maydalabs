@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { primaryCtaClasses } from "./ProgramsSection";
+import { GrowthTrace } from "./visuals/GrowthTrace";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
 
 type Mode = "ecom" | "svc";
@@ -554,21 +555,19 @@ export function RoiQuickcheckSection({
     <section
       id="roi-quickcheck"
       aria-label="ROI Quickcheck"
-      className="relative py-16 sm:py-24"
+      className="mayda-section relative"
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 sm:px-6 lg:px-8">
         <header className="mx-auto max-w-3xl text-center">
-          <p className="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-slate-400">
-            Advanced ROI quickcheck
-          </p>
-          <h2 className="text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+          <p className="mayda-kicker mb-2">Advanced ROI quickcheck</p>
+          <h2 className="mayda-section-title text-foreground">
             {heading}
           </h2>
-          <p className="mt-3 text-sm text-muted sm:text-base">
+          <p className="mayda-section-copy mt-3 text-sm sm:text-base">
             {subheading}
           </p>
           {showPrefillSourceNote && prefillSource === "roi_widget" && (
-            <p className="mt-3 inline-flex rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1 text-[0.72rem] font-medium text-slate-200">
+            <p className="mt-3 inline-flex rounded-full border border-border bg-surface-card px-3 py-1 text-[0.72rem] font-medium text-foreground/88">
               Prefilled from Quickcheck — tweak inputs to match your numbers.
             </p>
           )}
@@ -577,10 +576,10 @@ export function RoiQuickcheckSection({
         {/* Layout: calc + results */}
         <div className="grid gap-6 sm:grid-cols-[minmax(0,1.05fr)_minmax(0,1.15fr)]">
           {/* LEFT: inputs */}
-          <aside className="flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-950/70 p-5 shadow-[0_18px_45px_rgba(2,6,23,0.85)] backdrop-blur">
+          <aside className="mayda-panel flex flex-col gap-4 rounded-2xl p-5">
             {/* Mode toggle */}
             <div
-              className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/70 p-1 text-[0.7rem]"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-card-alt/90 p-1 text-[0.7rem]"
               role="tablist"
               aria-label="Calculator mode"
             >
@@ -594,8 +593,8 @@ export function RoiQuickcheckSection({
                 }}
                 className={`flex-1 rounded-full px-3 py-1.5 font-semibold transition ${
                   mode === "ecom"
-                    ? "bg-slate-50 text-slate-900"
-                    : "text-slate-300 hover:text-slate-50"
+                    ? "bg-foreground/92 text-background"
+                    : "text-muted hover:text-foreground"
                 }`}
               >
                 eCommerce
@@ -610,8 +609,8 @@ export function RoiQuickcheckSection({
                 }}
                 className={`flex-1 rounded-full px-3 py-1.5 font-semibold transition ${
                   mode === "svc"
-                    ? "bg-slate-50 text-slate-900"
-                    : "text-slate-300 hover:text-slate-50"
+                    ? "bg-foreground/92 text-background"
+                    : "text-muted hover:text-foreground"
                 }`}
               >
                 Leads / services
@@ -943,73 +942,79 @@ export function RoiQuickcheckSection({
           </aside>
 
           {/* RIGHT: results */}
-          <div className="flex flex-col rounded-2xl border border-slate-800 bg-slate-950/70 p-5 shadow-[0_18px_45px_rgba(2,6,23,0.85)] backdrop-blur">
-            <div className="grid grid-cols-2 gap-4">
+          <div className="mayda-panel relative flex flex-col overflow-hidden rounded-2xl p-5">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[linear-gradient(180deg,rgba(156,199,207,0.08),transparent)]" />
+            <GrowthTrace
+              variant="panel"
+              className="absolute inset-x-2 bottom-0 top-16 opacity-80"
+            />
+
+            <div className="relative z-10 grid grid-cols-2 gap-4">
               <div>
-                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
                   Extra / month
                 </div>
-                <div className="mt-1 text-3xl font-semibold text-slate-50 sm:text-4xl">
+                <div className="mt-1 text-3xl font-semibold text-foreground sm:text-4xl">
                   {formatMoney(extraMonth)}
                 </div>
               </div>
               <div>
-                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
                   Per year
                 </div>
-                <div className="mt-1 text-2xl font-semibold text-slate-50">
+                <div className="mt-1 text-2xl font-semibold text-foreground">
                   {formatMoney(extraYear)}
                 </div>
               </div>
             </div>
 
             {/* Meta line */}
-            <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-medium text-slate-200">
-              <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1">
+            <div className="relative z-10 mt-3 flex flex-wrap gap-2 text-[11px] font-medium text-foreground/88">
+              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-card-alt/92 px-3 py-1">
                 {ordersLabel}
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1">
+              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-card-alt/92 px-3 py-1">
                 {newRateLabel}
               </span>
             </div>
 
             {/* Guardrail */}
             {guardMessage && (
-              <p className="mt-3 rounded-xl border border-slate-800 bg-slate-900/80 px-3 py-2 text-[11px] font-medium text-slate-300">
+              <p className="relative z-10 mt-3 rounded-xl border border-border bg-surface-card-alt/94 px-3 py-2 text-[11px] font-medium text-muted">
                 {guardMessage}
               </p>
             )}
 
             {/* Recommendation */}
-            <div className="mt-4 border-t border-slate-800 pt-4">
+            <div className="relative z-10 mt-4 border-t border-border pt-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <ProgramIconInline id={program.key} />
                   <div className="space-y-0.5">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
                       Recommended starting point
                     </p>
-                    <h3 className="text-sm font-semibold tracking-tight text-slate-50">
+                    <h3 className="text-sm font-semibold tracking-tight text-foreground">
                       {program.name}
                     </h3>
-                    <p className="text-xs font-medium text-slate-300">
+                    <p className="text-xs font-medium text-muted">
                       {program.price} • {program.timeline}
                     </p>
                   </div>
                 </div>
-                <span className="inline-flex items-center rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                <span className="inline-flex items-center rounded-full border border-border bg-surface-card-alt/92 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
                   Model confidence: ~80%
                 </span>
               </div>
-              <p className="mt-2 text-xs font-medium text-slate-300">
+              <p className="mt-2 text-xs font-medium text-muted">
                 {mode === "ecom"
                   ? "You’ve got traffic; the fastest upside is fixing conversion first."
                   : "You’ve got demand; the upside is in handoff and close rate."}
               </p>
-              <ul className="mt-3 space-y-2 text-sm font-medium text-slate-200">
+              <ul className="mt-3 space-y-2 text-sm font-medium text-foreground/88">
                 {program.bullets.slice(0, 3).map((b) => (
                   <li key={b} className="relative pl-4">
-                    <span className="absolute left-0 top-[2px] text-[11px] text-emerald-400">
+                    <span className="absolute left-0 top-[2px] text-[11px] text-mayda-teal-soft">
                       ✓
                     </span>
                     {b}
@@ -1019,7 +1024,7 @@ export function RoiQuickcheckSection({
             </div>
 
             {/* CTAs */}
-            <div className="mt-4 flex flex-wrap gap-3">
+            <div className="relative z-10 mt-4 flex flex-wrap gap-3">
               <Link
                 href={primaryCtaHref}
                 target="_blank"
@@ -1032,17 +1037,17 @@ export function RoiQuickcheckSection({
                 <button
                   type="button"
                   onClick={handleAdvancedClick}
-                  className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-transparent px-5 py-2 text-xs font-medium text-slate-200 transition hover:bg-slate-900/70"
+                  className="inline-flex items-center justify-center rounded-full border border-border bg-transparent px-5 py-2 text-xs font-medium text-foreground transition hover:border-mayda-teal/40 hover:bg-surface-card-alt/80"
                 >
                   Open advanced ROI calculator →
                 </button>
               )}
             </div>
-            <p className="mt-2 text-[11px] font-medium text-slate-400">
+            <p className="relative z-10 mt-2 text-[11px] font-medium text-muted">
               15–20 minutes. We’ll sanity-check your inputs and the math
               together.
             </p>
-            <p className="mt-1 text-[11px] font-medium text-slate-500">
+            <p className="relative z-10 mt-1 text-[11px] font-medium text-muted/72">
               Prefer email? You can send your numbers to {resultsEmail}.
             </p>
           </div>

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function AdvancedRoiPage() {
   return (
-    <div className="space-y-12 md:space-y-16">
+    <div className="mayda-page-stack">
       <RoiQuickcheckSection
         heading="Advanced ROI Quickcheck"
         subheading="Directional, back-of-the-envelope math to estimate the upside from better conversion or close rate."
@@ -23,7 +23,7 @@ export default function AdvancedRoiPage() {
       />
 
       <section>
-        <div className="mx-auto max-w-6xl rounded-2xl border border-border bg-surface/85 p-5 sm:p-6 lg:max-w-7xl">
+        <div className="mx-auto max-w-6xl rounded-2xl border border-border bg-surface-card p-5 shadow-[0_18px_45px_rgba(2,6,23,0.52)] sm:p-6 lg:max-w-7xl">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-muted">
               Want to compare recommendations and scope details before booking?

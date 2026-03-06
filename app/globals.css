@@ -8,24 +8,24 @@
 /* Base tokens on :root (dark mode by default) */
 :root {
   /* Brand palette */
-  --mayda-navy: #020617;         /* near slate-950 */
-  --mayda-navy-soft: #050816;    /* slightly lifted */
-  --mayda-teal: #60a4ba;         /* primary accent */
-  --mayda-teal-soft: #7fc0d4;
-  --mayda-ink: #f9fafb;
+  --mayda-navy: #091017;
+  --mayda-navy-soft: #0d151d;
+  --mayda-teal: #6aaab4;
+  --mayda-teal-soft: #9cc7cf;
+  --mayda-ink: #e8eef2;
 
   /* Semantic tokens (dark-first) */
-  --background: var(--mayda-navy);
+  --background: #091017;
   --foreground: var(--mayda-ink);
-  --surface: #020617;            /* base surface */
-  --surface-alt: #050816;        /* slightly lighter / elevated */
-  --muted: #94a3b8;              /* slate-400ish */
-  --border: #1f2937;             /* slate-800ish */
+  --surface: #0d151d;
+  --surface-alt: #111c25;
+  --surface-card: rgba(17, 28, 37, 0.82);
+  --surface-card-alt: rgba(12, 20, 27, 0.92);
+  --muted: #96a6b3;
+  --border: rgba(150, 166, 179, 0.18);
+  --border-strong: rgba(150, 166, 179, 0.3);
   --ring: var(--mayda-teal);
-
-  /* Card / elevated hints (used via Tailwind utilities where needed) */
-  --surface-card: #020617;
-  --surface-card-alt: #020617;
+  --shadow-color: rgba(2, 6, 23, 0.72);
 
   /* Approx combined height of announcement strip + header.
      Tweak if you adjust those heights later. */
@@ -34,12 +34,15 @@
 
 /* Optional light mode override (for later) */
 :root[data-theme="light"] {
-  --background: #f9fafb;
+  --background: #f4f7f8;
   --foreground: #020617;
   --surface: #ffffff;
-  --surface-alt: #eef2ff;
-  --muted: #6b7280;
-  --border: #e5e7eb;
+  --surface-alt: #eef3f5;
+  --surface-card: rgba(255, 255, 255, 0.88);
+  --surface-card-alt: rgba(244, 247, 248, 0.94);
+  --muted: #667785;
+  --border: rgba(2, 6, 23, 0.12);
+  --border-strong: rgba(2, 6, 23, 0.2);
   --ring: var(--mayda-teal);
 }
 
@@ -50,8 +53,11 @@
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
   --color-surface-alt: var(--surface-alt);
+  --color-surface-card: var(--surface-card);
+  --color-surface-card-alt: var(--surface-card-alt);
   --color-muted: var(--muted);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-ring: var(--ring);
 
   /* Brand colors */
@@ -67,13 +73,13 @@
   --radius-pill: 999px;
 
   /* Shadows */
-  --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.6);
+  --shadow-soft: 0 24px 64px var(--shadow-color);
 
   /* Fonts – can later be wired from next/font in layout.tsx */
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+  --font-sans: "Avenir Next", "Segoe UI Variable Text", "SF Pro Text",
+    "Helvetica Neue", "Arial Nova", sans-serif;
+  --font-mono: "SFMono-Regular", "IBM Plex Mono", Menlo, Monaco, Consolas,
+    "Liberation Mono", monospace;
 }
 
 /* Global reset */
@@ -89,11 +95,20 @@ body {
   padding: 0;
 }
 
+html {
+  color-scheme: dark;
+  background-color: var(--background);
+  scroll-behavior: smooth;
+}
+
 /* Base typography – actual background handled by .mayda-aurora-bg */
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  font-size: 15.5px;
+  line-height: 1.58;
+  letter-spacing: -0.011em;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -101,13 +116,26 @@ body {
 /* Global aurora background for the whole app.
    Applied via className="mayda-aurora-bg" on <body> in app/layout.tsx */
 .mayda-aurora-bg {
-  background-color: #020617;
+  background-color: var(--background);
   background-image:
-    radial-gradient(circle at 0% 0%, #020617 0, #020617 40%, transparent 70%),
-    radial-gradient(circle at 100% 0%, rgba(56, 189, 248, 0.26) 0, transparent 55%),
-    radial-gradient(circle at 50% 120%, rgba(34, 197, 94, 0.18) 0, transparent 65%);
+    radial-gradient(
+      110% 120% at 0% 0%,
+      rgba(106, 170, 180, 0.11) 0,
+      transparent 42%
+    ),
+    radial-gradient(
+      90% 85% at 100% 0%,
+      rgba(43, 84, 103, 0.2) 0,
+      transparent 46%
+    ),
+    linear-gradient(180deg, #091017 0%, #0b1218 30%, #091017 100%);
   background-repeat: no-repeat;
   background-attachment: fixed;
+}
+
+::selection {
+  background: rgba(106, 170, 180, 0.24);
+  color: var(--foreground);
 }
 
 /* Basic link behavior */
@@ -123,6 +151,52 @@ a:hover {
 /* Layout height is handled by the flex wrapper in RootLayout */
 main {
   min-height: 0;
+}
+
+.mayda-page-stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3.75rem, 5vw, 5rem);
+}
+
+.mayda-section {
+  padding-block: clamp(3.75rem, 5vw, 5rem);
+}
+
+.mayda-kicker {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.mayda-section-title {
+  text-wrap: balance;
+  font-size: clamp(1.95rem, 2vw + 1rem, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.mayda-section-copy {
+  color: var(--muted);
+  font-size: clamp(0.98rem, 0.28vw + 0.92rem, 1.08rem);
+  line-height: 1.58;
+}
+
+.mayda-panel {
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(180deg, rgba(17, 28, 37, 0.9), rgba(12, 20, 27, 0.92));
+  box-shadow: 0 26px 70px var(--shadow-color);
+  backdrop-filter: blur(18px);
+}
+
+.mayda-panel-soft {
+  border: 1px solid rgba(150, 166, 179, 0.14);
+  background: rgba(12, 20, 27, 0.78);
+  box-shadow: 0 18px 48px rgba(2, 6, 23, 0.54);
+  backdrop-filter: blur(16px);
 }
 
 /* Logo belt marquee */
@@ -203,11 +277,11 @@ input.roi-input[type="number"]::-webkit-outer-spin-button {
 
 /* Hero heading */
 .hero-heading {
-  font-size: clamp(2.8rem, 3.4vw + 1rem, 4rem);
+  font-size: clamp(2.7rem, 3.1vw + 1rem, 4rem);
   font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 1.02;
-  color: #f9fafb;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+  color: var(--foreground);
 }
 
 /* Simple load / reveal animation for hero columns */
@@ -233,94 +307,80 @@ input.roi-input[type="number"]::-webkit-outer-spin-button {
   }
 }
 
-/* Flow arcs behind the console */
-.hero-flow-layer {
+/* Growth Trace motif */
+.growth-trace {
   position: absolute;
-  inset: -32px -80px -8px;
+  inset: 0;
   pointer-events: none;
-  z-index: -10;
+  overflow: hidden;
 }
 
-/* Base arc style */
-.hero-flow-arc {
-  position: absolute;
-  height: 2px;
-  border-radius: 999px;
-  background-image: linear-gradient(
-    90deg,
-    rgba(15, 23, 42, 0),
-    rgba(148, 163, 184, 0.25),
-    rgba(96, 164, 186, 0.7),
-    rgba(15, 23, 42, 0)
-  );
-  background-size: 220% 100%;
-  opacity: 0.35;
-  animation: hero-flow-shimmer 22s linear infinite;
+.growth-trace-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: growth-trace-float 18s linear infinite;
 }
 
-/* Individual arcs – tuned for desktop; mobile is simplified below */
-.hero-flow-arc-1 {
-  left: -12%;
-  right: 18%;
-  top: 68%;
-  transform: translate3d(0, 0, 0) rotate(-6deg);
-  animation-duration: 26s;
+.growth-trace-guide {
+  fill: none;
+  stroke: rgba(150, 166, 179, 0.12);
+  stroke-width: 1;
+  stroke-linecap: round;
 }
 
-.hero-flow-arc-2 {
-  left: -5%;
-  right: 10%;
-  top: 52%;
-  transform: translate3d(0, 0, 0) rotate(-3deg);
-  animation-duration: 22s;
+.growth-trace-guide--dashed {
+  stroke-dasharray: 1 10;
 }
 
-.hero-flow-arc-3 {
-  left: 0%;
-  right: 2%;
-  top: 36%;
-  transform: translate3d(0, 0, 0) rotate(-1deg);
-  animation-duration: 19s;
+.growth-trace-path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-/* Nodes that pulse on the arcs */
-.hero-flow-node {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--mayda-teal-soft);
-  box-shadow: 0 0 0 0 rgba(96, 164, 186, 0.45);
-  opacity: 0.8;
-  animation: hero-node-pulse 2.8s ease-in-out infinite;
+.growth-trace-path--base {
+  stroke: rgba(150, 166, 179, 0.32);
+  stroke-width: 1.25;
 }
 
-.hero-flow-node::after {
-  content: "";
-  position: absolute;
-  inset: -8px;
-  border-radius: inherit;
-  background: radial-gradient(circle, rgba(96, 164, 186, 0.36), transparent);
-  opacity: 0.6;
+.growth-trace-path--echo {
+  stroke: rgba(106, 170, 180, 0.18);
+  stroke-width: 0.95;
 }
 
-/* Node positions */
-.hero-flow-node-1 {
-  left: 8%;
-  top: 64%;
-  animation-delay: 0.2s;
+.growth-trace-signal {
+  fill: none;
+  stroke: rgba(156, 199, 207, 0.78);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-dasharray: 22 128;
+  stroke-dashoffset: 150;
+  filter: drop-shadow(0 0 8px rgba(106, 170, 180, 0.18));
+  animation: growth-trace-scan 14s linear infinite;
 }
 
-.hero-flow-node-2 {
-  left: 42%;
-  top: 52%;
-  animation-delay: 0.9s;
+.growth-trace-node {
+  fill: rgba(156, 199, 207, 0.82);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: growth-trace-node 10s ease-in-out infinite;
 }
 
-.hero-flow-node-3 {
-  right: 12%;
-  top: 40%;
-  animation-delay: 1.6s;
+.growth-trace-node--2 {
+  animation-delay: 1.8s;
+}
+
+.growth-trace-node--3 {
+  animation-delay: 3.3s;
+}
+
+.growth-trace-node--4 {
+  animation-delay: 5s;
+}
+
+.growth-trace--panel .growth-trace-svg {
+  animation-duration: 20s;
 }
 
 /* Console “live” dot */
@@ -347,33 +407,47 @@ input.roi-input[type="number"]::-webkit-outer-spin-button {
 }
 
 /* Animations */
-@keyframes hero-flow-shimmer {
+@keyframes growth-trace-float {
   0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 120% 50%;
+    transform: translate3d(0, 0, 0);
   }
   100% {
-    background-position: 0% 50%;
+    transform: translate3d(0, -1.5%, 0);
   }
 }
 
-@keyframes hero-node-pulse {
+@keyframes growth-trace-scan {
   0% {
-    transform: scale(1);
-    opacity: 0.7;
-    box-shadow: 0 0 0 0 rgba(96, 164, 186, 0.45);
+    stroke-dashoffset: 150;
+    opacity: 0;
   }
-  50% {
-    transform: scale(1.08);
-    opacity: 1;
-    box-shadow: 0 0 0 10px rgba(96, 164, 186, 0);
+  12% {
+    opacity: 0.58;
+  }
+  45% {
+    opacity: 0.9;
+  }
+  75% {
+    opacity: 0.38;
   }
   100% {
-    transform: scale(1);
-    opacity: 0.7;
-    box-shadow: 0 0 0 0 rgba(96, 164, 186, 0);
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes growth-trace-node {
+  0% {
+    opacity: 0.28;
+    transform: scale(0.92);
+  }
+  44% {
+    opacity: 0.82;
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 0.36;
+    transform: scale(0.96);
   }
 }
 
@@ -403,41 +477,13 @@ input.roi-input[type="number"]::-webkit-outer-spin-button {
   }
 }
 
-/* Mobile adjustments for flow arcs */
-@media (max-width: 768px) {
-  .hero-flow-layer {
-    inset: -16px -32px -4px;
-  }
-
-  .hero-flow-arc-1 {
-    left: -10%;
-    right: 20%;
-    top: 60%;
-    transform: translate3d(0, 0, 0) rotate(-4deg);
-  }
-
-  .hero-flow-arc-2 {
-    left: -4%;
-    right: 8%;
-    top: 46%;
-    transform: translate3d(0, 0, 0) rotate(-2deg);
-  }
-
-  .hero-flow-arc-3 {
-    display: none;
-  }
-
-  .hero-flow-node-3 {
-    display: none;
-  }
-}
-
 /* Respect reduced motion for all hero animations */
 @media (prefers-reduced-motion: reduce) {
   .hero-fade-in-left,
   .hero-fade-in-right,
-  .hero-flow-arc,
-  .hero-flow-node,
+  .growth-trace-svg,
+  .growth-trace-signal,
+  .growth-trace-node,
   .hero-live-dot,
   .hero-metric-bar,
   .hero-metric-area {
@@ -479,4 +525,3 @@ input.roi-input[type="number"]::-webkit-outer-spin-button {
     transform: translateX(120%);
   }
 }
-
