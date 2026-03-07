@@ -23,8 +23,15 @@ export default function HomePage() {
       <CaseSpotlights />
       <ProgramsSection />
       <PricingSection />
-      <RoiQuickcheckSection />
-      <HowWeWorkSection />
+      <RoiQuickcheckSection
+        kicker="Estimate upside"
+        heading="See what a modest lift could be worth before you commit."
+        subheading="Use the quickcheck to sanity-check likely payback, pressure-test the upside, and see which engagement makes the most sense as a starting point."
+      />
+      <HowWeWorkSection
+        heading="What happens next"
+        subheading="If the numbers make sense, this is the operating rhythm from kickoff to shipped fixes and measured lift."
+      />
       <GuaranteeRail />
       <FaqSection />
     </>

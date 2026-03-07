@@ -7,7 +7,7 @@ const HERO_INTRO_CALL_URL = getIntroCallUrl("hero");
 
 export function HeroSection() {
   return (
-    <section className="flex items-center pb-14 pt-3 md:pb-16 md:pt-5 lg:min-h-[calc(100vh-var(--chrome-height))]">
+    <section className="flex items-center pb-10 pt-4 md:pb-12 md:pt-6 lg:min-h-[calc(100vh-var(--chrome-height))]">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 text-center lg:max-w-7xl lg:flex-row lg:items-center lg:justify-between lg:gap-12 lg:text-left">
         <div className="hero-fade-in-left flex-1 space-y-7">
           <div className="space-y-3.5">

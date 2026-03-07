@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { SiteHeader } from "../components/SiteHeader";
-import { AnnouncementStrip } from "../components/AnnouncementStrip";
 import { SiteFooter } from "../components/SiteFooter";
 import { SITE_URL } from "@/lib/site";
 
@@ -26,10 +25,6 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen overflow-x-hidden text-foreground antialiased mayda-aurora-bg">
         <div className="flex min-h-screen flex-col">
-          {/* Slim status strip – scrolls away */}
-          <AnnouncementStrip />
-
-          {/* Sticky main header */}
           <SiteHeader />
 
           <main className="flex-1">

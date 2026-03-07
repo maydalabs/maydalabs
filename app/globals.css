@@ -27,9 +27,8 @@
   --ring: var(--mayda-teal);
   --shadow-color: rgba(2, 6, 23, 0.72);
 
-  /* Approx combined height of announcement strip + header.
-     Tweak if you adjust those heights later. */
-  --chrome-height: 5.75rem;
+  /* Approx sticky header height. */
+  --chrome-height: 4.5rem;
 }
 
 /* Optional light mode override (for later) */
@@ -258,6 +257,21 @@ main {
 .case-ken-burns {
   animation: case-ken-burns 18s ease-in-out infinite;
   transform-origin: 50% 55%;
+}
+
+@keyframes case-scene-enter {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.case-scene-enter {
+  animation: case-scene-enter 560ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 /* ROI numeric inputs – hide native spinners; we’ll draw our own */

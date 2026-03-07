@@ -117,6 +117,7 @@ function formatMoney(n: number): string {
 }
 
 interface RoiQuickcheckProps {
+  kicker?: string;
   heading?: string;
   subheading?: string;
   primaryCtaLabel?: string;
@@ -127,6 +128,21 @@ interface RoiQuickcheckProps {
   showPrefillSourceNote?: boolean;
   showAdvancedLinkButton?: boolean;
 }
+
+const ROI_GUIDE_STEPS = [
+  {
+    title: "Start with your current baseline",
+    copy: "Use traffic, AOV, lead volume, or close rate you already trust.",
+  },
+  {
+    title: "Keep the lift modest",
+    copy: "A small percentage-point change is enough to pressure-test the case.",
+  },
+  {
+    title: "Use the output as a filter",
+    copy: "It is directional math to gauge whether the first sprint clears the bar.",
+  },
+] as const;
 
 // Small inline program icon for the recommendation row
 function ProgramIconInline({ id }: { id: ProgramKey }) {
@@ -160,6 +176,7 @@ function ProgramIconInline({ id }: { id: ProgramKey }) {
 }
 
 export function RoiQuickcheckSection({
+  kicker = "Advanced ROI quickcheck",
   heading = "Estimate your upside before you change anything.",
   subheading = "Directional, back-of-the-envelope math for what a small conversion or close-rate lift could mean in real dollars.",
   primaryCtaLabel = "Book a 15-min Intro Call",
@@ -557,26 +574,62 @@ export function RoiQuickcheckSection({
       aria-label="ROI Quickcheck"
       className="mayda-section relative"
     >
-      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 sm:px-6 lg:px-8">
-        <header className="mx-auto max-w-3xl text-center">
-          <p className="mayda-kicker mb-2">Advanced ROI quickcheck</p>
-          <h2 className="mayda-section-title text-foreground">
-            {heading}
-          </h2>
-          <p className="mayda-section-copy mt-3 text-sm sm:text-base">
-            {subheading}
-          </p>
-          {showPrefillSourceNote && prefillSource === "roi_widget" && (
-            <p className="mt-3 inline-flex rounded-full border border-border bg-surface-card px-3 py-1 text-[0.72rem] font-medium text-foreground/88">
-              Prefilled from Quickcheck — tweak inputs to match your numbers.
+      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
+        <header className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:items-end">
+          <div className="max-w-2xl">
+            <p className="mayda-kicker mb-2">{kicker}</p>
+            <h2 className="mayda-section-title text-foreground">{heading}</h2>
+            <p className="mayda-section-copy mt-3 text-sm sm:text-base">
+              {subheading}
             </p>
-          )}
+            {showPrefillSourceNote && prefillSource === "roi_widget" && (
+              <p className="mt-3 inline-flex rounded-full border border-border bg-surface-card px-3 py-1 text-[0.72rem] font-medium text-foreground/88">
+                Prefilled from Quickcheck — tweak inputs to match your numbers.
+              </p>
+            )}
+          </div>
+
+          <div className="rounded-[1.75rem] border border-white/8 bg-[linear-gradient(180deg,rgba(13,21,29,0.64),rgba(8,12,17,0.38))] p-4 shadow-[0_18px_54px_rgba(2,6,23,0.24)] sm:p-5">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-400">
+              Use this as a directional filter
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+              {ROI_GUIDE_STEPS.map((step, index) => (
+                <div
+                  key={step.title}
+                  className="rounded-[1.2rem] border border-white/7 bg-white/[0.02] px-3 py-3"
+                >
+                  <div className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-mayda-teal-soft">
+                    0{index + 1}
+                  </div>
+                  <div className="mt-2 text-sm font-semibold text-foreground">
+                    {step.title}
+                  </div>
+                  <p className="mt-1 text-[0.78rem] leading-relaxed text-muted">
+                    {step.copy}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </header>
 
-        {/* Layout: calc + results */}
-        <div className="grid gap-6 sm:grid-cols-[minmax(0,1.05fr)_minmax(0,1.15fr)]">
-          {/* LEFT: inputs */}
-          <aside className="mayda-panel flex flex-col gap-4 rounded-2xl p-5">
+        <div className="relative overflow-hidden rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,rgba(10,16,23,0.78),rgba(7,11,17,0.62))] p-4 shadow-[0_28px_88px_rgba(2,6,23,0.34)] sm:p-5 lg:p-6">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[linear-gradient(180deg,rgba(156,199,207,0.08),transparent)]" />
+
+          <div className="relative grid gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+            {/* LEFT: inputs */}
+            <aside className="flex flex-col gap-4 rounded-[1.6rem] border border-white/8 bg-[linear-gradient(180deg,rgba(13,21,29,0.74),rgba(9,16,23,0.52))] p-5 shadow-[0_18px_48px_rgba(2,6,23,0.28)]">
+              <div className="space-y-2">
+                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                  Your baseline
+                </p>
+                <p className="text-sm leading-relaxed text-muted">
+                  Plug in the numbers you trust today, then test a conservative
+                  lift against the fixed scopes above.
+                </p>
+              </div>
+
             {/* Mode toggle */}
             <div
               className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-card-alt/90 p-1 text-[0.7rem]"
@@ -941,115 +994,135 @@ export function RoiQuickcheckSection({
             </div>
           </aside>
 
-          {/* RIGHT: results */}
-          <div className="mayda-panel relative flex flex-col overflow-hidden rounded-2xl p-5">
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[linear-gradient(180deg,rgba(156,199,207,0.08),transparent)]" />
-            <GrowthTrace
-              variant="panel"
-              className="absolute inset-x-2 bottom-0 top-16 opacity-80"
-            />
+            {/* RIGHT: results */}
+            <div className="relative flex flex-col overflow-hidden rounded-[1.6rem] border border-white/10 bg-[linear-gradient(180deg,rgba(11,18,24,0.9),rgba(8,12,17,0.96))] p-5 shadow-[0_22px_64px_rgba(2,6,23,0.34)]">
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(70%_80%_at_20%_0%,rgba(156,199,207,0.14),transparent_68%)]" />
+              <GrowthTrace
+                variant="panel"
+                className="absolute bottom-[-10%] right-[-12%] top-[28%] hidden w-[68%] opacity-[0.18] md:block"
+              />
 
-            <div className="relative z-10 grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
-                  Extra / month
+              <div className="relative z-10 flex flex-wrap items-start justify-between gap-4">
+                <div className="max-w-[34rem]">
+                  <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    Estimated upside
+                  </p>
+                  <h3 className="mt-2 text-[1.35rem] font-semibold tracking-tight text-foreground sm:text-[1.55rem]">
+                    What a modest lift could unlock.
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">
+                    {mode === "ecom"
+                      ? "Directional math only, but enough to see whether a conversion-focused sprint should pay back."
+                      : "Directional math only, but enough to see whether tightening handoff and close rate should pay back."}
+                  </p>
                 </div>
-                <div className="mt-1 text-3xl font-semibold text-foreground sm:text-4xl">
-                  {formatMoney(extraMonth)}
-                </div>
-              </div>
-              <div>
-                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
-                  Per year
-                </div>
-                <div className="mt-1 text-2xl font-semibold text-foreground">
-                  {formatMoney(extraYear)}
-                </div>
-              </div>
-            </div>
-
-            {/* Meta line */}
-            <div className="relative z-10 mt-3 flex flex-wrap gap-2 text-[11px] font-medium text-foreground/88">
-              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-card-alt/92 px-3 py-1">
-                {ordersLabel}
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-card-alt/92 px-3 py-1">
-                {newRateLabel}
-              </span>
-            </div>
-
-            {/* Guardrail */}
-            {guardMessage && (
-              <p className="relative z-10 mt-3 rounded-xl border border-border bg-surface-card-alt/94 px-3 py-2 text-[11px] font-medium text-muted">
-                {guardMessage}
-              </p>
-            )}
-
-            {/* Recommendation */}
-            <div className="relative z-10 mt-4 border-t border-border pt-4">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <ProgramIconInline id={program.key} />
-                  <div className="space-y-0.5">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
-                      Recommended starting point
-                    </p>
-                    <h3 className="text-sm font-semibold tracking-tight text-foreground">
-                      {program.name}
-                    </h3>
-                    <p className="text-xs font-medium text-muted">
-                      {program.price} • {program.timeline}
-                    </p>
-                  </div>
-                </div>
-                <span className="inline-flex items-center rounded-full border border-border bg-surface-card-alt/92 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
-                  Model confidence: ~80%
+                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-slate-300">
+                  {mode === "ecom"
+                    ? `+${lift.toFixed(1)}pp CR scenario`
+                    : `+${lift.toFixed(1)}pp close-rate scenario`}
                 </span>
               </div>
-              <p className="mt-2 text-xs font-medium text-muted">
-                {mode === "ecom"
-                  ? "You’ve got traffic; the fastest upside is fixing conversion first."
-                  : "You’ve got demand; the upside is in handoff and close rate."}
-              </p>
-              <ul className="mt-3 space-y-2 text-sm font-medium text-foreground/88">
-                {program.bullets.slice(0, 3).map((b) => (
-                  <li key={b} className="relative pl-4">
-                    <span className="absolute left-0 top-[2px] text-[11px] text-mayda-teal-soft">
-                      ✓
-                    </span>
-                    {b}
-                  </li>
-                ))}
-              </ul>
-            </div>
 
-            {/* CTAs */}
-            <div className="relative z-10 mt-4 flex flex-wrap gap-3">
-              <Link
-                href={primaryCtaHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={primaryCtaClasses}
-              >
-                {primaryCtaLabel}
-              </Link>
-              {showAdvancedLinkButton && (
-                <button
-                  type="button"
-                  onClick={handleAdvancedClick}
-                  className="inline-flex items-center justify-center rounded-full border border-border bg-transparent px-5 py-2 text-xs font-medium text-foreground transition hover:border-mayda-teal/40 hover:bg-surface-card-alt/80"
-                >
-                  Open advanced ROI calculator →
-                </button>
+              <div className="relative z-10 mt-5 grid grid-cols-2 gap-3">
+                <div className="rounded-[1.2rem] border border-white/8 bg-white/[0.03] px-4 py-4">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
+                    Extra / month
+                  </div>
+                  <div className="mt-2 text-[1.9rem] font-semibold tracking-tight text-foreground sm:text-[2.35rem]">
+                    {formatMoney(extraMonth)}
+                  </div>
+                </div>
+                <div className="rounded-[1.2rem] border border-white/8 bg-white/[0.03] px-4 py-4">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
+                    Per year
+                  </div>
+                  <div className="mt-2 text-[1.45rem] font-semibold tracking-tight text-foreground sm:text-[1.7rem]">
+                    {formatMoney(extraYear)}
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative z-10 mt-3 flex flex-wrap gap-2 text-[11px] font-medium text-foreground/88">
+                <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-card-alt/70 px-3 py-1">
+                  {ordersLabel}
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-card-alt/70 px-3 py-1">
+                  {newRateLabel}
+                </span>
+              </div>
+
+              {guardMessage && (
+                <p className="relative z-10 mt-3 rounded-[1rem] border border-white/8 bg-white/[0.03] px-3 py-2 text-[11px] font-medium leading-relaxed text-muted">
+                  {guardMessage}
+                </p>
               )}
+
+              <div className="relative z-10 mt-5 rounded-[1.35rem] border border-white/8 bg-white/[0.03] p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <ProgramIconInline id={program.key} />
+                    <div className="space-y-0.5">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
+                        Recommended starting point
+                      </p>
+                      <h3 className="text-sm font-semibold tracking-tight text-foreground">
+                        {program.name}
+                      </h3>
+                      <p className="text-xs font-medium text-muted">
+                        {program.price} • {program.timeline}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="inline-flex items-center rounded-full border border-white/8 bg-surface-card-alt/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
+                    Model confidence: ~80%
+                  </span>
+                </div>
+                <p className="mt-3 text-xs font-medium leading-relaxed text-muted">
+                  {mode === "ecom"
+                    ? "You already have traffic. The question is whether a focused conversion sprint can unlock enough upside to justify moving now."
+                    : "You already have demand. The question is whether tighter qualification, handoff, and close-rate work will clear the bar quickly enough."}
+                </p>
+                <ul className="mt-3 space-y-2 text-sm font-medium text-foreground/88">
+                  {program.bullets.slice(0, 3).map((b) => (
+                    <li key={b} className="relative pl-4">
+                      <span className="absolute left-0 top-[2px] text-[11px] text-mayda-teal-soft">
+                        ✓
+                      </span>
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="relative z-10 mt-5 border-t border-white/8 pt-4">
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href={primaryCtaHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={primaryCtaClasses}
+                  >
+                    {primaryCtaLabel}
+                  </Link>
+                  {showAdvancedLinkButton && (
+                    <button
+                      type="button"
+                      onClick={handleAdvancedClick}
+                      className="inline-flex items-center justify-center rounded-full border border-border bg-transparent px-5 py-2 text-xs font-medium text-foreground transition hover:border-mayda-teal/40 hover:bg-surface-card-alt/80"
+                    >
+                      Open advanced ROI calculator →
+                    </button>
+                  )}
+                </div>
+                <p className="mt-3 text-[11px] font-medium text-muted">
+                  15–20 minutes. We’ll sanity-check the inputs, the math, and
+                  whether the likely payback makes sense for your stage.
+                </p>
+                <p className="mt-1 text-[11px] font-medium text-muted/72">
+                  Prefer email? You can send your numbers to {resultsEmail}.
+                </p>
+              </div>
             </div>
-            <p className="relative z-10 mt-2 text-[11px] font-medium text-muted">
-              15–20 minutes. We’ll sanity-check your inputs and the math
-              together.
-            </p>
-            <p className="relative z-10 mt-1 text-[11px] font-medium text-muted/72">
-              Prefer email? You can send your numbers to {resultsEmail}.
-            </p>
           </div>
         </div>
       </div>

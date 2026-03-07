@@ -13,6 +13,7 @@ export default function AdvancedRoiPage() {
   return (
     <div className="mayda-page-stack">
       <RoiQuickcheckSection
+        kicker="Advanced ROI quickcheck"
         heading="Advanced ROI Quickcheck"
         subheading="Directional, back-of-the-envelope math to estimate the upside from better conversion or close rate."
         primaryCtaHref={getIntroCallUrl("roi")}

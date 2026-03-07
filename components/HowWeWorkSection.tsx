@@ -87,8 +87,7 @@ export function HowWeWorkSection({
       className="mayda-section relative"
     >
       <div className="mx-auto flex max-w-6xl flex-col px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <header className="mx-auto mb-4 max-w-3xl text-center">
+        <header className="mx-auto mb-5 max-w-3xl text-center">
           <p className="mayda-kicker mb-2">Delivery rhythm</p>
           <h2 className="mayda-section-title text-foreground">
             {heading}
@@ -98,15 +97,13 @@ export function HowWeWorkSection({
           </p>
         </header>
 
-        {/* Desktop rail line */}
         <div className="pointer-events-none relative hidden h-0 md:block">
-          <div className="pointer-events-none absolute left-0 right-0 top-6 mx-auto h-px max-w-5xl bg-border" />
+          <div className="pointer-events-none absolute left-0 right-0 top-6 mx-auto h-px max-w-5xl bg-white/8" />
         </div>
 
-        {/* Cards grid / mobile swipe */}
         <div
           className="
-            relative mt-4
+            relative mt-5
             flex gap-4 overflow-x-auto pb-4
             text-sm text-foreground
             md:grid md:grid-cols-4 md:gap-6 md:overflow-visible md:pb-0
@@ -125,17 +122,17 @@ export function HowWeWorkSection({
               aria-describedby={`${id}-d${step.id}`}
               className="
                 relative flex min-h-[190px] flex-[0_0_82%] flex-col gap-2
-                rounded-2xl border border-border bg-surface-card
-                p-5 shadow-[0_18px_45px_rgba(2,6,23,0.62)] backdrop-blur
+                rounded-[1.6rem] border border-white/8
+                bg-[linear-gradient(180deg,rgba(12,20,27,0.56),rgba(8,12,17,0.34))]
+                p-5 shadow-[0_14px_34px_rgba(2,6,23,0.24)] backdrop-blur-sm
                 transition-transform duration-150 ease-out
-                hover:-translate-y-1 hover:border-mayda-teal/45 hover:bg-surface-card-alt/94 hover:shadow-[0_24px_64px_rgba(2,6,23,0.76)]
+                hover:-translate-y-0.5 hover:border-white/14 hover:bg-[linear-gradient(180deg,rgba(12,20,27,0.64),rgba(8,12,17,0.4))] hover:shadow-[0_18px_42px_rgba(2,6,23,0.3)]
                 md:flex-[0_0_auto] md:min-w-0
               "
             >
-              {/* Step badge */}
               <span
                 aria-hidden="true"
-                className="absolute left-4 top-4 grid h-6 w-6 place-items-center rounded-full border border-border bg-surface-card-alt/94 text-[11px] font-semibold text-foreground"
+                className="absolute left-4 top-4 grid h-6 w-6 place-items-center rounded-full border border-white/10 bg-white/[0.03] text-[11px] font-semibold text-foreground"
               >
                 {step.id}
               </span>
@@ -147,7 +144,7 @@ export function HowWeWorkSection({
                 {step.title}
               </h3>
 
-              <div className="ml-7 inline-flex w-max items-center rounded-full border border-border bg-surface-card-alt/92 px-2.5 py-1 text-[11px] font-medium text-muted">
+              <div className="ml-7 inline-flex w-max items-center rounded-full border border-white/8 bg-white/[0.03] px-2.5 py-1 text-[11px] font-medium text-muted">
                 {step.timeframe}
               </div>
 
@@ -174,8 +171,7 @@ export function HowWeWorkSection({
           ))}
         </div>
 
-        {/* CTA row */}
-        <div className="mt-10 grid place-items-center gap-3">
+        <div className="mt-9 grid place-items-center gap-3">
           {primaryIsExternal ? (
             <a
               href={primaryCtaHref}
