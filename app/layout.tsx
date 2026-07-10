@@ -3,12 +3,28 @@ import "./globals.css";
 import { SiteHeader } from "../components/SiteHeader";
 import { SiteFooter } from "../components/SiteFooter";
 import { SITE_URL } from "@/lib/site";
+import { Newsreader, Space_Grotesk } from "next/font/google";
+
+const studioSans = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-studio-sans",
+});
+
+const studioSerif = Newsreader({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  weight: ["400", "500", "600"],
+  variable: "--font-studio-serif",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "MaydaLabs – Growth partner for digital-first brands",
+  title: {
+    default: "MaydaLabs — Product & growth studio",
+    template: "%s · MaydaLabs",
+  },
   description:
-    "MaydaLabs helps digital brands, SaaS, and service firms turn underperforming traffic into meetings, clients, and revenue with clean tracking, focused CRO sprints, and lifecycle systems.",
+    "MaydaLabs builds apps, marketplaces, commerce experiences, and growth systems for ambitious founders.",
 };
 
 export const viewport: Viewport = {
@@ -22,16 +38,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="min-h-screen overflow-x-hidden text-foreground antialiased mayda-aurora-bg">
+    <html lang="en" className={`${studioSans.variable} ${studioSerif.variable}`}>
+      <body className="min-h-screen overflow-x-hidden bg-background text-foreground antialiased">
         <div className="flex min-h-screen flex-col">
           <SiteHeader />
 
-          <main className="flex-1">
-            <div className="mx-auto max-w-6xl px-4 pb-14 pt-6 sm:px-6 sm:pb-16 sm:pt-7 lg:max-w-7xl lg:px-8">
-              {children}
-            </div>
-          </main>
+          <main className="flex-1">{children}</main>
 
           <SiteFooter />
         </div>
