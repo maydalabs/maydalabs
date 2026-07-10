@@ -138,9 +138,14 @@ export function StudioHome() {
             <div className="project-case-tags">
               <span>Product</span><span>UX/UI</span><span>Next.js</span><span>Supabase</span><span>Bitcoin payments</span>
             </div>
-            <Link href="/case-studies#hodlstay" className="studio-text-link">
-              View project story <ArrowUpRight />
-            </Link>
+            <div className="project-case-links">
+              <Link href="/case-studies#hodlstay" className="studio-text-link">
+                View project story <ArrowUpRight />
+              </Link>
+              <a href="https://hodlstay.com" target="_blank" rel="noopener noreferrer" className="studio-text-link studio-text-link-muted">
+                Visit live <ArrowUpRight />
+              </a>
+            </div>
           </div>
 
           <div className="project-browser project-browser-hodl">
@@ -177,16 +182,21 @@ export function StudioHome() {
             <div className="project-case-tags">
               <span>Editorial UX</span><span>Data systems</span><span>Automation</span><span>CMS</span><span>AI workflows</span>
             </div>
-            <Link href="/case-studies#satoshi-gazette" className="studio-text-link">
-              View project story <ArrowUpRight />
-            </Link>
+            <div className="project-case-links">
+              <Link href="/case-studies#satoshi-gazette" className="studio-text-link">
+                View project story <ArrowUpRight />
+              </Link>
+              <a href="https://satoshigazette.org" target="_blank" rel="noopener noreferrer" className="studio-text-link studio-text-link-muted">
+                Visit live <ArrowUpRight />
+              </a>
+            </div>
           </div>
 
           <div className="project-browser project-browser-gazette">
             <div className="project-browser-chrome">
               <div><i /><i /><i /></div>
               <span>satoshigazette.org</span>
-              <b>In development</b>
+              <b>Live · Active build</b>
             </div>
             <Image
               src="/work/satoshi-gazette-home.png"

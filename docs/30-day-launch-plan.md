@@ -8,6 +8,8 @@
 - Proof strategy: lead with Bitcoin-native work, target founders across industries
 - Commercial model: no public price list; scope and pricing follow a project call
 - Flagship work at launch: HodlStay and Satoshi Gazette
+- HodlStay: live at https://hodlstay.com
+- Satoshi Gazette: live at https://satoshigazette.org and in an active showcase-polish phase
 
 ## Core message
 

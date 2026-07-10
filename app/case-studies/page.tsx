@@ -3,13 +3,47 @@ import Image from "next/image";
 import Link from "next/link";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
 
+type GalleryItem = {
+  src: string;
+  alt: string;
+  label: string;
+  detail: string;
+};
+
+type ProofItem = {
+  number: string;
+  title: string;
+  copy: string;
+};
+
+type CaseStudy = {
+  id: string;
+  number: string;
+  name: string;
+  category: string;
+  title: string;
+  summary: string;
+  challenge: string;
+  built: string[];
+  stack: string[];
+  image: string;
+  width: number;
+  height: number;
+  alt: string;
+  status: string;
+  domain: string;
+  url: string;
+  gallery: GalleryItem[];
+  proof: ProofItem[];
+};
+
 export const metadata: Metadata = {
   title: "Selected work",
   description:
     "Selected MaydaLabs product work, including HodlStay and Satoshi Gazette.",
 };
 
-const CASES = [
+const CASES: CaseStudy[] = [
   {
     id: "hodlstay",
     number: "01",
@@ -17,15 +51,15 @@ const CASES = [
     category: "Marketplace · Travel · Bitcoin",
     title: "A global stay marketplace, rebuilt around a sharper product idea.",
     summary:
-      "HodlStay evolved from AirBTC into a premium travel product with Bitcoin-friendly booking built in. The work spans the public marketplace, host operations, guest journeys, data migration, payments, and the brand system around it.",
+      "HodlStay evolved from AirBTC into a premium travel product with Bitcoin-friendly booking built in. The work spans public discovery, host operations, guest journeys, legacy-data migration, partner inventory, payments, and the brand system around it.",
     challenge:
       "Turn a promising niche platform into a credible, scalable marketplace without losing the community and Bitcoin roots that made it distinct.",
     built: [
-      "Marketplace architecture and discovery",
-      "Host onboarding and listing operations",
-      "Booking, availability, payout, and payment flows",
-      "Product redesign and AirBTC → HodlStay brand evolution",
-      "Launch, analytics, SEO, and lifecycle foundations",
+      "Unified marketplace discovery and stay dossiers",
+      "Host onboarding, listing, calendar, and payout operations",
+      "Booking, availability, review, and payment lifecycles",
+      "AirBTC to HodlStay product and brand evolution",
+      "Conference accommodation and partner inventory flows",
     ],
     stack: ["Next.js", "React", "Supabase", "BTCPay", "Resend", "Vercel"],
     image: "/work/hodlstay-home.png",
@@ -33,6 +67,50 @@ const CASES = [
     height: 714,
     alt: "HodlStay global booking marketplace",
     status: "Live product",
+    domain: "hodlstay.com",
+    url: "https://hodlstay.com",
+    gallery: [
+      {
+        src: "/work/hodlstay-stays.png",
+        alt: "HodlStay stay discovery and search interface",
+        label: "Discovery",
+        detail: "Category-led search, dates, guests, filters, and live inventory.",
+      },
+      {
+        src: "/work/hodlstay-listing.png",
+        alt: "HodlStay property dossier and booking interface",
+        label: "Stay dossier",
+        detail: "Property story, media, host context, fiat and sats pricing, and booking entry.",
+      },
+      {
+        src: "/work/hodlstay-conferences.png",
+        alt: "HodlStay conference accommodation interface",
+        label: "Conference product",
+        detail: "Dedicated accommodation paths for events, attendees, organizers, and hosts.",
+      },
+    ],
+    proof: [
+      {
+        number: "01",
+        title: "Unified discovery",
+        copy: "One search layer can present native HodlStay inventory alongside eligible HotelPlanner and Dtravel partner supply.",
+      },
+      {
+        number: "02",
+        title: "Availability safety",
+        copy: "Imported iCal blocks, manual host blocks, and internal bookings are checked together to reduce double-booking risk.",
+      },
+      {
+        number: "03",
+        title: "Bitcoin payment lifecycle",
+        copy: "Host acceptance leads into BTCPay checkout, signed webhook verification, booking settlement, and a traceable payout record.",
+      },
+      {
+        number: "04",
+        title: "Operational migration",
+        copy: "Legacy WordPress and founder spreadsheet records are reconciled into a structured launch pipeline with explicit exception handling.",
+      },
+    ],
   },
   {
     id: "satoshi-gazette",
@@ -41,7 +119,7 @@ const CASES = [
     category: "Media · Data · AI-assisted operations",
     title: "A Bitcoin newsroom designed as an information product.",
     summary:
-      "Satoshi Gazette combines a live market layer, structured editorial desks, long-form reporting, wire updates, and briefings. The product is being built to help operators separate useful signal from the daily noise.",
+      "Satoshi Gazette combines a live market layer, structured editorial desks, long-form reporting, wire updates, and briefings. The live product is in an active build phase as the newsroom and publishing workflows are brought to showcase level.",
     challenge:
       "Build a publication that feels authoritative and editorial while the operating system behind it stays fast, structured, and ready for responsible AI assistance.",
     built: [
@@ -56,9 +134,17 @@ const CASES = [
     width: 1280,
     height: 720,
     alt: "Satoshi Gazette Bitcoin newsroom",
-    status: "In development",
+    status: "Live · Active build",
+    domain: "satoshigazette.org",
+    url: "https://satoshigazette.org",
+    gallery: [],
+    proof: [],
   },
-] as const;
+];
+
+function ExternalArrow() {
+  return <span aria-hidden>↗</span>;
+}
 
 export default function CaseStudiesPage() {
   return (
@@ -79,13 +165,18 @@ export default function CaseStudiesPage() {
           </div>
           <div className="case-detail-title">
             <h2>{item.title}</h2>
-            <p>{item.summary}</p>
+            <div>
+              <p>{item.summary}</p>
+              <a href={item.url} target="_blank" rel="noopener noreferrer" className="studio-text-link">
+                Visit {item.domain} <ExternalArrow />
+              </a>
+            </div>
           </div>
 
           <div className="case-detail-screen">
             <div className="project-browser-chrome">
               <div><i /><i /><i /></div>
-              <span>{item.name.toLowerCase().replace(" ", "")}</span>
+              <span>{item.domain}</span>
               <b>{item.status}</b>
             </div>
             <Image
@@ -111,6 +202,43 @@ export default function CaseStudiesPage() {
               <div>{item.stack.map((entry) => <span key={entry}>{entry}</span>)}</div>
             </section>
           </div>
+
+          {item.gallery.length > 0 ? (
+            <section className="case-gallery" aria-label={`${item.name} product gallery`}>
+              <div className="case-subheading">
+                <p className="studio-kicker">Inside the product</p>
+                <h3>A marketplace is more than its landing page.</h3>
+              </div>
+              <div className="case-gallery-grid">
+                {item.gallery.map((frame) => (
+                  <figure key={frame.src}>
+                    <div className="case-gallery-frame">
+                      <Image src={frame.src} alt={frame.alt} width={1270} height={714} sizes="(max-width: 900px) 100vw, 72vw" />
+                    </div>
+                    <figcaption><strong>{frame.label}</strong><span>{frame.detail}</span></figcaption>
+                  </figure>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {item.proof.length > 0 ? (
+            <section className="case-proof">
+              <div className="case-subheading">
+                <p className="studio-kicker">The system behind the screen</p>
+                <h3>Four hard problems, connected.</h3>
+              </div>
+              <div className="case-proof-grid">
+                {item.proof.map((proof) => (
+                  <article key={proof.number}>
+                    <span>{proof.number}</span>
+                    <h4>{proof.title}</h4>
+                    <p>{proof.copy}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
         </article>
       ))}
 
@@ -118,7 +246,7 @@ export default function CaseStudiesPage() {
         <p className="studio-kicker">Your project could be next</p>
         <h2>Let’s build the proof.</h2>
         <Link href={getIntroCallUrl("work_bottom")} target="_blank" rel="noopener noreferrer" className="studio-button">
-          Start a project <span aria-hidden>↗</span>
+          Start a project <ExternalArrow />
         </Link>
       </section>
     </div>
