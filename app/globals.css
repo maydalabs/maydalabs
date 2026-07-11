@@ -93,6 +93,29 @@ select {
   margin-inline: auto;
 }
 
+.mayda-mark {
+  overflow: visible;
+}
+
+.mayda-mark-gate,
+.mayda-mark-signal {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.group:hover .mayda-mark-gate-left {
+  transform: translateX(-1.5px);
+}
+
+.group:hover .mayda-mark-gate-right {
+  transform: translateX(1.5px);
+}
+
+.group:hover .mayda-mark-signal {
+  transform: scale(1.22);
+}
+
 .studio-header {
   position: sticky;
   top: 0;
@@ -130,11 +153,13 @@ select {
   transition: transform 250ms ease;
 }
 
-.studio-nav-link:hover {
+.studio-nav-link:hover,
+.studio-nav-link.is-active {
   color: #fff;
 }
 
-.studio-nav-link:hover::after {
+.studio-nav-link:hover::after,
+.studio-nav-link.is-active::after {
   transform: scaleX(1);
   transform-origin: left;
 }
@@ -169,6 +194,10 @@ select {
   padding: 0.8rem 0;
   border-bottom: 1px solid var(--border);
   font-size: 1.35rem;
+}
+
+.studio-mobile-nav > a.is-active:not(.studio-button) {
+  color: white;
 }
 
 .studio-mobile-nav > a span {
@@ -213,6 +242,31 @@ select {
 .studio-button-ghost:hover {
   border-color: rgba(255, 255, 255, 0.45);
   box-shadow: none;
+}
+
+.studio-availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 1.1rem;
+  color: rgba(9, 9, 9, 0.58);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.studio-availability span {
+  width: 0.48rem;
+  height: 0.48rem;
+  border-radius: 999px;
+  background: #65a30d;
+  box-shadow: 0 0 0 5px rgba(101, 163, 13, 0.12);
+}
+
+.studio-availability-dark {
+  color: rgba(255, 255, 255, 0.56);
 }
 
 .studio-home {
@@ -1134,6 +1188,25 @@ select {
   margin: 0;
   color: rgba(255, 255, 255, 0.5);
   line-height: 1.7;
+}
+
+.case-detail-title .case-detail-engagement {
+  display: flex;
+  margin-top: 1.5rem;
+  align-items: baseline;
+  gap: 0.7rem;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.82rem;
+}
+
+.case-detail-engagement span {
+  flex: 0 0 auto;
+  color: var(--signal);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .case-detail-screen {

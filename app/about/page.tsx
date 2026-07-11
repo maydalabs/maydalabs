@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
+import { createPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "About",
+  socialTitle: "A small studio for serious ideas · MaydaLabs",
   description:
     "MaydaLabs is a founder-led product and growth studio building software, commerce, and growth systems.",
-};
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (

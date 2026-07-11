@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
+import { createPageMetadata } from "@/lib/metadata";
 
 type GalleryItem = {
   src: string;
@@ -23,6 +23,7 @@ type CaseStudy = {
   category: string;
   title: string;
   summary: string;
+  engagement?: string;
   challenge: string;
   built: string[];
   stack: string[];
@@ -37,11 +38,13 @@ type CaseStudy = {
   proof: ProofItem[];
 };
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Selected work",
+  socialTitle: "Selected product work · MaydaLabs",
   description:
     "Selected MaydaLabs product work, including HodlStay and Satoshi Gazette.",
-};
+  path: "/case-studies",
+});
 
 const CASES: CaseStudy[] = [
   {
@@ -52,6 +55,7 @@ const CASES: CaseStudy[] = [
     title: "A global stay marketplace, rebuilt around a sharper product idea.",
     summary:
       "HodlStay evolved from AirBTC into a premium travel product with Bitcoin-friendly booking built in. The work spans public discovery, host operations, guest journeys, legacy-data migration, partner inventory, payments, and the brand system around it.",
+    engagement: "End-to-end client product build, prepared for handover on completion.",
     challenge:
       "Turn a promising niche platform into a credible, scalable marketplace without losing the community and Bitcoin roots that made it distinct.",
     built: [
@@ -66,7 +70,7 @@ const CASES: CaseStudy[] = [
     width: 1270,
     height: 714,
     alt: "HodlStay global booking marketplace",
-    status: "Live product",
+    status: "Client project · Live",
     domain: "hodlstay.com",
     url: "https://hodlstay.com",
     gallery: [
@@ -167,6 +171,12 @@ export default function CaseStudiesPage() {
             <h2>{item.title}</h2>
             <div>
               <p>{item.summary}</p>
+              {item.engagement ? (
+                <p className="case-detail-engagement">
+                  <span>Engagement</span>
+                  {item.engagement}
+                </p>
+              ) : null}
               <a href={item.url} target="_blank" rel="noopener noreferrer" className="studio-text-link">
                 Visit {item.domain} <ExternalArrow />
               </a>
@@ -243,7 +253,7 @@ export default function CaseStudiesPage() {
       ))}
 
       <section className="studio-inner-cta">
-        <p className="studio-kicker">Your project could be next</p>
+        <p className="studio-kicker">Open for new client work</p>
         <h2>Let’s build the proof.</h2>
         <Link href={getIntroCallUrl("work_bottom")} target="_blank" rel="noopener noreferrer" className="studio-button">
           Start a project <ExternalArrow />

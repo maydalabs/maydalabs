@@ -1,16 +1,19 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
+import { createPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Start a project",
+  socialTitle: "Bring the messy idea · MaydaLabs",
   description: "Talk to MaydaLabs about your app, marketplace, commerce, or growth project.",
-};
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (
     <div className="studio-inner-page">
       <section className="studio-inner-hero contact-hero">
+        <div className="studio-availability studio-availability-dark"><span /> Open for new client work</div>
         <p className="studio-kicker">Start a project / No hard sell</p>
         <h1>Tell us what you’re<br /><em>trying to make real.</em></h1>
         <p>

@@ -152,7 +152,7 @@ export function StudioHome() {
             <div className="project-browser-chrome">
               <div><i /><i /><i /></div>
               <span>hodlstay.com</span>
-              <b>Live product</b>
+              <b>Client project · Live</b>
             </div>
             <Image
               src="/work/hodlstay-home.png"
@@ -250,7 +250,7 @@ export function StudioHome() {
           <p className="studio-kicker">A modern build system</p>
           <h2>Small team.<br /><em>Unfair output.</em></h2>
           <p>
-            We pair founder-level attention with an AI-native production workflow. Codex and Claude help us explore, build, test, and document faster; taste, product judgment, and accountability stay human.
+            We pair founder-level attention with an AI-accelerated production system. Research, build, QA, and documentation move faster; product judgment, taste, and accountability remain human.
           </p>
           <div className="studio-ai-stats">
             <div><strong>1</strong><span>connected team from strategy to launch</span></div>
@@ -283,6 +283,7 @@ export function StudioHome() {
       </section>
 
       <section className="studio-final-cta">
+        <div className="studio-availability"><span /> Open for new client work</div>
         <p className="studio-kicker">Have something ambitious in mind?</p>
         <h2>Bring the messy idea.<br /><em>We’ll find the signal.</em></h2>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
