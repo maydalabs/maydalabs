@@ -32,6 +32,14 @@ export function SiteFooter() {
                 Book a project call ↗
               </Link>
               <a href="mailto:info@maydalabs.com">info@maydalabs.com</a>
+              <a
+                href="https://www.linkedin.com/in/mehmet-e-mayda/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Mehmet E Mayda on LinkedIn"
+              >
+                LinkedIn · Mehmet E Mayda ↗
+              </a>
             </div>
           </div>
         </div>
