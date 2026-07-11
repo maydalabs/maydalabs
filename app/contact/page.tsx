@@ -2,6 +2,27 @@ import Link from "next/link";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { createPageMetadata } from "@/lib/metadata";
 
+const STARTING_POINTS = [
+  {
+    number: "01",
+    title: "New product",
+    copy: "An app, marketplace, SaaS product, or internal system that needs a credible first release.",
+    href: "/services#product-builds",
+  },
+  {
+    number: "02",
+    title: "Rebuild or commerce",
+    copy: "A product or storefront that works today but cannot support where the business needs to go.",
+    href: "/services#commerce",
+  },
+  {
+    number: "03",
+    title: "Launch and growth",
+    copy: "A shipped product that needs better measurement, conversion, lifecycle, or market momentum.",
+    href: "/services#growth-systems",
+  },
+];
+
 export const metadata = createPageMetadata({
   title: "Start a project",
   socialTitle: "Bring the messy idea · MaydaLabs",
@@ -26,6 +47,23 @@ export default function ContactPage() {
           <a href="mailto:info@maydalabs.com" className="studio-button studio-button-ghost">
             Email the brief
           </a>
+        </div>
+      </section>
+
+      <section className="contact-paths">
+        <div className="contact-paths-heading">
+          <p className="studio-kicker">Choose a starting point</p>
+          <h2>What kind of move are we making?</h2>
+        </div>
+        <div className="contact-paths-grid">
+          {STARTING_POINTS.map((point) => (
+            <Link key={point.number} href={point.href}>
+              <span>{point.number}</span>
+              <h3>{point.title}</h3>
+              <p>{point.copy}</p>
+              <b>Explore the fit <i aria-hidden>↗</i></b>
+            </Link>
+          ))}
         </div>
       </section>
 

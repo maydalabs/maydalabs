@@ -8,7 +8,7 @@ import { MaydaMark } from "@/components/MaydaMark";
 
 const NAV_ITEMS = [
   { label: "Work", href: "/case-studies", section: "work" },
-  { label: "Services", href: "/#services", section: "services" },
+  { label: "Services", href: "/services", section: "services" },
   { label: "Approach", href: "/#approach", section: "approach" },
   { label: "About", href: "/about" },
 ];
@@ -62,6 +62,7 @@ export function SiteHeader() {
 
   const isActive = (item: (typeof NAV_ITEMS)[number]) => {
     if (item.label === "Work" && pathname === "/case-studies") return true;
+    if (item.label === "Services" && pathname === "/services") return true;
     if (item.label === "About" && pathname === "/about") return true;
     return pathname === "/" && item.section === activeSection;
   };
@@ -84,6 +85,7 @@ export function SiteHeader() {
               className={`studio-nav-link ${isActive(item) ? "is-active" : ""}`}
               aria-current={
                 (item.label === "Work" && pathname === "/case-studies") ||
+                (item.label === "Services" && pathname === "/services") ||
                 (item.label === "About" && pathname === "/about")
                   ? "page"
                   : undefined

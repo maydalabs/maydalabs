@@ -21,7 +21,7 @@ export function SiteFooter() {
             <p className="studio-footer-label">Explore</p>
             <div className="mt-4 flex flex-col gap-2 text-sm text-white/60">
               <Link href="/case-studies">Selected work</Link>
-              <Link href="/#services">Services</Link>
+              <Link href="/services">Services</Link>
               <Link href="/#approach">Approach</Link>
               <Link href="/about">About</Link>
             </div>

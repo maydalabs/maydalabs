@@ -4,18 +4,21 @@ import { getIntroCallUrl } from "@/lib/marketingLinks";
 
 const SERVICES = [
   {
+    id: "product-builds",
     number: "01",
     title: "Product builds",
     copy: "From rough concept to a product real people can use. We shape the system, design the experience, and ship the software.",
     items: ["Web & mobile apps", "Marketplaces", "SaaS & internal tools", "Payments & integrations"],
   },
   {
+    id: "commerce",
     number: "02",
     title: "Commerce",
     copy: "Storefronts that feel like brands, not templates, backed by cleaner operations and a sharper path to purchase.",
     items: ["Shopify builds", "Custom commerce", "Subscriptions", "Conversion systems"],
   },
   {
+    id: "growth-systems",
     number: "03",
     title: "Growth systems",
     copy: "The measurement, messaging, and lifecycle machinery that turns a launch into a business instead of a moment.",
@@ -231,6 +234,9 @@ export function StudioHome() {
               <ul>
                 {service.items.map((item) => <li key={item}>{item}</li>)}
               </ul>
+              <Link href={`/services#${service.id}`} className="studio-text-link">
+                Explore fit and scope <ArrowUpRight />
+              </Link>
             </article>
           ))}
         </div>
