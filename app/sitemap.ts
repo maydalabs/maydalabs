@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/services",
     "/contact",
     "/case-studies",
+    "/case-studies/hodlstay",
     "/privacy",
     "/terms",
   ];

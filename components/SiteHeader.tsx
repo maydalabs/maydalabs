@@ -61,7 +61,7 @@ export function SiteHeader() {
   }, [pathname]);
 
   const isActive = (item: (typeof NAV_ITEMS)[number]) => {
-    if (item.label === "Work" && pathname === "/case-studies") return true;
+    if (item.label === "Work" && pathname.startsWith("/case-studies")) return true;
     if (item.label === "Services" && pathname === "/services") return true;
     if (item.label === "About" && pathname === "/about") return true;
     return pathname === "/" && item.section === activeSection;
@@ -84,7 +84,7 @@ export function SiteHeader() {
               href={item.href}
               className={`studio-nav-link ${isActive(item) ? "is-active" : ""}`}
               aria-current={
-                (item.label === "Work" && pathname === "/case-studies") ||
+                (item.label === "Work" && pathname.startsWith("/case-studies")) ||
                 (item.label === "Services" && pathname === "/services") ||
                 (item.label === "About" && pathname === "/about")
                   ? "page"

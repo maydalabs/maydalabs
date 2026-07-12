@@ -142,7 +142,7 @@ export function StudioHome() {
               <span>Product</span><span>UX/UI</span><span>Next.js</span><span>Supabase</span><span>Bitcoin payments</span>
             </div>
             <div className="project-case-links">
-              <Link href="/case-studies#hodlstay" className="studio-text-link">
+              <Link href="/case-studies/hodlstay" className="studio-text-link">
                 View project story <ArrowUpRight />
               </Link>
               <a href="https://hodlstay.com" target="_blank" rel="noopener noreferrer" className="studio-text-link studio-text-link-muted">

@@ -177,9 +177,16 @@ export default function CaseStudiesPage() {
                   {item.engagement}
                 </p>
               ) : null}
-              <a href={item.url} target="_blank" rel="noopener noreferrer" className="studio-text-link">
-                Visit {item.domain} <ExternalArrow />
-              </a>
+              <div className="case-detail-links">
+                {item.id === "hodlstay" ? (
+                  <Link href="/case-studies/hodlstay" className="studio-text-link">
+                    Open full case study <ExternalArrow />
+                  </Link>
+                ) : null}
+                <a href={item.url} target="_blank" rel="noopener noreferrer" className="studio-text-link">
+                  Visit {item.domain} <ExternalArrow />
+                </a>
+              </div>
             </div>
           </div>
 
