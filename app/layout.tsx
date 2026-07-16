@@ -88,7 +88,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${studioSans.variable} ${studioSerif.variable}`}>
+    <html
+      lang="en"
+      className={`${studioSans.variable} ${studioSerif.variable}`}
+      data-scroll-behavior="smooth"
+    >
       <body className="min-h-screen overflow-x-hidden bg-background text-foreground antialiased">
         <script
           type="application/ld+json"

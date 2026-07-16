@@ -1,30 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
+import { BuildDossier } from "@/components/BuildDossier";
+import { HomeExperience } from "@/components/HomeExperience";
+import { ProjectPreview } from "@/components/ProjectPreview";
+import { ServiceRouter } from "@/components/ServiceRouter";
+import { SignalField } from "@/components/SignalField";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
-
-const SERVICES = [
-  {
-    id: "product-builds",
-    number: "01",
-    title: "Product builds",
-    copy: "From rough concept to a product real people can use. We shape the system, design the experience, and ship the software.",
-    items: ["Web & mobile apps", "Marketplaces", "SaaS & internal tools", "Payments & integrations"],
-  },
-  {
-    id: "commerce",
-    number: "02",
-    title: "Commerce",
-    copy: "Storefronts that feel like brands, not templates, backed by cleaner operations and a sharper path to purchase.",
-    items: ["Shopify builds", "Custom commerce", "Subscriptions", "Conversion systems"],
-  },
-  {
-    id: "growth-systems",
-    number: "03",
-    title: "Growth systems",
-    copy: "The measurement, messaging, and lifecycle machinery that turns a launch into a business instead of a moment.",
-    items: ["Launch strategy", "Funnels & landing pages", "Analytics & automation", "Content & lifecycle"],
-  },
-];
 
 const PROCESS = [
   { number: "01", title: "Find the signal", copy: "We turn the messy brief into a crisp product and commercial target." },
@@ -37,38 +17,11 @@ function ArrowUpRight() {
   return <span aria-hidden className="text-[0.9em]">↗</span>;
 }
 
-function SignalField() {
-  return (
-    <div className="signal-field" aria-hidden="true">
-      <div className="signal-grid" />
-      <div className="signal-orbit signal-orbit-one" />
-      <div className="signal-orbit signal-orbit-two" />
-      <div className="signal-core">
-        <span className="signal-core-ring" />
-        <span className="signal-core-dot" />
-      </div>
-      <div className="signal-card signal-card-one">
-        <span>BUILD / 01</span>
-        <strong>Marketplace</strong>
-        <i>Shipping</i>
-      </div>
-      <div className="signal-card signal-card-two">
-        <span>SYSTEM / 02</span>
-        <strong>Editorial engine</strong>
-        <i>Live</i>
-      </div>
-      <p className="signal-coordinate signal-coordinate-one">41.0082° N</p>
-      <p className="signal-coordinate signal-coordinate-two">28.9784° E</p>
-      <div className="signal-cursor"><span>MaydaLabs</span></div>
-    </div>
-  );
-}
-
 export function StudioHome() {
   const projectUrl = getIntroCallUrl("home_hero");
 
   return (
-    <div className="studio-home">
+    <HomeExperience>
       <section className="studio-hero">
         <div className="studio-hero-copy">
           <div className="studio-eyebrow hero-reveal hero-reveal-1">
@@ -107,7 +60,7 @@ export function StudioHome() {
         </div>
       </section>
 
-      <section className="studio-manifesto" aria-label="Positioning">
+      <section className="studio-manifesto" aria-label="Positioning" data-reveal>
         <p>Bitcoin-native by proof.</p>
         <p>Founder-focused by design.</p>
         <div className="studio-manifesto-line" />
@@ -115,7 +68,7 @@ export function StudioHome() {
       </section>
 
       <section id="work" className="studio-section scroll-mt-28">
-        <div className="studio-section-heading">
+        <div className="studio-section-heading" data-reveal>
           <div>
             <p className="studio-kicker">Selected work / 001–002</p>
             <h2>Proof, not promises.</h2>
@@ -151,22 +104,19 @@ export function StudioHome() {
             </div>
           </div>
 
-          <div className="project-browser project-browser-hodl">
-            <div className="project-browser-chrome">
-              <div><i /><i /><i /></div>
-              <span>hodlstay.com</span>
-              <b>Client project · Live</b>
-            </div>
-            <Image
-              src="/work/hodlstay-home.png"
-              alt="HodlStay marketplace homepage"
-              width={1270}
-              height={714}
-              sizes="(max-width: 900px) 100vw, 62vw"
-              className="project-screen"
-            />
-            <Image src="/work/hodlstay-logo.png" alt="" width={6865} height={1255} className="project-watermark project-watermark-wide" />
-          </div>
+          <ProjectPreview
+            variant="hodl"
+            domain="hodlstay.com"
+            status="Client project · Live"
+            imageSrc="/work/hodlstay-home.png"
+            imageAlt="HodlStay marketplace homepage"
+            imageWidth={1270}
+            imageHeight={714}
+            watermarkSrc="/work/hodlstay-logo.png"
+            watermarkWidth={6865}
+            watermarkHeight={1255}
+            watermarkClassName="project-watermark-wide"
+          />
         </article>
 
         <article className="project-case project-case-gazette">
@@ -195,27 +145,24 @@ export function StudioHome() {
             </div>
           </div>
 
-          <div className="project-browser project-browser-gazette">
-            <div className="project-browser-chrome">
-              <div><i /><i /><i /></div>
-              <span>satoshigazette.org</span>
-              <b>Live · Active build</b>
-            </div>
-            <Image
-              src="/work/satoshi-gazette-home.png"
-              alt="Satoshi Gazette Bitcoin newsroom homepage"
-              width={1280}
-              height={720}
-              sizes="(max-width: 900px) 100vw, 62vw"
-              className="project-screen"
-            />
-            <Image src="/work/satoshi-gazette-mark.png" alt="" width={1080} height={1080} className="project-watermark project-watermark-mark" />
-          </div>
+          <ProjectPreview
+            variant="gazette"
+            domain="satoshigazette.org"
+            status="Live · Active build"
+            imageSrc="/work/satoshi-gazette-home.png"
+            imageAlt="Satoshi Gazette Bitcoin newsroom homepage"
+            imageWidth={1280}
+            imageHeight={720}
+            watermarkSrc="/work/satoshi-gazette-mark.png"
+            watermarkWidth={1080}
+            watermarkHeight={1080}
+            watermarkClassName="project-watermark-mark"
+          />
         </article>
       </section>
 
       <section id="services" className="studio-section studio-services scroll-mt-28">
-        <div className="studio-section-heading">
+        <div className="studio-section-heading" data-reveal>
           <div>
             <p className="studio-kicker">What we build / Three connected layers</p>
             <h2>From first click to working business.</h2>
@@ -225,48 +172,13 @@ export function StudioHome() {
           </p>
         </div>
 
-        <div className="studio-service-grid">
-          {SERVICES.map((service) => (
-            <article key={service.number} className="studio-service-card">
-              <span>{service.number}</span>
-              <h3>{service.title}</h3>
-              <p>{service.copy}</p>
-              <ul>
-                {service.items.map((item) => <li key={item}>{item}</li>)}
-              </ul>
-              <Link href={`/services#${service.id}`} className="studio-text-link">
-                Explore fit and scope <ArrowUpRight />
-              </Link>
-            </article>
-          ))}
-        </div>
+        <ServiceRouter />
       </section>
 
-      <section className="studio-ai-native">
-        <div className="studio-ai-visual" aria-hidden="true">
-          <div className="studio-ai-terminal">
-            <div><span>maydalabs / build-system</span><i>● live</i></div>
-            <p><b>01</b> founder context → product decisions</p>
-            <p><b>02</b> design intent → working interface</p>
-            <p><b>03</b> code + QA → shipped release</p>
-            <p><b>04</b> market signal → next iteration</p>
-          </div>
-        </div>
-        <div className="studio-ai-copy">
-          <p className="studio-kicker">A modern build system</p>
-          <h2>Small team.<br /><em>Unfair output.</em></h2>
-          <p>
-            We pair founder-level attention with an AI-accelerated production system. Research, build, QA, and documentation move faster; product judgment, taste, and accountability remain human.
-          </p>
-          <div className="studio-ai-stats">
-            <div><strong>1</strong><span>connected team from strategy to launch</span></div>
-            <div><strong>0</strong><span>handoffs into a junior delivery maze</span></div>
-          </div>
-        </div>
-      </section>
+      <BuildDossier />
 
       <section id="approach" className="studio-section scroll-mt-28">
-        <div className="studio-section-heading">
+        <div className="studio-section-heading" data-reveal>
           <div>
             <p className="studio-kicker">How we work / No black box</p>
             <h2>Momentum is the method.</h2>
@@ -277,7 +189,7 @@ export function StudioHome() {
         </div>
         <div className="studio-process-grid">
           {PROCESS.map((step) => (
-            <article key={step.number}>
+            <article key={step.number} data-reveal>
               <span>{step.number}</span>
               <div>
                 <h3>{step.title}</h3>
@@ -288,7 +200,7 @@ export function StudioHome() {
         </div>
       </section>
 
-      <section className="studio-final-cta">
+      <section className="studio-final-cta" data-reveal>
         <div className="studio-availability"><span /> Open for new client work</div>
         <p className="studio-kicker">Have something ambitious in mind?</p>
         <h2>Bring the messy idea.<br /><em>We’ll find the signal.</em></h2>
@@ -302,6 +214,6 @@ export function StudioHome() {
         </div>
         <p className="studio-final-note">No fixed packages. We scope the right engagement after we understand the job.</p>
       </section>
-    </div>
+    </HomeExperience>
   );
 }
