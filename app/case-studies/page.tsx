@@ -134,9 +134,9 @@ const CASES: CaseStudy[] = [
       "AI-assisted research and production foundations",
     ],
     stack: ["Next.js", "React", "Supabase", "Editorial CMS", "Market data", "AI workflows"],
-    image: "/work/satoshi-gazette-home.png",
-    width: 1280,
-    height: 720,
+    image: "/work/satoshi-gazette-live-home.png",
+    width: 1440,
+    height: 900,
     alt: "Satoshi Gazette Bitcoin newsroom",
     status: "Live · Active build",
     domain: "satoshigazette.org",
@@ -178,11 +178,9 @@ export default function CaseStudiesPage() {
                 </p>
               ) : null}
               <div className="case-detail-links">
-                {item.id === "hodlstay" ? (
-                  <Link href="/case-studies/hodlstay" className="studio-text-link">
+                <Link href={`/case-studies/${item.id}`} className="studio-text-link">
                     Open full case study <ExternalArrow />
-                  </Link>
-                ) : null}
+                </Link>
                 <a href={item.url} target="_blank" rel="noopener noreferrer" className="studio-text-link">
                   Visit {item.domain} <ExternalArrow />
                 </a>

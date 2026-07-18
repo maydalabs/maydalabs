@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/contact",
     "/case-studies",
     "/case-studies/hodlstay",
+    "/case-studies/satoshi-gazette",
     "/privacy",
     "/terms",
   ];

@@ -136,7 +136,7 @@ export function StudioHome() {
               <span>Editorial UX</span><span>Data systems</span><span>Automation</span><span>CMS</span><span>AI workflows</span>
             </div>
             <div className="project-case-links">
-              <Link href="/case-studies#satoshi-gazette" className="studio-text-link">
+              <Link href="/case-studies/satoshi-gazette" className="studio-text-link">
                 View project story <ArrowUpRight />
               </Link>
               <a href="https://satoshigazette.org" target="_blank" rel="noopener noreferrer" className="studio-text-link studio-text-link-muted">
@@ -149,13 +149,13 @@ export function StudioHome() {
             variant="gazette"
             domain="satoshigazette.org"
             status="Live · Active build"
-            imageSrc="/work/satoshi-gazette-home.png"
+            imageSrc="/work/satoshi-gazette-live-home.png"
             imageAlt="Satoshi Gazette Bitcoin newsroom homepage"
-            imageWidth={1280}
-            imageHeight={720}
-            watermarkSrc="/work/satoshi-gazette-mark.png"
-            watermarkWidth={1080}
-            watermarkHeight={1080}
+            imageWidth={1440}
+            imageHeight={900}
+            watermarkSrc="/work/satoshi-gazette-ec1-mark.svg"
+            watermarkWidth={64}
+            watermarkHeight={64}
             watermarkClassName="project-watermark-mark"
           />
         </article>

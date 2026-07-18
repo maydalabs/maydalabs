@@ -3,6 +3,8 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { SiteHeader } from "../components/SiteHeader";
 import { SiteFooter } from "../components/SiteFooter";
+import { GoogleTagManager } from "@/components/GoogleTagManager";
+import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { SITE_URL } from "@/lib/site";
 import { Newsreader, Space_Grotesk } from "next/font/google";
 
@@ -94,6 +96,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
     >
       <body className="min-h-screen overflow-x-hidden bg-background text-foreground antialiased">
+        <GoogleTagManager />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -106,6 +109,7 @@ export default function RootLayout({
           <SiteFooter />
         </div>
         <Analytics />
+        <SiteAnalytics />
       </body>
     </html>
   );

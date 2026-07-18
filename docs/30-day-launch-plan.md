@@ -1,59 +1,53 @@
 # MaydaLabs 30-Day Launch Plan
 
-## Decisions locked
+_Status updated: 18 July 2026_
 
-- Brand: MaydaLabs
-- Domain: https://maydalabs.com
-- Positioning: product and growth studio for founders
-- Proof strategy: lead with Bitcoin-native work, target founders across industries
-- Commercial model: no public price list; scope and pricing follow a project call
-- Flagship work at launch: HodlStay and Satoshi Gazette
-- HodlStay: live at https://hodlstay.com
-- Satoshi Gazette: live at https://satoshigazette.org and in an active showcase-polish phase
+## Decisions Locked
 
-## Core message
+- Brand and domain: MaydaLabs at https://maydalabs.com.
+- Positioning: product and growth studio for founders.
+- Proof strategy: lead with Bitcoin-native work and target founders across industries.
+- Commercial model: no public price list; scope and pricing follow a project call.
+- Flagships: HodlStay and Satoshi Gazette.
+- Intake: Calendly and `info@maydalabs.com`; no database or email provider required for launch.
+- Availability language: `Open for new client work` without an artificial cap.
 
-MaydaLabs builds apps, marketplaces, commerce experiences, and the growth systems around them.
+## Product Status
 
-Bitcoin-native by proof. Founder-focused by design.
+- [x] New MaydaLabs identity and dark-first visual system.
+- [x] Immersive homepage with signal field, product previews, service router, and scroll-linked build dossier.
+- [x] Services, About, Contact, legal, metadata, sitemap, and social image foundation.
+- [x] Dedicated HodlStay flagship case study.
+- [x] Dedicated Satoshi Gazette flagship case study grounded in current product capabilities.
+- [x] Current flagship screenshots and outbound product links.
+- [x] Legacy Programs, Pricing, ROI, Playbooks, and Newsletter routes removed from the application.
+- [x] Permanent redirects retained for old URLs.
+- [x] Vercel Analytics and conversion-intent event layer.
+- [x] GTM-ready integration and setup documentation.
+- [ ] Add the real GTM container ID when an account/container exists.
+- [ ] Final production QA after deployment.
 
-## Week 1: Foundation
+## Finish the Site
 
-- Finalize the new homepage direction and studio positioning.
-- Replace legacy CRO/program/pricing messaging across public navigation.
-- Build the first real HodlStay and Satoshi Gazette project stories.
-- Confirm the exact public status and outbound URL for each flagship.
-- Collect founder bio, portrait, social links, and company story.
+1. Verify desktop and mobile behavior on every public route.
+2. Test Calendly attribution, email links, flagship links, redirects, metadata, sitemap, and social previews in production.
+3. Review Satoshi Gazette case-study language as the newsroom publishes more work; add outcomes only when they are verifiable.
+4. Run accessibility, performance, and browser checks.
+5. Freeze launch copy and visual assets.
 
-## Week 2: Conversion and proof
+## Marketing Sprint: Start After Site QA
 
-- Expand each flagship into a complete case study with process, constraints, and outcomes.
-- Add verified screenshots from desktop and mobile product flows.
-- Add honest metrics where available; use scope and complexity proof where metrics are not public.
-- Rewrite About, Contact, legal, email, and scheduling touchpoints.
-- Replace or remove legacy Programs, ROI, Playbooks, and Newsletter pages.
+1. Create the MaydaLabs social profiles and use the final brand assets consistently.
+2. Prepare six launch assets: founder introduction, studio launch, HodlStay case post, Satoshi Gazette case post, build-dossier note, and product-system note.
+3. Create one share graphic and one short product walkthrough for each flagship.
+4. Build a focused founder prospect list and match each outreach message to the most relevant case study.
+5. Start with organic posts and direct outreach before paid ads.
+6. After conversion tracking is verified, test one narrow paid campaign with one audience, one case-study landing page, and one primary conversion: `project_call_click`.
+7. Review traffic, qualified calls, replies, and objections after seven days; change the message from evidence rather than impressions.
 
-## Week 3: Launch system
+## Inputs Still Needed
 
-- Connect analytics, conversion events, and scheduling attribution.
-- Add a real project intake flow and email notifications.
-- Create route-level metadata and social sharing images.
-- Test accessibility, responsive behavior, speed, forms, links, and redirects.
-- Prepare six launch assets: founder post, studio announcement, two case posts, two build notes.
-
-## Week 4: Publish and distribute
-
-- Freeze launch copy and visual assets.
-- Run production QA on maydalabs.com.
-- Publish the studio announcement and flagship case studies.
-- Start focused founder outreach using the relevant case study as proof.
-- Publish one useful build/growth note each week after launch.
-- Review traffic, calls, replies, and objections after seven days; adjust messaging from evidence.
-
-## Inputs still needed
-
-- Founder name, short biography, portrait, and preferred social links.
-- Public URLs and launch status for HodlStay and Satoshi Gazette.
-- Any metrics, milestones, testimonials, or partner logos that can be published.
-- Whether Codex/Claude should be named publicly or described more generally as an AI-native build system.
-- Preferred project-call length and qualifying questions.
+- A GTM container ID if Google Ads tracking is required.
+- Any public HodlStay or Satoshi Gazette outcomes, milestones, or testimonials that can be verified.
+- Final social account URLs after the MaydaLabs profiles are created.
+- Target geography and initial customer profile before paid campaign setup.
