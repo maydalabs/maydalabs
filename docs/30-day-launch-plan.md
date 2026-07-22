@@ -1,6 +1,6 @@
 # MaydaLabs 30-Day Launch Plan
 
-_Status updated: 18 July 2026_
+_Status updated: 22 July 2026_
 
 ## Decisions Locked
 
@@ -23,6 +23,10 @@ _Status updated: 18 July 2026_
 - [x] Legacy Programs, Pricing, ROI, Playbooks, and Newsletter routes removed from the application.
 - [x] Permanent redirects retained for old URLs.
 - [x] Vercel Analytics and conversion-intent event layer.
+- [x] Vercel Speed Insights and campaign attribution through to Calendly.
+- [x] English, Turkish, and French routes with location-aware first visit and manual language control.
+- [x] Localized metadata, canonical URLs, `hreflang`, sitemap entries, and dedicated social cards.
+- [x] Primary X profile connected at `@maydalabs`.
 - [x] GTM-ready integration and setup documentation.
 - [ ] Add the real GTM container ID when an account/container exists.
 - [ ] Final production QA after deployment.
@@ -30,7 +34,7 @@ _Status updated: 18 July 2026_
 ## Finish the Site
 
 1. Verify desktop and mobile behavior on every public route.
-2. Test Calendly attribution, email links, flagship links, redirects, metadata, sitemap, and social previews in production.
+2. Re-test Calendly attribution, email links, flagship links, localized redirects, metadata, sitemap, and social previews after production deployment.
 3. Review Satoshi Gazette case-study language as the newsroom publishes more work; add outcomes only when they are verifiable.
 4. Run accessibility, performance, and browser checks.
 5. Freeze launch copy and visual assets.

@@ -2,7 +2,7 @@
 
 ## What works now
 
-`@vercel/analytics` records page views and the site event layer records these conversion-intent actions:
+Vercel Web Analytics records page views, Speed Insights measures real-user performance, and the site event layer emits these conversion-intent actions:
 
 | Event | Trigger | Properties |
 | --- | --- | --- |
@@ -11,13 +11,23 @@
 | `case_study_click` | Internal case-study link | project slug |
 | `flagship_outbound` | Link to HodlStay or Satoshi Gazette | project |
 | `email_click` | `mailto:` link | address |
-| `social_click` | LinkedIn link | network |
+| `social_click` | X, LinkedIn, or future Instagram link | network |
 
 Events are sent to Vercel Analytics and pushed to `window.dataLayer`. Payloads contain only short, non-personal values.
 
+Web Analytics page views and Speed Insights are available on every Vercel plan. Vercel's custom-event dashboard currently requires Pro or Enterprise. On Hobby, page/referrer reporting still works and `dataLayer` remains ready, but conversion-event reporting requires either a Vercel upgrade or a tested GTM/analytics destination before paid ads begin.
+
+## Localization and campaign attribution
+
+- English uses canonical unprefixed URLs. Turkish uses `/tr`; French uses `/fr`.
+- On the first visit, Vercel country headers select Turkish for Turkey and French for France/Monaco. Browser language is the fallback.
+- A manual EN/TR/FR choice overrides location and is stored in the `maydalabs_locale` cookie for one year.
+- Inbound `utm_source`, `utm_medium`, `utm_campaign`, and `utm_term` values are retained for the browser session and forwarded to Calendly.
+- Calendly `utm_content` remains the exact MaydaLabs CTA surface, such as `header` or `hodlstay_case_bottom`.
+
 ## Activate Google Tag Manager
 
-GTM is optional. Do not delay production or the first marketing posts for it.
+GTM is optional. Vercel Analytics and Speed Insights are the launch baseline; do not delay production or organic posts for GTM.
 
 1. Create a web container at [Google Tag Manager](https://tagmanager.google.com/).
 2. Copy the container ID in the form `GTM-XXXXXXX`.

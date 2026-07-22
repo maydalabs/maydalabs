@@ -164,6 +164,40 @@ select {
   transform-origin: left;
 }
 
+.studio-language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.2rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.studio-language-switcher a {
+  display: grid;
+  min-width: 2rem;
+  height: 1.85rem;
+  place-items: center;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  transition: color 180ms ease, background 180ms ease;
+}
+
+.studio-language-switcher a:hover,
+.studio-language-switcher a[aria-current="true"] {
+  background: rgba(255, 255, 255, 0.09);
+  color: white;
+}
+
+.studio-language-switcher-mobile {
+  width: fit-content;
+  margin-top: 1rem;
+}
+
 .studio-menu-button {
   width: 2.5rem;
   height: 2.5rem;

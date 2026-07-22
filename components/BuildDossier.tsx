@@ -1,46 +1,44 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { Locale } from "@/lib/i18n";
 
-const DOSSIER_STAGES = [
-  {
-    number: "01",
-    eyebrow: "Input / Founder context",
-    title: "Find the signal.",
-    copy: "The half-formed brief, customer reality, commercial target, and constraints become a decision frame.",
-    note: "Ambiguity is useful input. It is not a build plan.",
-    rows: ["Problem / audience", "Commercial target", "Risks / unknowns"],
+const DOSSIER_COPY = {
+  en: {
+    progress: "MaydaLabs / build dossier", sequence: "Sequence", file: "CONFIDENTIAL / WORKING FILE", kicker: "A modern build system", heading: ["Small team.", "Unfair output."], choose: "Choose a build dossier stage", show: "Show stage", replay: "Replay dossier", stats: ["connected team from strategy to launch", "handoffs into a junior delivery maze"], showing: "Showing dossier stage",
+    stages: [
+      { number: "01", eyebrow: "Input / Founder context", title: "Find the signal.", copy: "The half-formed brief, customer reality, commercial target, and constraints become a decision frame.", note: "Ambiguity is useful input. It is not a build plan.", rows: ["Problem / audience", "Commercial target", "Risks / unknowns"] },
+      { number: "02", eyebrow: "System / Product decisions", title: "Shape the system.", copy: "Flows, architecture, visual language, operations, and priorities are designed as one connected product.", note: "Design intent and technical reality move together.", rows: ["Experience map", "System architecture", "Build sequence"] },
+      { number: "03", eyebrow: "Release / Working software", title: "Ship the real thing.", copy: "Working interfaces arrive in tight cycles. QA, documentation, and production decisions stay inside the loop.", note: "The product, not the presentation, is the source of truth.", rows: ["Interface / code", "QA / release", "Production handoff"] },
+      { number: "04", eyebrow: "Signal / Next iteration", title: "Create momentum.", copy: "Launch data and market response reveal the next highest-leverage move, and the system keeps learning.", note: "Shipping is where the useful evidence begins.", rows: ["Measure response", "Find constraint", "Compound learning"] },
+    ],
   },
-  {
-    number: "02",
-    eyebrow: "System / Product decisions",
-    title: "Shape the system.",
-    copy: "Flows, architecture, visual language, operations, and priorities are designed as one connected product.",
-    note: "Design intent and technical reality move together.",
-    rows: ["Experience map", "System architecture", "Build sequence"],
+  tr: {
+    progress: "MaydaLabs / geliştirme dosyası", sequence: "Aşama", file: "GİZLİ / ÇALIŞMA DOSYASI", kicker: "Modern bir geliştirme sistemi", heading: ["Küçük ekip.", "Haksız üstünlük."], choose: "Geliştirme dosyası aşamasını seçin", show: "Aşamayı göster", replay: "Dosyayı yeniden oynat", stats: ["stratejiden lansmana bağlı ekip", "junior teslimat labirentine devredilen iş"], showing: "Gösterilen dosya aşaması",
+    stages: [
+      { number: "01", eyebrow: "Girdi / Kurucu bağlamı", title: "Sinyali bul.", copy: "Yarım şekillenmiş brief, müşteri gerçekliği, ticari hedef ve kısıtlar bir karar çerçevesine dönüşür.", note: "Belirsizlik faydalı bir girdidir. Geliştirme planı değildir.", rows: ["Problem / kitle", "Ticari hedef", "Riskler / bilinmeyenler"] },
+      { number: "02", eyebrow: "Sistem / Ürün kararları", title: "Sistemi şekillendir.", copy: "Akışlar, mimari, görsel dil, operasyonlar ve öncelikler tek bir bağlantılı ürün olarak tasarlanır.", note: "Tasarım niyeti ve teknik gerçeklik birlikte ilerler.", rows: ["Deneyim haritası", "Sistem mimarisi", "Geliştirme sırası"] },
+      { number: "03", eyebrow: "Yayın / Çalışan yazılım", title: "Gerçek ürünü yayınla.", copy: "Çalışan arayüzler kısa döngülerde gelir. QA, dokümantasyon ve üretim kararları döngünün içinde kalır.", note: "Doğrunun kaynağı sunum değil, üründür.", rows: ["Arayüz / kod", "QA / yayın", "Üretim devri"] },
+      { number: "04", eyebrow: "Sinyal / Sonraki iterasyon", title: "İvme yarat.", copy: "Lansman verisi ve pazar tepkisi, en yüksek etkili sonraki hamleyi gösterir; sistem öğrenmeye devam eder.", note: "Faydalı kanıt, ürün yayınlandığında başlar.", rows: ["Tepkiyi ölç", "Kısıtı bul", "Öğrenmeyi büyüt"] },
+    ],
   },
-  {
-    number: "03",
-    eyebrow: "Release / Working software",
-    title: "Ship the real thing.",
-    copy: "Working interfaces arrive in tight cycles. QA, documentation, and production decisions stay inside the loop.",
-    note: "The product, not the presentation, is the source of truth.",
-    rows: ["Interface / code", "QA / release", "Production handoff"],
+  fr: {
+    progress: "MaydaLabs / dossier de construction", sequence: "Séquence", file: "CONFIDENTIEL / DOSSIER DE TRAVAIL", kicker: "Un système de construction moderne", heading: ["Petite équipe.", "Impact démesuré."], choose: "Choisir une étape du dossier", show: "Afficher l’étape", replay: "Rejouer le dossier", stats: ["équipe connectée de la stratégie au lancement", "transferts dans un labyrinthe de livraison junior"], showing: "Étape du dossier affichée",
+    stages: [
+      { number: "01", eyebrow: "Entrée / Contexte fondateur", title: "Trouver le signal.", copy: "Le brief inachevé, la réalité client, la cible commerciale et les contraintes deviennent un cadre de décision.", note: "L’ambiguïté est une donnée utile. Ce n’est pas un plan de construction.", rows: ["Problème / public", "Cible commerciale", "Risques / inconnues"] },
+      { number: "02", eyebrow: "Système / Décisions produit", title: "Structurer le système.", copy: "Parcours, architecture, langage visuel, opérations et priorités sont conçus comme un produit connecté.", note: "L’intention de design et la réalité technique avancent ensemble.", rows: ["Carte d’expérience", "Architecture système", "Séquence de construction"] },
+      { number: "03", eyebrow: "Livraison / Logiciel fonctionnel", title: "Livrer le produit réel.", copy: "Les interfaces fonctionnelles arrivent par cycles courts. QA, documentation et décisions de production restent dans la boucle.", note: "Le produit, pas la présentation, est la source de vérité.", rows: ["Interface / code", "QA / livraison", "Transmission production"] },
+      { number: "04", eyebrow: "Signal / Itération suivante", title: "Créer l’élan.", copy: "Les données du lancement et la réponse du marché révèlent l’étape suivante à plus fort impact.", note: "La livraison est le point de départ des preuves utiles.", rows: ["Mesurer la réponse", "Trouver la contrainte", "Amplifier l’apprentissage"] },
+    ],
   },
-  {
-    number: "04",
-    eyebrow: "Signal / Next iteration",
-    title: "Create momentum.",
-    copy: "Launch data and market response reveal the next highest-leverage move, and the system keeps learning.",
-    note: "Shipping is where the useful evidence begins.",
-    rows: ["Measure response", "Find constraint", "Compound learning"],
-  },
-] as const;
+} as const;
 
 const clamp = (value: number, minimum = 0, maximum = 1) =>
   Math.min(maximum, Math.max(minimum, value));
 
-export function BuildDossier() {
+export function BuildDossier({ locale }: { locale: Locale }) {
+  const copy = DOSSIER_COPY[locale];
+  const stages = copy.stages;
   const sectionRef = useRef<HTMLElement>(null);
   const pageRefs = useRef<Array<HTMLElement | null>>([]);
   const replayTimerRef = useRef<number | null>(null);
@@ -121,7 +119,7 @@ export function BuildDossier() {
         setActiveStage(stage);
         applyStage(stage);
 
-        if (stage < DOSSIER_STAGES.length - 1) {
+        if (stage < stages.length - 1) {
           advance(stage + 1);
         } else {
           replayTimerRef.current = null;
@@ -134,7 +132,7 @@ export function BuildDossier() {
     advance(1);
   };
 
-  const progress = ((activeStage + 1) / DOSSIER_STAGES.length) * 100;
+  const progress = ((activeStage + 1) / stages.length) * 100;
 
   return (
     <section
@@ -146,23 +144,23 @@ export function BuildDossier() {
       <div className="build-dossier-sticky">
         <div className="build-dossier-visual" aria-hidden="true">
           <div className="build-dossier-progress">
-            <span>MaydaLabs / build dossier</span>
+            <span>{copy.progress}</span>
             <i><b style={{ width: `${progress}%` }} /></i>
-            <span>Sequence / {String(activeStage + 1).padStart(2, "0")} of 04</span>
+            <span>{copy.sequence} / {String(activeStage + 1).padStart(2, "0")} / 04</span>
           </div>
           <div className="build-dossier-book">
             <div className="build-dossier-spine" />
             <div className="build-dossier-back" />
-            {DOSSIER_STAGES.map((stage, index) => (
+            {stages.map((stage, index) => (
               <article
                 key={stage.number}
                 ref={(page) => { pageRefs.current[index] = page; }}
                 className="build-dossier-page"
-                style={{ zIndex: DOSSIER_STAGES.length - index }}
+                style={{ zIndex: stages.length - index }}
               >
                 <div className="build-dossier-page-head">
                   <span>ML / {stage.number}</span>
-                  <span>CONFIDENTIAL / WORKING FILE</span>
+                  <span>{copy.file}</span>
                 </div>
                 <p>{stage.eyebrow}</p>
                 <h3>{stage.title}</h3>
@@ -182,10 +180,10 @@ export function BuildDossier() {
         </div>
 
         <div className="build-dossier-copy">
-          <p className="studio-kicker">A modern build system</p>
-          <h2>Small team.<br /><em>Unfair output.</em></h2>
+          <p className="studio-kicker">{copy.kicker}</p>
+          <h2>{copy.heading[0]}<br /><em>{copy.heading[1]}</em></h2>
           <div className="build-dossier-stage-copy">
-            {DOSSIER_STAGES.map((stage, index) => (
+            {stages.map((stage, index) => (
               <article key={stage.number} data-stage={index}>
                 <span>{stage.number} / {stage.eyebrow}</span>
                 <h3>{stage.title}</h3>
@@ -195,12 +193,12 @@ export function BuildDossier() {
             ))}
           </div>
           <div className="build-dossier-controls">
-            <div role="group" aria-label="Choose a build dossier stage">
-              {DOSSIER_STAGES.map((stage, index) => (
+            <div role="group" aria-label={copy.choose}>
+              {stages.map((stage, index) => (
                 <button
                   key={stage.number}
                   type="button"
-                  aria-label={`Show stage ${stage.number}: ${stage.title}`}
+                  aria-label={`${copy.show} ${stage.number}: ${stage.title}`}
                   aria-pressed={activeStage === index}
                   onClick={() => selectStage(index)}
                 >
@@ -209,15 +207,15 @@ export function BuildDossier() {
               ))}
             </div>
             <button type="button" className="build-dossier-replay" onClick={replayDossier}>
-              Replay dossier <span aria-hidden>↻</span>
+              {copy.replay} <span aria-hidden>↻</span>
             </button>
           </div>
           <div className="studio-ai-stats">
-            <div><strong>1</strong><span>connected team from strategy to launch</span></div>
-            <div><strong>0</strong><span>handoffs into a junior delivery maze</span></div>
+            <div><strong>1</strong><span>{copy.stats[0]}</span></div>
+            <div><strong>0</strong><span>{copy.stats[1]}</span></div>
           </div>
           <p className="sr-only" aria-live="polite">
-            Showing dossier stage {activeStage + 1}: {DOSSIER_STAGES[activeStage].title}
+            {copy.showing} {activeStage + 1}: {stages[activeStage].title}
           </p>
         </div>
       </div>

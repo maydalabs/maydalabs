@@ -5,16 +5,20 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { MaydaMark } from "@/components/MaydaMark";
+import {
+  LOCALES,
+  LOCALE_LABELS,
+  SITE_CHROME_COPY,
+  type Locale,
+  localizePath,
+  stripLocaleFromPath,
+} from "@/lib/i18n";
 
-const NAV_ITEMS = [
-  { label: "Work", href: "/case-studies", section: "work" },
-  { label: "Services", href: "/services", section: "services" },
-  { label: "Approach", href: "/#approach", section: "approach" },
-  { label: "About", href: "/about" },
-];
-
-export function SiteHeader() {
+export function SiteHeader({ locale }: { locale: Locale }) {
   const pathname = usePathname();
+  const normalizedPathname = stripLocaleFromPath(pathname);
+  const copy = SITE_CHROME_COPY[locale];
+  const navItems = copy.nav.map(([label, href, section]) => ({ label, href, section }));
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
@@ -27,7 +31,7 @@ export function SiteHeader() {
   }, []);
 
   useEffect(() => {
-    if (pathname !== "/") {
+    if (normalizedPathname !== "/") {
       return;
     }
 
@@ -58,35 +62,58 @@ export function SiteHeader() {
       window.removeEventListener("resize", onScroll);
       if (frame) window.cancelAnimationFrame(frame);
     };
-  }, [pathname]);
+  }, [normalizedPathname]);
 
-  const isActive = (item: (typeof NAV_ITEMS)[number]) => {
-    if (item.label === "Work" && pathname.startsWith("/case-studies")) return true;
-    if (item.label === "Services" && pathname === "/services") return true;
-    if (item.label === "About" && pathname === "/about") return true;
-    return pathname === "/" && item.section === activeSection;
+  const isActive = (item: (typeof navItems)[number]) => {
+    if (item.href === "/case-studies" && normalizedPathname.startsWith("/case-studies")) return true;
+    if (item.href === "/services" && normalizedPathname === "/services") return true;
+    if (item.href === "/about" && normalizedPathname === "/about") return true;
+    return normalizedPathname === "/" && item.section === activeSection;
   };
+
+  const localeSwitchHref = (nextLocale: Locale) => {
+    if (nextLocale !== "en") return localizePath(normalizedPathname, nextLocale);
+    return normalizedPathname === "/" ? "/en" : `/en${normalizedPathname}`;
+  };
+
+  const languageLinks = (className: string) => (
+    <div className={className} aria-label={copy.languageLabel}>
+      {LOCALES.map((nextLocale) => (
+        <Link
+          key={nextLocale}
+          href={localeSwitchHref(nextLocale)}
+          hrefLang={nextLocale}
+          lang={nextLocale}
+          aria-current={locale === nextLocale ? "true" : undefined}
+          aria-label={LOCALE_LABELS[nextLocale]}
+          onClick={() => setOpen(false)}
+        >
+          {nextLocale.toUpperCase()}
+        </Link>
+      ))}
+    </div>
+  );
 
   return (
     <header className={`studio-header ${scrolled || open ? "is-scrolled" : ""}`}>
       <div className="studio-shell flex h-[72px] items-center justify-between gap-5">
-        <Link href="/" className="group flex items-center gap-3" aria-label="MaydaLabs home">
+        <Link href={localizePath("/", locale)} className="group flex items-center gap-3" aria-label={copy.homeLabel}>
           <MaydaMark className="h-8 w-8 text-white" />
           <span className="text-[0.82rem] font-bold uppercase tracking-[0.18em] text-white">
             MaydaLabs
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Primary navigation">
-          {NAV_ITEMS.map((item) => (
+        <nav className="hidden items-center gap-1 md:flex" aria-label={copy.navigationLabel}>
+          {navItems.map((item) => (
             <Link
               key={item.label}
-              href={item.href}
+              href={localizePath(item.href, locale)}
               className={`studio-nav-link ${isActive(item) ? "is-active" : ""}`}
               aria-current={
-                (item.label === "Work" && pathname.startsWith("/case-studies")) ||
-                (item.label === "Services" && pathname === "/services") ||
-                (item.label === "About" && pathname === "/about")
+                (item.href === "/case-studies" && normalizedPathname.startsWith("/case-studies")) ||
+                (item.href === "/services" && normalizedPathname === "/services") ||
+                (item.href === "/about" && normalizedPathname === "/about")
                   ? "page"
                   : undefined
               }
@@ -96,21 +123,22 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden items-center gap-3 md:flex">
+          {languageLinks("studio-language-switcher")}
           <Link
             href={getIntroCallUrl("header")}
             target="_blank"
             rel="noopener noreferrer"
             className="studio-button studio-button-small"
           >
-            Start a project <span aria-hidden>↗</span>
+            {copy.startProject} <span aria-hidden>↗</span>
           </Link>
         </div>
 
         <button
           type="button"
           className="studio-menu-button md:hidden"
-          aria-label={open ? "Close menu" : "Open menu"}
+          aria-label={open ? copy.closeMenu : copy.openMenu}
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
         >
@@ -120,11 +148,11 @@ export function SiteHeader() {
       </div>
 
       {open ? (
-        <nav className="studio-mobile-nav md:hidden" aria-label="Mobile navigation">
-          {NAV_ITEMS.map((item, index) => (
+        <nav className="studio-mobile-nav md:hidden" aria-label={copy.mobileNavigationLabel}>
+          {navItems.map((item, index) => (
             <Link
               key={item.label}
-              href={item.href}
+              href={localizePath(item.href, locale)}
               onClick={() => setOpen(false)}
               className={isActive(item) ? "is-active" : ""}
             >
@@ -139,8 +167,9 @@ export function SiteHeader() {
             onClick={() => setOpen(false)}
             className="studio-button mt-3"
           >
-            Start a project <span aria-hidden>↗</span>
+            {copy.startProject} <span aria-hidden>↗</span>
           </Link>
+          {languageLinks("studio-language-switcher studio-language-switcher-mobile")}
         </nav>
       ) : null}
     </header>

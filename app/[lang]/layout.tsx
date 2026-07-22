@@ -1,15 +1,20 @@
 import type { Metadata, Viewport } from "next";
+import { notFound } from "next/navigation";
 import { Analytics } from "@vercel/analytics/next";
-import "./globals.css";
-import { SiteHeader } from "../components/SiteHeader";
-import { SiteFooter } from "../components/SiteFooter";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import "../globals.css";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { GoogleTagManager } from "@/components/GoogleTagManager";
 import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { SITE_URL } from "@/lib/site";
+import {
+  LOCALES,
+  SITE_DESCRIPTIONS,
+  type Locale,
+  isLocale,
+} from "@/lib/i18n";
 import { Newsreader, Space_Grotesk } from "next/font/google";
-
-const SITE_DESCRIPTION =
-  "MaydaLabs builds apps, marketplaces, commerce experiences, and growth systems for ambitious founders.";
 
 const studioSans = Space_Grotesk({
   subsets: ["latin"],
@@ -23,48 +28,48 @@ const studioSerif = Newsreader({
   variable: "--font-studio-serif",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: "MaydaLabs — Product & growth studio",
-    template: "%s · MaydaLabs",
-  },
-  description: SITE_DESCRIPTION,
-  applicationName: "MaydaLabs",
-  authors: [{ name: "MaydaLabs", url: SITE_URL }],
-  creator: "MaydaLabs",
-  publisher: "MaydaLabs",
-  category: "technology",
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    siteName: "MaydaLabs",
-    url: SITE_URL,
-    title: "MaydaLabs — Product & growth studio",
-    description: SITE_DESCRIPTION,
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "MaydaLabs — Product & growth studio",
-    description: SITE_DESCRIPTION,
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+export async function generateStaticParams() {
+  return LOCALES.map((lang) => ({ lang }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  if (!isLocale(lang)) return {};
+
+  const description = SITE_DESCRIPTIONS[lang];
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: "MaydaLabs — Product & growth studio",
+      template: "%s · MaydaLabs",
+    },
+    description,
+    applicationName: "MaydaLabs",
+    authors: [{ name: "MaydaLabs", url: SITE_URL }],
+    creator: "MaydaLabs",
+    publisher: "MaydaLabs",
+    category: "technology",
+    robots: { index: true, follow: true },
+  };
+}
 
 export const viewport: Viewport = {
   colorScheme: "dark",
   themeColor: "#090909",
 };
 
-const structuredData = {
+function getStructuredData(locale: Locale) {
+  return {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
   name: "MaydaLabs",
   url: SITE_URL,
-  description: SITE_DESCRIPTION,
+  description: SITE_DESCRIPTIONS[locale],
+  inLanguage: locale,
   email: "info@maydalabs.com",
   areaServed: "Worldwide",
   address: {
@@ -72,7 +77,10 @@ const structuredData = {
     addressLocality: "Istanbul",
     addressCountry: "TR",
   },
-  sameAs: ["https://www.linkedin.com/in/mehmet-e-mayda/"],
+  sameAs: [
+    "https://x.com/maydalabs",
+    "https://www.linkedin.com/in/mehmet-e-mayda/",
+  ],
   knowsAbout: [
     "Product strategy",
     "Web applications",
@@ -82,16 +90,24 @@ const structuredData = {
     "Growth systems",
     "Bitcoin products",
   ],
-};
+  };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{ lang: string }>;
 }>) {
+  const { lang } = await params;
+  if (!isLocale(lang)) notFound();
+
+  const structuredData = getStructuredData(lang);
+
   return (
     <html
-      lang="en"
+      lang={lang}
       className={`${studioSans.variable} ${studioSerif.variable}`}
       data-scroll-behavior="smooth"
     >
@@ -102,13 +118,14 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
         <div className="flex min-h-screen flex-col">
-          <SiteHeader />
+          <SiteHeader locale={lang} />
 
           <main className="flex-1">{children}</main>
 
-          <SiteFooter />
+          <SiteFooter locale={lang} />
         </div>
         <Analytics />
+        <SpeedInsights />
         <SiteAnalytics />
       </body>
     </html>

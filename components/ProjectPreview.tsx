@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState, type KeyboardEvent, type PointerEvent } from "react";
+import type { Locale } from "@/lib/i18n";
 
 type ProjectPreviewProps = {
   variant: "hodl" | "gazette";
@@ -15,24 +16,35 @@ type ProjectPreviewProps = {
   watermarkWidth: number;
   watermarkHeight: number;
   watermarkClassName: string;
+  locale: Locale;
 };
 
-const XRAY_LAYERS = {
-  hodl: [
-    ["01", "Discovery", "Native and partner inventory"],
-    ["02", "Transaction", "Booking and payment state"],
-    ["03", "Operations", "Hosts, calendars, and payouts"],
-    ["04", "Trust", "Reviews and support lifecycle"],
-  ],
-  gazette: [
-    ["01", "Intelligence", "Markets and source context"],
-    ["02", "Editorial", "Desks, stories, and briefings"],
-    ["03", "Operations", "Publishing and distribution"],
-    ["04", "Knowledge", "Search and assisted research"],
-  ],
+const PREVIEW_COPY = {
+  en: {
+    anatomy: "System anatomy",
+    inspect: "Hold to inspect system",
+    inspectLabel: "Hold to inspect the systems behind",
+    hodl: [["01", "Discovery", "Native and partner inventory"], ["02", "Transaction", "Booking and payment state"], ["03", "Operations", "Hosts, calendars, and payouts"], ["04", "Trust", "Reviews and support lifecycle"]],
+    gazette: [["01", "Intelligence", "Markets and source context"], ["02", "Editorial", "Desks, stories, and briefings"], ["03", "Operations", "Publishing and distribution"], ["04", "Knowledge", "Search and assisted research"]],
+  },
+  tr: {
+    anatomy: "Sistem anatomisi",
+    inspect: "Sistemi incelemek için basılı tut",
+    inspectLabel: "Arka plandaki sistemleri incelemek için basılı tut",
+    hodl: [["01", "Keşif", "Yerel ve iş ortağı envanteri"], ["02", "İşlem", "Rezervasyon ve ödeme durumu"], ["03", "Operasyon", "Ev sahipleri, takvimler ve ödemeler"], ["04", "Güven", "Yorumlar ve destek yaşam döngüsü"]],
+    gazette: [["01", "İstihbarat", "Piyasalar ve kaynak bağlamı"], ["02", "Editoryal", "Masalar, haberler ve bültenler"], ["03", "Operasyon", "Yayınlama ve dağıtım"], ["04", "Bilgi", "Arama ve destekli araştırma"]],
+  },
+  fr: {
+    anatomy: "Anatomie du système",
+    inspect: "Maintenir pour inspecter",
+    inspectLabel: "Maintenir pour inspecter les systèmes derrière",
+    hodl: [["01", "Découverte", "Inventaire natif et partenaire"], ["02", "Transaction", "État des réservations et paiements"], ["03", "Opérations", "Hôtes, calendriers et versements"], ["04", "Confiance", "Avis et cycle d’assistance"]],
+    gazette: [["01", "Intelligence", "Marchés et contexte des sources"], ["02", "Éditorial", "Rubriques, articles et briefings"], ["03", "Opérations", "Publication et distribution"], ["04", "Connaissance", "Recherche et assistance"]],
+  },
 } as const;
 
 export function ProjectPreview({
+  locale,
   variant,
   domain,
   status,
@@ -46,6 +58,7 @@ export function ProjectPreview({
   watermarkClassName,
 }: ProjectPreviewProps) {
   const [inspecting, setInspecting] = useState(false);
+  const copy = PREVIEW_COPY[locale];
 
   const beginInspection = (event: PointerEvent<HTMLButtonElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -89,13 +102,13 @@ export function ProjectPreview({
           />
           <div className="project-xray" aria-hidden="true">
             <div className="project-xray-grid" />
-            <p>System anatomy / {domain}</p>
+            <p>{copy.anatomy} / {domain}</p>
             <div className="project-xray-layers">
-              {XRAY_LAYERS[variant].map(([number, title, copy]) => (
+              {copy[variant].map(([number, title, detail]) => (
                 <div key={number}>
                   <span>{number}</span>
                   <strong>{title}</strong>
-                  <small>{copy}</small>
+                  <small>{detail}</small>
                 </div>
               ))}
             </div>
@@ -113,7 +126,7 @@ export function ProjectPreview({
       <button
         type="button"
         className="project-inspect-button"
-        aria-label={`Hold to inspect the systems behind ${domain}`}
+        aria-label={`${copy.inspectLabel} ${domain}`}
         aria-pressed={inspecting}
         onPointerDown={beginInspection}
         onPointerUp={endInspection}
@@ -122,7 +135,7 @@ export function ProjectPreview({
         onKeyUp={handleKeyUp}
         onBlur={() => setInspecting(false)}
       >
-        <span /> Hold to inspect system
+        <span /> {copy.inspect}
       </button>
     </div>
   );

@@ -2,12 +2,25 @@
 
 import { useEffect } from "react";
 import { track } from "@vercel/analytics/react";
+import { stripLocaleFromPath } from "@/lib/i18n";
 
 type EventProperties = Record<string, string | number | boolean | null>;
 type ClassifiedClick = {
   name: string;
   properties: EventProperties;
 };
+
+const CAMPAIGN_STORAGE_KEY = "maydalabs_campaign";
+const CAMPAIGN_KEYS = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_term",
+  "utm_content",
+] as const;
+
+type CampaignKey = (typeof CAMPAIGN_KEYS)[number];
+type CampaignData = Partial<Record<CampaignKey, string>>;
 
 declare global {
   interface Window {
@@ -16,11 +29,60 @@ declare global {
 }
 
 function getProject(pathname: string) {
+  pathname = stripLocaleFromPath(pathname);
+
   if (pathname === "/case-studies" || pathname === "/case-studies/") {
     return "work_index";
   }
 
   return pathname.split("/").filter(Boolean).at(-1) ?? "work_index";
+}
+
+function readStoredCampaign(): CampaignData {
+  try {
+    const stored = window.sessionStorage.getItem(CAMPAIGN_STORAGE_KEY);
+    if (!stored) return {};
+
+    const parsed = JSON.parse(stored) as Record<string, unknown>;
+    return Object.fromEntries(
+      CAMPAIGN_KEYS.flatMap((key) =>
+        typeof parsed[key] === "string" ? [[key, parsed[key]]] : [],
+      ),
+    );
+  } catch {
+    return {};
+  }
+}
+
+function captureInboundCampaign() {
+  const incoming = Object.fromEntries(
+    CAMPAIGN_KEYS.flatMap((key) => {
+      const value = new URLSearchParams(window.location.search).get(key);
+      return value ? [[key, value]] : [];
+    }),
+  ) as CampaignData;
+
+  if (!Object.keys(incoming).length) return;
+
+  try {
+    window.sessionStorage.setItem(
+      CAMPAIGN_STORAGE_KEY,
+      JSON.stringify({ ...readStoredCampaign(), ...incoming }),
+    );
+  } catch {
+    // Attribution must never block navigation in privacy-restricted browsers.
+  }
+}
+
+function enrichCalendlyUrl(url: URL) {
+  const campaign = readStoredCampaign();
+
+  for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_term"] as const) {
+    const value = campaign[key];
+    if (value) url.searchParams.set(key, value);
+  }
+
+  return url;
 }
 
 function classifyClick(url: URL): ClassifiedClick | null {
@@ -45,6 +107,20 @@ function classifyClick(url: URL): ClassifiedClick | null {
     };
   }
 
+  if (url.hostname === "x.com" || url.hostname.endsWith("twitter.com")) {
+    return {
+      name: "social_click",
+      properties: { network: "x" },
+    };
+  }
+
+  if (url.hostname.endsWith("instagram.com")) {
+    return {
+      name: "social_click",
+      properties: { network: "instagram" },
+    };
+  }
+
   const flagship = ["hodlstay.com", "satoshigazette.org"].find(
     (domain) => url.hostname === domain || url.hostname.endsWith(`.${domain}`),
   );
@@ -56,14 +132,16 @@ function classifyClick(url: URL): ClassifiedClick | null {
     };
   }
 
-  if (url.origin === window.location.origin && url.pathname.startsWith("/case-studies")) {
+  const localPath = stripLocaleFromPath(url.pathname);
+
+  if (url.origin === window.location.origin && localPath.startsWith("/case-studies")) {
     return {
       name: "case_study_click",
       properties: { project: getProject(url.pathname) },
     };
   }
 
-  if (url.origin === window.location.origin && url.pathname === "/contact") {
+  if (url.origin === window.location.origin && localPath === "/contact") {
     return {
       name: "contact_page_click",
       properties: { surface: window.location.pathname },
@@ -81,6 +159,7 @@ function emit(name: string, properties: EventProperties) {
 export function SiteAnalytics() {
   useEffect(() => {
     window.dataLayer = window.dataLayer || [];
+    captureInboundCampaign();
 
     const handleClick = (event: MouseEvent) => {
       const target = event.target;
@@ -95,7 +174,14 @@ export function SiteAnalytics() {
         return;
       }
 
-      const classified = classifyClick(new URL(anchor.href, window.location.href));
+      let url = new URL(anchor.href, window.location.href);
+
+      if (url.hostname.endsWith("calendly.com")) {
+        url = enrichCalendlyUrl(url);
+        anchor.href = url.toString();
+      }
+
+      const classified = classifyClick(url);
 
       if (classified) {
         emit(classified.name, classified.properties);

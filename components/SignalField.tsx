@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, type CSSProperties, type PointerEvent } from "react";
+import type { Locale } from "@/lib/i18n";
 
 type NoiseStyle = CSSProperties & {
   "--noise-x": string;
@@ -23,8 +24,15 @@ const NOISE_POINTS = [
   ["254px", "-225px", "110px", "-98px", "535ms"],
 ] as const;
 
-export function SignalField() {
+const SIGNAL_COPY = {
+  en: ["INPUT / CONTEXT", "Ambiguous brief", "Resolving", "OUTPUT / SYSTEM", "Working product", "Signal found", "Signal acquired"],
+  tr: ["GİRDİ / BAĞLAM", "Belirsiz brief", "Çözümleniyor", "ÇIKTI / SİSTEM", "Çalışan ürün", "Sinyal bulundu", "Sinyal yakalandı"],
+  fr: ["ENTRÉE / CONTEXTE", "Brief ambigu", "Résolution", "SORTIE / SYSTÈME", "Produit fonctionnel", "Signal trouvé", "Signal acquis"],
+} as const;
+
+export function SignalField({ locale }: { locale: Locale }) {
   const fieldRef = useRef<HTMLDivElement>(null);
+  const copy = SIGNAL_COPY[locale];
 
   const moveSignal = (event: PointerEvent<HTMLDivElement>) => {
     const field = fieldRef.current;
@@ -80,19 +88,19 @@ export function SignalField() {
         <span className="signal-core-dot" />
       </div>
       <div className="signal-card signal-card-one">
-        <span>INPUT / CONTEXT</span>
-        <strong>Ambiguous brief</strong>
-        <i>Resolving</i>
+        <span>{copy[0]}</span>
+        <strong>{copy[1]}</strong>
+        <i>{copy[2]}</i>
       </div>
       <div className="signal-card signal-card-two">
-        <span>OUTPUT / SYSTEM</span>
-        <strong>Working product</strong>
-        <i>Signal found</i>
+        <span>{copy[3]}</span>
+        <strong>{copy[4]}</strong>
+        <i>{copy[5]}</i>
       </div>
       <p className="signal-coordinate signal-coordinate-one">41.0082° N</p>
       <p className="signal-coordinate signal-coordinate-two">28.9784° E</p>
       <div className="signal-cursor"><span>MaydaLabs</span></div>
-      <div className="signal-lock"><span>Signal acquired</span><b>100%</b></div>
+      <div className="signal-lock"><span>{copy[6]}</span><b>100%</b></div>
     </div>
   );
 }
