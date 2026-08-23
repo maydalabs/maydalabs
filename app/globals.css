@@ -2071,6 +2071,104 @@ select {
   line-height: 1.75;
 }
 
+.about-founder {
+  display: grid;
+  scroll-margin-top: 7rem;
+  padding-block: clamp(5rem, 9vw, 9rem);
+  border-bottom: 1px solid var(--border);
+  gap: 3rem;
+}
+
+.about-founder-heading h2 {
+  max-width: 9ch;
+  margin: 1rem 0 0;
+  font-size: clamp(3rem, 7vw, 7rem);
+  font-weight: 520;
+  line-height: 0.9;
+  letter-spacing: -0.065em;
+}
+
+.about-founder-role {
+  max-width: 30rem;
+  margin: 1.5rem 0 0;
+  color: var(--signal);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  line-height: 1.6;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+}
+
+.about-founder-story {
+  display: grid;
+  align-content: end;
+  gap: 1.25rem;
+}
+
+.about-founder-story > p {
+  max-width: 40rem;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.75;
+}
+
+.about-founder-story .about-founder-intro {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: clamp(1.2rem, 2vw, 1.7rem);
+  line-height: 1.45;
+  letter-spacing: -0.025em;
+}
+
+.about-founder-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin-top: 0.75rem;
+}
+
+.about-founder-links a {
+  color: rgba(255, 255, 255, 0.72);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: color 180ms ease;
+}
+
+.about-founder-links a:hover {
+  color: var(--signal);
+}
+
+.about-founder-signals {
+  display: grid;
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--border);
+}
+
+.about-founder-signals article {
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.about-founder-signals article:last-child {
+  border-bottom: 0;
+}
+
+.about-founder-signals h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 550;
+  letter-spacing: -0.02em;
+}
+
+.about-founder-signals p {
+  max-width: 30rem;
+  margin: 0.8rem 0 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
 .about-principles {
   padding-block: clamp(5rem, 9vw, 9rem);
   border-bottom: 1px solid var(--border);
@@ -2538,6 +2636,28 @@ select {
   .about-statement {
     grid-template-columns: 1.2fr 0.8fr;
     align-items: end;
+  }
+
+  .about-founder {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  }
+
+  .about-founder-signals {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .about-founder-signals article {
+    padding: 2rem;
+    border-right: 1px solid var(--border);
+    border-bottom: 0;
+  }
+
+  .about-founder-signals article:first-child {
+    padding-left: 0;
+  }
+
+  .about-founder-signals article:last-child {
+    border-right: 0;
   }
 
   .case-detail-grid,

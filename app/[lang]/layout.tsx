@@ -49,8 +49,11 @@ export async function generateMetadata({
     },
     description,
     applicationName: "MaydaLabs",
-    authors: [{ name: "MaydaLabs", url: SITE_URL }],
-    creator: "MaydaLabs",
+    authors: [
+      { name: "Mehmet E. Mayda", url: `${SITE_URL}/about` },
+      { name: "MaydaLabs", url: SITE_URL },
+    ],
+    creator: "Mehmet E. Mayda",
     publisher: "MaydaLabs",
     category: "technology",
     robots: { index: true, follow: true },
@@ -64,32 +67,65 @@ export const viewport: Viewport = {
 
 function getStructuredData(locale: Locale) {
   return {
-  "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  name: "MaydaLabs",
-  url: SITE_URL,
-  description: SITE_DESCRIPTIONS[locale],
-  inLanguage: locale,
-  email: "info@maydalabs.com",
-  areaServed: "Worldwide",
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "Istanbul",
-    addressCountry: "TR",
-  },
-  sameAs: [
-    "https://x.com/maydalabs",
-    "https://www.linkedin.com/in/mehmet-e-mayda/",
-  ],
-  knowsAbout: [
-    "Product strategy",
-    "Web applications",
-    "Mobile applications",
-    "Online marketplaces",
-    "Shopify",
-    "Growth systems",
-    "Bitcoin products",
-  ],
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "ProfessionalService",
+        "@id": `${SITE_URL}/#studio`,
+        name: "MaydaLabs",
+        url: SITE_URL,
+        description: SITE_DESCRIPTIONS[locale],
+        inLanguage: locale,
+        email: "info@maydalabs.com",
+        areaServed: "Worldwide",
+        founder: { "@id": `${SITE_URL}/about#mehmet-e-mayda` },
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Istanbul",
+          addressCountry: "TR",
+        },
+        sameAs: [
+          "https://github.com/maydalabs",
+          "https://x.com/maydalabs",
+          "https://www.linkedin.com/in/mehmet-e-mayda/",
+        ],
+        knowsAbout: [
+          "Product strategy",
+          "Web applications",
+          "Mobile applications",
+          "Online marketplaces",
+          "Shopify",
+          "Growth systems",
+          "Bitcoin products",
+        ],
+      },
+      {
+        "@type": "Person",
+        "@id": `${SITE_URL}/about#mehmet-e-mayda`,
+        name: "Mehmet E. Mayda",
+        url: `${SITE_URL}/about`,
+        jobTitle: "Founder and Full-Stack Product Builder",
+        worksFor: { "@id": `${SITE_URL}/#studio` },
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Istanbul",
+          addressCountry: "TR",
+        },
+        sameAs: [
+          "https://github.com/maydalabs",
+          "https://www.linkedin.com/in/mehmet-e-mayda/",
+        ],
+        knowsAbout: [
+          "Full-stack product engineering",
+          "Growth systems",
+          "Technical SEO",
+          "Analytics",
+          "Localization",
+          "Bitcoin products",
+          "AI-assisted operations",
+        ],
+      },
+    ],
   };
 }
 

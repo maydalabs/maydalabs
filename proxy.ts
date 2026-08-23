@@ -39,6 +39,9 @@ function rememberLocale(response: NextResponse, locale: Locale) {
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const isLocalHost =
+    request.nextUrl.hostname === "localhost" ||
+    request.nextUrl.hostname === "127.0.0.1";
 
   if (
     pathname.startsWith("/_next") ||
@@ -56,6 +59,17 @@ export function proxy(request: NextRequest) {
 
   if (firstSegment && isLocale(firstSegment)) {
     if (firstSegment === DEFAULT_LOCALE) {
+      // Local HTTP rewrites can re-enter the proxy at `/en/*`. Keep that
+      // internal destination routable while retaining clean default-locale
+      // URLs on the deployed site.
+      if (isLocalHost) {
+        if (request.cookies.get(LOCALE_COOKIE)?.value !== DEFAULT_LOCALE) {
+          return rememberLocale(NextResponse.next(), DEFAULT_LOCALE);
+        }
+
+        return NextResponse.next();
+      }
+
       const url = request.nextUrl.clone();
       url.pathname = stripLocaleFromPath(pathname);
       const response = NextResponse.redirect(url, 307);

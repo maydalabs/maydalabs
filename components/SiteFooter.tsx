@@ -48,10 +48,18 @@ export function SiteFooter({ locale }: { locale: Locale }) {
               <a
                 href="https://www.linkedin.com/in/mehmet-e-mayda/"
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="me noopener noreferrer"
                 aria-label="Mehmet E Mayda on LinkedIn"
               >
                 LinkedIn · Mehmet E Mayda ↗
+              </a>
+              <a
+                href="https://github.com/maydalabs"
+                target="_blank"
+                rel="me noopener noreferrer"
+                aria-label="MaydaLabs on GitHub"
+              >
+                GitHub · @maydalabs ↗
               </a>
             </div>
           </div>

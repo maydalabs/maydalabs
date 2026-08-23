@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MaydaLabs
 
-## Getting Started
+I’m Mehmet E. Mayda, the founder and full-stack product builder behind
+[MaydaLabs](https://maydalabs.com).
 
-First, run the development server:
+I build production web products and the systems around them: product flows,
+marketplaces, payments, lifecycle email, analytics, technical SEO,
+localization, content operations, and AI-assisted workflows with deliberate
+human control.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+This repository contains the MaydaLabs studio site. It is both the public home
+of the studio and a compact example of how I approach product engineering:
+clear positioning, multilingual information architecture, strong technical
+foundations, measurable user journeys, and careful evidence boundaries.
+
+## Selected work
+
+### HodlStay
+
+A Bitcoin-native accommodation marketplace delivered as a client product
+build, from product strategy and booking architecture through payments,
+localization, SEO, analytics, lifecycle communication, and operational
+handover.
+
+- [Visit HodlStay](https://hodlstay.com)
+- [Read the case study](https://maydalabs.com/case-studies/hodlstay)
+
+### Satoshi Gazette
+
+A Bitcoin intelligence and publishing product combining source intake,
+evidence-aware editorial workflows, wire and story production, briefings,
+Ask Satoshi, and approval-gated distribution. MaydaLabs owns the product;
+internal newsroom tooling and operational data remain private.
+
+- [Visit Satoshi Gazette](https://satoshigazette.com)
+- [Read the case study](https://maydalabs.com/case-studies/satoshi-gazette)
+
+## What this codebase demonstrates
+
+- Next.js App Router, React, TypeScript, and component-driven UI
+- English, Turkish, and French routing with localized metadata
+- Structured data, canonical URLs, sitemap, robots, and social cards
+- Responsive product and case-study storytelling
+- Vercel Analytics, Speed Insights, and conversion-path instrumentation
+- Explicit separation between public proof and private client or operational data
+
+## Architecture
+
+```text
+app/[lang]/       Localized pages, metadata, and route composition
+components/       Shared navigation, analytics, and interface components
+lib/              Localization, metadata, site, and marketing-link helpers
+public/           Brand and case-study assets approved for public display
+docs/             Supporting product and launch documentation
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Run locally
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Requirements: a current Node.js LTS release and npm.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+Open [http://localhost:3000](http://localhost:3000). Before a production
+change, run:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run lint
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The repository includes an environment-variable example file. Never commit
+real credentials or private operational data.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Evidence boundaries
 
-## Deploy on Vercel
+- HodlStay is client work and is described only to the extent publicly approved.
+- Satoshi Gazette is a MaydaLabs product; its internal newsroom runtime and automation remain private.
+- Case-study language distinguishes shipped work from planned or ongoing work.
+- No client secret, credential, private dataset, or application record belongs in this repository.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Contact
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [MaydaLabs](https://maydalabs.com)
+- [LinkedIn](https://www.linkedin.com/in/mehmet-e-mayda/)
+- [Email](mailto:info@maydalabs.com)
+
+This repository is presented as a portfolio artifact. No open-source license
+is granted unless a `LICENSE` file is added explicitly.
