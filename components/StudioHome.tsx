@@ -4,6 +4,7 @@ import { HomeExperience } from "@/components/HomeExperience";
 import { ProductConstellation } from "@/components/ProductConstellation";
 import { ServiceRouter } from "@/components/ServiceRouter";
 import { SignalDecode } from "@/components/SignalDecode";
+import { StationTelemetry } from "@/components/StationTelemetry";
 import { VisualProofReel } from "@/components/VisualProofReel";
 import { type Locale, localizePath } from "@/lib/i18n";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
@@ -229,6 +230,7 @@ export function StudioHome({ locale }: { locale: Locale }) {
           <p className="studio-kicker">{copy.evidence.kicker}</p>
           <p>{copy.evidence.note}</p>
         </div>
+        <StationTelemetry locale={locale} />
         <dl>
           {copy.evidence.items.map(([value, label]) => (
             <div key={label}>

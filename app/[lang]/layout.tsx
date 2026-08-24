@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../globals.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SoundLayer } from "@/components/SoundLayer";
 import { GoogleTagManager } from "@/components/GoogleTagManager";
 import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { SITE_URL } from "@/lib/site";
@@ -161,6 +162,7 @@ export default async function RootLayout({
           <SiteFooter locale={lang} />
         </div>
         <div className="studio-grain" aria-hidden="true" />
+        <SoundLayer />
         <Analytics />
         <SpeedInsights />
         <SiteAnalytics />

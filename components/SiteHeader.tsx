@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { MaydaMark } from "@/components/MaydaMark";
+import { isSoundEnabled, loadSoundPreference, onSoundChange, setSoundEnabled } from "@/lib/soundSignal";
 import {
   LOCALES,
   LOCALE_LABELS,
@@ -22,12 +23,18 @@ export function SiteHeader({ locale }: { locale: Locale }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [sound, setSound] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 18);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    setSound(loadSoundPreference());
+    return onSoundChange(setSound);
   }, []);
 
   useEffect(() => {
@@ -124,6 +131,15 @@ export function SiteHeader({ locale }: { locale: Locale }) {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
+          <button
+            type="button"
+            className={`studio-sound-toggle ${sound ? "is-on" : ""}`}
+            aria-pressed={sound}
+            aria-label={sound ? copy.soundOn : copy.soundOff}
+            onClick={() => setSoundEnabled(!isSoundEnabled())}
+          >
+            SND<span aria-hidden />
+          </button>
           {languageLinks("studio-language-switcher")}
           <Link
             href={getIntroCallUrl("header")}

@@ -181,6 +181,46 @@ select {
   transform-origin: left;
 }
 
+.studio-sound-toggle {
+  display: inline-flex;
+  height: 2.25rem;
+  padding: 0 0.8rem;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.025);
+  color: rgba(255, 255, 255, 0.52);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  transition: color 180ms ease, border-color 180ms ease;
+}
+
+.studio-sound-toggle span {
+  display: block;
+  width: 0.4rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  transition: background 180ms ease, box-shadow 180ms ease;
+}
+
+.studio-sound-toggle:hover {
+  border-color: var(--border-strong);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.studio-sound-toggle.is-on {
+  color: white;
+}
+
+.studio-sound-toggle.is-on span {
+  background: var(--acid);
+  box-shadow: 0 0 10px rgba(215, 255, 104, 0.55);
+}
+
 .studio-language-switcher {
   display: inline-flex;
   align-items: center;
@@ -1858,6 +1898,74 @@ select {
   color: rgba(255, 255, 255, 0.44);
   font-size: 0.82rem;
   line-height: 1.7;
+}
+
+.station-telemetry {
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  padding: 1rem 0 1.1rem;
+  border-top: 1px dashed var(--border-strong);
+}
+
+.station-telemetry > p {
+  margin: 0 0 0.9rem;
+  color: var(--signal);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.station-telemetry ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: 0.7rem 2.5rem;
+  list-style: none;
+}
+
+.station-telemetry li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.station-telemetry li i {
+  flex: 0 0 auto;
+  width: 0.4rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-0.05rem);
+}
+
+.station-telemetry li.is-live i {
+  background: var(--acid);
+  box-shadow: 0 0 0 4px rgba(215, 255, 104, 0.08), 0 0 14px rgba(215, 255, 104, 0.4);
+  animation: status-pulse 2.4s ease-in-out infinite;
+}
+
+.station-telemetry strong {
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 600;
+}
+
+.station-telemetry span {
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.44);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 900px) {
+  .station-telemetry ul {
+    grid-template-columns: repeat(3, minmax(0, auto));
+    justify-content: start;
+  }
 }
 
 .studio-evidence dl {
