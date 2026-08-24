@@ -2,6 +2,7 @@ import Link from "next/link";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
+import { VisualProofReel } from "@/components/VisualProofReel";
 
 const COPY = {
   en: {
@@ -238,6 +239,8 @@ export default async function ProfilePage({ params }: LocalePageProps) {
           <a href="https://www.linkedin.com/in/mehmet-e-mayda/" target="_blank" rel="me noopener noreferrer" className="studio-button studio-button-ghost">{copy.actions.linkedin} <span aria-hidden>↗</span></a>
         </div>
       </section>
+
+      <VisualProofReel locale={locale} placement="profile" />
 
       <section className="profile-facts" aria-label={copy.factsLabel}>
         {copy.facts.map(([term, detail]) => (

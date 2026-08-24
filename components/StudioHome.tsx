@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { BuildDossier } from "@/components/BuildDossier";
 import { HomeExperience } from "@/components/HomeExperience";
-import { InProgressVisual } from "@/components/InProgressVisual";
-import { ProjectPreview } from "@/components/ProjectPreview";
+import { ProductConstellation } from "@/components/ProductConstellation";
 import { ServiceRouter } from "@/components/ServiceRouter";
-import { SignalField } from "@/components/SignalField";
+import { VisualProofReel } from "@/components/VisualProofReel";
 import { type Locale, localizePath } from "@/lib/i18n";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
 
@@ -26,41 +25,8 @@ const HOME_COPY = {
     },
     workKicker: "Selected work / 001–004",
     workTitle: "Proof, not promises.",
-    workIntro: "Two products are live in public. Two more are being built in private. Together they show the range from marketplaces and media systems to trust-critical product architecture.",
-    projects: {
-      hodl: {
-        category: "Marketplace · Travel · Bitcoin",
-        label: "A stay worth holding onto",
-        title: "Turning a Bitcoin travel idea into a global booking product.",
-        copy: "Product strategy, marketplace architecture, host and guest journeys, booking operations, payments, brand evolution, and launch systems in one connected build.",
-        tags: ["Product", "UX/UI", "Next.js", "Supabase", "Bitcoin payments"],
-        story: "View project story",
-        live: "Visit live",
-        status: "Client project · Live",
-        alt: "HodlStay marketplace homepage",
-      },
-      gazette: {
-        category: "Media · Data · AI-assisted ops",
-        label: "Signal for Bitcoin operators",
-        title: "Building a newsroom as a product, not just a publication.",
-        copy: "An editorial system that connects live market context, structured desks, publishing workflows, briefings, and AI-assisted operations without losing human judgment.",
-        tags: ["Editorial UX", "Data systems", "Automation", "CMS", "AI workflows"],
-        story: "View project story",
-        live: "Visit live",
-        status: "Live · Active build",
-        alt: "Satoshi Gazette Bitcoin newsroom homepage",
-      },
-    },
-    development: {
-      kicker: "In the lab / Private working products",
-      title: "Show the work. Label the frontier.",
-      intro: "These products are not launch claims. They are active builds presented with their current evidence, constraints, and next gates intact.",
-      story: "View work-in-progress case",
-      items: [
-        { variant: "mortal", number: "03", name: "Mortal Vault", status: "Private alpha · Unaudited", title: "A self-custodial continuity vault with delayed claims and an owner challenge window.", copy: "Solidity contracts, owner and beneficiary journeys, event-backed history, security tests, and explicit release gates—without pretending an unaudited alpha is ready for meaningful funds.", tags: ["Solidity", "Hardhat", "Next.js", "Security"], path: "/case-studies/mortal-vault" },
-        { variant: "sofra", number: "04", name: "Sofra", status: "Private Phase 1", title: "A managed household dinner marketplace built around trust, privacy, and the rhythm of a shared table.", copy: "Bilingual guest, host, and operator journeys with public/private data boundaries and demo-safe infrastructure—without claiming a public launch or real payments.", tags: ["Marketplace", "Next.js", "Supabase", "EN/TR"], path: "/case-studies/sofra" },
-      ],
-    },
+    workIntro: "Two products are live in public. Two more are active private builds, shown with their boundaries intact.",
+    workCta: "Explore all case studies",
     servicesKicker: "What we build / Three connected layers",
     servicesTitle: "From first click to working business.",
     servicesIntro: "You do not need five disconnected vendors. We connect the product, the experience, and the system that brings people back.",
@@ -97,41 +63,8 @@ const HOME_COPY = {
     },
     workKicker: "Seçili projeler / 001–004",
     workTitle: "Vaat değil, kanıt.",
-    workIntro: "İki ürün herkese açık ve canlı. İki ürün daha özel olarak geliştiriliyor. Birlikte pazar yerlerinden medya sistemlerine ve güven kritik ürün mimarisine uzanan alanı gösteriyorlar.",
-    projects: {
-      hodl: {
-        category: "Pazar yeri · Seyahat · Bitcoin",
-        label: "Hodl etmeye değer bir konaklama",
-        title: "Bir Bitcoin seyahat fikrini küresel bir rezervasyon ürününe dönüştürmek.",
-        copy: "Ürün stratejisi, pazar yeri mimarisi, ev sahibi ve misafir yolculukları, rezervasyon operasyonları, ödemeler, marka dönüşümü ve lansman sistemleri tek bir bağlantılı üründe.",
-        tags: ["Ürün", "UX/UI", "Next.js", "Supabase", "Bitcoin ödemeleri"],
-        story: "Proje hikâyesini incele",
-        live: "Canlı ürünü aç",
-        status: "Müşteri projesi · Canlı",
-        alt: "HodlStay pazar yeri ana sayfası",
-      },
-      gazette: {
-        category: "Medya · Veri · Yapay zekâ destekli operasyon",
-        label: "Bitcoin operatörleri için sinyal",
-        title: "Sadece bir yayın değil, ürün olarak çalışan bir haber merkezi kurmak.",
-        copy: "Canlı piyasa bağlamını, yapılandırılmış masaları, yayın akışlarını, bültenleri ve yapay zekâ destekli operasyonları insan muhakemesini kaybetmeden birleştiren editoryal sistem.",
-        tags: ["Editoryal UX", "Veri sistemleri", "Otomasyon", "CMS", "Yapay zekâ akışları"],
-        story: "Proje hikâyesini incele",
-        live: "Canlı ürünü aç",
-        status: "Canlı · Aktif geliştirme",
-        alt: "Satoshi Gazette Bitcoin haber merkezi ana sayfası",
-      },
-    },
-    development: {
-      kicker: "Laboratuvarda / Özel çalışan ürünler",
-      title: "Çalışmayı göster. Sınırı açıkla.",
-      intro: "Bunlar lansman iddiası değil. Mevcut kanıtları, sınırları ve sonraki kapılarıyla sunulan aktif ürün geliştirmeleridir.",
-      story: "Geliştirme aşaması vakasını incele",
-      items: [
-        { variant: "mortal", number: "03", name: "Mortal Vault", status: "Özel alpha · Denetlenmedi", title: "Gecikmeli talepler ve sahip itiraz süresi olan self-custody süreklilik kasası.", copy: "Solidity sözleşmeleri, sahip ve lehtar yolculukları, event tabanlı geçmiş, güvenlik testleri ve açık sürüm kapıları—denetlenmemiş alpha'yı anlamlı tutarlara hazır göstermeden.", tags: ["Solidity", "Hardhat", "Next.js", "Güvenlik"], path: "/case-studies/mortal-vault" },
-        { variant: "sofra", number: "04", name: "Sofra", status: "Özel Phase 1", title: "Güven, gizlilik ve paylaşılan sofranın ritmi etrafında kurulan yönetilen ev yemeği pazarı.", copy: "Açık/özel veri sınırları ve demo güvenli altyapıyla iki dilli misafir, ev sahibi ve operatör yolculukları—herkese açık lansman veya gerçek ödeme iddiası olmadan.", tags: ["Pazar yeri", "Next.js", "Supabase", "EN/TR"], path: "/case-studies/sofra" },
-      ],
-    },
+    workIntro: "İki ürün herkese açık ve canlı. İki aktif özel geliştirme ise sınırları korunarak gösteriliyor.",
+    workCta: "Tüm vaka çalışmalarını incele",
     servicesKicker: "Neler geliştiriyoruz / Birbirine bağlı üç katman",
     servicesTitle: "İlk tıklamadan çalışan işletmeye.",
     servicesIntro: "Birbirinden kopuk beş farklı tedarikçiye ihtiyacınız yok. Ürünü, deneyimi ve insanları geri getiren sistemi birbirine bağlıyoruz.",
@@ -168,41 +101,8 @@ const HOME_COPY = {
     },
     workKicker: "Projets sélectionnés / 001–004",
     workTitle: "Des preuves, pas des promesses.",
-    workIntro: "Deux produits sont publics et en ligne. Deux autres sont construits en privé. Ensemble, ils vont des marketplaces et médias jusqu’aux architectures produit critiques.",
-    projects: {
-      hodl: {
-        category: "Marketplace · Voyage · Bitcoin",
-        label: "Un séjour qui mérite d’être conservé",
-        title: "Transformer une idée de voyage Bitcoin en produit mondial de réservation.",
-        copy: "Stratégie produit, architecture marketplace, parcours hôtes et voyageurs, opérations de réservation, paiements, évolution de marque et lancement dans un seul système.",
-        tags: ["Produit", "UX/UI", "Next.js", "Supabase", "Paiements Bitcoin"],
-        story: "Voir l’étude de cas",
-        live: "Voir le produit",
-        status: "Projet client · En ligne",
-        alt: "Page d’accueil de la marketplace HodlStay",
-      },
-      gazette: {
-        category: "Média · Données · Opérations assistées par IA",
-        label: "Le signal pour les opérateurs Bitcoin",
-        title: "Concevoir une rédaction comme un produit, pas seulement une publication.",
-        copy: "Un système éditorial qui relie contexte de marché, rubriques structurées, publication, briefings et opérations assistées par IA sans sacrifier le jugement humain.",
-        tags: ["UX éditoriale", "Systèmes de données", "Automatisation", "CMS", "Workflows IA"],
-        story: "Voir l’étude de cas",
-        live: "Voir le produit",
-        status: "En ligne · Construction active",
-        alt: "Page d’accueil de la rédaction Bitcoin Satoshi Gazette",
-      },
-    },
-    development: {
-      kicker: "Au laboratoire / Produits privés fonctionnels",
-      title: "Montrer le travail. Nommer la frontière.",
-      intro: "Ce ne sont pas des lancements. Ce sont des constructions actives présentées avec leurs preuves, contraintes et prochaines conditions.",
-      story: "Voir l’étude en cours",
-      items: [
-        { variant: "mortal", number: "03", name: "Mortal Vault", status: "Alpha privée · Non auditée", title: "Un coffre de continuité en autogarde avec réclamation différée et délai de recours.", copy: "Contrats Solidity, parcours propriétaire et bénéficiaire, historique d’événements, tests de sécurité et conditions de sortie—sans présenter une alpha non auditée comme prête pour des fonds significatifs.", tags: ["Solidity", "Hardhat", "Next.js", "Sécurité"], path: "/case-studies/mortal-vault" },
-        { variant: "sofra", number: "04", name: "Sofra", status: "Phase 1 privée", title: "Une marketplace gérée de dîners chez l’habitant fondée sur confiance, confidentialité et table partagée.", copy: "Parcours bilingues invité, hôte et opérateur, limites public/privé et infrastructure de démo sûre—sans revendiquer lancement public ou paiements réels.", tags: ["Marketplace", "Next.js", "Supabase", "EN/TR"], path: "/case-studies/sofra" },
-      ],
-    },
+    workIntro: "Deux produits sont publics et en ligne. Deux constructions privées actives sont montrées avec leurs limites intactes.",
+    workCta: "Explorer toutes les études de cas",
     servicesKicker: "Ce que nous construisons / Trois couches connectées",
     servicesTitle: "Du premier clic à une activité qui fonctionne.",
     servicesIntro: "Vous n’avez pas besoin de cinq prestataires isolés. Nous relions le produit, l’expérience et le système qui fait revenir les utilisateurs.",
@@ -258,7 +158,7 @@ export function StudioHome({ locale }: { locale: Locale }) {
         </div>
 
         <div className="hero-reveal hero-reveal-3 studio-hero-visual">
-          <SignalField locale={locale} />
+          <ProductConstellation locale={locale} />
         </div>
 
         <div className="studio-hero-index" aria-hidden="true">
@@ -288,61 +188,11 @@ export function StudioHome({ locale }: { locale: Locale }) {
           <div><p className="studio-kicker">{copy.workKicker}</p><h2>{copy.workTitle}</h2></div>
           <p>{copy.workIntro}</p>
         </div>
-
-        <article className="project-case project-case-hodl">
-          <div className="project-case-copy">
-            <div className="project-case-topline"><span>01 / HodlStay</span><span>{copy.projects.hodl.category}</span></div>
-            <div>
-              <p className="project-case-label">{copy.projects.hodl.label}</p>
-              <h3>{copy.projects.hodl.title}</h3>
-              <p className="project-case-description">{copy.projects.hodl.copy}</p>
-            </div>
-            <div className="project-case-tags">{copy.projects.hodl.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-            <div className="project-case-links">
-              <Link href={localizePath("/case-studies/hodlstay", locale)} className="studio-text-link">{copy.projects.hodl.story} <ArrowUpRight /></Link>
-              <a href="https://hodlstay.com" target="_blank" rel="noopener noreferrer" className="studio-text-link studio-text-link-muted">{copy.projects.hodl.live} <ArrowUpRight /></a>
-            </div>
-          </div>
-
-          <ProjectPreview locale={locale} variant="hodl" domain="hodlstay.com" status={copy.projects.hodl.status} imageSrc="/work/hodlstay-2026-08-home.png" imageAlt={copy.projects.hodl.alt} imageWidth={1430} imageHeight={894} watermarkSrc="/work/hodlstay-logo.png" watermarkWidth={6865} watermarkHeight={1255} watermarkClassName="project-watermark-wide" />
-        </article>
-
-        <article className="project-case project-case-gazette">
-          <div className="project-case-copy">
-            <div className="project-case-topline"><span>02 / Satoshi Gazette</span><span>{copy.projects.gazette.category}</span></div>
-            <div>
-              <p className="project-case-label">{copy.projects.gazette.label}</p>
-              <h3>{copy.projects.gazette.title}</h3>
-              <p className="project-case-description">{copy.projects.gazette.copy}</p>
-            </div>
-            <div className="project-case-tags">{copy.projects.gazette.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-            <div className="project-case-links">
-              <Link href={localizePath("/case-studies/satoshi-gazette", locale)} className="studio-text-link">{copy.projects.gazette.story} <ArrowUpRight /></Link>
-              <a href="https://satoshigazette.org" target="_blank" rel="noopener noreferrer" className="studio-text-link studio-text-link-muted">{copy.projects.gazette.live} <ArrowUpRight /></a>
-            </div>
-          </div>
-
-          <ProjectPreview locale={locale} variant="gazette" domain="satoshigazette.org" status={copy.projects.gazette.status} imageSrc="/work/satoshi-gazette-2026-08-home.png" imageAlt={copy.projects.gazette.alt} imageWidth={1280} imageHeight={720} watermarkSrc="/work/satoshi-gazette-ec1-mark.svg" watermarkWidth={64} watermarkHeight={64} watermarkClassName="project-watermark-mark" />
-        </article>
-
-        <div id="in-development" className="lab-work-heading scroll-mt-28" data-reveal>
-          <div><p className="studio-kicker">{copy.development.kicker}</p><h3>{copy.development.title}</h3></div>
-          <p>{copy.development.intro}</p>
-        </div>
-
-        <div className="lab-project-grid">
-          {copy.development.items.map((item) => (
-            <article id={`${item.variant}-preview`} className="lab-project-card scroll-mt-28" key={item.name} data-reveal>
-              <header><span>{item.number} / {item.name}</span><span>{item.status}</span></header>
-              <InProgressVisual compact locale={locale} variant={item.variant} />
-              <div className="lab-project-card-copy">
-                <h4>{item.title}</h4>
-                <p>{item.copy}</p>
-                <div className="project-case-tags">{item.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-                <Link href={localizePath(item.path, locale)} className="studio-text-link">{copy.development.story} <ArrowUpRight /></Link>
-              </div>
-            </article>
-          ))}
+        <VisualProofReel locale={locale} />
+        <div className="visual-proof-all" data-reveal>
+          <Link href={localizePath("/case-studies", locale)} className="studio-text-link">
+            {copy.workCta} <ArrowUpRight />
+          </Link>
         </div>
       </section>
 
