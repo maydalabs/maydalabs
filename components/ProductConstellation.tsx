@@ -97,6 +97,34 @@ function createPrivateTexture(
     context.fill();
   }
 
+  if (typeof context.roundRect === "function") {
+    context.strokeStyle = "rgba(242,240,234,.24)";
+    context.lineWidth = 2;
+    context.setLineDash([8, 8]);
+    context.beginPath();
+    context.roundRect(54, 58, 210, 128, 12);
+    context.stroke();
+    context.setLineDash([]);
+
+    context.fillStyle = accent;
+    context.globalAlpha = 0.55;
+    context.beginPath();
+    context.roundRect(80, 84, 104, 14, 7);
+    context.fill();
+    context.globalAlpha = 0.14;
+    context.fillStyle = "#f2f0ea";
+    context.beginPath();
+    context.roundRect(80, 112, 148, 12, 6);
+    context.fill();
+    context.beginPath();
+    context.roundRect(80, 136, 116, 12, 6);
+    context.fill();
+    context.globalAlpha = 1;
+    context.fillStyle = "rgba(242,240,234,.4)";
+    context.font = "500 17px monospace";
+    context.fillText("WIP", 80, 172);
+  }
+
   context.fillStyle = "#f2f0ea";
   context.font = "600 54px Arial";
   context.fillText(name, 54, 500);
