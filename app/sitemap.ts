@@ -10,6 +10,8 @@ const ROUTES = [
   "/case-studies",
   "/case-studies/hodlstay",
   "/case-studies/satoshi-gazette",
+  "/case-studies/mortal-vault",
+  "/case-studies/sofra",
   "/privacy",
   "/terms",
 ];

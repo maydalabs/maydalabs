@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BuildDossier } from "@/components/BuildDossier";
 import { HomeExperience } from "@/components/HomeExperience";
+import { InProgressVisual } from "@/components/InProgressVisual";
 import { ProjectPreview } from "@/components/ProjectPreview";
 import { ServiceRouter } from "@/components/ServiceRouter";
 import { SignalField } from "@/components/SignalField";
@@ -16,9 +17,9 @@ const HOME_COPY = {
     explore: "Explore our work",
     index: "DESIGN · CODE · GROWTH",
     manifesto: ["Bitcoin-native by proof.", "Founder-focused by design.", "We work across industries."],
-    workKicker: "Selected work / 001–002",
+    workKicker: "Selected work / 001–004",
     workTitle: "Proof, not promises.",
-    workIntro: "Our first flagships live in Bitcoin. They prove the range: a global marketplace on one side, a living media system on the other.",
+    workIntro: "Two products are live in public. Two more are being built in private. Together they show the range from marketplaces and media systems to trust-critical product architecture.",
     projects: {
       hodl: {
         category: "Marketplace · Travel · Bitcoin",
@@ -42,6 +43,16 @@ const HOME_COPY = {
         status: "Live · Active build",
         alt: "Satoshi Gazette Bitcoin newsroom homepage",
       },
+    },
+    development: {
+      kicker: "In the lab / Private working products",
+      title: "Show the work. Label the frontier.",
+      intro: "These products are not launch claims. They are active builds presented with their current evidence, constraints, and next gates intact.",
+      story: "View work-in-progress case",
+      items: [
+        { variant: "mortal", number: "03", name: "Mortal Vault", status: "Private alpha · Unaudited", title: "A self-custodial continuity vault with delayed claims and an owner challenge window.", copy: "Solidity contracts, owner and beneficiary journeys, event-backed history, security tests, and explicit release gates—without pretending an unaudited alpha is ready for meaningful funds.", tags: ["Solidity", "Hardhat", "Next.js", "Security"], path: "/case-studies/mortal-vault" },
+        { variant: "sofra", number: "04", name: "Sofra", status: "Private Phase 1", title: "A managed household dinner marketplace built around trust, privacy, and the rhythm of a shared table.", copy: "Bilingual guest, host, and operator journeys with public/private data boundaries and demo-safe infrastructure—without claiming a public launch or real payments.", tags: ["Marketplace", "Next.js", "Supabase", "EN/TR"], path: "/case-studies/sofra" },
+      ],
     },
     servicesKicker: "What we build / Three connected layers",
     servicesTitle: "From first click to working business.",
@@ -70,9 +81,9 @@ const HOME_COPY = {
     explore: "Projelerimizi keşfet",
     index: "TASARIM · KOD · BÜYÜME",
     manifesto: ["Kanıtımız Bitcoin-native projeler.", "Odağımız kurucular.", "Farklı sektörlerle çalışıyoruz."],
-    workKicker: "Seçili projeler / 001–002",
+    workKicker: "Seçili projeler / 001–004",
     workTitle: "Vaat değil, kanıt.",
-    workIntro: "İlk amiral projelerimiz Bitcoin dünyasında. Biri küresel bir pazar yeri, diğeri yaşayan bir medya sistemi; birlikte çalışma alanımızın genişliğini gösteriyorlar.",
+    workIntro: "İki ürün herkese açık ve canlı. İki ürün daha özel olarak geliştiriliyor. Birlikte pazar yerlerinden medya sistemlerine ve güven kritik ürün mimarisine uzanan alanı gösteriyorlar.",
     projects: {
       hodl: {
         category: "Pazar yeri · Seyahat · Bitcoin",
@@ -96,6 +107,16 @@ const HOME_COPY = {
         status: "Canlı · Aktif geliştirme",
         alt: "Satoshi Gazette Bitcoin haber merkezi ana sayfası",
       },
+    },
+    development: {
+      kicker: "Laboratuvarda / Özel çalışan ürünler",
+      title: "Çalışmayı göster. Sınırı açıkla.",
+      intro: "Bunlar lansman iddiası değil. Mevcut kanıtları, sınırları ve sonraki kapılarıyla sunulan aktif ürün geliştirmeleridir.",
+      story: "Geliştirme aşaması vakasını incele",
+      items: [
+        { variant: "mortal", number: "03", name: "Mortal Vault", status: "Özel alpha · Denetlenmedi", title: "Gecikmeli talepler ve sahip itiraz süresi olan self-custody süreklilik kasası.", copy: "Solidity sözleşmeleri, sahip ve lehtar yolculukları, event tabanlı geçmiş, güvenlik testleri ve açık sürüm kapıları—denetlenmemiş alpha'yı anlamlı tutarlara hazır göstermeden.", tags: ["Solidity", "Hardhat", "Next.js", "Güvenlik"], path: "/case-studies/mortal-vault" },
+        { variant: "sofra", number: "04", name: "Sofra", status: "Özel Phase 1", title: "Güven, gizlilik ve paylaşılan sofranın ritmi etrafında kurulan yönetilen ev yemeği pazarı.", copy: "Açık/özel veri sınırları ve demo güvenli altyapıyla iki dilli misafir, ev sahibi ve operatör yolculukları—herkese açık lansman veya gerçek ödeme iddiası olmadan.", tags: ["Pazar yeri", "Next.js", "Supabase", "EN/TR"], path: "/case-studies/sofra" },
+      ],
     },
     servicesKicker: "Neler geliştiriyoruz / Birbirine bağlı üç katman",
     servicesTitle: "İlk tıklamadan çalışan işletmeye.",
@@ -124,9 +145,9 @@ const HOME_COPY = {
     explore: "Découvrir nos projets",
     index: "DESIGN · CODE · CROISSANCE",
     manifesto: ["Bitcoin-native par les preuves.", "Pensé pour les fondateurs.", "Nous travaillons dans tous les secteurs."],
-    workKicker: "Projets sélectionnés / 001–002",
+    workKicker: "Projets sélectionnés / 001–004",
     workTitle: "Des preuves, pas des promesses.",
-    workIntro: "Nos premiers projets phares sont ancrés dans Bitcoin. Ils montrent notre amplitude : une marketplace mondiale d’un côté, un système média vivant de l’autre.",
+    workIntro: "Deux produits sont publics et en ligne. Deux autres sont construits en privé. Ensemble, ils vont des marketplaces et médias jusqu’aux architectures produit critiques.",
     projects: {
       hodl: {
         category: "Marketplace · Voyage · Bitcoin",
@@ -150,6 +171,16 @@ const HOME_COPY = {
         status: "En ligne · Construction active",
         alt: "Page d’accueil de la rédaction Bitcoin Satoshi Gazette",
       },
+    },
+    development: {
+      kicker: "Au laboratoire / Produits privés fonctionnels",
+      title: "Montrer le travail. Nommer la frontière.",
+      intro: "Ce ne sont pas des lancements. Ce sont des constructions actives présentées avec leurs preuves, contraintes et prochaines conditions.",
+      story: "Voir l’étude en cours",
+      items: [
+        { variant: "mortal", number: "03", name: "Mortal Vault", status: "Alpha privée · Non auditée", title: "Un coffre de continuité en autogarde avec réclamation différée et délai de recours.", copy: "Contrats Solidity, parcours propriétaire et bénéficiaire, historique d’événements, tests de sécurité et conditions de sortie—sans présenter une alpha non auditée comme prête pour des fonds significatifs.", tags: ["Solidity", "Hardhat", "Next.js", "Sécurité"], path: "/case-studies/mortal-vault" },
+        { variant: "sofra", number: "04", name: "Sofra", status: "Phase 1 privée", title: "Une marketplace gérée de dîners chez l’habitant fondée sur confiance, confidentialité et table partagée.", copy: "Parcours bilingues invité, hôte et opérateur, limites public/privé et infrastructure de démo sûre—sans revendiquer lancement public ou paiements réels.", tags: ["Marketplace", "Next.js", "Supabase", "EN/TR"], path: "/case-studies/sofra" },
+      ],
     },
     servicesKicker: "Ce que nous construisons / Trois couches connectées",
     servicesTitle: "Du premier clic à une activité qui fonctionne.",
@@ -240,7 +271,7 @@ export function StudioHome({ locale }: { locale: Locale }) {
             </div>
           </div>
 
-          <ProjectPreview locale={locale} variant="hodl" domain="hodlstay.com" status={copy.projects.hodl.status} imageSrc="/work/hodlstay-home.png" imageAlt={copy.projects.hodl.alt} imageWidth={1270} imageHeight={714} watermarkSrc="/work/hodlstay-logo.png" watermarkWidth={6865} watermarkHeight={1255} watermarkClassName="project-watermark-wide" />
+          <ProjectPreview locale={locale} variant="hodl" domain="hodlstay.com" status={copy.projects.hodl.status} imageSrc="/work/hodlstay-2026-08-home.png" imageAlt={copy.projects.hodl.alt} imageWidth={1430} imageHeight={894} watermarkSrc="/work/hodlstay-logo.png" watermarkWidth={6865} watermarkHeight={1255} watermarkClassName="project-watermark-wide" />
         </article>
 
         <article className="project-case project-case-gazette">
@@ -258,8 +289,28 @@ export function StudioHome({ locale }: { locale: Locale }) {
             </div>
           </div>
 
-          <ProjectPreview locale={locale} variant="gazette" domain="satoshigazette.org" status={copy.projects.gazette.status} imageSrc="/work/satoshi-gazette-live-home.png" imageAlt={copy.projects.gazette.alt} imageWidth={1440} imageHeight={900} watermarkSrc="/work/satoshi-gazette-ec1-mark.svg" watermarkWidth={64} watermarkHeight={64} watermarkClassName="project-watermark-mark" />
+          <ProjectPreview locale={locale} variant="gazette" domain="satoshigazette.org" status={copy.projects.gazette.status} imageSrc="/work/satoshi-gazette-2026-08-home.png" imageAlt={copy.projects.gazette.alt} imageWidth={1280} imageHeight={720} watermarkSrc="/work/satoshi-gazette-ec1-mark.svg" watermarkWidth={64} watermarkHeight={64} watermarkClassName="project-watermark-mark" />
         </article>
+
+        <div id="in-development" className="lab-work-heading scroll-mt-28" data-reveal>
+          <div><p className="studio-kicker">{copy.development.kicker}</p><h3>{copy.development.title}</h3></div>
+          <p>{copy.development.intro}</p>
+        </div>
+
+        <div className="lab-project-grid">
+          {copy.development.items.map((item) => (
+            <article id={`${item.variant}-preview`} className="lab-project-card scroll-mt-28" key={item.name} data-reveal>
+              <header><span>{item.number} / {item.name}</span><span>{item.status}</span></header>
+              <InProgressVisual compact locale={locale} variant={item.variant} />
+              <div className="lab-project-card-copy">
+                <h4>{item.title}</h4>
+                <p>{item.copy}</p>
+                <div className="project-case-tags">{item.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+                <Link href={localizePath(item.path, locale)} className="studio-text-link">{copy.development.story} <ArrowUpRight /></Link>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section id="services" className="studio-section studio-services scroll-mt-28">
