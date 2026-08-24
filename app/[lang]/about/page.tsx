@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { createPageMetadata } from "@/lib/metadata";
@@ -46,6 +47,7 @@ const COPY = {
       github: "View GitHub",
       linkedin: "View LinkedIn",
       email: "Email Mehmet",
+      profile: "Full working profile",
     },
     principlesKicker: "Operating principles",
     principlesHeading: "How we think.",
@@ -117,6 +119,7 @@ const COPY = {
       github: "GitHub’ı incele",
       linkedin: "LinkedIn’i görüntüle",
       email: "Mehmet’e e-posta gönder",
+      profile: "Detaylı çalışma profili",
     },
     principlesKicker: "Çalışma ilkeleri",
     principlesHeading: "Nasıl düşünüyoruz.",
@@ -188,6 +191,7 @@ const COPY = {
       github: "Voir GitHub",
       linkedin: "Voir LinkedIn",
       email: "Écrire à Mehmet",
+      profile: "Profil de travail complet",
     },
     principlesKicker: "Principes de fonctionnement",
     principlesHeading: "Notre façon de penser.",
@@ -279,6 +283,7 @@ export default async function AboutPage({ params }: LocalePageProps) {
               {copy.founderLinks.linkedin} ↗
             </a>
             <a href="mailto:info@maydalabs.com">{copy.founderLinks.email} ↗</a>
+            <Link href={localizePath("/profile", locale)}>{copy.founderLinks.profile} →</Link>
           </div>
         </div>
         <div className="about-founder-signals">

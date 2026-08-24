@@ -3,6 +3,7 @@ import { BuildDossier } from "@/components/BuildDossier";
 import { HomeExperience } from "@/components/HomeExperience";
 import { ProductConstellation } from "@/components/ProductConstellation";
 import { ServiceRouter } from "@/components/ServiceRouter";
+import { SignalDecode } from "@/components/SignalDecode";
 import { VisualProofReel } from "@/components/VisualProofReel";
 import { type Locale, localizePath } from "@/lib/i18n";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
@@ -16,14 +17,7 @@ const HOME_COPY = {
     explore: "Explore our work",
     index: "DESIGN · CODE · GROWTH",
     manifesto: ["Bitcoin-native by proof.", "Founder-focused by design.", "We work across industries."],
-    profile: {
-      kicker: "For hiring teams",
-      name: "Mehmet E. Mayda",
-      role: "Founder · Full-stack product builder · Growth systems",
-      copy: "See the individual ownership, working range, and inspectable project evidence behind MaydaLabs.",
-      action: "View founder profile",
-    },
-    workKicker: "Selected work / 001–004",
+    workKicker: "Transmissions / TX-01–04",
     workTitle: "Proof, not promises.",
     workIntro: "Two products are live in public. Two more are active private builds, shown with their boundaries intact.",
     workCta: "Explore all case studies",
@@ -65,14 +59,7 @@ const HOME_COPY = {
     explore: "Projelerimizi keşfet",
     index: "TASARIM · KOD · BÜYÜME",
     manifesto: ["Kanıtımız Bitcoin-native projeler.", "Odağımız kurucular.", "Farklı sektörlerle çalışıyoruz."],
-    profile: {
-      kicker: "İşe alım ekipleri için",
-      name: "Mehmet E. Mayda",
-      role: "Kurucu · Full-stack ürün geliştirici · Büyüme sistemleri",
-      copy: "MaydaLabs'in arkasındaki bireysel sahipliği, çalışma alanını ve incelenebilir proje kanıtlarını görün.",
-      action: "Kurucu profilini incele",
-    },
-    workKicker: "Seçili projeler / 001–004",
+    workKicker: "Sinyaldeki işler / TX-01–04",
     workTitle: "Vaat değil, kanıt.",
     workIntro: "İki ürün herkese açık ve canlı. İki aktif özel geliştirme ise sınırları korunarak gösteriliyor.",
     workCta: "Tüm vaka çalışmalarını incele",
@@ -114,14 +101,7 @@ const HOME_COPY = {
     explore: "Découvrir nos projets",
     index: "DESIGN · CODE · CROISSANCE",
     manifesto: ["Bitcoin-native par les preuves.", "Pensé pour les fondateurs.", "Nous travaillons dans tous les secteurs."],
-    profile: {
-      kicker: "Pour les équipes de recrutement",
-      name: "Mehmet E. Mayda",
-      role: "Fondateur · Builder produit full-stack · Systèmes de croissance",
-      copy: "Découvrez l’ownership individuel, le champ d’action et les preuves projet vérifiables derrière MaydaLabs.",
-      action: "Voir le profil fondateur",
-    },
-    workKicker: "Projets sélectionnés / 001–004",
+    workKicker: "Transmissions / TX-01–04",
     workTitle: "Des preuves, pas des promesses.",
     workIntro: "Deux produits sont publics et en ligne. Deux constructions privées actives sont montrées avec leurs limites intactes.",
     workCta: "Explorer toutes les études de cas",
@@ -164,6 +144,10 @@ function ArrowUpRight() {
 export function StudioHome({ locale }: { locale: Locale }) {
   const copy = HOME_COPY[locale];
   const projectUrl = getIntroCallUrl("home_hero");
+  // Stagger the decode so each hero segment locks in reading order,
+  // regardless of how long the localized line before it runs.
+  const lineTwoDelay = 140 + copy.hero[0].length * 30 - 80;
+  const emphasisDelay = lineTwoDelay + copy.hero[1].length * 30 + 40;
 
   return (
     <HomeExperience>
@@ -175,8 +159,8 @@ export function StudioHome({ locale }: { locale: Locale }) {
           </div>
 
           <h1>
-            <span className="hero-line"><span className="hero-line-inner">{copy.hero[0]}</span></span>
-            <span className="hero-line"><span className="hero-line-inner">{copy.hero[1]} <em>{copy.hero[2]}</em></span></span>
+            <span className="hero-line"><span className="hero-line-inner"><SignalDecode text={copy.hero[0]} delay={140} /></span></span>
+            <span className="hero-line"><span className="hero-line-inner"><SignalDecode text={copy.hero[1]} delay={lineTwoDelay} /> <em><SignalDecode text={copy.hero[2]} delay={emphasisDelay} /></em></span></span>
           </h1>
 
           <p className="hero-reveal hero-reveal-3">{copy.heroCopy}</p>
@@ -204,18 +188,6 @@ export function StudioHome({ locale }: { locale: Locale }) {
         <p>{copy.manifesto[0]}</p><p>{copy.manifesto[1]}</p>
         <div className="studio-manifesto-line" /><span>{copy.manifesto[2]}</span>
       </section>
-
-      <aside className="studio-founder-gateway" data-reveal>
-        <div>
-          <p className="studio-kicker">{copy.profile.kicker}</p>
-          <h2>{copy.profile.name}</h2>
-          <span>{copy.profile.role}</span>
-        </div>
-        <p>{copy.profile.copy}</p>
-        <Link href={localizePath("/profile", locale)} className="studio-text-link">
-          {copy.profile.action} <ArrowUpRight />
-        </Link>
-      </aside>
 
       <section id="work" className="studio-section scroll-mt-28">
         <div className="studio-section-heading" data-reveal>

@@ -7,7 +7,7 @@ import { type Locale, localizePath } from "@/lib/i18n";
 
 const CONSTELLATION_COPY = {
   en: {
-    eyebrow: "Interactive product map",
+    eyebrow: "Signal array / live product map",
     title: "Four products. One connected range.",
     navigation: "Explore MaydaLabs projects",
     projects: [
@@ -18,7 +18,7 @@ const CONSTELLATION_COPY = {
     ],
   },
   tr: {
-    eyebrow: "Etkileşimli ürün haritası",
+    eyebrow: "Sinyal dizisi / canlı ürün haritası",
     title: "Dört ürün. Birbirine bağlı tek kapsam.",
     navigation: "MaydaLabs projelerini keşfedin",
     projects: [
@@ -29,7 +29,7 @@ const CONSTELLATION_COPY = {
     ],
   },
   fr: {
-    eyebrow: "Carte produit interactive",
+    eyebrow: "Réseau de signaux / carte produit en direct",
     title: "Quatre produits. Un champ connecté.",
     navigation: "Explorer les projets MaydaLabs",
     projects: [
@@ -122,7 +122,7 @@ function createPrivateTexture(
     context.globalAlpha = 1;
     context.fillStyle = "rgba(242,240,234,.4)";
     context.font = "500 17px monospace";
-    context.fillText("WIP", 80, 172);
+    context.fillText("ENCRYPTED", 80, 172);
   }
 
   context.fillStyle = "#f2f0ea";

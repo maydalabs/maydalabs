@@ -27,7 +27,6 @@ export function SiteFooter({ locale }: { locale: Locale }) {
               <Link href={localizePath("/services", locale)}>{copy.nav[1][0]}</Link>
               <Link href={localizePath("/#approach", locale)}>{copy.nav[2][0]}</Link>
               <Link href={localizePath("/about", locale)}>{copy.nav[3][0]}</Link>
-              <Link href={localizePath("/profile", locale)}>{copy.nav[4][0]}</Link>
             </div>
           </div>
 
@@ -50,7 +49,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
                 target="_blank"
                 rel="me noopener noreferrer"
               >
-                LinkedIn · Mehmet E Mayda ↗
+                LinkedIn ↗
               </a>
               <a
                 href="https://github.com/maydalabs"

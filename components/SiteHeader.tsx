@@ -68,7 +68,6 @@ export function SiteHeader({ locale }: { locale: Locale }) {
     if (item.href === "/case-studies" && normalizedPathname.startsWith("/case-studies")) return true;
     if (item.href === "/services" && normalizedPathname === "/services") return true;
     if (item.href === "/about" && normalizedPathname === "/about") return true;
-    if (item.href === "/profile" && normalizedPathname === "/profile") return true;
     return normalizedPathname === "/" && item.section === activeSection;
   };
 
@@ -110,12 +109,11 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             <Link
               key={item.label}
               href={localizePath(item.href, locale)}
-              className={`studio-nav-link ${item.href === "/profile" ? "hidden lg:inline-flex" : ""} ${isActive(item) ? "is-active" : ""}`}
+              className={`studio-nav-link ${isActive(item) ? "is-active" : ""}`}
               aria-current={
                 (item.href === "/case-studies" && normalizedPathname.startsWith("/case-studies")) ||
                 (item.href === "/services" && normalizedPathname === "/services") ||
-                (item.href === "/about" && normalizedPathname === "/about") ||
-                (item.href === "/profile" && normalizedPathname === "/profile")
+                (item.href === "/about" && normalizedPathname === "/about")
                   ? "page"
                   : undefined
               }

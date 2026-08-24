@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SignalDecode } from "@/components/SignalDecode";
 import { isLocale, localizePath, type Locale } from "@/lib/i18n";
 
 const COPY = {
@@ -34,13 +35,14 @@ export default function NotFound() {
   const copy = COPY[locale];
 
   return (
-    <div className="studio-inner-page">
+    <div className="studio-inner-page lost-signal">
       <section className="studio-inner-hero">
+        <div className="lost-signal-static" aria-hidden="true" />
         <p className="studio-kicker">{copy.kicker}</p>
         <h1>
-          {copy.heading[0]}
+          <SignalDecode text={copy.heading[0]} delay={120} />
           <br />
-          <em>{copy.heading[1]}</em>
+          <em><SignalDecode text={copy.heading[1]} delay={420} /></em>
         </h1>
         <p>{copy.body}</p>
         <div className="flex flex-col gap-3 sm:flex-row">
