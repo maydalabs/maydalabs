@@ -14,6 +14,7 @@ export type SocialCardKind =
   | "satoshi-gazette"
   | "mortal-vault"
   | "sofra"
+  | "profile"
   | "about"
   | "contact"
   | "legal";

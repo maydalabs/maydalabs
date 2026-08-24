@@ -17,6 +17,13 @@ const HOME_COPY = {
     explore: "Explore our work",
     index: "DESIGN · CODE · GROWTH",
     manifesto: ["Bitcoin-native by proof.", "Founder-focused by design.", "We work across industries."],
+    profile: {
+      kicker: "For hiring teams",
+      name: "Mehmet E. Mayda",
+      role: "Founder · Full-stack product builder · Growth systems",
+      copy: "See the individual ownership, working range, and inspectable project evidence behind MaydaLabs.",
+      action: "View founder profile",
+    },
     workKicker: "Selected work / 001–004",
     workTitle: "Proof, not promises.",
     workIntro: "Two products are live in public. Two more are being built in private. Together they show the range from marketplaces and media systems to trust-critical product architecture.",
@@ -81,6 +88,13 @@ const HOME_COPY = {
     explore: "Projelerimizi keşfet",
     index: "TASARIM · KOD · BÜYÜME",
     manifesto: ["Kanıtımız Bitcoin-native projeler.", "Odağımız kurucular.", "Farklı sektörlerle çalışıyoruz."],
+    profile: {
+      kicker: "İşe alım ekipleri için",
+      name: "Mehmet E. Mayda",
+      role: "Kurucu · Full-stack ürün geliştirici · Büyüme sistemleri",
+      copy: "MaydaLabs'in arkasındaki bireysel sahipliği, çalışma alanını ve incelenebilir proje kanıtlarını görün.",
+      action: "Kurucu profilini incele",
+    },
     workKicker: "Seçili projeler / 001–004",
     workTitle: "Vaat değil, kanıt.",
     workIntro: "İki ürün herkese açık ve canlı. İki ürün daha özel olarak geliştiriliyor. Birlikte pazar yerlerinden medya sistemlerine ve güven kritik ürün mimarisine uzanan alanı gösteriyorlar.",
@@ -145,6 +159,13 @@ const HOME_COPY = {
     explore: "Découvrir nos projets",
     index: "DESIGN · CODE · CROISSANCE",
     manifesto: ["Bitcoin-native par les preuves.", "Pensé pour les fondateurs.", "Nous travaillons dans tous les secteurs."],
+    profile: {
+      kicker: "Pour les équipes de recrutement",
+      name: "Mehmet E. Mayda",
+      role: "Fondateur · Builder produit full-stack · Systèmes de croissance",
+      copy: "Découvrez l’ownership individuel, le champ d’action et les preuves projet vérifiables derrière MaydaLabs.",
+      action: "Voir le profil fondateur",
+    },
     workKicker: "Projets sélectionnés / 001–004",
     workTitle: "Des preuves, pas des promesses.",
     workIntro: "Deux produits sont publics et en ligne. Deux autres sont construits en privé. Ensemble, ils vont des marketplaces et médias jusqu’aux architectures produit critiques.",
@@ -249,6 +270,18 @@ export function StudioHome({ locale }: { locale: Locale }) {
         <p>{copy.manifesto[0]}</p><p>{copy.manifesto[1]}</p>
         <div className="studio-manifesto-line" /><span>{copy.manifesto[2]}</span>
       </section>
+
+      <aside className="studio-founder-gateway" data-reveal>
+        <div>
+          <p className="studio-kicker">{copy.profile.kicker}</p>
+          <h2>{copy.profile.name}</h2>
+          <span>{copy.profile.role}</span>
+        </div>
+        <p>{copy.profile.copy}</p>
+        <Link href={localizePath("/profile", locale)} className="studio-text-link">
+          {copy.profile.action} <ArrowUpRight />
+        </Link>
+      </aside>
 
       <section id="work" className="studio-section scroll-mt-28">
         <div className="studio-section-heading" data-reveal>

@@ -5,6 +5,7 @@ import { SITE_URL } from "@/lib/site";
 const ROUTES = [
   "",
   "/about",
+  "/profile",
   "/services",
   "/contact",
   "/case-studies",

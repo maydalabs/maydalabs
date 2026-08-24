@@ -10,23 +10,6 @@ import {
 const ONE_YEAR = 60 * 60 * 24 * 365;
 const PUBLIC_FILE = /\.[^/]+$/;
 
-function requestedLocale(request: NextRequest): Locale {
-  const saved = request.cookies.get(LOCALE_COOKIE)?.value;
-  if (saved && isLocale(saved)) return saved;
-
-  const country = request.headers.get("x-vercel-ip-country")?.toUpperCase();
-  if (country === "TR") return "tr";
-  if (country === "FR" || country === "MC") return "fr";
-
-  const languages = (request.headers.get("accept-language") ?? "")
-    .split(",")
-    .map((entry) => entry.trim().split(";")[0]?.split("-")[0]?.toLowerCase());
-  if (languages.includes("tr")) return "tr";
-  if (languages.includes("fr")) return "fr";
-
-  return DEFAULT_LOCALE;
-}
-
 function rememberLocale(response: NextResponse, locale: Locale) {
   response.cookies.set(LOCALE_COOKIE, locale, {
     maxAge: ONE_YEAR,
@@ -84,13 +67,8 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const locale = requestedLocale(request);
-  if (locale !== DEFAULT_LOCALE) {
-    const url = request.nextUrl.clone();
-    url.pathname = pathname === "/" ? `/${locale}` : `/${locale}${pathname}`;
-    return rememberLocale(NextResponse.redirect(url, 307), locale);
-  }
-
+  // Unprefixed URLs are the canonical English experience. Keep first visits
+  // redirect-free; visitors can choose a localized route explicitly.
   const url = request.nextUrl.clone();
   url.pathname = pathname === "/" ? "/en" : `/en${pathname}`;
   return NextResponse.rewrite(url);

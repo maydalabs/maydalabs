@@ -50,7 +50,7 @@ export async function generateMetadata({
     description,
     applicationName: "MaydaLabs",
     authors: [
-      { name: "Mehmet E. Mayda", url: `${SITE_URL}/about` },
+      { name: "Mehmet E. Mayda", url: `${SITE_URL}/profile` },
       { name: "MaydaLabs", url: SITE_URL },
     ],
     creator: "Mehmet E. Mayda",
@@ -78,7 +78,7 @@ function getStructuredData(locale: Locale) {
         inLanguage: locale,
         email: "info@maydalabs.com",
         areaServed: "Worldwide",
-        founder: { "@id": `${SITE_URL}/about#mehmet-e-mayda` },
+        founder: { "@id": `${SITE_URL}/profile#mehmet-e-mayda` },
         address: {
           "@type": "PostalAddress",
           addressLocality: "Istanbul",
@@ -101,9 +101,9 @@ function getStructuredData(locale: Locale) {
       },
       {
         "@type": "Person",
-        "@id": `${SITE_URL}/about#mehmet-e-mayda`,
+        "@id": `${SITE_URL}/profile#mehmet-e-mayda`,
         name: "Mehmet E. Mayda",
-        url: `${SITE_URL}/about`,
+        url: `${SITE_URL}/profile`,
         jobTitle: "Founder and Full-Stack Product Builder",
         worksFor: { "@id": `${SITE_URL}/#studio` },
         address: {

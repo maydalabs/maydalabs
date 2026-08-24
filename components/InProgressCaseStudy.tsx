@@ -20,6 +20,10 @@ export type InProgressCaseCopy = {
   next: string;
   nextItems: readonly string[];
   nextKicker: string;
+  ownership: readonly (readonly [string, string])[];
+  ownershipIntro: string;
+  ownershipKicker: string;
+  ownershipTitle: string;
   scope: string;
   scopeItems: readonly string[];
   start: string;
@@ -71,6 +75,21 @@ export function InProgressCaseStudy({ copy, locale, name, variant }: InProgressC
               <article key={number}><span>{number}</span><h3>{title}</h3><p>{description}</p></article>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="development-ownership">
+        <div className="development-shell development-ownership-layout">
+          <div>
+            <p className="studio-kicker">{copy.ownershipKicker}</p>
+            <h2>{copy.ownershipTitle}</h2>
+            <p>{copy.ownershipIntro}</p>
+          </div>
+          <dl>
+            {copy.ownership.map(([term, detail]) => (
+              <div key={term}><dt>{term}</dt><dd>{detail}</dd></div>
+            ))}
+          </dl>
         </div>
       </section>
 
