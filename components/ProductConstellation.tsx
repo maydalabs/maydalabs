@@ -287,6 +287,7 @@ export function ProductConstellation({ locale }: { locale: Locale }) {
         const raycaster = new THREE.Raycaster();
         const pointer = new THREE.Vector2();
         const pointerTarget = new THREE.Vector2();
+        const scaleTarget = new THREE.Vector3();
         let animationFrame = 0;
 
         const resize = () => {
@@ -341,7 +342,7 @@ export function ProductConstellation({ locale }: { locale: Locale }) {
           cardGroups.forEach((group, index) => {
             group.position.y = cardPositions[index].y + Math.sin(time * 0.65 + index * 1.4) * 0.08;
             const targetScale = activeRef.current === index ? 1.075 : 1;
-            group.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.08);
+            group.scale.lerp(scaleTarget.setScalar(targetScale), 0.08);
           });
 
           renderer.render(scene, camera);
@@ -407,7 +408,7 @@ export function ProductConstellation({ locale }: { locale: Locale }) {
         {projects.map((project, index) => (
           <div key={project.name} className={`constellation-fallback-card constellation-fallback-card-${index + 1}`}>
             {project.image ? (
-              <Image src={project.image} alt="" fill sizes="(max-width: 760px) 44vw, 28vw" />
+              <Image src={project.image} alt="" fill priority sizes="(max-width: 760px) 44vw, 28vw" />
             ) : (
               <div className={`constellation-private-mark constellation-private-mark-${index}`}><span /><i /><b /></div>
             )}

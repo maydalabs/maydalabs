@@ -93,6 +93,23 @@ select {
   margin-inline: auto;
 }
 
+.studio-grain {
+  position: fixed;
+  z-index: 90;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
+  mix-blend-mode: overlay;
+  opacity: 0.055;
+  pointer-events: none;
+}
+
+@media print {
+  .studio-grain {
+    display: none;
+  }
+}
+
 .mayda-mark {
   overflow: visible;
 }
@@ -276,6 +293,15 @@ select {
 .studio-button-ghost:hover {
   border-color: rgba(255, 255, 255, 0.45);
   box-shadow: none;
+}
+
+.studio-button:focus-visible,
+.studio-text-link:focus-visible,
+.studio-nav-link:focus-visible,
+.studio-language-switcher a:focus-visible,
+.studio-menu-button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
 }
 
 .studio-availability {
@@ -828,6 +854,27 @@ select {
 .hero-reveal-3 { animation-delay: 300ms; }
 .hero-reveal-4 { animation-delay: 420ms; }
 
+.hero-line {
+  display: block;
+  overflow: hidden;
+  padding-block: 0.14em;
+  margin-block: -0.14em;
+}
+
+.hero-line-inner {
+  display: block;
+  transform: translateY(118%);
+  animation: hero-line-rise 950ms cubic-bezier(0.16, 1, 0.3, 1) 160ms forwards;
+}
+
+.hero-line:nth-child(2) .hero-line-inner {
+  animation-delay: 300ms;
+}
+
+@keyframes hero-line-rise {
+  to { transform: translateY(0); }
+}
+
 .studio-manifesto {
   display: grid;
   width: min(100% - 2rem, 1480px);
@@ -1028,6 +1075,75 @@ select {
     #0a0b0b;
 }
 
+.visual-proof-private::before {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(247, 147, 26, 0.55), transparent);
+  box-shadow: 0 0 16px rgba(247, 147, 26, 0.25);
+  opacity: 0;
+  animation: proof-scan 6.4s ease-in-out 1.2s infinite;
+}
+
+.visual-proof-private-3::before {
+  background: linear-gradient(90deg, transparent, rgba(217, 117, 85, 0.55), transparent);
+  box-shadow: 0 0 16px rgba(217, 117, 85, 0.25);
+  animation-delay: 2.8s;
+}
+
+@keyframes proof-scan {
+  0% { top: 6%; opacity: 0; }
+  12% { opacity: 1; }
+  46% { top: 64%; opacity: 1; }
+  60% { top: 78%; opacity: 0; }
+  100% { top: 78%; opacity: 0; }
+}
+
+.visual-proof-private-wire {
+  position: absolute;
+  top: clamp(1.2rem, 2.4vw, 2rem);
+  left: clamp(1.2rem, 2.4vw, 2rem);
+  display: grid;
+  width: 9rem;
+  padding: 0.8rem;
+  gap: 0.45rem;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  border-radius: 0.6rem;
+}
+
+.visual-proof-private-wire::after {
+  margin-top: 0.15rem;
+  color: rgba(255, 255, 255, 0.3);
+  content: "WIP";
+  font-family: var(--font-mono);
+  font-size: 0.46rem;
+  letter-spacing: 0.14em;
+}
+
+.visual-proof-private-wire i {
+  display: block;
+  height: 0.42rem;
+  border-radius: 0.21rem;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.visual-proof-private-wire i:first-child {
+  width: 58%;
+  background: rgba(247, 147, 26, 0.34);
+}
+
+.visual-proof-private-wire i:nth-child(3) {
+  width: 74%;
+}
+
+.visual-proof-private-3 .visual-proof-private-wire i:first-child {
+  background: rgba(217, 117, 85, 0.4);
+}
+
 .visual-proof-private-3 {
   background:
     radial-gradient(circle at 62% 34%, rgba(217, 117, 85, 0.2), transparent 26%),
@@ -1054,6 +1170,7 @@ select {
   border: 1px solid rgba(247, 147, 26, 0.46);
   border-radius: 50%;
   transform: translate(-50%, -50%);
+  animation: orbit-rotate 52s linear infinite;
 }
 
 .visual-proof-private-3 .visual-proof-private-orbit { border-color: rgba(217, 117, 85, 0.55); }
@@ -1609,11 +1726,29 @@ select {
 }
 
 .studio-process-grid article {
+  position: relative;
   display: grid;
   grid-template-columns: 3rem 1fr;
   padding-block: 1.7rem;
   border-bottom: 1px solid var(--border);
   gap: 1.25rem;
+}
+
+.studio-process-grid article::after {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, var(--signal), rgba(247, 147, 26, 0));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 650ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.studio-process-grid article:hover::after {
+  transform: scaleX(1);
 }
 
 .studio-process-grid article > span {
@@ -1628,6 +1763,11 @@ select {
   font-size: clamp(1.4rem, 3vw, 2.7rem);
   font-weight: 520;
   letter-spacing: -0.04em;
+  transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.studio-process-grid article:hover h3 {
+  transform: translateX(0.6rem);
 }
 
 .studio-process-grid p {
@@ -1635,6 +1775,11 @@ select {
   margin: 0.6rem 0 0;
   color: rgba(255, 255, 255, 0.44);
   font-size: 0.85rem;
+  transition: color 300ms ease;
+}
+
+.studio-process-grid article:hover p {
+  color: rgba(255, 255, 255, 0.66);
 }
 
 .studio-final-cta {
@@ -2755,13 +2900,22 @@ select {
   max-width: 15ch;
 }
 
-.profile-hero .profile-availability {
-  max-width: 58rem;
-  margin-top: 1.2rem;
+.profile-hero > p.profile-intro {
+  max-width: 43rem;
+  margin: 2rem 0 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  line-height: 1.7;
+}
+
+.profile-hero > p.profile-availability {
+  max-width: 43rem;
+  margin: 1.4rem 0 0;
   padding-left: 1rem;
   border-left: 2px solid var(--signal);
   color: rgba(255, 255, 255, 0.76);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
+  line-height: 1.7;
 }
 
 .profile-actions {
@@ -3714,6 +3868,7 @@ select {
     transition-duration: 0.01ms !important;
   }
   .hero-reveal { opacity: 1; transform: none; }
+  .hero-line-inner { transform: none; }
 }
 
 /* Homepage motion system */
@@ -3735,6 +3890,10 @@ select {
   opacity: 1;
   transform: translateY(0);
 }
+
+.studio-home.is-motion-ready .studio-process-grid article[data-reveal]:nth-child(2) { transition-delay: 90ms; }
+.studio-home.is-motion-ready .studio-process-grid article[data-reveal]:nth-child(3) { transition-delay: 180ms; }
+.studio-home.is-motion-ready .studio-process-grid article[data-reveal]:nth-child(4) { transition-delay: 270ms; }
 
 .studio-signal-spine {
   position: fixed;

@@ -231,7 +231,7 @@ export default async function ProfilePage({ params }: LocalePageProps) {
       <section className="studio-inner-hero profile-hero">
         <p className="studio-kicker">{copy.kicker}</p>
         <h1>{copy.heading[0]}<br /><em>{copy.heading[1]}</em></h1>
-        <p>{copy.intro}</p>
+        <p className="profile-intro">{copy.intro}</p>
         <p className="profile-availability">{copy.availability}</p>
         <div className="profile-actions">
           <a href="#evidence" className="studio-button">{copy.actions.work} <span aria-hidden>↓</span></a>

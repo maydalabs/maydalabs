@@ -141,8 +141,9 @@ export function StudioHome({ locale }: { locale: Locale }) {
             {copy.eyebrow}
           </div>
 
-          <h1 className="hero-reveal hero-reveal-2">
-            {copy.hero[0]}<br />{copy.hero[1]} <em>{copy.hero[2]}</em>
+          <h1>
+            <span className="hero-line"><span className="hero-line-inner">{copy.hero[0]}</span></span>
+            <span className="hero-line"><span className="hero-line-inner">{copy.hero[1]} <em>{copy.hero[2]}</em></span></span>
           </h1>
 
           <p className="hero-reveal hero-reveal-3">{copy.heroCopy}</p>

@@ -69,6 +69,7 @@ export function VisualProofReel({
               <div className={`visual-proof-private visual-proof-private-${index}`} aria-hidden="true">
                 <div className="visual-proof-private-grid" />
                 <div className="visual-proof-private-orbit"><span /><i /><b /><em /></div>
+                <div className="visual-proof-private-wire"><i /><i /><i /></div>
                 <strong>{project.name}</strong>
                 <small>{project.status}</small>
               </div>

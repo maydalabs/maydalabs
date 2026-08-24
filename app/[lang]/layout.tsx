@@ -160,6 +160,7 @@ export default async function RootLayout({
 
           <SiteFooter locale={lang} />
         </div>
+        <div className="studio-grain" aria-hidden="true" />
         <Analytics />
         <SpeedInsights />
         <SiteAnalytics />
