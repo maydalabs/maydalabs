@@ -864,15 +864,26 @@ select {
 .hero-line-inner {
   display: block;
   transform: translateY(118%);
-  animation: hero-line-rise 950ms cubic-bezier(0.16, 1, 0.3, 1) 160ms forwards;
+  animation: hero-line-rise 850ms cubic-bezier(0.16, 1, 0.3, 1) 100ms forwards;
 }
 
 .hero-line:nth-child(2) .hero-line-inner {
-  animation-delay: 300ms;
+  animation-delay: 220ms;
 }
 
 @keyframes hero-line-rise {
   to { transform: translateY(0); }
+}
+
+.route-enter {
+  animation: route-enter 560ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes route-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 }
 
 .studio-manifesto {
@@ -1780,6 +1791,101 @@ select {
 
 .studio-process-grid article:hover p {
   color: rgba(255, 255, 255, 0.66);
+}
+
+.studio-evidence {
+  width: min(100% - 2rem, 1480px);
+  margin-inline: auto;
+  padding-block: clamp(3.5rem, 6vw, 6rem);
+  border-top: 1px solid var(--border);
+}
+
+.studio-evidence-head {
+  display: grid;
+  margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  gap: 0.9rem;
+}
+
+.studio-evidence-head > p:last-child {
+  max-width: 34rem;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.44);
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+
+.studio-evidence dl {
+  display: grid;
+  margin: 0;
+  border-top: 1px solid var(--border);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.studio-evidence dl > div {
+  display: flex;
+  min-height: 8.5rem;
+  padding: 1.25rem 1.25rem 1.1rem 0;
+  flex-direction: column-reverse;
+  justify-content: space-between;
+  gap: 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.studio-evidence dd {
+  margin: 0;
+  font-size: clamp(1.7rem, 2.6vw, 2.6rem);
+  font-weight: 520;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+}
+
+.studio-evidence dd::after {
+  display: inline-block;
+  width: 0.32rem;
+  aspect-ratio: 1;
+  margin-left: 0.5rem;
+  border-radius: 50%;
+  content: "";
+  background: var(--signal);
+  vertical-align: 0.45em;
+}
+
+.studio-evidence dt {
+  color: rgba(255, 255, 255, 0.42);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.6;
+}
+
+@media (min-width: 900px) {
+  .studio-evidence-head {
+    grid-template-columns: auto 1fr;
+    align-items: end;
+    justify-content: space-between;
+  }
+
+  .studio-evidence-head > p:last-child {
+    justify-self: end;
+    text-align: right;
+  }
+
+  .studio-evidence dl {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .studio-evidence dl > div {
+    border-right: 1px solid var(--border);
+  }
+
+  .studio-evidence dl > div:last-child {
+    border-right: 0;
+  }
+
+  .studio-evidence dl > div + div {
+    padding-left: 1.25rem;
+  }
 }
 
 .studio-final-cta {

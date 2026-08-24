@@ -40,6 +40,17 @@ const HOME_COPY = {
       ["04", "Create momentum", "We instrument, launch, learn, and build the next highest-leverage move."],
     ],
     availability: "Open for new client work",
+    evidence: {
+      kicker: "This site is evidence / Measured, not promised",
+      note: "The studio site ships to the same standard we sell. Metrics from Lighthouse and production, August 2026.",
+      items: [
+        ["100·100·100", "Accessibility · SEO · best practices"],
+        ["430 KB", "First-load transfer, home"],
+        ["43 ms", "Server response, edge"],
+        ["3", "Languages shipped end-to-end"],
+        ["0.00", "Cumulative layout shift"],
+      ],
+    },
     ctaKicker: "Have something ambitious in mind?",
     cta: ["Bring the messy idea.", "We’ll find the signal."],
     book: "Book a project call",
@@ -78,6 +89,17 @@ const HOME_COPY = {
       ["04", "İvme yarat", "Ölçer, yayına alır, öğrenir ve en yüksek etkili bir sonraki hamleyi geliştiririz."],
     ],
     availability: "Yeni müşteri projelerine açık",
+    evidence: {
+      kicker: "Bu site kanıtın kendisi / Vaat değil, ölçüm",
+      note: "Stüdyo sitesi, sattığımız standardın aynısıyla yayında. Metrikler Lighthouse ve üretim ortamından, Ağustos 2026.",
+      items: [
+        ["100·100·100", "Erişilebilirlik · SEO · en iyi uygulamalar"],
+        ["430 KB", "Ana sayfa ilk yükleme boyutu"],
+        ["43 ms", "Sunucu yanıtı, edge"],
+        ["3", "Uçtan uca yayınlanan dil"],
+        ["0.00", "Kümülatif düzen kayması"],
+      ],
+    },
     ctaKicker: "Aklınızda iddialı bir fikir mi var?",
     cta: ["Dağınık fikri getirin.", "Sinyali birlikte bulalım."],
     book: "Proje görüşmesi ayarla",
@@ -116,6 +138,17 @@ const HOME_COPY = {
       ["04", "Créer l’élan", "Nous instrumentons, lançons, apprenons puis construisons l’étape suivante à plus fort impact."],
     ],
     availability: "Ouvert à de nouveaux projets clients",
+    evidence: {
+      kicker: "Ce site est la preuve / Mesuré, pas promis",
+      note: "Le site du studio est livré au standard que nous vendons. Mesures Lighthouse et production, août 2026.",
+      items: [
+        ["100·100·100", "Accessibilité · SEO · bonnes pratiques"],
+        ["430 Ko", "Premier chargement, accueil"],
+        ["43 ms", "Réponse serveur, edge"],
+        ["3", "Langues livrées de bout en bout"],
+        ["0.00", "Décalage de mise en page cumulé"],
+      ],
+    },
     ctaKicker: "Vous avez une idée ambitieuse ?",
     cta: ["Apportez l’idée encore floue.", "Nous trouverons le signal."],
     book: "Réserver un appel projet",
@@ -217,6 +250,21 @@ export function StudioHome({ locale }: { locale: Locale }) {
             <article key={number} data-reveal><span>{number}</span><div><h3>{title}</h3><p>{description}</p></div></article>
           ))}
         </div>
+      </section>
+
+      <section className="studio-evidence" data-reveal>
+        <div className="studio-evidence-head">
+          <p className="studio-kicker">{copy.evidence.kicker}</p>
+          <p>{copy.evidence.note}</p>
+        </div>
+        <dl>
+          {copy.evidence.items.map(([value, label]) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
       <section className="studio-final-cta" data-reveal>
