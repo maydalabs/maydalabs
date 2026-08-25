@@ -55,19 +55,36 @@ export function OsMenuBar({
     <header className="os-menubar">
       <div className="os-menubar-left">
         {onBrandClick ? (
-          <button type="button" className="os-menubar-brand group" onClick={onBrandClick} aria-label="About MaydaOS">
+          <button
+            type="button"
+            className="os-menubar-brand group os-menu-explain"
+            onClick={onBrandClick}
+            aria-label="About MaydaOS"
+            data-tooltip={copy.menubarHelp.brand}
+          >
             <MaydaMark className="h-4 w-4 text-white" />
             <strong>MaydaOS</strong>
           </button>
         ) : (
-          <Link href={localizePath("/", locale)} className="os-menubar-brand group" aria-label="MaydaOS">
+          <Link
+            href={localizePath("/", locale)}
+            className="os-menubar-brand group os-menu-explain"
+            aria-label="MaydaOS"
+            data-tooltip={copy.menubarHelp.brand}
+          >
             <MaydaMark className="h-4 w-4 text-white" />
             <strong>MaydaOS</strong>
           </Link>
         )}
         <nav className="os-menubar-nav" aria-label="MaydaOS">
-          {copy.menu.map(([label, path]) => (
-            <Link key={path} href={localizePath(path, locale)} className={normalized.startsWith(path) ? "is-active" : ""}>
+          {copy.menu.map(([label, path, description]) => (
+            <Link
+              key={path}
+              href={localizePath(path, locale)}
+              className={`os-menu-explain ${normalized.startsWith(path) ? "is-active" : ""}`}
+              aria-label={label}
+              data-tooltip={description}
+            >
               {label}
             </Link>
           ))}
@@ -76,17 +93,19 @@ export function OsMenuBar({
       <div className="os-menubar-right">
         <button
           type="button"
-          className="os-menubar-palette"
+          className="os-menubar-palette os-menu-explain"
           aria-label="Command palette"
+          data-tooltip={copy.menubarHelp.palette}
           onClick={() => window.dispatchEvent(new CustomEvent("os:palette"))}
         >
           ⌘K
         </button>
         <button
           type="button"
-          className={`studio-sound-toggle ${sound ? "is-on" : ""}`}
+          className={`studio-sound-toggle os-menu-explain ${sound ? "is-on" : ""}`}
           aria-pressed={sound}
           aria-label="SND"
+          data-tooltip={copy.menubarHelp.sound}
           onClick={() => setSoundEnabled(!isSoundEnabled())}
         >
           SND<span aria-hidden />
@@ -101,12 +120,13 @@ export function OsMenuBar({
               aria-label={LOCALE_LABELS[nextLocale]}
               aria-current={locale === nextLocale ? "true" : undefined}
               className={locale === nextLocale ? "is-active" : ""}
+              title={copy.menubarHelp.language}
             >
               {nextLocale.toUpperCase()}
             </Link>
           ))}
         </span>
-        <span className="os-menubar-block">₿ {blockHeight ? blockHeight.toLocaleString(locale) : "———"}</span>
+        <span className="os-menubar-block" title={copy.menubarHelp.block}>₿ {blockHeight ? blockHeight.toLocaleString(locale) : "———"}</span>
         <span>{clock || "--:--"} IST</span>
       </div>
     </header>

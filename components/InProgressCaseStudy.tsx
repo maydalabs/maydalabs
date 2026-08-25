@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { InProgressVisual } from "@/components/InProgressVisual";
 import { type Locale, localizePath } from "@/lib/i18n";
 
@@ -13,6 +14,10 @@ export type InProgressCaseCopy = {
   builtTitle: string;
   cta: readonly [string, string];
   ctaKicker: string;
+  evidenceCaptions: readonly string[];
+  evidenceIntro: string;
+  evidenceKicker: string;
+  evidenceTitle: string;
   hero: readonly [string, string];
   kicker: string;
   lead: string;
@@ -37,6 +42,28 @@ type InProgressCaseStudyProps = {
   name: string;
   variant: "mortal" | "sofra";
 };
+
+const EVIDENCE = {
+  mortal: [
+    {
+      src: "/work/mortal-vault-demo-home.jpg",
+      alt: "Mortal Vault private alpha owner entry screen",
+      domain: "local alpha · test networks only",
+    },
+  ],
+  sofra: [
+    {
+      src: "/work/sofra-demo-home.jpg",
+      alt: "Sofra fictional public demo discovery screen",
+      domain: "fictional demo · public discovery",
+    },
+    {
+      src: "/work/sofra-demo-journey.jpg",
+      alt: "Sofra read-only cross-role demo journey",
+      domain: "fictional demo · guided journey",
+    },
+  ],
+} as const;
 
 function Arrow() {
   return <span aria-hidden>↗</span>;
@@ -72,6 +99,36 @@ export function InProgressCaseStudy({ copy, locale, name, variant }: InProgressC
           <div className="development-build-grid">
             {copy.built.map(([number, title, description]) => (
               <article key={number}><span>{number}</span><h3>{title}</h3><p>{description}</p></article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="demo-evidence" className="development-evidence">
+        <div className="development-shell">
+          <div className="development-evidence-heading">
+            <div>
+              <p className="studio-kicker">{copy.evidenceKicker}</p>
+              <h2>{copy.evidenceTitle}</h2>
+            </div>
+            <p>{copy.evidenceIntro}</p>
+          </div>
+          <div className={`development-evidence-grid is-${variant}`}>
+            {EVIDENCE[variant].map((asset, index) => (
+              <figure key={asset.src}>
+                <div className="development-evidence-frame">
+                  <div className="development-evidence-browser" aria-hidden="true">
+                    <i /><i /><i />
+                    <span>{asset.domain}</span>
+                    <em>demo evidence</em>
+                  </div>
+                  <Image src={asset.src} alt={asset.alt} width={1280} height={640} sizes="(max-width: 900px) 94vw, 76vw" />
+                </div>
+                <figcaption>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  {copy.evidenceCaptions[index]}
+                </figcaption>
+              </figure>
             ))}
           </div>
         </div>

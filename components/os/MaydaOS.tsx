@@ -14,6 +14,7 @@ import { WALLPAPERS } from "@/components/os/wallpaperScenes";
 import { resolveWallpaperId } from "@/components/os/OsWallpaper";
 import { OsMenuBar } from "@/components/os/OsMenuBar";
 import { OsScreensaver } from "@/components/os/OsScreensaver";
+import { OsFirstSession, type SessionPerspective } from "@/components/os/OsFirstSession";
 import { OsTour } from "@/components/os/OsTour";
 import { OsWallpaper } from "@/components/os/OsWallpaper";
 import { OS_COPY } from "@/components/os/osCopy";
@@ -39,6 +40,28 @@ const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
 const ENTER_DELAYS: Partial<Record<WindowId, number>> = { welcome: 60, hodlstay: 150, monitor: 240, gazette: 300, terminal: 330 };
 
 const DESKTOP_STORAGE_KEY = "ml_desktop_v1";
+
+function createSessionDesktop(perspective: SessionPerspective | null): Record<WindowId, WindowState> {
+  const state = Object.fromEntries(
+    (Object.entries(INITIAL_WINDOWS) as Array<[WindowId, WindowState]>).map(([id, windowState]) => [
+      id,
+      { ...windowState, open: false, min: false, max: false, snap: null, z: 1 },
+    ]),
+  ) as Record<WindowId, WindowState>;
+
+  state.terminal = { ...state.terminal, open: true, x: 612, y: 92, z: 12, w: 620 };
+  if (perspective === "hiring") {
+    state.welcome = { ...state.welcome, open: true, x: 54, y: 46, z: 9 };
+    state.work = { ...state.work, open: true, x: 736, y: 390, z: 10 };
+  } else if (perspective === "build") {
+    state.work = { ...state.work, open: true, x: 64, y: 100, z: 9 };
+    state.monitor = { ...state.monitor, open: true, x: 1050, y: 82, z: 10 };
+  } else if (perspective === "explore") {
+    state.work = { ...state.work, open: true, x: 64, y: 86, z: 8 };
+    state.array = { ...state.array, open: true, x: 694, y: 302, z: 10 };
+  }
+  return state;
+}
 
 // Stored layouts are untrusted input from a previous visit: every field
 // is validated, widths stay design-owned, and a layout with no open
@@ -192,6 +215,28 @@ export function MaydaOS({ locale }: { locale: Locale }) {
     zRef.current = 6;
     setWindows(INITIAL_WINDOWS);
   }, []);
+
+  const startSessionDesktop = useCallback((perspective: SessionPerspective | null) => {
+    try {
+      window.localStorage.removeItem(DESKTOP_STORAGE_KEY);
+    } catch {
+      // A guided session can still start without persistence.
+    }
+    zRef.current = 12;
+    setWindows(createSessionDesktop(perspective));
+    playLock();
+  }, []);
+
+  useEffect(() => {
+    const onSessionStart = (event: Event) => {
+      const perspective = (event as CustomEvent).detail?.perspective;
+      if (perspective === "hiring" || perspective === "build" || perspective === "explore") {
+        startSessionDesktop(perspective);
+      }
+    };
+    window.addEventListener("os:session-start", onSessionStart);
+    return () => window.removeEventListener("os:session-start", onSessionStart);
+  }, [startSessionDesktop]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -489,11 +534,13 @@ export function MaydaOS({ locale }: { locale: Locale }) {
               onOpenWindow={openWindow}
               onNavigate={(path) => router.push(localizePath(path, locale))}
               onReset={resetDesktop}
+              onStartSession={startSessionDesktop}
             />
           </OsWindow>
 
           <p className="os-desktop-tag" aria-hidden="true">MAYDAOS 26.08 · ISTANBUL / EVERYWHERE</p>
 
+          <OsFirstSession locale={locale} />
           <OsTour locale={locale} />
 
           <div className="os-toasts" aria-live="polite">
@@ -504,18 +551,18 @@ export function MaydaOS({ locale }: { locale: Locale }) {
         </div>
 
         <nav className="os-dock" aria-label="MaydaOS dock">
-          <button type="button" className={windows.welcome.open ? "is-running" : ""} onClick={() => openWindow("welcome")} title={copy.dock.welcome}><Glyph name="doc" /></button>
-          <button type="button" className={windows.work.open ? "is-running" : ""} onClick={() => openWindow("work")} title={copy.dock.work}><Glyph name="grid" /></button>
-          <button type="button" className={windows.terminal.open ? "is-running" : ""} onClick={() => openWindow("terminal")} title={copy.dock.terminal}><Glyph name="shell" /></button>
-          <button type="button" className={windows.monitor.open ? "is-running" : ""} onClick={() => openWindow("monitor")} title={copy.dock.monitor}><Glyph name="monitor" /></button>
-          <button type="button" className={windows.array.open ? "is-running" : ""} onClick={() => openWindow("array")} title={copy.arrayWindow.title} data-tour="dock-array"><Glyph name="array" /></button>
+          <button type="button" className={windows.welcome.open ? "is-running" : ""} onClick={() => openWindow("welcome")} aria-label={copy.dock.welcome} data-tooltip={`${copy.dock.welcome} — ${copy.dockHelp.welcome}`}><Glyph name="doc" /></button>
+          <button type="button" className={windows.work.open ? "is-running" : ""} onClick={() => openWindow("work")} aria-label={copy.dock.work} data-tooltip={`${copy.dock.work} — ${copy.dockHelp.work}`}><Glyph name="grid" /></button>
+          <button type="button" className={windows.terminal.open ? "is-running" : ""} onClick={() => openWindow("terminal")} aria-label={copy.dock.terminal} data-tooltip={`${copy.dock.terminal} — ${copy.dockHelp.terminal}`}><Glyph name="shell" /></button>
+          <button type="button" className={windows.monitor.open ? "is-running" : ""} onClick={() => openWindow("monitor")} aria-label={copy.dock.monitor} data-tooltip={`${copy.dock.monitor} — ${copy.dockHelp.monitor}`}><Glyph name="monitor" /></button>
+          <button type="button" className={windows.array.open ? "is-running" : ""} onClick={() => openWindow("array")} aria-label={copy.arrayWindow.title} data-tooltip={`${copy.arrayWindow.title} — ${copy.dockHelp.array}`} data-tour="dock-array"><Glyph name="array" /></button>
           <i aria-hidden="true" />
-          <Link href={localizePath("/services", locale)} title={copy.dock.services}><Glyph name="layers" /></Link>
-          <Link href={localizePath("/about", locale)} title={copy.dock.about}><Glyph name="mark" /></Link>
-          <Link href={localizePath("/contact", locale)} title={copy.dock.call} className="os-dock-accent"><Glyph name="send" stroke="#f7931a" /></Link>
+          <Link href={localizePath("/services", locale)} aria-label={copy.dock.services} data-tooltip={`${copy.dock.services} — ${copy.dockHelp.services}`}><Glyph name="layers" /></Link>
+          <Link href={localizePath("/about", locale)} aria-label={copy.dock.about} data-tooltip={`${copy.dock.about} — ${copy.dockHelp.about}`}><Glyph name="mark" /></Link>
+          <Link href={localizePath("/contact", locale)} aria-label={copy.dock.call} data-tooltip={`${copy.dock.call} — ${copy.dockHelp.call}`} className="os-dock-accent"><Glyph name="send" stroke="#f7931a" /></Link>
           <i aria-hidden="true" />
-          <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("os:tour"))} title={copy.tour.dock}><Glyph name="play" /></button>
-          <button type="button" className={windows.trash.open ? "is-running" : ""} onClick={() => openWindow("trash")} title={copy.dock.trash}><Glyph name="trash" /></button>
+          <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("os:tour"))} aria-label={copy.tour.dock} data-tooltip={`${copy.tour.dock} — ${copy.dockHelp.tour}`}><Glyph name="play" /></button>
+          <button type="button" className={windows.trash.open ? "is-running" : ""} onClick={() => openWindow("trash")} aria-label={copy.dock.trash} data-tooltip={`${copy.dock.trash} — ${copy.dockHelp.trash}`}><Glyph name="trash" /></button>
         </nav>
 
         <OsScreensaver locale={locale} />
@@ -570,6 +617,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
               bootedAt={BOOTED_AT}
               onOpenWindow={() => undefined}
               onNavigate={(path) => router.push(localizePath(path, locale))}
+              onStartSession={() => undefined}
             />
           </div>
         ) : null}
@@ -742,8 +790,9 @@ function OsWindow({
 }
 
 type TermLine = { kind: "cmd" | "out" | "accent"; text: string };
+type TerminalSession = { id: string; perspective: SessionPerspective | null };
 
-const COMMANDS = ["help", "work", "open", "proof", "services", "about", "brief", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo", "array", "radio", "reset", "matrix", "tour", "wallpaper"];
+const COMMANDS = ["help", "session", "work", "open", "proof", "profile", "contact", "services", "about", "brief", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo", "array", "radio", "reset", "matrix", "tour", "wallpaper"];
 
 function OsTerminal({
   locale,
@@ -754,6 +803,7 @@ function OsTerminal({
   onOpenWindow,
   onNavigate,
   onReset = () => undefined,
+  onStartSession = () => undefined,
 }: {
   locale: Locale;
   hint: string;
@@ -763,8 +813,15 @@ function OsTerminal({
   onOpenWindow: (id: WindowId) => void;
   onNavigate: (path: string) => void;
   onReset?: () => void;
+  onStartSession?: (perspective: SessionPerspective | null) => void;
 }) {
-  const [lines, setLines] = useState<TermLine[]>([{ kind: "out", text: hint }]);
+  const copy = OS_COPY[locale];
+  const [lines, setLines] = useState<TermLine[]>([
+    { kind: "out", text: hint },
+    { kind: "out", text: copy.firstSession.terminalHint },
+  ]);
+  const [session, setSession] = useState<TerminalSession>({ id: "GUEST", perspective: null });
+  const [showStarter, setShowStarter] = useState(true);
   const [value, setValue] = useState("");
   const historyRef = useRef<string[]>([]);
   const historyIndexRef = useRef(-1);
@@ -776,6 +833,36 @@ function OsTerminal({
   useEffect(() => {
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
   }, [lines]);
+
+  const beginSession = useCallback(
+    (perspective: SessionPerspective, arrangeDesktop = true) => {
+      const id = `ML-${Date.now().toString(36).slice(-4).toUpperCase()}`;
+      const option = copy.firstSession.options.find((item) => item.id === perspective);
+      const guides = copy.firstSession.guides[perspective];
+      setSession({ id, perspective });
+      setShowStarter(false);
+      setLines([
+        { kind: "accent", text: `${copy.firstSession.created} — ${id} · ${option?.label ?? perspective}` },
+        ...guides.map((guide) => ({ kind: "out" as const, text: `→ ${guide}` })),
+      ]);
+      historyRef.current = [];
+      historyIndexRef.current = -1;
+      if (arrangeDesktop) onStartSession(perspective);
+      requestAnimationFrame(() => inputRef.current?.focus());
+    },
+    [copy.firstSession, onStartSession],
+  );
+
+  useEffect(() => {
+    const onSessionStart = (event: Event) => {
+      const perspective = (event as CustomEvent).detail?.perspective;
+      if (perspective === "hiring" || perspective === "build" || perspective === "explore") {
+        beginSession(perspective, false);
+      }
+    };
+    window.addEventListener("os:session-start", onSessionStart);
+    return () => window.removeEventListener("os:session-start", onSessionStart);
+  }, [beginSession]);
 
   const run = (raw: string) => {
     const input = raw.trim();
@@ -791,11 +878,33 @@ function OsTerminal({
     switch (commandName) {
       case "help":
         push([
-          { kind: "out", text: "work · open <tx-01…04> · proof · array · neofetch · services · about" },
+          { kind: "out", text: "session new <hiring|build|explore> · profile · work · open <tx-01…04>" },
+          { kind: "out", text: "proof · array · neofetch · services · about · contact" },
           { kind: "out", text: "wallpaper <1–10> · radio · matrix · brief · lang <en|tr|fr> · trash · reset" },
           { kind: "out", text: "tour · tab completes · arrows replay history · sudo does what sudo does" },
         ]);
         break;
+      case "session": {
+        const [action, requested] = rest.map((part) => part.toLowerCase());
+        if (!action || action === "status") {
+          push([
+            { kind: "out", text: `session ${session.id} · perspective: ${session.perspective ?? "unselected"}` },
+            { kind: "out", text: "usage: session new <hiring|build|explore>" },
+          ]);
+        } else if (action === "new" && !requested) {
+          setSession({ id: "GUEST", perspective: null });
+          setShowStarter(true);
+          setLines([{ kind: "accent", text: copy.firstSession.choose }]);
+          historyRef.current = [];
+          historyIndexRef.current = -1;
+          if (!mobile) onStartSession(null);
+        } else if (action === "new" && (requested === "hiring" || requested === "build" || requested === "explore")) {
+          beginSession(requested);
+        } else {
+          push([{ kind: "out", text: "usage: session new <hiring|build|explore>" }]);
+        }
+        break;
+      }
       case "work":
         push([{ kind: "out", text: "TX-01 hodlstay · TX-02 gazette · TX-03 vault* · TX-04 sofra*  (* encrypted)" }]);
         if (!mobile) onOpenWindow("work");
@@ -843,6 +952,14 @@ function OsTerminal({
       case "services":
         push([{ kind: "accent", text: "opening services …" }]);
         onNavigate("/services");
+        break;
+      case "profile":
+        push([{ kind: "accent", text: "opening the builder profile …" }]);
+        onNavigate("/profile");
+        break;
+      case "contact":
+        push([{ kind: "accent", text: "opening the guided brief …" }]);
+        onNavigate("/contact");
         break;
       case "about":
         if (mobile) {
@@ -949,7 +1066,7 @@ function OsTerminal({
         push([{ kind: "out", text: rest.join(" ") || "" }]);
         break;
       case "whoami":
-        push([{ kind: "out", text: "guest — a founder with a messy idea, probably" }]);
+        push([{ kind: "out", text: session.perspective ? `${session.id.toLowerCase()} — ${session.perspective} perspective` : "guest — perspective not selected yet" }]);
         break;
       case "sudo":
         push([{ kind: "out", text: "nice try. this studio runs on proof, not privileges." }]);
@@ -1001,6 +1118,20 @@ function OsTerminal({
           </p>
         ))}
       </div>
+      {showStarter ? (
+        <div className="os-terminal-starter" onClick={(event) => event.stopPropagation()}>
+          <span>{copy.firstSession.terminalLabel}</span>
+          <p>{copy.firstSession.terminalHint}</p>
+          <div>
+            {copy.firstSession.options.map((option) => (
+              <button key={option.id} type="button" onClick={() => beginSession(option.id as SessionPerspective)}>
+                <strong>{option.label}</strong>
+                <small>{option.detail}</small>
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
       <form
         className="os-terminal-input"
         onSubmit={(event) => {

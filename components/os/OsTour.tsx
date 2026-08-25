@@ -5,16 +5,13 @@ import type { Locale } from "@/lib/i18n";
 import { OS_COPY } from "@/components/os/osCopy";
 import { trackOsEvent } from "@/lib/osAnalytics";
 
-const TOUR_SEEN_KEY = "ml_tour_seen";
-
 // The OS demos itself: a ghost cursor types `proof` into the real shell,
 // opens the Signal Array from the dock, drags a window, splashes the
-// water, and ends circling the call-to-action. Offered on first visit,
-// re-runnable from the dock or the `tour` command, and cancelled the
-// instant the visitor touches anything themselves.
+// water, and ends circling the call-to-action. It is launched from the
+// first-session guide, dock, or `tour` command and cancelled the instant
+// the visitor touches anything themselves.
 export function OsTour({ locale }: { locale: Locale }) {
   const copy = OS_COPY[locale].tour;
-  const [offer, setOffer] = useState(false);
   const [cursor, setCursor] = useState<{ x: number; y: number; visible: boolean; clicking: boolean }>({
     x: 0,
     y: 0,
@@ -24,14 +21,6 @@ export function OsTour({ locale }: { locale: Locale }) {
   const runningRef = useRef(false);
   const cancelRef = useRef(false);
 
-  const markSeen = useCallback(() => {
-    try {
-      window.localStorage.setItem(TOUR_SEEN_KEY, "1");
-    } catch {
-      // Preference simply won't persist.
-    }
-  }, []);
-
   const runTour = useCallback(async () => {
     if (runningRef.current) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -40,8 +29,6 @@ export function OsTour({ locale }: { locale: Locale }) {
     }
     runningRef.current = true;
     cancelRef.current = false;
-    setOffer(false);
-    markSeen();
     trackOsEvent("os_tour", { phase: "start" });
 
     const cancelled = () => cancelRef.current;
@@ -190,7 +177,7 @@ export function OsTour({ locale }: { locale: Locale }) {
       setCursor((current) => ({ ...current, visible: false, clicking: false }));
       runningRef.current = false;
     }
-  }, [copy.done, copy.skipped, markSeen]);
+  }, [copy.done, copy.skipped]);
 
   useEffect(() => {
     const onSummon = () => void runTour();
@@ -198,41 +185,8 @@ export function OsTour({ locale }: { locale: Locale }) {
     return () => window.removeEventListener("os:tour", onSummon);
   }, [runTour]);
 
-  // First visit: offer the tour a moment after the desktop settles.
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let seen = false;
-    try {
-      seen = window.localStorage.getItem(TOUR_SEEN_KEY) === "1";
-    } catch {
-      seen = true;
-    }
-    if (seen) return;
-    const timer = setTimeout(() => {
-      if (!runningRef.current) setOffer(true);
-    }, 4600);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <>
-      {offer ? (
-        <div className="os-tour-offer">
-          <button type="button" onClick={() => void runTour()}>
-            <span aria-hidden>▶</span> {copy.offer}
-          </button>
-          <button
-            type="button"
-            aria-label="✕"
-            onClick={() => {
-              setOffer(false);
-              markSeen();
-            }}
-          >
-            ✕
-          </button>
-        </div>
-      ) : null}
       {cursor.visible ? (
         <div
           className={`os-ghost-cursor ${cursor.clicking ? "is-clicking" : ""}`}

@@ -31,7 +31,8 @@ functional rather than decorative:
 
 - Draggable, snappable windows with a persisted desktop layout, a dock,
   a menubar, and a ⌘K command palette
-- A 24-command shell: `proof` pings the studio's shipped products and
+- A guided command shell: `session new` creates a clean hiring, building,
+  or exploration perspective; `proof` pings the studio's shipped products and
   prints live response times, `wallpaper` switches scenes, `tour` hands
   control to a ghost cursor that drives the real UI and yields the
   moment a human touches anything
