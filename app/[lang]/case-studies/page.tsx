@@ -3,7 +3,6 @@ import Link from "next/link";
 import { InProgressVisual } from "@/components/InProgressVisual";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
-import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { createPageMetadata } from "@/lib/metadata";
 
 const COPY = {
@@ -88,7 +87,7 @@ export default async function CaseStudiesPage({ params }: LocalePageProps) {
           <div className="case-detail-grid"><section><p className="studio-kicker">{copy.challenge}</p><p>{item.challenge}</p></section><section><p className="studio-kicker">{copy.built}</p><ul>{item.built.map((entry) => <li key={entry}>{entry}</li>)}</ul></section><section><p className="studio-kicker">{copy.stack}</p><div>{item.stack.map((entry) => <span key={entry}>{entry}</span>)}</div></section></div>
         </article>
       ))}
-      <section className="studio-inner-cta"><p className="studio-kicker">{copy.availability}</p><h2>{copy.cta}</h2><Link href={getIntroCallUrl("work_bottom")} target="_blank" rel="noopener noreferrer" className="studio-button">{copy.start} <Arrow /></Link></section>
+      <section className="studio-inner-cta"><p className="studio-kicker">{copy.availability}</p><h2>{copy.cta}</h2><Link href={localizePath("/contact", locale)} className="studio-button">{copy.start} <Arrow /></Link></section>
     </div>
   );
 }

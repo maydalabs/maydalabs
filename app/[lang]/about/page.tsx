@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
-import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { createPageMetadata } from "@/lib/metadata";
 
 const COPY = {
@@ -320,9 +319,7 @@ export default async function AboutPage({ params }: LocalePageProps) {
         <p className="studio-kicker">{copy.ctaKicker}</p>
         <h2>{copy.ctaHeading}</h2>
         <Link
-          href={getIntroCallUrl("about_bottom")}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={localizePath("/contact", locale)}
           className="studio-button"
         >
           {copy.cta} <span aria-hidden>↗</span>

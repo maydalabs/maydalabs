@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
-import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { createPageMetadata } from "@/lib/metadata";
 
 const META = {
@@ -20,7 +19,7 @@ const COPY = {
     ],
     standardsKicker: "Every engagement / Same operating standard", standardsHeading: ["The shape changes.", "The rigor does not."],
     standards: [["01", "One decision loop", "Product context stays connected to design and engineering instead of being translated through account layers."], ["02", "Working releases", "Decisions happen against the real product in tight cycles, not against a presentation that disappears after kickoff."], ["03", "Built for ownership", "The system, documentation, and handover are prepared so the product can keep moving after the engagement."], ["04", "Measured momentum", "Launch instrumentation and customer signals shape the next highest-leverage move."]],
-    availability: "Open for new client work", scope: "Scope follows understanding", cta: ["Start with the problem.", "We’ll shape the engagement."], book: "Book a project call", seeWork: "See the work", note: "No fixed packages or public rate card. Scope and commercial terms follow the first conversation.",
+    availability: "Open for new client work", scope: "Scope follows understanding", cta: ["Start with the problem.", "We’ll shape the engagement."], book: "Shape a project brief", seeWork: "See the work", note: "No fixed packages or public rate card. Scope and commercial terms follow the first conversation.",
   },
   tr: {
     kicker: "Yetkinlikler / Tasarım gereği bağlantılı", heading: ["Tek stüdyo.", "İlerlemenin üç yolu."], intro: "Ürünle, mağazayla ya da büyüme problemiyle başlayın. İş gerektirdiğinde diğer katmanları biz birbirine bağlarız.", map: ["ÜRÜN", "E-TİCARET", "BÜYÜME"], fit: "Şu durumlarda güçlü uyum", outputs: "Birbirine bağlayabileceklerimiz", discuss: "Bu tür bir projeyi konuşalım",
@@ -31,7 +30,7 @@ const COPY = {
     ],
     standardsKicker: "Her çalışma / Aynı işletim standardı", standardsHeading: ["Şekil değişir.", "Titizlik değişmez."],
     standards: [["01", "Tek karar döngüsü", "Ürün bağlamı hesap katmanlarında çevrilmek yerine tasarım ve mühendislikle bağlantılı kalır."], ["02", "Çalışan sürümler", "Kararlar, başlangıç toplantısından sonra kaybolan sunumlar yerine kısa döngülerde gerçek ürün üzerinden alınır."], ["03", "Sahiplik için geliştirildi", "Sistem, dokümantasyon ve devir; çalışma sonrası ürünün ilerleyebilmesi için hazırlanır."], ["04", "Ölçülen ivme", "Lansman ölçümü ve müşteri sinyalleri en yüksek etkili sonraki hamleyi şekillendirir."]],
-    availability: "Yeni müşteri projelerine açık", scope: "Kapsam, anlayıştan sonra gelir", cta: ["Problemle başlayın.", "Çalışmayı birlikte şekillendirelim."], book: "Proje görüşmesi ayarla", seeWork: "Projeleri incele", note: "Sabit paket veya herkese açık fiyat listesi yok. Kapsam ve ticari koşullar ilk görüşmeden sonra belirlenir.",
+    availability: "Yeni müşteri projelerine açık", scope: "Kapsam, anlayıştan sonra gelir", cta: ["Problemle başlayın.", "Çalışmayı birlikte şekillendirelim."], book: "Proje brief'i oluştur", seeWork: "Projeleri incele", note: "Sabit paket veya herkese açık fiyat listesi yok. Kapsam ve ticari koşullar ilk görüşmeden sonra belirlenir.",
   },
   fr: {
     kicker: "Compétences / Connectées par conception", heading: ["Un studio.", "Trois façons d’avancer."], intro: "Commencez par le produit, la boutique ou le problème de croissance. Nous relions les autres couches lorsque le projet l’exige.", map: ["PRODUIT", "E-COMMERCE", "CROISSANCE"], fit: "Une bonne adéquation si", outputs: "Ce que nous pouvons connecter", discuss: "Discuter de ce type de projet",
@@ -42,7 +41,7 @@ const COPY = {
     ],
     standardsKicker: "Chaque mission / La même exigence", standardsHeading: ["La forme change.", "La rigueur reste."],
     standards: [["01", "Une seule boucle de décision", "Le contexte produit reste relié au design et à l’ingénierie au lieu de traverser des couches de gestion."], ["02", "Des versions fonctionnelles", "Les décisions se prennent sur le produit réel par cycles courts, pas sur une présentation oubliée après le kickoff."], ["03", "Conçu pour être repris", "Système, documentation et transmission permettent au produit d’avancer après la mission."], ["04", "Un élan mesuré", "L’instrumentation du lancement et les signaux clients déterminent l’étape suivante à plus fort impact."]],
-    availability: "Ouvert à de nouveaux projets clients", scope: "Le périmètre vient après la compréhension", cta: ["Commencez par le problème.", "Nous définirons la mission."], book: "Réserver un appel projet", seeWork: "Voir les projets", note: "Pas de forfaits fixes ni de tarifs publics. Le périmètre et les conditions commerciales suivent le premier échange.",
+    availability: "Ouvert à de nouveaux projets clients", scope: "Le périmètre vient après la compréhension", cta: ["Commencez par le problème.", "Nous définirons la mission."], book: "Structurer un brief projet", seeWork: "Voir les projets", note: "Pas de forfaits fixes ni de tarifs publics. Le périmètre et les conditions commerciales suivent le premier échange.",
   },
 } as const;
 
@@ -82,7 +81,7 @@ export default async function ServicesPage({ params }: LocalePageProps) {
                 <section><p>{copy.outputs}</p><ul>{service.outputs.map((item) => <li key={item}>{item}</li>)}</ul></section>
               </div>
             </div>
-            <Link href={getIntroCallUrl(service.surface)} target="_blank" rel="noopener noreferrer" className={service.tone === "dark" ? "studio-button" : "studio-button studio-button-light"}>{copy.discuss} <Arrow /></Link>
+            <Link href={localizePath(`/contact?need=${service.id === "product-builds" ? "product" : service.id === "commerce" ? "commerce" : "growth"}#brief`, locale)} className={service.tone === "dark" ? "studio-button" : "studio-button studio-button-light"}>{copy.discuss} <Arrow /></Link>
           </article>
         ))}
       </section>
@@ -96,7 +95,7 @@ export default async function ServicesPage({ params }: LocalePageProps) {
         <div className="studio-availability"><span /> {copy.availability}</div><p className="studio-kicker">{copy.scope}</p>
         <h2>{copy.cta[0]}<br /><em>{copy.cta[1]}</em></h2>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link href={getIntroCallUrl("services_bottom")} target="_blank" rel="noopener noreferrer" className="studio-button studio-button-light">{copy.book} <Arrow /></Link>
+          <Link href={localizePath("/contact#needs", locale)} className="studio-button studio-button-light">{copy.book} <Arrow /></Link>
           <Link href={localizePath("/case-studies", locale)} className="studio-button studio-button-outline-light">{copy.seeWork}</Link>
         </div>
         <p className="studio-final-note">{copy.note}</p>

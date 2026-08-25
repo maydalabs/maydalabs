@@ -13,7 +13,7 @@ const CARD_COPY: Record<Locale, Record<SocialCardKind, { eyebrow: string; title:
     sofra: { eyebrow: "PRIVATE PHASE 1 · MARKETPLACE", title: "Trust, built around a table.", accent: "Sofra" },
     profile: { eyebrow: "FOUNDER · PRODUCT · GROWTH", title: "Mehmet E. Mayda", accent: "Full-stack product builder" },
     about: { eyebrow: "FOUNDER-LED STUDIO", title: "Small team. Serious ideas.", accent: "About" },
-    contact: { eyebrow: "OPEN FOR NEW CLIENT WORK", title: "Start with a conversation.", accent: "Start a project" },
+    contact: { eyebrow: "OPEN FOR NEW CLIENT WORK", title: "Start with the problem.", accent: "Shape a brief" },
     legal: { eyebrow: "MAYDALABS", title: "Clear terms. No fog.", accent: "Legal" },
   },
   tr: {
@@ -26,7 +26,7 @@ const CARD_COPY: Record<Locale, Record<SocialCardKind, { eyebrow: string; title:
     sofra: { eyebrow: "ÖZEL PHASE 1 · PAZAR YERİ", title: "Sofra etrafında kurulan güven.", accent: "Sofra" },
     profile: { eyebrow: "KURUCU · ÜRÜN · BÜYÜME", title: "Mehmet E. Mayda", accent: "Full-stack ürün geliştirici" },
     about: { eyebrow: "KURUCU LİDERLİĞİNDE STÜDYO", title: "Küçük ekip. Ciddi fikirler.", accent: "Hakkımızda" },
-    contact: { eyebrow: "YENİ MÜŞTERİ PROJELERİNE AÇIK", title: "Bir görüşmeyle başlayın.", accent: "Proje başlat" },
+    contact: { eyebrow: "YENİ MÜŞTERİ PROJELERİNE AÇIK", title: "Problemle başlayın.", accent: "Brief oluştur" },
     legal: { eyebrow: "MAYDALABS", title: "Açık koşullar. Belirsizlik yok.", accent: "Yasal" },
   },
   fr: {
@@ -39,7 +39,7 @@ const CARD_COPY: Record<Locale, Record<SocialCardKind, { eyebrow: string; title:
     sofra: { eyebrow: "PHASE 1 PRIVÉE · MARKETPLACE", title: "La confiance autour d’une table.", accent: "Sofra" },
     profile: { eyebrow: "FONDATEUR · PRODUIT · CROISSANCE", title: "Mehmet E. Mayda", accent: "Builder produit full-stack" },
     about: { eyebrow: "STUDIO DIRIGÉ PAR SON FONDATEUR", title: "Petite équipe. Grandes idées.", accent: "À propos" },
-    contact: { eyebrow: "OUVERT À DE NOUVEAUX PROJETS", title: "Commencez par un échange.", accent: "Lancer un projet" },
+    contact: { eyebrow: "OUVERT À DE NOUVEAUX PROJETS", title: "Commencez par le problème.", accent: "Structurer un brief" },
     legal: { eyebrow: "MAYDALABS", title: "Des règles claires. Sans brouillard.", accent: "Juridique" },
   },
 };

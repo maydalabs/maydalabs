@@ -7,7 +7,6 @@ import { SignalDecode } from "@/components/SignalDecode";
 import { StationTelemetry } from "@/components/StationTelemetry";
 import { VisualProofReel } from "@/components/VisualProofReel";
 import { type Locale, localizePath } from "@/lib/i18n";
-import { getIntroCallUrl } from "@/lib/marketingLinks";
 
 const HOME_COPY = {
   en: {
@@ -48,7 +47,7 @@ const HOME_COPY = {
     },
     ctaKicker: "Have something ambitious in mind?",
     cta: ["Bring the messy idea.", "We’ll find the signal."],
-    book: "Book a project call",
+    book: "Shape a project brief",
     email: "Email the brief",
     note: "No fixed packages. We scope the right engagement after we understand the job.",
   },
@@ -90,7 +89,7 @@ const HOME_COPY = {
     },
     ctaKicker: "Aklınızda iddialı bir fikir mi var?",
     cta: ["Dağınık fikri getirin.", "Sinyali birlikte bulalım."],
-    book: "Proje görüşmesi ayarla",
+    book: "Proje brief'i oluştur",
     email: "Brief'i e-postayla gönder",
     note: "Sabit paketler yok. İşi anladıktan sonra doğru çalışma kapsamını oluşturuyoruz.",
   },
@@ -132,7 +131,7 @@ const HOME_COPY = {
     },
     ctaKicker: "Vous avez une idée ambitieuse ?",
     cta: ["Apportez l’idée encore floue.", "Nous trouverons le signal."],
-    book: "Réserver un appel projet",
+    book: "Structurer un brief projet",
     email: "Envoyer le brief",
     note: "Pas de forfaits fixes. Nous définissons la bonne mission après avoir compris le travail.",
   },
@@ -144,7 +143,7 @@ function ArrowUpRight() {
 
 export function StudioHome({ locale }: { locale: Locale }) {
   const copy = HOME_COPY[locale];
-  const projectUrl = getIntroCallUrl("home_hero");
+  const projectUrl = localizePath("/contact", locale);
   // Stagger the decode so each hero segment locks in reading order,
   // regardless of how long the localized line before it runs.
   const lineTwoDelay = 140 + copy.hero[0].length * 30 - 80;
@@ -167,7 +166,7 @@ export function StudioHome({ locale }: { locale: Locale }) {
           <p className="hero-reveal hero-reveal-3">{copy.heroCopy}</p>
 
           <div className="hero-reveal hero-reveal-4 flex flex-col gap-3 sm:flex-row">
-            <Link href={projectUrl} target="_blank" rel="noopener noreferrer" className="studio-button">
+            <Link href={projectUrl} className="studio-button">
               {copy.start} <ArrowUpRight />
             </Link>
             <Link href={localizePath("/#work", locale)} className="studio-button studio-button-ghost">
@@ -246,7 +245,7 @@ export function StudioHome({ locale }: { locale: Locale }) {
         <p className="studio-kicker">{copy.ctaKicker}</p>
         <h2>{copy.cta[0]}<br /><em>{copy.cta[1]}</em></h2>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link href={getIntroCallUrl("home_bottom")} target="_blank" rel="noopener noreferrer" className="studio-button studio-button-light">{copy.book} <ArrowUpRight /></Link>
+          <Link href={localizePath("/contact#needs", locale)} className="studio-button studio-button-light">{copy.book} <ArrowUpRight /></Link>
           <a href="mailto:info@maydalabs.com" className="studio-button studio-button-outline-light">{copy.email}</a>
         </div>
         <p className="studio-final-note">{copy.note}</p>

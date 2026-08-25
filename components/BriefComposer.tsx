@@ -47,6 +47,7 @@ const COPY: Record<Locale, {
       { id: "product", label: "New product" },
       { id: "commerce", label: "Commerce" },
       { id: "growth", label: "Growth systems" },
+      { id: "automation", label: "AI / automation" },
       { id: "unsure", label: "Not sure yet" },
     ],
     timelineLabel: "Timeline",
@@ -83,6 +84,7 @@ const COPY: Record<Locale, {
       { id: "product", label: "Yeni ürün" },
       { id: "commerce", label: "E-ticaret" },
       { id: "growth", label: "Büyüme sistemleri" },
+      { id: "automation", label: "Yapay zekâ / otomasyon" },
       { id: "unsure", label: "Henüz belirsiz" },
     ],
     timelineLabel: "Zamanlama",
@@ -119,6 +121,7 @@ const COPY: Record<Locale, {
       { id: "product", label: "Nouveau produit" },
       { id: "commerce", label: "E-commerce" },
       { id: "growth", label: "Systèmes de croissance" },
+      { id: "automation", label: "IA / automatisation" },
       { id: "unsure", label: "Pas encore sûr" },
     ],
     timelineLabel: "Délai",
@@ -164,11 +167,13 @@ function Chips({ label, options, value, onPick }: { label: string; options: Opti
 // become a structured brief, composed entirely client-side. The brief
 // travels only when the visitor sends it — into the Calendly booking,
 // the clipboard, or an email draft.
-export function BriefComposer({ locale }: { locale: Locale }) {
+export function BriefComposer({ locale, initialMove = null }: { locale: Locale; initialMove?: string | null }) {
   const copy = COPY[locale];
   const [idea, setIdea] = useState("");
   const [stage, setStage] = useState<string | null>(null);
-  const [move, setMove] = useState<string | null>(null);
+  const [move, setMove] = useState<string | null>(
+    copy.moves.some((option) => option.id === initialMove) ? initialMove : null,
+  );
   const [timeline, setTimeline] = useState<string | null>(null);
   const [context, setContext] = useState("");
   const [copied, setCopied] = useState(false);
@@ -205,7 +210,7 @@ export function BriefComposer({ locale }: { locale: Locale }) {
   const mailUrl = `mailto:info@maydalabs.com?subject=${encodeURIComponent(copy.mailSubject)}&body=${encodeURIComponent(brief)}`;
 
   return (
-    <section className="brief-composer">
+    <section className="brief-composer" id="brief">
       <div className="brief-heading">
         <p className="studio-kicker">{copy.kicker}</p>
         <h2>{copy.heading[0]}<br /><em>{copy.heading[1]}</em></h2>

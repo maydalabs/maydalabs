@@ -3,7 +3,6 @@ import Link from "next/link";
 import { HodlStayJourney } from "@/components/HodlStayJourney";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
-import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { createPageMetadata } from "@/lib/metadata";
 
 const COPY = {
@@ -67,7 +66,7 @@ export default async function HodlStayCaseStudyPage({ params }: LocalePageProps)
       <section className="hodl-gallery"><div className="hodl-shell"><div className="hodl-gallery-heading"><p className="studio-kicker">{copy.galleryKicker}</p><h2>{copy.galleryHeading}</h2></div><div className="hodl-gallery-list">{copy.gallery.map(([number, label, title, description, src, alt]) => <figure key={number}><div className="hodl-gallery-copy"><div><span>{number}</span><p>{label}</p></div><h3>{title}</h3><p>{description}</p></div><div className="hodl-gallery-frame"><div className="project-browser-chrome"><div><i /><i /><i /></div><span>hodlstay.com</span><b>{label}</b></div><Image src={currentAsset(src)} alt={alt} width={1430} height={894} sizes="(max-width: 900px) 100vw, 74vw" /></div></figure>)}</div></div></section>
       <section className="hodl-proof"><div className="hodl-shell"><div className="hodl-proof-heading"><p className="studio-kicker">{copy.proofKicker}</p><h2>{copy.proofHeading}</h2></div><div className="hodl-proof-grid">{copy.proof.map(([number, title, description]) => <article key={number}><span>{number}</span><h3>{title}</h3><p>{description}</p></article>)}</div></div></section>
       <section className="hodl-contribution"><div className="hodl-shell hodl-contribution-layout"><div><p className="studio-kicker">{copy.contributionKicker}</p><h2>{copy.contributionHeading}</h2><p>{copy.contributionIntro}</p></div><dl>{copy.contribution.map(([term, detail]) => <div key={term}><dt>{term}</dt><dd>{detail}</dd></div>)}</dl></div></section>
-      <section className="studio-final-cta hodl-final-cta"><div className="studio-availability"><span /> {copy.availability}</div><p className="studio-kicker">{copy.ctaKicker}</p><h2>{copy.cta[0]}<br /><em>{copy.cta[1]}</em></h2><div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"><Link href={getIntroCallUrl("hodlstay_case_bottom")} target="_blank" rel="noopener noreferrer" className="studio-button studio-button-light">{copy.start} <Arrow /></Link><Link href={localizePath("/services", locale)} className="studio-button studio-button-outline-light">{copy.services}</Link></div></section>
+      <section className="studio-final-cta hodl-final-cta"><div className="studio-availability"><span /> {copy.availability}</div><p className="studio-kicker">{copy.ctaKicker}</p><h2>{copy.cta[0]}<br /><em>{copy.cta[1]}</em></h2><div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"><Link href={localizePath("/contact", locale)} className="studio-button studio-button-light">{copy.start} <Arrow /></Link><Link href={localizePath("/services", locale)} className="studio-button studio-button-outline-light">{copy.services}</Link></div></section>
     </div>
   );
 }

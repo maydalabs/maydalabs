@@ -3,6 +3,8 @@ import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
 import { VisualProofReel } from "@/components/VisualProofReel";
+import { AutomationProof } from "@/components/AutomationProof";
+import { FounderSignal } from "@/components/FounderSignal";
 
 const COPY = {
   en: {
@@ -229,14 +231,19 @@ export default async function ProfilePage({ params }: LocalePageProps) {
   return (
     <div className="studio-inner-page profile-page" id="mehmet-e-mayda">
       <section className="studio-inner-hero profile-hero">
-        <p className="studio-kicker">{copy.kicker}</p>
-        <h1>{copy.heading[0]}<br /><em>{copy.heading[1]}</em></h1>
-        <p className="profile-intro">{copy.intro}</p>
-        <p className="profile-availability">{copy.availability}</p>
-        <div className="profile-actions">
-          <a href="#evidence" className="studio-button">{copy.actions.work} <span aria-hidden>↓</span></a>
-          <a href="https://github.com/maydalabs" target="_blank" rel="me noopener noreferrer" className="studio-button studio-button-ghost">{copy.actions.github} <span aria-hidden>↗</span></a>
-          <a href="https://www.linkedin.com/in/mehmet-e-mayda/" target="_blank" rel="me noopener noreferrer" className="studio-button studio-button-ghost">{copy.actions.linkedin} <span aria-hidden>↗</span></a>
+        <div className="profile-hero-layout">
+          <div className="profile-hero-copy">
+            <p className="studio-kicker">{copy.kicker}</p>
+            <h1>{copy.heading[0]}<br /><em>{copy.heading[1]}</em></h1>
+            <p className="profile-intro">{copy.intro}</p>
+            <p className="profile-availability">{copy.availability}</p>
+            <div className="profile-actions">
+              <a href="#evidence" className="studio-button">{copy.actions.work} <span aria-hidden>↓</span></a>
+              <a href="https://github.com/maydalabs" target="_blank" rel="me noopener noreferrer" className="studio-button studio-button-ghost">{copy.actions.github} <span aria-hidden>↗</span></a>
+              <a href="https://www.linkedin.com/in/mehmet-e-mayda/" target="_blank" rel="me noopener noreferrer" className="studio-button studio-button-ghost">{copy.actions.linkedin} <span aria-hidden>↗</span></a>
+            </div>
+          </div>
+          <FounderSignal locale={locale} />
         </div>
       </section>
 
@@ -252,6 +259,8 @@ export default async function ProfilePage({ params }: LocalePageProps) {
         <div><p className="studio-kicker">{copy.bridgeKicker}</p><h2>{copy.bridgeHeading}</h2></div>
         <div>{copy.bridgeBody.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
       </section>
+
+      <AutomationProof locale={locale} />
 
       <section className="profile-capabilities">
         <div className="studio-section-heading">

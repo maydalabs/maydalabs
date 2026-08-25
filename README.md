@@ -13,6 +13,8 @@ of the studio and a compact example of how I approach product engineering:
 clear positioning, multilingual information architecture, strong technical
 foundations, measurable user journeys, and careful evidence boundaries.
 
+**[Founder profile](https://maydalabs.com/profile)** · **[Selected work](https://maydalabs.com/case-studies)** · **[What do you need?](https://maydalabs.com/contact)**
+
 ## MaydaOS
 
 The site runs as a small operating system, and everything on it is
@@ -20,9 +22,16 @@ functional rather than decorative:
 
 ![MaydaOS desktop](docs/awards/01-desktop-globe.png)
 
+<table>
+  <tr>
+    <td width="66%"><img src="docs/awards/02-case-window.png" alt="MaydaOS product case window" /></td>
+    <td width="34%"><img src="docs/awards/03-mobile-home.png" alt="MaydaOS mobile home" /></td>
+  </tr>
+</table>
+
 - Draggable, snappable windows with a persisted desktop layout, a dock,
   a menubar, and a ⌘K command palette
-- A 23-command shell: `proof` pings the studio's shipped products and
+- A 24-command shell: `proof` pings the studio's shipped products and
   prints live response times, `wallpaper` switches scenes, `tour` hands
   control to a ghost cursor that drives the real UI and yields the
   moment a human touches anything
@@ -89,6 +98,41 @@ demo-safe and does not claim a public launch or real payments.
 - Vercel Analytics, Speed Insights, and conversion-path instrumentation,
   including interface events that carry state ids and never typed input
 - Explicit separation between public proof and private client or operational data
+
+## Human-controlled automation
+
+The same operating discipline appears in the private research, editorial, and
+production systems around the public products. AI can help qualify evidence,
+retrieve context, and prepare a draft, while exact consequential actions remain
+behind a human approval gate and are verified after execution.
+
+```mermaid
+flowchart LR
+    A[Capture<br/>source + provenance] --> B[Qualify<br/>rules + hard gates]
+    B --> C[Assist<br/>research + draft]
+    C --> D{Human approval<br/>exact payload + target}
+    D -->|approved| E[Act<br/>bounded external write]
+    D -->|revise| C
+    E --> F[Verify<br/>destination + factual record]
+```
+
+- Evidence and provenance travel with the record.
+- Autonomous external writes are off by default.
+- Application, publication, and outreach payloads stay reviewable before action.
+- The system records what factually happened, rather than assuming success.
+
+## Product proof, side by side
+
+<table>
+  <tr>
+    <td width="50%"><img src="public/work/hodlstay-2026-08-home.png" alt="HodlStay live marketplace" /></td>
+    <td width="50%"><img src="public/work/satoshi-gazette-2026-08-data.png" alt="Satoshi Gazette evidence-led Data Desk" /></td>
+  </tr>
+  <tr>
+    <td><strong>HodlStay</strong><br />Marketplace, payments, operations, lifecycle, and growth.</td>
+    <td><strong>Satoshi Gazette</strong><br />Editorial UX, evidence, retrieval, publishing, and guarded distribution.</td>
+  </tr>
+</table>
 
 ## Architecture
 

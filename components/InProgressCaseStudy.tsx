@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { InProgressVisual } from "@/components/InProgressVisual";
 import { type Locale, localizePath } from "@/lib/i18n";
-import { getIntroCallUrl } from "@/lib/marketingLinks";
 
 export type InProgressCaseCopy = {
   back: string;
@@ -111,7 +110,7 @@ export function InProgressCaseStudy({ copy, locale, name, variant }: InProgressC
       <section className="studio-final-cta development-final-cta">
         <p className="studio-kicker">{copy.ctaKicker}</p>
         <h2>{copy.cta[0]}<br /><em>{copy.cta[1]}</em></h2>
-        <Link href={getIntroCallUrl(`${variant}_case_bottom`)} target="_blank" rel="noopener noreferrer" className="studio-button studio-button-light">{copy.start} <Arrow /></Link>
+        <Link href={localizePath("/contact", locale)} className="studio-button studio-button-light">{copy.start} <Arrow /></Link>
       </section>
     </div>
   );

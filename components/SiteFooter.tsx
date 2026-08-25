@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { MaydaMark } from "@/components/MaydaMark";
 import { SITE_CHROME_COPY, type Locale, localizePath } from "@/lib/i18n";
 
@@ -26,14 +25,15 @@ export function SiteFooter({ locale }: { locale: Locale }) {
               <Link href={localizePath("/case-studies", locale)}>{copy.selectedWork}</Link>
               <Link href={localizePath("/services", locale)}>{copy.nav[1][0]}</Link>
               <Link href={localizePath("/about", locale)}>{copy.nav[2][0]}</Link>
+              <Link href={localizePath("/profile", locale)}>{copy.nav[3][0]}</Link>
             </div>
           </div>
 
           <div>
             <p className="studio-footer-label">{copy.startSomething}</p>
             <div className="mt-4 flex flex-col gap-2 text-sm text-white/60">
-              <Link href={getIntroCallUrl("footer")} target="_blank" rel="noopener noreferrer">
-                {copy.bookCall} ↗
+              <Link href={localizePath("/contact", locale)}>
+                {copy.bookCall} →
               </Link>
               <a href="mailto:info@maydalabs.com">info@maydalabs.com</a>
               <a

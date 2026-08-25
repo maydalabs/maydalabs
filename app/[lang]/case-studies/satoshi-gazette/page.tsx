@@ -3,7 +3,6 @@ import Link from "next/link";
 import { SatoshiGazetteJourney } from "@/components/HodlStayJourney";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
-import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { createPageMetadata } from "@/lib/metadata";
 
 const COPY = {
@@ -75,7 +74,7 @@ export default async function SatoshiGazetteCaseStudyPage({ params }: LocalePage
       <section className="sg-surfaces"><div className="sg-shell"><div className="sg-section-heading"><div><p className="studio-kicker">{copy.surfacesKicker}</p><h2>{copy.surfacesHeading}</h2></div><p>{copy.surfacesIntro}</p></div><div className="sg-surface-list">{CURRENT_SURFACES[locale].map(([number, label, title, description, src, alt]) => <figure key={number}><figcaption><div><span>{number}</span><p>{label}</p></div><h3>{title}</h3><p>{description}</p></figcaption><div className="sg-surface-frame"><div className="project-browser-chrome"><div><i /><i /><i /></div><span>satoshigazette.org</span><b>{label}</b></div><Image src={src} alt={alt} width={1280} height={720} sizes="(max-width: 900px) 100vw, 78vw" /></div></figure>)}</div></div></section>
       <section className="sg-proof"><div className="sg-shell"><div className="sg-proof-heading"><p className="studio-kicker">{copy.proofKicker}</p><h2>{copy.proofHeading}</h2></div><div className="sg-proof-grid">{copy.proof.map(([number, title, description], index) => <article key={number}><span>{number}</span><h3>{title}</h3><p>{index === 2 ? RETRIEVAL_BOUNDARY[locale] : description}</p></article>)}</div></div></section>
       <section className="sg-contribution"><div className="sg-shell sg-contribution-layout"><div><p className="studio-kicker">{copy.contributionKicker}</p><h2>{copy.contributionHeading}</h2><p>{copy.contributionIntro}</p></div><dl>{copy.contribution.map(([term, detail]) => <div key={term}><dt>{term}</dt><dd>{detail}</dd></div>)}</dl></div></section>
-      <section className="studio-final-cta sg-final-cta"><div className="studio-availability"><span /> {copy.availability}</div><p className="studio-kicker">{copy.ctaKicker}</p><h2>{copy.cta[0]}<br /><em>{copy.cta[1]}</em></h2><div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"><Link href={getIntroCallUrl("satoshi_gazette_case_bottom")} target="_blank" rel="noopener noreferrer" className="studio-button studio-button-light">{copy.start} <Arrow /></Link><Link href={localizePath("/services", locale)} className="studio-button studio-button-outline-light">{copy.services}</Link></div></section>
+      <section className="studio-final-cta sg-final-cta"><div className="studio-availability"><span /> {copy.availability}</div><p className="studio-kicker">{copy.ctaKicker}</p><h2>{copy.cta[0]}<br /><em>{copy.cta[1]}</em></h2><div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"><Link href={localizePath("/contact", locale)} className="studio-button studio-button-light">{copy.start} <Arrow /></Link><Link href={localizePath("/services", locale)} className="studio-button studio-button-outline-light">{copy.services}</Link></div></section>
     </div>
   );
 }

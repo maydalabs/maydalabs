@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { MaydaMark } from "@/components/MaydaMark";
 import { isSoundEnabled, loadSoundPreference, onSoundChange, setSoundEnabled } from "@/lib/soundSignal";
 import {
@@ -79,6 +78,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
     if (item.href === "/case-studies" && normalizedPathname.startsWith("/case-studies")) return true;
     if (item.href === "/services" && normalizedPathname === "/services") return true;
     if (item.href === "/about" && normalizedPathname === "/about") return true;
+    if (item.href === "/profile" && normalizedPathname === "/profile") return true;
     return normalizedPathname === "/" && item.section === activeSection;
   };
 
@@ -124,7 +124,8 @@ export function SiteHeader({ locale }: { locale: Locale }) {
               aria-current={
                 (item.href === "/case-studies" && normalizedPathname.startsWith("/case-studies")) ||
                 (item.href === "/services" && normalizedPathname === "/services") ||
-                (item.href === "/about" && normalizedPathname === "/about")
+                (item.href === "/about" && normalizedPathname === "/about") ||
+                (item.href === "/profile" && normalizedPathname === "/profile")
                   ? "page"
                   : undefined
               }
@@ -146,9 +147,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
           </button>
           {languageLinks("studio-language-switcher")}
           <Link
-            href={getIntroCallUrl("header")}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={localizePath("/contact", locale)}
             className="studio-button studio-button-small"
           >
             {copy.startProject} <span aria-hidden>↗</span>
@@ -181,9 +180,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             </Link>
           ))}
           <Link
-            href={getIntroCallUrl("mobile_header")}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={localizePath("/contact", locale)}
             onClick={() => setOpen(false)}
             className="studio-button mt-3"
           >

@@ -8,7 +8,6 @@ import { MaydaMark } from "@/components/MaydaMark";
 import { ProductConstellation } from "@/components/ProductConstellation";
 import { SignalDecode } from "@/components/SignalDecode";
 import { type Locale, localizePath } from "@/lib/i18n";
-import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { isRadioOn, playLock, playTick, startRadio, stopRadio } from "@/lib/soundSignal";
 import { OsMatrix } from "@/components/os/OsMatrix";
 import { WALLPAPERS } from "@/components/os/wallpaperScenes";
@@ -334,7 +333,6 @@ export function MaydaOS({ locale }: { locale: Locale }) {
     return () => window.removeEventListener("os:tour-action", onAction);
   }, [openWindow, nudgeWindow]);
 
-  const projectUrl = getIntroCallUrl("os_desktop");
   const checks = telemetry?.checks ?? [
     { id: "hodlstay", host: "hodlstay.com", ok: false, status: 0, ms: null },
     { id: "satoshi-gazette", host: "satoshigazette.org", ok: false, status: 0, ms: null },
@@ -395,6 +393,13 @@ export function MaydaOS({ locale }: { locale: Locale }) {
                 {copy.welcome.body.map((paragraph) => (
                   <p key={paragraph.slice(0, 24)}>{paragraph}</p>
                 ))}
+                <div className="os-welcome-products" aria-label={copy.workWindow.title}>
+                  {copy.workWindow.rows.map((row) => (
+                    <Link key={row.tx} href={localizePath(row.path, locale)}>
+                      <span>{row.tx}</span><strong>{row.name}</strong><small>{row.status}</small>
+                    </Link>
+                  ))}
+                </div>
                 <ul>
                   {copy.welcome.capabilities.map(([label, path]) => (
                     <li key={label}><Link href={localizePath(path, locale)}>{label}</Link></li>
@@ -403,7 +408,8 @@ export function MaydaOS({ locale }: { locale: Locale }) {
                 <p className="os-welcome-note">{copy.welcome.note}</p>
               </div>
               <div className="os-welcome-actions">
-                <a href={projectUrl} target="_blank" rel="noopener noreferrer" className="studio-button studio-button-small" data-tour="start">{copy.welcome.start} <span aria-hidden>↗</span></a>
+                <Link href={localizePath("/contact", locale)} className="studio-button studio-button-small" data-tour="start">{copy.welcome.start} <span aria-hidden>→</span></Link>
+                <Link href={localizePath("/profile", locale)} className="studio-button studio-button-small studio-button-ghost">{copy.welcome.profile}</Link>
                 <button type="button" className="studio-button studio-button-small studio-button-ghost" onClick={() => openWindow("work")}>{copy.welcome.explore}</button>
               </div>
             </div>
@@ -506,7 +512,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
           <i aria-hidden="true" />
           <Link href={localizePath("/services", locale)} title={copy.dock.services}><Glyph name="layers" /></Link>
           <Link href={localizePath("/about", locale)} title={copy.dock.about}><Glyph name="mark" /></Link>
-          <a href={getIntroCallUrl("os_dock")} target="_blank" rel="noopener noreferrer" title={copy.dock.call} className="os-dock-accent"><Glyph name="call" stroke="#f7931a" /></a>
+          <Link href={localizePath("/contact", locale)} title={copy.dock.call} className="os-dock-accent"><Glyph name="send" stroke="#f7931a" /></Link>
           <i aria-hidden="true" />
           <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("os:tour"))} title={copy.tour.dock}><Glyph name="play" /></button>
           <button type="button" className={windows.trash.open ? "is-running" : ""} onClick={() => openWindow("trash")} title={copy.dock.trash}><Glyph name="trash" /></button>
@@ -548,7 +554,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
             </div>
           ))}
         </div>
-        <a href={getIntroCallUrl("os_mobile")} target="_blank" rel="noopener noreferrer" className="studio-button os-mobile-call">{copy.mobile.call} <span aria-hidden>↗</span></a>
+        <Link href={localizePath("/contact", locale)} className="studio-button os-mobile-call">{copy.mobile.call} <span aria-hidden>→</span></Link>
 
         {mobileShell ? (
           <div className="os-mobile-terminal" role="dialog" aria-label={copy.terminalWindow.title}>
@@ -737,7 +743,7 @@ function OsWindow({
 
 type TermLine = { kind: "cmd" | "out" | "accent"; text: string };
 
-const COMMANDS = ["help", "work", "open", "proof", "services", "about", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo", "array", "radio", "reset", "matrix", "tour", "wallpaper"];
+const COMMANDS = ["help", "work", "open", "proof", "services", "about", "brief", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo", "array", "radio", "reset", "matrix", "tour", "wallpaper"];
 
 function OsTerminal({
   locale,
@@ -786,7 +792,7 @@ function OsTerminal({
       case "help":
         push([
           { kind: "out", text: "work · open <tx-01…04> · proof · array · neofetch · services · about" },
-          { kind: "out", text: "wallpaper <1–10> · radio · matrix · book-call · lang <en|tr|fr> · trash · reset" },
+          { kind: "out", text: "wallpaper <1–10> · radio · matrix · brief · lang <en|tr|fr> · trash · reset" },
           { kind: "out", text: "tour · tab completes · arrows replay history · sudo does what sudo does" },
         ]);
         break;
@@ -921,10 +927,11 @@ function OsTerminal({
           push([{ kind: "accent", text: "desktop restored to factory settings" }]);
         }
         break;
+      case "brief":
       case "book-call":
       case "book":
-        push([{ kind: "accent", text: "opening the calendar — bring the messy idea" }]);
-        window.open(getIntroCallUrl("os_terminal"), "_blank", "noopener,noreferrer");
+        push([{ kind: "accent", text: "opening the guided brief — bring the messy idea" }]);
+        onNavigate("/contact");
         break;
       case "lang": {
         if (arg === "en" || arg === "tr" || arg === "fr") {
