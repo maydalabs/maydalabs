@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import { OS_COPY } from "@/components/os/osCopy";
+import { trackOsEvent } from "@/lib/osAnalytics";
 
 const TOUR_SEEN_KEY = "ml_tour_seen";
 
@@ -41,6 +42,7 @@ export function OsTour({ locale }: { locale: Locale }) {
     cancelRef.current = false;
     setOffer(false);
     markSeen();
+    trackOsEvent("os_tour", { phase: "start" });
 
     const cancelled = () => cancelRef.current;
     const cancelOnRealInput = (event: Event) => {
@@ -177,6 +179,7 @@ export function OsTour({ locale }: { locale: Locale }) {
       }
 
       if (!cancelled()) {
+        trackOsEvent("os_tour", { phase: "complete" });
         window.dispatchEvent(new CustomEvent("os:toast", { detail: { text: copy.done } }));
       }
     } finally {

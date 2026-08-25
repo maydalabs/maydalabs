@@ -6,6 +6,7 @@ import { type Locale, localizePath } from "@/lib/i18n";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { isSoundEnabled, setSoundEnabled } from "@/lib/soundSignal";
 import { OS_COPY } from "@/components/os/osCopy";
+import { trackOsEvent } from "@/lib/osAnalytics";
 
 export function OsPalette({ locale }: { locale: Locale }) {
   const copy = OS_COPY[locale].palette;
@@ -48,6 +49,7 @@ export function OsPalette({ locale }: { locale: Locale }) {
   const runItem = useCallback(
     (item: (typeof copy.items)[number]) => {
       setOpen(false);
+      trackOsEvent("os_palette_run", { kind: item.kind });
       if (item.kind === "page") router.push(localizePath(item.target, locale));
       else if (item.kind === "call") window.open(getIntroCallUrl("os_palette"), "_blank", "noopener,noreferrer");
       else if (item.kind === "sound") setSoundEnabled(!isSoundEnabled());

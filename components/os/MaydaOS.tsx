@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { HodlStayJourney } from "@/components/HodlStayJourney";
+import { HodlStayJourney, SatoshiGazetteJourney } from "@/components/HodlStayJourney";
 import { MaydaMark } from "@/components/MaydaMark";
 import { ProductConstellation } from "@/components/ProductConstellation";
 import { SignalDecode } from "@/components/SignalDecode";
@@ -18,15 +18,17 @@ import { OsScreensaver } from "@/components/os/OsScreensaver";
 import { OsTour } from "@/components/os/OsTour";
 import { OsWallpaper } from "@/components/os/OsWallpaper";
 import { OS_COPY } from "@/components/os/osCopy";
+import { trackOsEvent } from "@/lib/osAnalytics";
 import { useTelemetry, type Telemetry } from "@/components/os/useTelemetry";
 
-type WindowId = "welcome" | "work" | "hodlstay" | "monitor" | "terminal" | "about" | "trash" | "array";
+type WindowId = "welcome" | "work" | "hodlstay" | "gazette" | "monitor" | "terminal" | "about" | "trash" | "array";
 
 type WindowState = { open: boolean; min: boolean; max: boolean; snap?: "left" | "right" | null; x: number; y: number; z: number; w: number };
 
 const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
   welcome: { open: true, min: false, max: false, x: 64, y: 46, z: 4, w: 500 },
   hodlstay: { open: true, min: false, max: false, x: 612, y: 26, z: 2, w: 540 },
+  gazette: { open: true, min: false, max: false, x: 548, y: 118, z: 1, w: 540 },
   monitor: { open: true, min: false, max: false, x: 1082, y: 58, z: 3, w: 330 },
   terminal: { open: true, min: false, max: false, x: 648, y: 428, z: 5, w: 560 },
   work: { open: false, min: false, max: false, x: 190, y: 160, z: 1, w: 470 },
@@ -35,7 +37,7 @@ const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
   array: { open: false, min: false, max: false, x: 320, y: 90, z: 1, w: 680 },
 };
 
-const ENTER_DELAYS: Partial<Record<WindowId, number>> = { welcome: 60, hodlstay: 150, monitor: 240, terminal: 330 };
+const ENTER_DELAYS: Partial<Record<WindowId, number>> = { welcome: 60, hodlstay: 150, monitor: 240, gazette: 300, terminal: 330 };
 
 const DESKTOP_STORAGE_KEY = "ml_desktop_v1";
 
@@ -278,6 +280,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
     const z = zRef.current;
     playLock();
     seaPulse(id);
+    trackOsEvent("os_window_open", { window: id });
     setWindows((current) => ({ ...current, [id]: { ...current[id], open: true, min: false, z } }));
   }, [seaPulse]);
 
@@ -412,6 +415,16 @@ export function MaydaOS({ locale }: { locale: Locale }) {
               <div className="os-preview-caption">
                 <span>{copy.hodlstayWindow.caption}</span>
                 <Link href={localizePath("/case-studies/hodlstay", locale)}>{copy.hodlstayWindow.cta} →</Link>
+              </div>
+            </div>
+          </OsWindow>
+
+          <OsWindow id="gazette" title={copy.gazetteWindow.title} state={windows.gazette} {...windowProps} accent>
+            <div className="os-preview">
+              <SatoshiGazetteJourney locale={locale} sizes="540px" />
+              <div className="os-preview-caption">
+                <span>{copy.gazetteWindow.caption}</span>
+                <Link href={localizePath("/case-studies/satoshi-gazette", locale)}>{copy.gazetteWindow.cta} →</Link>
               </div>
             </div>
           </OsWindow>
@@ -766,8 +779,10 @@ function OsTerminal({
     const push = (extra: TermLine[]) => setLines((current) => [...current, { kind: "cmd", text: input }, ...extra]);
     const [command, ...rest] = input.split(/\s+/);
     const arg = rest.join(" ").toLowerCase();
+    const commandName = command.toLowerCase();
+    trackOsEvent("os_shell_command", { command: COMMANDS.includes(commandName) ? commandName : "unknown" });
 
-    switch (command.toLowerCase()) {
+    switch (commandName) {
       case "help":
         push([
           { kind: "out", text: "work · open <tx-01…04> · proof · array · neofetch · services · about" },

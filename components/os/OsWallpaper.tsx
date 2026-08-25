@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { DEFAULT_WALLPAPER, WALLPAPERS, type SceneHandle } from "@/components/os/wallpaperScenes";
+import { trackOsEvent } from "@/lib/osAnalytics";
 
 const STORAGE_KEY = "ml_wallpaper";
 
@@ -132,6 +133,7 @@ export function OsWallpaper({ mempoolCount = null }: { mempoolCount?: number | n
           } catch {
             // Choice simply won't persist.
           }
+          trackOsEvent("os_wallpaper_set", { wallpaper: id });
           mount(id);
         };
         window.addEventListener("os:sea-pulse", onSeaPulse);

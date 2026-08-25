@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { SatoshiGazetteJourney } from "@/components/HodlStayJourney";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
@@ -65,7 +66,7 @@ export default async function SatoshiGazetteCaseStudyPage({ params }: LocalePage
       <section className="sg-hero"><div className="sg-shell sg-hero-grid">
         <div className="sg-hero-copy"><Link href={localizePath("/case-studies", locale)} className="sg-back-link"><span aria-hidden>←</span> {copy.back}</Link><p className="studio-kicker">{copy.kicker}</p><h1>{copy.hero[0]} <em>{copy.hero[1]}</em></h1><p className="sg-hero-lead">{copy.lead}</p><div className="sg-hero-actions"><a href="https://satoshigazette.org" target="_blank" rel="noopener noreferrer" className="studio-button">{copy.visit} <Arrow /></a><a href="#system" className="studio-text-link">{copy.inspect} <span aria-hidden>↓</span></a></div></div>
         <div className="sg-hero-identity" aria-hidden="true"><span>EC / 1</span><Image src="/work/satoshi-gazette-ec1-mark.svg" alt="" width={64} height={64} /><p>{copy.identity[0]}<br />{copy.identity[1]}</p></div>
-        <div className="sg-hero-screen"><div className="project-browser-chrome"><div><i /><i /><i /></div><span>satoshigazette.org</span><b>{copy.status}</b></div><Image src="/work/satoshi-gazette-2026-08-home.png" alt={copy.alt} width={1280} height={720} priority loading="eager" sizes="(max-width: 900px) 100vw, 82vw" /></div>
+        <div className="sg-hero-screen"><div className="project-browser-chrome"><div><i /><i /><i /></div><span>satoshigazette.org</span><b>{copy.status}</b></div><SatoshiGazetteJourney locale={locale} sizes="(max-width: 900px) 100vw, 82vw" /></div>
         <div className="sg-status-rail" aria-label={copy.summaryLabel}>{copy.summary.map(([term, detail]) => <div key={term}><span>{term}</span><strong>{detail}</strong></div>)}</div>
       </div></section>
       <section className="sg-thesis"><div className="sg-shell sg-thesis-grid"><p className="studio-kicker">{copy.premiseKicker}</p><h2>{copy.premise[0]}<br /><em>{copy.premise[1]}</em></h2><p>{copy.premiseCopy}</p></div></section>
