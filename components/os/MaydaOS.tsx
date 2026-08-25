@@ -9,7 +9,7 @@ import { ProductConstellation } from "@/components/ProductConstellation";
 import { SignalDecode } from "@/components/SignalDecode";
 import { type Locale, localizePath } from "@/lib/i18n";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
-import { playLock, playTick } from "@/lib/soundSignal";
+import { isRadioOn, playLock, playTick, startRadio, stopRadio } from "@/lib/soundSignal";
 import { OsMenuBar } from "@/components/os/OsMenuBar";
 import { OsScreensaver } from "@/components/os/OsScreensaver";
 import { OsWallpaper } from "@/components/os/OsWallpaper";
@@ -32,6 +32,48 @@ const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
 };
 
 const ENTER_DELAYS: Partial<Record<WindowId, number>> = { welcome: 60, hodlstay: 150, monitor: 240, terminal: 330 };
+
+const DESKTOP_STORAGE_KEY = "ml_desktop_v1";
+
+// Stored layouts are untrusted input from a previous visit: every field
+// is validated, widths stay design-owned, and a layout with no open
+// window at all falls back to the default desktop.
+function restoreDesktop(): { state: Record<WindowId, WindowState>; maxZ: number } | null {
+  try {
+    const raw = window.localStorage.getItem(DESKTOP_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return null;
+    const record = parsed as Record<string, unknown>;
+    const state = { ...INITIAL_WINDOWS };
+    let anyOpen = false;
+    let maxZ = 6;
+    const clampNumber = (value: unknown, fallback: number, min: number, max: number) =>
+      typeof value === "number" && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback;
+    for (const id of Object.keys(INITIAL_WINDOWS) as WindowId[]) {
+      const saved = record[id];
+      if (!saved || typeof saved !== "object") continue;
+      const entry = saved as Record<string, unknown>;
+      const base = INITIAL_WINDOWS[id];
+      state[id] = {
+        open: typeof entry.open === "boolean" ? entry.open : base.open,
+        min: typeof entry.min === "boolean" ? entry.min : false,
+        max: typeof entry.max === "boolean" ? entry.max : false,
+        snap: entry.snap === "left" || entry.snap === "right" ? entry.snap : null,
+        x: clampNumber(entry.x, base.x, 0, 6000),
+        y: clampNumber(entry.y, base.y, 0, 4000),
+        z: clampNumber(entry.z, base.z, 1, 600),
+        w: base.w,
+      };
+      if (state[id].open) anyOpen = true;
+      maxZ = Math.max(maxZ, state[id].z);
+    }
+    if (!anyOpen) return null;
+    return { state, maxZ };
+  } catch {
+    return null;
+  }
+}
 
 // Module-evaluation time doubles as the OS boot timestamp for uptime.
 const BOOTED_AT = Date.now();
@@ -70,6 +112,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
   const desktopRef = useRef<HTMLDivElement>(null);
   const zRef = useRef(6);
   const staggerRef = useRef(true);
+  const lastSplashRef = useRef(0);
   const [windows, setWindows] = useState(INITIAL_WINDOWS);
   const [booting, setBooting] = useState(false);
   const [mobileShell, setMobileShell] = useState(false);
@@ -79,6 +122,39 @@ export function MaydaOS({ locale }: { locale: Locale }) {
   useEffect(() => {
     windowsRef.current = windows;
   }, [windows]);
+
+  // Returning visitors find their desktop the way they left it.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      const restored = restoreDesktop();
+      if (restored) {
+        zRef.current = restored.maxZ + 1;
+        setWindows(restored.state);
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        window.localStorage.setItem(DESKTOP_STORAGE_KEY, JSON.stringify(windows));
+      } catch {
+        // Layout simply won't persist.
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [windows]);
+
+  const resetDesktop = useCallback(() => {
+    try {
+      window.localStorage.removeItem(DESKTOP_STORAGE_KEY);
+    } catch {
+      // Nothing to clear.
+    }
+    zRef.current = 6;
+    setWindows(INITIAL_WINDOWS);
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -232,7 +308,20 @@ export function MaydaOS({ locale }: { locale: Locale }) {
       <div className="os-desktop-frame os-desktop-only">
         <OsMenuBar locale={locale} blockHeight={telemetry?.blockHeight ?? null} onBrandClick={() => openWindow("about")} />
 
-        <div className="os-desktop" ref={desktopRef}>
+        <div
+          className="os-desktop"
+          ref={desktopRef}
+          onClick={(event) => {
+            const now = performance.now();
+            if (now - lastSplashRef.current < 400) return;
+            lastSplashRef.current = now;
+            window.dispatchEvent(
+              new CustomEvent("os:sea-pulse", {
+                detail: { x: event.clientX / window.innerWidth, y: event.clientY / window.innerHeight },
+              }),
+            );
+          }}
+        >
           <div className="os-wallpaper" aria-hidden="true">
             <OsWallpaper />
           </div>
@@ -315,6 +404,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
               bootedAt={BOOTED_AT}
               onOpenWindow={openWindow}
               onNavigate={(path) => router.push(localizePath(path, locale))}
+              onReset={resetDesktop}
             />
           </OsWindow>
 
@@ -557,7 +647,7 @@ function OsWindow({
 
 type TermLine = { kind: "cmd" | "out" | "accent"; text: string };
 
-const COMMANDS = ["help", "work", "open", "proof", "services", "about", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo", "array"];
+const COMMANDS = ["help", "work", "open", "proof", "services", "about", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo", "array", "radio", "reset"];
 
 function OsTerminal({
   locale,
@@ -567,6 +657,7 @@ function OsTerminal({
   variant = "desktop",
   onOpenWindow,
   onNavigate,
+  onReset = () => undefined,
 }: {
   locale: Locale;
   hint: string;
@@ -575,6 +666,7 @@ function OsTerminal({
   variant?: "desktop" | "mobile";
   onOpenWindow: (id: WindowId) => void;
   onNavigate: (path: string) => void;
+  onReset?: () => void;
 }) {
   const [lines, setLines] = useState<TermLine[]>([{ kind: "out", text: hint }]);
   const [value, setValue] = useState("");
@@ -602,7 +694,7 @@ function OsTerminal({
       case "help":
         push([
           { kind: "out", text: "work · open <tx-01…04> · proof · array · neofetch · services · about" },
-          { kind: "out", text: "book-call · lang <en|tr|fr> · trash · screensaver · whoami · clear" },
+          { kind: "out", text: "radio · book-call · lang <en|tr|fr> · trash · screensaver · reset · clear" },
           { kind: "out", text: "tab completes · arrows replay history · sudo does what sudo does" },
         ]);
         break;
@@ -684,6 +776,24 @@ function OsTerminal({
       case "screensaver":
         push([{ kind: "accent", text: "dimming the lights …" }]);
         window.dispatchEvent(new CustomEvent("os:screensaver"));
+        break;
+      case "radio":
+        if (isRadioOn()) {
+          stopRadio();
+          push([{ kind: "out", text: "radio off — silence restored" }]);
+        } else if (startRadio()) {
+          push([{ kind: "accent", text: "◌ tuning 96.3 THE SIGNAL — lo-fi transmissions. `radio` again to stop" }]);
+        } else {
+          push([{ kind: "out", text: "no audio hardware on this frequency" }]);
+        }
+        break;
+      case "reset":
+        if (mobile) {
+          push([{ kind: "out", text: "nothing to reset — the phone keeps it simple" }]);
+        } else {
+          onReset();
+          push([{ kind: "accent", text: "desktop restored to factory settings" }]);
+        }
         break;
       case "book-call":
       case "book":
