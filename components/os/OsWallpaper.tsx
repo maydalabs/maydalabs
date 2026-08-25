@@ -84,6 +84,11 @@ export function OsWallpaper() {
         // and typing in the shell stirs the whole surface.
         const splashes: Array<{ x: number; z: number; start: number }> = [];
         let excitement = 0;
+        let radioTide = false;
+        const onRadioState = (event: Event) => {
+          radioTide = Boolean((event as CustomEvent).detail?.on);
+        };
+        window.addEventListener("os:radio-state", onRadioState);
         const onSeaPulse = (event: Event) => {
           const detail = (event as CustomEvent).detail ?? {};
           const vx = typeof detail.x === "number" ? Math.min(1, Math.max(0, detail.x)) : 0.5;
@@ -124,7 +129,9 @@ export function OsWallpaper() {
           const pulseFade = Math.max(0, 1 - pulseAge / 5);
 
           excitement *= 0.986;
-          const amp = 1 + excitement * 0.85;
+          // While the radio plays, the whole tide breathes with the drone.
+          const tide = radioTide ? 1 + 0.22 * Math.sin(t * 0.45) : 1;
+          const amp = (1 + excitement * 0.85) * tide;
 
           for (const splash of splashes) {
             if (splash.start < 0) splash.start = t;
@@ -179,6 +186,7 @@ export function OsWallpaper() {
           window.removeEventListener("pointermove", onPointerMove);
           window.removeEventListener("os:sea-pulse", onSeaPulse);
           window.removeEventListener("os:sea-excite", onSeaExcite);
+          window.removeEventListener("os:radio-state", onRadioState);
           root.removeEventListener("wallpaper:visible", startRendering);
           if (animationFrame) window.cancelAnimationFrame(animationFrame);
           geometry.dispose();

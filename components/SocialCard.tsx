@@ -116,49 +116,66 @@ function renderDesktopCard(locale: Locale): ReactElement {
   );
 }
 
+const CARD_PATHS: Record<SocialCardKind, string> = {
+  studio: "~",
+  services: "~/services",
+  work: "~/work",
+  hodlstay: "~/work/tx-01-hodlstay",
+  "satoshi-gazette": "~/work/tx-02-gazette",
+  "mortal-vault": "~/work/tx-03-vault",
+  sofra: "~/work/tx-04-sofra",
+  profile: "~/profile",
+  about: "~/about",
+  contact: "~/contact",
+  legal: "~/legal",
+};
+
 export function renderSocialCard(locale: Locale, kind: SocialCardKind): ReactElement {
   if (kind === "studio") return renderDesktopCard(locale);
   const copy = CARD_COPY[locale][kind];
+  const words = copy.title.split(" ");
+  const lead = words.slice(0, -1).join(" ");
+  const last = words[words.length - 1];
 
   return (
-    <div
-      style={{
-        position: "relative",
-        display: "flex",
-        width: "100%",
-        height: "100%",
-        overflow: "hidden",
-        background: "#090909",
-        color: "#f2f0ea",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <div style={{ position: "absolute", inset: 0, display: "flex", opacity: 0.22, backgroundImage: "linear-gradient(rgba(255,255,255,.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px)", backgroundSize: "58px 58px" }} />
-      <div style={{ position: "absolute", top: -280, right: -120, display: "flex", width: 720, height: 720, borderRadius: 999, background: "radial-gradient(circle, rgba(247,147,26,.34), rgba(9,9,9,0) 68%)" }} />
-      <div style={{ position: "absolute", top: 92, right: 92, display: "flex", width: 330, height: 330, border: "1px solid rgba(242,240,234,.16)", borderRadius: 999 }} />
-      <div style={{ position: "absolute", top: 147, right: 147, display: "flex", width: 220, height: 220, border: "1px solid rgba(247,147,26,.45)", borderRadius: 999 }} />
-      <div style={{ position: "absolute", top: 241, right: 241, display: "flex", width: 32, height: 32, borderRadius: 999, background: "#f39a36", boxShadow: "0 0 44px rgba(247,147,26,.9)" }} />
+    <div style={{ position: "relative", display: "flex", width: "100%", height: "100%", overflow: "hidden", background: "#0a0a09", color: "#f2f0ea", fontFamily: "Arial, sans-serif" }}>
+      <div style={{ position: "absolute", inset: 0, display: "flex", opacity: 0.16, backgroundImage: "linear-gradient(rgba(242,240,234,.14) 1px, transparent 1px), linear-gradient(90deg, rgba(242,240,234,.14) 1px, transparent 1px)", backgroundSize: "52px 52px" }} />
+      <div style={{ position: "absolute", top: -140, right: -220, display: "flex", width: 760, height: 700, borderRadius: 999, background: "radial-gradient(circle, rgba(247,147,26,.24), rgba(9,9,9,0) 66%)" }} />
 
-      <div style={{ position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between", width: "78%", padding: "58px 62px 52px" }}>
-        <div style={{ display: "flex", alignItems: "center", fontSize: 19, fontWeight: 700, letterSpacing: 5 }}>
-          <svg width="34" height="34" viewBox="0 0 40 40" fill="none" style={{ marginRight: 16 }}>
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", alignItems: "center", justifyContent: "space-between", height: 52, padding: "0 30px", background: "rgba(12,12,11,.96)", borderBottom: "1px solid rgba(242,240,234,.12)" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <svg width="21" height="21" viewBox="0 0 40 40" fill="none" style={{ marginRight: 12 }}>
             <path d="M6 5H11L17 11V29L11 35H6V5Z" fill="#F2F0EA" />
             <path d="M34 5H29L23 11V29L29 35H34V5Z" fill="#F2F0EA" />
             <circle cx="20" cy="20" r="3.5" fill="#F39A36" />
           </svg>
-          MAYDALABS
+          <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: 3 }}>MaydaOS</span>
         </div>
-
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <span style={{ color: "#f39a36", fontSize: 16, fontWeight: 700, letterSpacing: 3 }}>{copy.eyebrow}</span>
-          <span style={{ display: "flex", maxWidth: 820, marginTop: 24, fontSize: 68, fontWeight: 600, lineHeight: 0.98, letterSpacing: -4 }}>{copy.title}</span>
-          <span style={{ marginTop: 28, color: "rgba(242,240,234,.55)", fontSize: 23 }}>{copy.accent}</span>
-        </div>
-
-        <div style={{ display: "flex", color: "rgba(242,240,234,.42)", fontSize: 15, letterSpacing: 3 }}>MAYDALABS.COM · ISTANBUL / EVERYWHERE</div>
+        <span style={{ color: "rgba(242,240,234,.45)", fontSize: 13, letterSpacing: 3 }}>ISTANBUL / EVERYWHERE</span>
       </div>
 
-      <div style={{ position: "absolute", right: 0, bottom: 0, display: "flex", width: 22, height: 180, background: "#f39a36" }} />
+      <div style={{ position: "absolute", top: 122, left: 110, display: "flex", flexDirection: "column", width: 980, borderRadius: 16, border: "1px solid rgba(247,147,26,.38)", background: "rgba(15,15,14,.99)", boxShadow: "0 48px 110px rgba(0,0,0,.62)" }}>
+        <div style={{ display: "flex", alignItems: "center", height: 46, padding: "0 18px", borderBottom: "1px solid rgba(242,240,234,.1)" }}>
+          <div style={{ display: "flex", width: 12, height: 12, borderRadius: 999, background: "#ff5b3d", marginRight: 7 }} />
+          <div style={{ display: "flex", width: 12, height: 12, borderRadius: 999, background: "#ffc36d", marginRight: 7 }} />
+          <div style={{ display: "flex", width: 12, height: 12, borderRadius: 999, background: "#d7ff68", marginRight: 16 }} />
+          <span style={{ color: "rgba(242,240,234,.55)", fontSize: 15, letterSpacing: 2 }}>{CARD_PATHS[kind]}</span>
+          <span style={{ marginLeft: "auto", color: "rgba(242,240,234,.3)", fontSize: 12, letterSpacing: 2 }}>MAYDAOS 26.08</span>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", padding: "40px 46px 46px" }}>
+          <span style={{ color: "#f39a36", fontSize: 16, fontWeight: 700, letterSpacing: 3 }}>{copy.eyebrow}</span>
+          <div style={{ display: "flex", flexWrap: "wrap", marginTop: 22, fontSize: 62, fontWeight: 600, lineHeight: 1.02, letterSpacing: -2.5 }}>
+            {lead ? <span>{lead}&nbsp;</span> : null}
+            <span style={{ color: "#f39a36" }}>{last}</span>
+          </div>
+          <span style={{ marginTop: 24, color: "rgba(242,240,234,.5)", fontSize: 21 }}>{copy.accent} · MAYDALABS.COM</span>
+        </div>
+      </div>
+
+      <div style={{ position: "absolute", bottom: 36, left: 110, display: "flex", alignItems: "center", color: "rgba(242,240,234,.4)", fontSize: 13, letterSpacing: 3 }}>
+        <div style={{ display: "flex", width: 8, height: 8, borderRadius: 999, background: "#d7ff68", marginRight: 10 }} />
+        BROADCASTING FROM MAYDAOS
+      </div>
     </div>
   );
 }

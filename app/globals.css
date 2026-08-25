@@ -8304,3 +8304,60 @@ select {
 .os-mobile-terminal .os-terminal-input input {
   font-size: 0.85rem;
 }
+
+/* MaydaOS v4.5 — toasts and the matrix */
+.os-toasts {
+  position: absolute;
+  top: 0.9rem;
+  right: 1rem;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.os-toast {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid rgba(247, 147, 26, 0.35);
+  border-radius: 0.65rem;
+  background: rgba(16, 16, 15, 0.95);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  color: rgba(242, 240, 234, 0.85);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.05em;
+  animation: toast-in 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.os-toast i {
+  flex: 0 0 auto;
+  width: 0.42rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--signal);
+  box-shadow: 0 0 12px rgba(247, 147, 26, 0.7);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+}
+
+.os-matrix {
+  position: fixed;
+  z-index: 390;
+  inset: 0;
+  animation: saver-in 500ms ease;
+}
+
+.os-matrix canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

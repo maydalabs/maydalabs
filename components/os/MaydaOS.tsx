@@ -10,6 +10,7 @@ import { SignalDecode } from "@/components/SignalDecode";
 import { type Locale, localizePath } from "@/lib/i18n";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { isRadioOn, playLock, playTick, startRadio, stopRadio } from "@/lib/soundSignal";
+import { OsMatrix } from "@/components/os/OsMatrix";
 import { OsMenuBar } from "@/components/os/OsMenuBar";
 import { OsScreensaver } from "@/components/os/OsScreensaver";
 import { OsWallpaper } from "@/components/os/OsWallpaper";
@@ -116,7 +117,37 @@ export function MaydaOS({ locale }: { locale: Locale }) {
   const [windows, setWindows] = useState(INITIAL_WINDOWS);
   const [booting, setBooting] = useState(false);
   const [mobileShell, setMobileShell] = useState(false);
+  const [toasts, setToasts] = useState<Array<{ id: number; text: string }>>([]);
+  const toastIdRef = useRef(0);
+  const prevBlockRef = useRef<number | null>(null);
   const { telemetry, failed: telemetryFailed } = useTelemetry();
+
+  // Toasts arrive over an event bus so any part of the OS can raise one.
+  useEffect(() => {
+    const onToast = (event: Event) => {
+      const detail = (event as CustomEvent).detail;
+      if (!detail || typeof detail.text !== "string") return;
+      toastIdRef.current += 1;
+      const id = toastIdRef.current;
+      setToasts((current) => [...current.slice(-2), { id, text: detail.text.slice(0, 120) }]);
+      setTimeout(() => setToasts((current) => current.filter((toast) => toast.id !== id)), 6000);
+    };
+    window.addEventListener("os:toast", onToast);
+    return () => window.removeEventListener("os:toast", onToast);
+  }, []);
+
+  // A real Bitcoin block mined while the OS is open becomes a
+  // notification, a tick, and a splash on the sea.
+  useEffect(() => {
+    const height = telemetry?.blockHeight ?? null;
+    if (height === null) return;
+    if (prevBlockRef.current !== null && height > prevBlockRef.current) {
+      window.dispatchEvent(new CustomEvent("os:toast", { detail: { text: `${copy.toasts.block} — ₿ ${height.toLocaleString(locale)}` } }));
+      window.dispatchEvent(new CustomEvent("os:sea-pulse", { detail: { x: 0.5, y: 0.4 } }));
+      playTick();
+    }
+    prevBlockRef.current = height;
+  }, [telemetry, copy.toasts.block, locale]);
 
   const windowsRef = useRef(windows);
   useEffect(() => {
@@ -409,6 +440,12 @@ export function MaydaOS({ locale }: { locale: Locale }) {
           </OsWindow>
 
           <p className="os-desktop-tag" aria-hidden="true">MAYDAOS 26.08 · ISTANBUL / EVERYWHERE</p>
+
+          <div className="os-toasts" aria-live="polite">
+            {toasts.map((toast) => (
+              <div key={toast.id} className="os-toast"><i aria-hidden="true" />{toast.text}</div>
+            ))}
+          </div>
         </div>
 
         <nav className="os-dock" aria-label="MaydaOS dock">
@@ -427,6 +464,8 @@ export function MaydaOS({ locale }: { locale: Locale }) {
 
         <OsScreensaver locale={locale} />
       </div>
+
+      <OsMatrix />
 
       <div className="os-mobile os-mobile-only">
         <div className="os-mobile-status">
@@ -647,7 +686,7 @@ function OsWindow({
 
 type TermLine = { kind: "cmd" | "out" | "accent"; text: string };
 
-const COMMANDS = ["help", "work", "open", "proof", "services", "about", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo", "array", "radio", "reset"];
+const COMMANDS = ["help", "work", "open", "proof", "services", "about", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo", "array", "radio", "reset", "matrix"];
 
 function OsTerminal({
   locale,
@@ -694,7 +733,7 @@ function OsTerminal({
       case "help":
         push([
           { kind: "out", text: "work · open <tx-01…04> · proof · array · neofetch · services · about" },
-          { kind: "out", text: "radio · book-call · lang <en|tr|fr> · trash · screensaver · reset · clear" },
+          { kind: "out", text: "radio · matrix · book-call · lang <en|tr|fr> · trash · screensaver · reset" },
           { kind: "out", text: "tab completes · arrows replay history · sudo does what sudo does" },
         ]);
         break;
@@ -776,6 +815,10 @@ function OsTerminal({
       case "screensaver":
         push([{ kind: "accent", text: "dimming the lights …" }]);
         window.dispatchEvent(new CustomEvent("os:screensaver"));
+        break;
+      case "matrix":
+        push([{ kind: "accent", text: "there is no template." }]);
+        window.dispatchEvent(new CustomEvent("os:matrix"));
         break;
       case "radio":
         if (isRadioOn()) {

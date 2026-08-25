@@ -203,7 +203,9 @@ export function startRadio(): boolean {
         // Already stopped.
       }
       master.disconnect();
+      window.dispatchEvent(new CustomEvent("os:radio-state", { detail: { on: false } }));
     },
   };
+  window.dispatchEvent(new CustomEvent("os:radio-state", { detail: { on: true } }));
   return true;
 }

@@ -36,6 +36,7 @@ export const OS_COPY = {
     hodlstayWindow: { title: "hodlstay.com — TX-01", caption: "Bitcoin-native stay marketplace · client build", cta: "Inspect the case" },
     monitorWindow: { title: "system monitor", scanning: "scanning…", noCarrier: "no carrier", block: "btc block height" },
     arrayWindow: { title: "signal array — product map" },
+    toasts: { block: "new block mined" },
     terminalWindow: { title: "maydalabs — shell", hint: "type `help` to see what this thing can do" },
     dock: { welcome: "Read me", work: "Work", terminal: "Shell", monitor: "Monitor", services: "Services", about: "About", call: "Book a call", trash: "Trash" },
     aboutWindow: {
@@ -123,6 +124,7 @@ export const OS_COPY = {
     hodlstayWindow: { title: "hodlstay.com — TX-01", caption: "Bitcoin-native konaklama pazar yeri · müşteri projesi", cta: "Vakayı incele" },
     monitorWindow: { title: "sistem monitörü", scanning: "taranıyor…", noCarrier: "sinyal yok", block: "btc blok yüksekliği" },
     arrayWindow: { title: "sinyal dizisi — ürün haritası" },
+    toasts: { block: "yeni blok kazıldı" },
     terminalWindow: { title: "maydalabs — kabuk", hint: "`help` yazarak neler yapabildiğini görün" },
     dock: { welcome: "Beni oku", work: "Projeler", terminal: "Kabuk", monitor: "Monitör", services: "Hizmetler", about: "Hakkımızda", call: "Görüşme ayarla", trash: "Çöp" },
     aboutWindow: {
@@ -210,6 +212,7 @@ export const OS_COPY = {
     hodlstayWindow: { title: "hodlstay.com — TX-01", caption: "Marketplace de séjours Bitcoin-native · projet client", cta: "Voir le cas" },
     monitorWindow: { title: "moniteur système", scanning: "balayage…", noCarrier: "pas de signal", block: "hauteur de bloc btc" },
     arrayWindow: { title: "réseau de signaux — carte produit" },
+    toasts: { block: "nouveau bloc miné" },
     terminalWindow: { title: "maydalabs — shell", hint: "tapez `help` pour voir ce que ça sait faire" },
     dock: { welcome: "Lisez-moi", work: "Projets", terminal: "Shell", monitor: "Moniteur", services: "Services", about: "À propos", call: "Réserver un appel", trash: "Corbeille" },
     aboutWindow: {
