@@ -13,6 +13,30 @@ of the studio and a compact example of how I approach product engineering:
 clear positioning, multilingual information architecture, strong technical
 foundations, measurable user journeys, and careful evidence boundaries.
 
+## MaydaOS
+
+The site runs as a small operating system, and everything on it is
+functional rather than decorative:
+
+![MaydaOS desktop](docs/awards/01-desktop-globe.png)
+
+- Draggable, snappable windows with a persisted desktop layout, a dock,
+  a menubar, and a ⌘K command palette
+- A 23-command shell: `proof` pings the studio's shipped products and
+  prints live response times, `wallpaper` switches scenes, `tour` hands
+  control to a ghost cursor that drives the real UI and yields the
+  moment a human touches anything
+- Live telemetry: the system monitor and the menubar block ticker read
+  from the products and mempool.space; a newly mined Bitcoin block
+  fires a toast and a wallpaper surge
+- A wallpaper engine with ten three.js scenes behind one interface —
+  the default is a node planet whose transaction arcs pace themselves
+  from real mempool pressure
+- Product windows play reels captured from the live products
+- Synthesized WebAudio interface sound (opt-in), three languages,
+  full reduced-motion support, and Lighthouse 92+ mobile / 97 desktop
+  with zero layout shift
+
 ## Selected work
 
 ### HodlStay
@@ -56,10 +80,14 @@ demo-safe and does not claim a public launch or real payments.
 ## What this codebase demonstrates
 
 - Next.js App Router, React, TypeScript, and component-driven UI
+- An event-driven interface layer: windows, shell, palette, tour, and
+  wallpapers coordinate over a small CustomEvent bus
+- three.js scenes behind one scene interface, loaded dynamically and
+  capped at 30 fps so ambience never taxes the page
 - English, Turkish, and French routing with localized metadata
-- Structured data, canonical URLs, sitemap, robots, and social cards
-- Responsive product and case-study storytelling
-- Vercel Analytics, Speed Insights, and conversion-path instrumentation
+- Structured data, canonical URLs, sitemap, robots, and OS-styled social cards
+- Vercel Analytics, Speed Insights, and conversion-path instrumentation,
+  including interface events that carry state ids and never typed input
 - Explicit separation between public proof and private client or operational data
 
 ## Architecture
@@ -67,9 +95,10 @@ demo-safe and does not claim a public launch or real payments.
 ```text
 app/[lang]/       Localized pages, metadata, and route composition
 components/       Shared navigation, analytics, and interface components
-lib/              Localization, metadata, site, and marketing-link helpers
+components/os/    MaydaOS: windows, shell, wallpaper engine, tour, telemetry
+lib/              Localization, metadata, analytics, and marketing-link helpers
 public/           Brand and case-study assets approved for public display
-docs/             Supporting product and launch documentation
+docs/             Supporting product, launch, and awards documentation
 ```
 
 ## Run locally
