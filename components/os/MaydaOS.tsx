@@ -18,7 +18,7 @@ import { useTelemetry, type Telemetry } from "@/components/os/useTelemetry";
 
 type WindowId = "welcome" | "work" | "hodlstay" | "monitor" | "terminal" | "about" | "trash" | "array";
 
-type WindowState = { open: boolean; min: boolean; max: boolean; x: number; y: number; z: number; w: number };
+type WindowState = { open: boolean; min: boolean; max: boolean; snap?: "left" | "right" | null; x: number; y: number; z: number; w: number };
 
 const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
   welcome: { open: true, min: false, max: false, x: 64, y: 46, z: 4, w: 500 },
@@ -72,13 +72,40 @@ export function MaydaOS({ locale }: { locale: Locale }) {
   const staggerRef = useRef(true);
   const [windows, setWindows] = useState(INITIAL_WINDOWS);
   const [booting, setBooting] = useState(false);
+  const [mobileShell, setMobileShell] = useState(false);
   const { telemetry, failed: telemetryFailed } = useTelemetry();
+
+  const windowsRef = useRef(windows);
+  useEffect(() => {
+    windowsRef.current = windows;
+  }, [windows]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       staggerRef.current = false;
     }, 800);
-    return () => clearTimeout(timer);
+    // The desktop greets the sea with one splash once everything is up.
+    const splash = setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("os:sea-pulse", { detail: { x: 0.5, y: 0.6 } }));
+    }, 2100);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(splash);
+    };
+  }, []);
+
+  const seaPulse = useCallback((id: WindowId) => {
+    const rect = desktopRef.current?.getBoundingClientRect();
+    const win = windowsRef.current[id];
+    if (!rect || !win) return;
+    window.dispatchEvent(
+      new CustomEvent("os:sea-pulse", {
+        detail: {
+          x: (win.x + win.w / 2) / Math.max(rect.width, 1),
+          y: (win.y + 90) / Math.max(rect.height, 1),
+        },
+      }),
+    );
   }, []);
 
   useEffect(() => {
@@ -138,24 +165,35 @@ export function MaydaOS({ locale }: { locale: Locale }) {
     zRef.current += 1;
     const z = zRef.current;
     playLock();
+    seaPulse(id);
     setWindows((current) => ({ ...current, [id]: { ...current[id], open: true, min: false, z } }));
-  }, []);
+  }, [seaPulse]);
 
   const closeWindow = useCallback((id: WindowId) => {
     playTick();
-    setWindows((current) => ({ ...current, [id]: { ...current[id], open: false, max: false } }));
-  }, []);
+    seaPulse(id);
+    setWindows((current) => ({ ...current, [id]: { ...current[id], open: false, max: false, snap: null } }));
+  }, [seaPulse]);
 
   const minimizeWindow = useCallback((id: WindowId) => {
     playTick();
+    seaPulse(id);
     setWindows((current) => ({ ...current, [id]: { ...current[id], min: true } }));
-  }, []);
+  }, [seaPulse]);
 
   const toggleMaximize = useCallback((id: WindowId) => {
     playLock();
+    seaPulse(id);
     zRef.current += 1;
     const z = zRef.current;
-    setWindows((current) => ({ ...current, [id]: { ...current[id], max: !current[id].max, z } }));
+    setWindows((current) => ({ ...current, [id]: { ...current[id], max: !current[id].max, snap: null, z } }));
+  }, [seaPulse]);
+
+  const snapWindow = useCallback((id: WindowId, side: "left" | "right" | null) => {
+    if (side) playLock();
+    zRef.current += 1;
+    const z = zRef.current;
+    setWindows((current) => ({ ...current, [id]: { ...current[id], snap: side, max: false, z } }));
   }, []);
 
   const moveWindow = useCallback((id: WindowId, x: number, y: number) => {
@@ -173,6 +211,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
     onClose: closeWindow,
     onMinimize: minimizeWindow,
     onMaximize: toggleMaximize,
+    onSnap: snapWindow,
     onMove: moveWindow,
     desktopRef,
     stagger: staggerRef,
@@ -316,6 +355,11 @@ export function MaydaOS({ locale }: { locale: Locale }) {
               {app.label}
             </Link>
           ))}
+          <button type="button" className="os-mobile-shell-tile" onClick={() => setMobileShell(true)}>
+            <span><Glyph name="shell" /></span>
+            {copy.dock.terminal}
+            <em aria-hidden="true">guest@maydalabs:~$</em>
+          </button>
         </div>
         <div className="os-mobile-monitor">
           {checks.map((check) => (
@@ -326,6 +370,24 @@ export function MaydaOS({ locale }: { locale: Locale }) {
           ))}
         </div>
         <a href={getIntroCallUrl("os_mobile")} target="_blank" rel="noopener noreferrer" className="studio-button os-mobile-call">{copy.mobile.call} <span aria-hidden>↗</span></a>
+
+        {mobileShell ? (
+          <div className="os-mobile-terminal" role="dialog" aria-label={copy.terminalWindow.title}>
+            <div className="os-mobile-terminal-bar">
+              <span>{copy.terminalWindow.title}</span>
+              <button type="button" onClick={() => setMobileShell(false)} aria-label="✕">✕</button>
+            </div>
+            <OsTerminal
+              locale={locale}
+              variant="mobile"
+              hint={copy.terminalWindow.hint}
+              telemetry={telemetry}
+              bootedAt={BOOTED_AT}
+              onOpenWindow={() => undefined}
+              onNavigate={(path) => router.push(localizePath(path, locale))}
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -400,6 +462,7 @@ function OsWindow({
   onClose,
   onMinimize,
   onMaximize,
+  onSnap,
   onMove,
   desktopRef,
   stagger,
@@ -413,25 +476,35 @@ function OsWindow({
   onClose: (id: WindowId) => void;
   onMinimize: (id: WindowId) => void;
   onMaximize: (id: WindowId) => void;
+  onSnap: (id: WindowId, side: "left" | "right" | null) => void;
   onMove: (id: WindowId, x: number, y: number) => void;
   desktopRef: React.RefObject<HTMLDivElement | null>;
   stagger: React.RefObject<boolean>;
   children: React.ReactNode;
 }) {
-  const dragRef = useRef<{ startX: number; startY: number; baseX: number; baseY: number } | null>(null);
+  const dragRef = useRef<{ startX: number; startY: number; baseX: number; baseY: number; moved: boolean } | null>(null);
 
   if (!state.open || state.min) return null;
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if ((event.target as Element).closest("button")) return;
     if (state.max) return;
-    dragRef.current = { startX: event.clientX, startY: event.clientY, baseX: state.x, baseY: state.y };
+    let baseX = state.x;
+    if (state.snap) {
+      // Dragging a snapped window peels it off under the pointer.
+      const rect = desktopRef.current?.getBoundingClientRect();
+      baseX = Math.max(8, event.clientX - (rect?.left ?? 0) - state.w / 2);
+      onSnap(id, null);
+      onMove(id, baseX, 60);
+    }
+    dragRef.current = { startX: event.clientX, startY: event.clientY, baseX, baseY: state.snap ? 60 : state.y, moved: false };
     (event.currentTarget as HTMLDivElement).setPointerCapture(event.pointerId);
   };
 
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current;
     if (!drag) return;
+    drag.moved = true;
     const bounds = desktopRef.current;
     const maxX = Math.max(8, (bounds?.clientWidth ?? 1440) - state.w - 8);
     const maxY = Math.max(4, (bounds?.clientHeight ?? 800) - 90);
@@ -442,18 +515,29 @@ function OsWindow({
     );
   };
 
-  const onPointerUp = () => {
+  const onPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current;
     dragRef.current = null;
+    if (!drag || !drag.moved) return;
+    const rect = desktopRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const px = event.clientX - rect.left;
+    const py = event.clientY - rect.top;
+    if (px < 26) onSnap(id, "left");
+    else if (px > rect.width - 26) onSnap(id, "right");
+    else if (py < 14) onMaximize(id);
   };
 
   const enterDelay = stagger.current ? (ENTER_DELAYS[id] ?? 0) : 0;
   const style = state.max
     ? { left: 10, top: 8, width: "calc(100% - 20px)", height: "calc(100% - 16px)", zIndex: state.z, animationDelay: `${enterDelay}ms` }
-    : { left: state.x, top: state.y, width: state.w, zIndex: state.z, animationDelay: `${enterDelay}ms` };
+    : state.snap
+      ? { left: state.snap === "left" ? 8 : "50%", top: 8, width: "calc(50% - 12px)", height: "calc(100% - 16px)", zIndex: state.z, animationDelay: `${enterDelay}ms` }
+      : { left: state.x, top: state.y, width: state.w, zIndex: state.z, animationDelay: `${enterDelay}ms` };
 
   return (
     <section
-      className={`os-window ${accent ? "os-window-accent" : ""} ${state.max ? "is-max" : ""}`}
+      className={`os-window ${accent ? "os-window-accent" : ""} ${state.max || state.snap ? "is-max" : ""}`}
       style={style}
       aria-label={title}
       onPointerDown={() => onFocus(id)}
@@ -480,6 +564,7 @@ function OsTerminal({
   hint,
   telemetry,
   bootedAt,
+  variant = "desktop",
   onOpenWindow,
   onNavigate,
 }: {
@@ -487,6 +572,7 @@ function OsTerminal({
   hint: string;
   telemetry: Telemetry | null;
   bootedAt: number;
+  variant?: "desktop" | "mobile";
   onOpenWindow: (id: WindowId) => void;
   onNavigate: (path: string) => void;
 }) {
@@ -494,8 +580,10 @@ function OsTerminal({
   const [value, setValue] = useState("");
   const historyRef = useRef<string[]>([]);
   const historyIndexRef = useRef(-1);
+  const lastExciteRef = useRef(0);
   const logRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const mobile = variant === "mobile";
 
   useEffect(() => {
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
@@ -520,7 +608,7 @@ function OsTerminal({
         break;
       case "work":
         push([{ kind: "out", text: "TX-01 hodlstay · TX-02 gazette · TX-03 vault* · TX-04 sofra*  (* encrypted)" }]);
-        onOpenWindow("work");
+        if (!mobile) onOpenWindow("work");
         break;
       case "open": {
         const map: Record<string, string> = {
@@ -567,16 +655,31 @@ function OsTerminal({
         onNavigate("/services");
         break;
       case "about":
-        push([{ kind: "accent", text: "about this mayda …" }]);
-        onOpenWindow("about");
+        if (mobile) {
+          push(OS_COPY[locale].aboutWindow.rows.map(([term, val]) => ({ kind: "out" as const, text: `${term}: ${val}` })));
+        } else {
+          push([{ kind: "accent", text: "about this mayda …" }]);
+          onOpenWindow("about");
+        }
         break;
       case "trash":
-        push([{ kind: "accent", text: "taking out the trash …" }]);
-        onOpenWindow("trash");
+        if (mobile) {
+          push([
+            ...OS_COPY[locale].trashWindow.items.map((item) => ({ kind: "out" as const, text: item })),
+            { kind: "accent", text: OS_COPY[locale].trashWindow.emptied },
+          ]);
+        } else {
+          push([{ kind: "accent", text: "taking out the trash …" }]);
+          onOpenWindow("trash");
+        }
         break;
       case "array":
-        push([{ kind: "accent", text: "raising the signal array …" }]);
-        onOpenWindow("array");
+        if (mobile) {
+          push([{ kind: "out", text: "the array wants a bigger antenna — visit from a desktop" }]);
+        } else {
+          push([{ kind: "accent", text: "raising the signal array …" }]);
+          onOpenWindow("array");
+        }
         break;
       case "screensaver":
         push([{ kind: "accent", text: "dimming the lights …" }]);
@@ -667,12 +770,20 @@ function OsTerminal({
         <input
           ref={inputRef}
           value={value}
-          onChange={(event) => setValue(event.target.value)}
+          onChange={(event) => {
+            setValue(event.target.value);
+            const now = performance.now();
+            if (now - lastExciteRef.current > 140) {
+              lastExciteRef.current = now;
+              window.dispatchEvent(new CustomEvent("os:sea-excite"));
+            }
+          }}
           onKeyDown={onKeyDown}
           aria-label="maydalabs shell"
           autoComplete="off"
           autoCapitalize="off"
           spellCheck={false}
+          autoFocus={mobile}
           lang={locale}
         />
       </form>

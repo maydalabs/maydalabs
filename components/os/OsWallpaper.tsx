@@ -80,6 +80,23 @@ export function OsWallpaper() {
         };
         window.addEventListener("pointermove", onPointerMove, { passive: true });
 
+        // The desktop talks to the sea: windows splash where they act,
+        // and typing in the shell stirs the whole surface.
+        const splashes: Array<{ x: number; z: number; start: number }> = [];
+        let excitement = 0;
+        const onSeaPulse = (event: Event) => {
+          const detail = (event as CustomEvent).detail ?? {};
+          const vx = typeof detail.x === "number" ? Math.min(1, Math.max(0, detail.x)) : 0.5;
+          const vy = typeof detail.y === "number" ? Math.min(1, Math.max(0, detail.y)) : 0.5;
+          splashes.push({ x: (vx - 0.5) * WIDTH * 0.72, z: 3.5 - (1 - vy) * DEPTH * 0.85, start: -1 });
+          if (splashes.length > 4) splashes.shift();
+        };
+        const onSeaExcite = () => {
+          excitement = Math.min(1, excitement + 0.4);
+        };
+        window.addEventListener("os:sea-pulse", onSeaPulse);
+        window.addEventListener("os:sea-excite", onSeaExcite);
+
         const resize = () => {
           const rect = root.getBoundingClientRect();
           const width = Math.max(rect.width, 1);
@@ -106,18 +123,34 @@ export function OsWallpaper() {
           const pulseRadius = pulseAge * 6.5;
           const pulseFade = Math.max(0, 1 - pulseAge / 5);
 
+          excitement *= 0.986;
+          const amp = 1 + excitement * 0.85;
+
+          for (const splash of splashes) {
+            if (splash.start < 0) splash.start = t;
+          }
+          const liveSplashes = splashes.filter((splash) => t - splash.start < 3.4);
+
           for (let index = 0; index < count; index += 1) {
             const x = positionAttr.getX(index);
             const z = positionAttr.getZ(index);
             let y =
-              Math.sin(x * 0.32 + t * 0.85) * 0.32 +
-              Math.sin(z * 0.5 - t * 0.55) * 0.26 +
-              Math.sin((x + z) * 0.17 + t * 0.32) * 0.42;
+              (Math.sin(x * 0.32 + t * 0.85) * 0.32 +
+                Math.sin(z * 0.5 - t * 0.55) * 0.26 +
+                Math.sin((x + z) * 0.17 + t * 0.32) * 0.42) * amp;
             if (pulsing) {
               const distance = Math.hypot(x, z - 3.5);
               const band = Math.abs(distance - pulseRadius);
               if (band < 1.7) {
                 y += Math.cos((band / 1.7) * Math.PI * 0.5) * 0.85 * pulseFade;
+              }
+            }
+            for (const splash of liveSplashes) {
+              const age = t - splash.start;
+              const radius = age * 5.2;
+              const band = Math.abs(Math.hypot(x - splash.x, z - splash.z) - radius);
+              if (band < 1.3) {
+                y += Math.cos((band / 1.3) * Math.PI * 0.5) * 1.05 * Math.max(0, 1 - age / 3.4);
               }
             }
             positionAttr.setY(index, y);
@@ -144,6 +177,8 @@ export function OsWallpaper() {
         destroyScene = () => {
           resizeObserver.disconnect();
           window.removeEventListener("pointermove", onPointerMove);
+          window.removeEventListener("os:sea-pulse", onSeaPulse);
+          window.removeEventListener("os:sea-excite", onSeaExcite);
           root.removeEventListener("wallpaper:visible", startRendering);
           if (animationFrame) window.cancelAnimationFrame(animationFrame);
           geometry.dispose();
