@@ -138,7 +138,13 @@ function createPrivateTexture(
   return texture;
 }
 
-export function ProductConstellation({ locale }: { locale: Locale }) {
+export function ProductConstellation({
+  locale,
+  variant = "panel",
+}: {
+  locale: Locale;
+  variant?: "panel" | "wallpaper";
+}) {
   const copy = CONSTELLATION_COPY[locale];
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -427,6 +433,14 @@ export function ProductConstellation({ locale }: { locale: Locale }) {
   }, [projects]);
 
   const active = projects[activeProject];
+
+  if (variant === "wallpaper") {
+    return (
+      <div ref={rootRef} className={`product-constellation is-${mode} is-wallpaper`}>
+        <canvas ref={canvasRef} className="product-constellation-canvas" aria-hidden="true" />
+      </div>
+    );
+  }
 
   return (
     <div ref={rootRef} className={`product-constellation is-${mode}`}>

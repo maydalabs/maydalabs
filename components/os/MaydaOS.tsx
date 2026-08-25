@@ -5,28 +5,32 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MaydaMark } from "@/components/MaydaMark";
+import { ProductConstellation } from "@/components/ProductConstellation";
 import { SignalDecode } from "@/components/SignalDecode";
-import { LOCALES, LOCALE_LABELS, type Locale, localizePath } from "@/lib/i18n";
+import { type Locale, localizePath } from "@/lib/i18n";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
-import { isSoundEnabled, loadSoundPreference, onSoundChange, setSoundEnabled } from "@/lib/soundSignal";
+import { playLock, playTick } from "@/lib/soundSignal";
+import { OsMenuBar } from "@/components/os/OsMenuBar";
+import { OsScreensaver } from "@/components/os/OsScreensaver";
 import { OS_COPY } from "@/components/os/osCopy";
+import { useTelemetry, type Telemetry } from "@/components/os/useTelemetry";
 
-type WindowId = "welcome" | "work" | "hodlstay" | "monitor" | "terminal";
+type WindowId = "welcome" | "work" | "hodlstay" | "monitor" | "terminal" | "about" | "trash";
 
-type WindowState = { open: boolean; x: number; y: number; z: number; w: number };
-
-type Telemetry = {
-  checks: Array<{ id: string; host: string; ok: boolean; status: number; ms: number | null }>;
-  blockHeight: number | null;
-};
+type WindowState = { open: boolean; min: boolean; max: boolean; x: number; y: number; z: number; w: number };
 
 const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
-  welcome: { open: true, x: 64, y: 46, z: 4, w: 500 },
-  hodlstay: { open: true, x: 612, y: 26, z: 2, w: 540 },
-  monitor: { open: true, x: 1082, y: 58, z: 3, w: 330 },
-  terminal: { open: true, x: 648, y: 428, z: 5, w: 560 },
-  work: { open: false, x: 190, y: 160, z: 1, w: 470 },
+  welcome: { open: true, min: false, max: false, x: 64, y: 46, z: 4, w: 500 },
+  hodlstay: { open: true, min: false, max: false, x: 612, y: 26, z: 2, w: 540 },
+  monitor: { open: true, min: false, max: false, x: 1082, y: 58, z: 3, w: 330 },
+  terminal: { open: true, min: false, max: false, x: 648, y: 428, z: 5, w: 560 },
+  work: { open: false, min: false, max: false, x: 190, y: 160, z: 1, w: 470 },
+  about: { open: false, min: false, max: false, x: 420, y: 130, z: 1, w: 360 },
+  trash: { open: false, min: false, max: false, x: 500, y: 210, z: 1, w: 400 },
 };
+
+// Module-evaluation time doubles as the OS boot timestamp for uptime.
+const BOOTED_AT = Date.now();
 
 function Glyph({ name, stroke = "#f2f0ea" }: { name: string; stroke?: string }) {
   const s = { stroke, strokeWidth: 1.4, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, fill: "none" };
@@ -47,6 +51,8 @@ function Glyph({ name, stroke = "#f2f0ea" }: { name: string; stroke?: string }) 
       return <svg width="20" height="20" viewBox="0 0 20 20"><path d="M4 3.5 L8.5 10 L4 16.5 Z" {...s} /><path d="M16 3.5 L11.5 10 L16 16.5 Z" {...s} /><circle cx="10" cy="10" r="1.4" fill={stroke} stroke="none" /></svg>;
     case "call":
       return <svg width="20" height="20" viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="13" rx="2" {...s} /><path d="M3 8 H17 M7 2.5 V5.5 M13 2.5 V5.5" {...s} /></svg>;
+    case "trash":
+      return <svg width="20" height="20" viewBox="0 0 20 20"><path d="M4 6 H16 M8 6 V4.5 H12 V6 M5.5 6 L6.4 16.5 H13.6 L14.5 6" {...s} /><path d="M8.4 9 V13.5 M11.6 9 V13.5" {...s} opacity="0.6" /></svg>;
     default:
       return null;
   }
@@ -59,19 +65,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
   const zRef = useRef(6);
   const [windows, setWindows] = useState(INITIAL_WINDOWS);
   const [booting, setBooting] = useState(false);
-  const [telemetry, setTelemetry] = useState<Telemetry | null>(null);
-  const [telemetryFailed, setTelemetryFailed] = useState(false);
-  const [clock, setClock] = useState("");
-  const [sound, setSound] = useState(false);
-
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setSound(loadSoundPreference()));
-    const unsubscribe = onSoundChange(setSound);
-    return () => {
-      cancelAnimationFrame(frame);
-      unsubscribe();
-    };
-  }, []);
+  const { telemetry, failed: telemetryFailed } = useTelemetry();
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -96,35 +90,6 @@ export function MaydaOS({ locale }: { locale: Locale }) {
       clearTimeout(timer);
     };
   }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/telemetry")
-      .then((response) => (response.ok ? response.json() : Promise.reject()))
-      .then((payload: Telemetry) => {
-        if (!cancelled) setTelemetry(payload);
-      })
-      .catch(() => {
-        if (!cancelled) setTelemetryFailed(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    const tick = () => {
-      setClock(
-        new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Europe/Istanbul" }).format(new Date()),
-      );
-    };
-    const frame = requestAnimationFrame(tick);
-    const interval = setInterval(tick, 30_000);
-    return () => {
-      cancelAnimationFrame(frame);
-      clearInterval(interval);
-    };
-  }, [locale]);
 
   // Keep the default layout inside smaller desktop viewports.
   useEffect(() => {
@@ -158,11 +123,25 @@ export function MaydaOS({ locale }: { locale: Locale }) {
   const openWindow = useCallback((id: WindowId) => {
     zRef.current += 1;
     const z = zRef.current;
-    setWindows((current) => ({ ...current, [id]: { ...current[id], open: true, z } }));
+    playLock();
+    setWindows((current) => ({ ...current, [id]: { ...current[id], open: true, min: false, z } }));
   }, []);
 
   const closeWindow = useCallback((id: WindowId) => {
-    setWindows((current) => ({ ...current, [id]: { ...current[id], open: false } }));
+    playTick();
+    setWindows((current) => ({ ...current, [id]: { ...current[id], open: false, max: false } }));
+  }, []);
+
+  const minimizeWindow = useCallback((id: WindowId) => {
+    playTick();
+    setWindows((current) => ({ ...current, [id]: { ...current[id], min: true } }));
+  }, []);
+
+  const toggleMaximize = useCallback((id: WindowId) => {
+    playLock();
+    zRef.current += 1;
+    const z = zRef.current;
+    setWindows((current) => ({ ...current, [id]: { ...current[id], max: !current[id].max, z } }));
   }, []);
 
   const moveWindow = useCallback((id: WindowId, x: number, y: number) => {
@@ -174,6 +153,8 @@ export function MaydaOS({ locale }: { locale: Locale }) {
     { id: "hodlstay", host: "hodlstay.com", ok: false, status: 0, ms: null },
     { id: "satoshi-gazette", host: "satoshigazette.org", ok: false, status: 0, ms: null },
   ];
+
+  const windowProps = { onFocus: focusWindow, onClose: closeWindow, onMinimize: minimizeWindow, onMaximize: toggleMaximize, onMove: moveWindow, desktopRef };
 
   return (
     <div className="mayda-os">
@@ -188,50 +169,14 @@ export function MaydaOS({ locale }: { locale: Locale }) {
       ) : null}
 
       <div className="os-desktop-frame os-desktop-only">
-        <header className="os-menubar">
-          <div className="os-menubar-left">
-            <Link href={localizePath("/", locale)} className="os-menubar-brand group" aria-label="MaydaOS">
-              <MaydaMark className="h-4 w-4 text-white" />
-              <strong>MaydaOS</strong>
-            </Link>
-            <nav className="os-menubar-nav" aria-label="MaydaOS">
-              {copy.menu.map(([label, path]) => (
-                <Link key={path} href={localizePath(path, locale)}>{label}</Link>
-              ))}
-            </nav>
-          </div>
-          <div className="os-menubar-right">
-            <button
-              type="button"
-              className={`studio-sound-toggle ${sound ? "is-on" : ""}`}
-              aria-pressed={sound}
-              aria-label="SND"
-              onClick={() => setSoundEnabled(!isSoundEnabled())}
-            >
-              SND<span aria-hidden />
-            </button>
-            <span className="os-menubar-langs">
-              {LOCALES.map((nextLocale) => (
-                <Link
-                  key={nextLocale}
-                  href={nextLocale === "en" ? "/en" : `/${nextLocale}`}
-                  hrefLang={nextLocale}
-                  lang={nextLocale}
-                  aria-label={LOCALE_LABELS[nextLocale]}
-                  aria-current={locale === nextLocale ? "true" : undefined}
-                  className={locale === nextLocale ? "is-active" : ""}
-                >
-                  {nextLocale.toUpperCase()}
-                </Link>
-              ))}
-            </span>
-            <span className="os-menubar-block">₿ {telemetry?.blockHeight ? telemetry.blockHeight.toLocaleString(locale) : "———"}</span>
-            <span>{clock || "--:--"} IST</span>
-          </div>
-        </header>
+        <OsMenuBar locale={locale} blockHeight={telemetry?.blockHeight ?? null} onBrandClick={() => openWindow("about")} />
 
         <div className="os-desktop" ref={desktopRef}>
-          <OsWindow id="welcome" title={copy.welcome.title} state={windows.welcome} onFocus={focusWindow} onClose={closeWindow} onMove={moveWindow} desktopRef={desktopRef}>
+          <div className="os-wallpaper" aria-hidden="true">
+            <ProductConstellation locale={locale} variant="wallpaper" />
+          </div>
+
+          <OsWindow id="welcome" title={copy.welcome.title} state={windows.welcome} {...windowProps}>
             <div className="os-welcome">
               <p className="os-welcome-kicker">{copy.welcome.kicker}</p>
               <h1>
@@ -246,7 +191,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
             </div>
           </OsWindow>
 
-          <OsWindow id="hodlstay" title={copy.hodlstayWindow.title} state={windows.hodlstay} onFocus={focusWindow} onClose={closeWindow} onMove={moveWindow} desktopRef={desktopRef} accent>
+          <OsWindow id="hodlstay" title={copy.hodlstayWindow.title} state={windows.hodlstay} {...windowProps} accent>
             <div className="os-preview">
               <Image src="/work/hodlstay-2026-08-home.png" alt="HodlStay marketplace homepage" width={540} height={338} priority />
               <div className="os-preview-caption">
@@ -256,7 +201,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
             </div>
           </OsWindow>
 
-          <OsWindow id="work" title={copy.workWindow.title} state={windows.work} onFocus={focusWindow} onClose={closeWindow} onMove={moveWindow} desktopRef={desktopRef}>
+          <OsWindow id="work" title={copy.workWindow.title} state={windows.work} {...windowProps}>
             <ul className="os-work-list">
               {copy.workWindow.rows.map((row) => (
                 <li key={row.tx}>
@@ -269,7 +214,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
             </ul>
           </OsWindow>
 
-          <OsWindow id="monitor" title={copy.monitorWindow.title} state={windows.monitor} onFocus={focusWindow} onClose={closeWindow} onMove={moveWindow} desktopRef={desktopRef}>
+          <OsWindow id="monitor" title={copy.monitorWindow.title} state={windows.monitor} {...windowProps}>
             <div className="os-monitor">
               {checks.map((check) => (
                 <div key={check.id} className={telemetry && check.ok ? "is-live" : ""}>
@@ -287,29 +232,48 @@ export function MaydaOS({ locale }: { locale: Locale }) {
             </div>
           </OsWindow>
 
-          <OsWindow id="terminal" title={copy.terminalWindow.title} state={windows.terminal} onFocus={focusWindow} onClose={closeWindow} onMove={moveWindow} desktopRef={desktopRef}>
-            <OsTerminal locale={locale} hint={copy.terminalWindow.hint} telemetry={telemetry} onOpenWindow={openWindow} onNavigate={(path) => router.push(localizePath(path, locale))} />
+          <OsWindow id="about" title={copy.aboutWindow.title} state={windows.about} {...windowProps}>
+            <AboutMayda locale={locale} bootedAt={BOOTED_AT} />
+          </OsWindow>
+
+          <OsWindow id="trash" title={copy.trashWindow.title} state={windows.trash} {...windowProps}>
+            <TrashBin locale={locale} />
+          </OsWindow>
+
+          <OsWindow id="terminal" title={copy.terminalWindow.title} state={windows.terminal} {...windowProps}>
+            <OsTerminal
+              locale={locale}
+              hint={copy.terminalWindow.hint}
+              telemetry={telemetry}
+              bootedAt={BOOTED_AT}
+              onOpenWindow={openWindow}
+              onNavigate={(path) => router.push(localizePath(path, locale))}
+            />
           </OsWindow>
 
           <p className="os-desktop-tag" aria-hidden="true">MAYDAOS 26.08 · ISTANBUL / EVERYWHERE</p>
         </div>
 
         <nav className="os-dock" aria-label="MaydaOS dock">
-          <button type="button" onClick={() => openWindow("welcome")} title={copy.dock.welcome}><Glyph name="doc" /></button>
-          <button type="button" onClick={() => openWindow("work")} title={copy.dock.work}><Glyph name="grid" /></button>
-          <button type="button" onClick={() => openWindow("terminal")} title={copy.dock.terminal}><Glyph name="shell" /></button>
-          <button type="button" onClick={() => openWindow("monitor")} title={copy.dock.monitor}><Glyph name="monitor" /></button>
+          <button type="button" className={windows.welcome.open ? "is-running" : ""} onClick={() => openWindow("welcome")} title={copy.dock.welcome}><Glyph name="doc" /></button>
+          <button type="button" className={windows.work.open ? "is-running" : ""} onClick={() => openWindow("work")} title={copy.dock.work}><Glyph name="grid" /></button>
+          <button type="button" className={windows.terminal.open ? "is-running" : ""} onClick={() => openWindow("terminal")} title={copy.dock.terminal}><Glyph name="shell" /></button>
+          <button type="button" className={windows.monitor.open ? "is-running" : ""} onClick={() => openWindow("monitor")} title={copy.dock.monitor}><Glyph name="monitor" /></button>
           <i aria-hidden="true" />
           <Link href={localizePath("/services", locale)} title={copy.dock.services}><Glyph name="layers" /></Link>
           <Link href={localizePath("/about", locale)} title={copy.dock.about}><Glyph name="mark" /></Link>
           <a href={getIntroCallUrl("os_dock")} target="_blank" rel="noopener noreferrer" title={copy.dock.call} className="os-dock-accent"><Glyph name="call" stroke="#f7931a" /></a>
+          <i aria-hidden="true" />
+          <button type="button" className={windows.trash.open ? "is-running" : ""} onClick={() => openWindow("trash")} title={copy.dock.trash}><Glyph name="trash" /></button>
         </nav>
+
+        <OsScreensaver locale={locale} />
       </div>
 
       <div className="os-mobile os-mobile-only">
         <div className="os-mobile-status">
-          <span>{clock || "--:--"}</span>
           <span>₿ {telemetry?.blockHeight ? telemetry.blockHeight.toLocaleString(locale) : "———"}</span>
+          <span>MAYDAOS 26.08</span>
         </div>
         <div className="os-mobile-head">
           <MaydaMark className="h-9 w-9 text-white" />
@@ -338,6 +302,66 @@ export function MaydaOS({ locale }: { locale: Locale }) {
   );
 }
 
+function AboutMayda({ locale, bootedAt }: { locale: Locale; bootedAt: number }) {
+  const copy = OS_COPY[locale].aboutWindow;
+  const [uptime, setUptime] = useState("0:00");
+
+  useEffect(() => {
+    const tick = () => {
+      const seconds = Math.floor((Date.now() - bootedAt) / 1000);
+      setUptime(`${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`);
+    };
+    const frame = requestAnimationFrame(tick);
+    const interval = setInterval(tick, 1000);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearInterval(interval);
+    };
+  }, [bootedAt]);
+
+  return (
+    <div className="os-about">
+      <MaydaMark className="h-10 w-10 text-white" />
+      <dl>
+        {copy.rows.map(([term, value]) => (
+          <div key={term}><dt>{term}</dt><dd>{value}</dd></div>
+        ))}
+        <div><dt>{copy.uptime}</dt><dd>{uptime}</dd></div>
+      </dl>
+      <p>{copy.footer}</p>
+    </div>
+  );
+}
+
+function TrashBin({ locale }: { locale: Locale }) {
+  const copy = OS_COPY[locale].trashWindow;
+  const [emptied, setEmptied] = useState(false);
+
+  return (
+    <div className="os-trash">
+      <ul>
+        {copy.items.map((item) => (
+          <li key={item} className={emptied ? "is-gone" : ""}><Glyph name="doc" stroke="rgba(242,240,234,0.4)" />{item}</li>
+        ))}
+      </ul>
+      {emptied ? (
+        <p>{copy.emptied}</p>
+      ) : (
+        <button
+          type="button"
+          className="studio-button studio-button-small studio-button-ghost"
+          onClick={() => {
+            playLock();
+            setEmptied(true);
+          }}
+        >
+          {copy.empty}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function OsWindow({
   id,
   title,
@@ -345,6 +369,8 @@ function OsWindow({
   accent = false,
   onFocus,
   onClose,
+  onMinimize,
+  onMaximize,
   onMove,
   desktopRef,
   children,
@@ -355,16 +381,19 @@ function OsWindow({
   accent?: boolean;
   onFocus: (id: WindowId) => void;
   onClose: (id: WindowId) => void;
+  onMinimize: (id: WindowId) => void;
+  onMaximize: (id: WindowId) => void;
   onMove: (id: WindowId, x: number, y: number) => void;
   desktopRef: React.RefObject<HTMLDivElement | null>;
   children: React.ReactNode;
 }) {
   const dragRef = useRef<{ startX: number; startY: number; baseX: number; baseY: number } | null>(null);
 
-  if (!state.open) return null;
+  if (!state.open || state.min) return null;
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if ((event.target as Element).closest("button")) return;
+    if (state.max) return;
     dragRef.current = { startX: event.clientX, startY: event.clientY, baseX: state.x, baseY: state.y };
     (event.currentTarget as HTMLDivElement).setPointerCapture(event.pointerId);
   };
@@ -386,17 +415,24 @@ function OsWindow({
     dragRef.current = null;
   };
 
+  const style = state.max
+    ? { left: 10, top: 8, width: "calc(100% - 20px)", height: "calc(100% - 16px)", zIndex: state.z }
+    : { left: state.x, top: state.y, width: state.w, zIndex: state.z };
+
   return (
     <section
-      className={`os-window ${accent ? "os-window-accent" : ""}`}
-      style={{ left: state.x, top: state.y, zIndex: state.z, width: state.w }}
+      className={`os-window ${accent ? "os-window-accent" : ""} ${state.max ? "is-max" : ""}`}
+      style={style}
       aria-label={title}
       onPointerDown={() => onFocus(id)}
     >
       <div className="os-window-bar" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
-        <span className="os-window-dots" aria-hidden="true"><i /><i /><i /></span>
+        <span className="os-window-lights">
+          <button type="button" className="os-light os-light-close" onClick={() => onClose(id)} aria-label={`close — ${title}`} />
+          <button type="button" className="os-light os-light-min" onClick={() => onMinimize(id)} aria-label={`minimize — ${title}`} />
+          <button type="button" className="os-light os-light-max" onClick={() => onMaximize(id)} aria-label={`maximize — ${title}`} />
+        </span>
         <span className="os-window-title">{title}</span>
-        <button type="button" className="os-window-close" onClick={() => onClose(id)} aria-label={`✕ ${title}`}>✕</button>
       </div>
       <div className="os-window-body">{children}</div>
     </section>
@@ -405,21 +441,27 @@ function OsWindow({
 
 type TermLine = { kind: "cmd" | "out" | "accent"; text: string };
 
+const COMMANDS = ["help", "work", "open", "proof", "services", "about", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo"];
+
 function OsTerminal({
   locale,
   hint,
   telemetry,
+  bootedAt,
   onOpenWindow,
   onNavigate,
 }: {
   locale: Locale;
   hint: string;
   telemetry: Telemetry | null;
+  bootedAt: number;
   onOpenWindow: (id: WindowId) => void;
   onNavigate: (path: string) => void;
 }) {
   const [lines, setLines] = useState<TermLine[]>([{ kind: "out", text: hint }]);
   const [value, setValue] = useState("");
+  const historyRef = useRef<string[]>([]);
+  const historyIndexRef = useRef(-1);
   const logRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -430,15 +472,18 @@ function OsTerminal({
   const run = (raw: string) => {
     const input = raw.trim();
     if (!input) return;
+    historyRef.current.push(input);
+    historyIndexRef.current = -1;
     const push = (extra: TermLine[]) => setLines((current) => [...current, { kind: "cmd", text: input }, ...extra]);
-    const [command, ...rest] = input.toLowerCase().split(/\s+/);
-    const arg = rest.join(" ");
+    const [command, ...rest] = input.split(/\s+/);
+    const arg = rest.join(" ").toLowerCase();
 
-    switch (command) {
+    switch (command.toLowerCase()) {
       case "help":
         push([
-          { kind: "out", text: "work · open <tx-01|tx-02|tx-03|tx-04> · proof · services · about" },
-          { kind: "out", text: "book-call · lang <en|tr|fr> · whoami · clear · sudo <anything>" },
+          { kind: "out", text: "work · open <tx-01…04> · proof · neofetch · services · about" },
+          { kind: "out", text: "book-call · lang <en|tr|fr> · trash · screensaver · whoami · clear" },
+          { kind: "out", text: "tab completes · arrows replay history · sudo does what sudo does" },
         ]);
         break;
       case "work":
@@ -473,13 +518,33 @@ function OsTerminal({
             : [{ kind: "out", text: "telemetry still scanning — try again in a second" }],
         );
         break;
+      case "neofetch": {
+        const seconds = Math.floor((Date.now() - bootedAt) / 1000);
+        push([
+          { kind: "accent", text: "  ▲▼   guest@maydalabs" },
+          { kind: "accent", text: " ▲ ● ▼  ──────────────" },
+          { kind: "out", text: `  ▼▲   OS: MaydaOS 26.08 (signal)` },
+          { kind: "out", text: `       Shell: mayda-sh 1.0 · Locale: ${locale}` },
+          { kind: "out", text: `       Uptime: ${Math.floor(seconds / 60)}m ${seconds % 60}s · Products: 4 (2 broadcasting)` },
+          { kind: "out", text: `       Display: Bitcoin orange @ 60 Hz · Memory: enough` },
+        ]);
+        break;
+      }
       case "services":
         push([{ kind: "accent", text: "opening services …" }]);
         onNavigate("/services");
         break;
       case "about":
-        push([{ kind: "accent", text: "opening about …" }]);
-        onNavigate("/about");
+        push([{ kind: "accent", text: "about this mayda …" }]);
+        onOpenWindow("about");
+        break;
+      case "trash":
+        push([{ kind: "accent", text: "taking out the trash …" }]);
+        onOpenWindow("trash");
+        break;
+      case "screensaver":
+        push([{ kind: "accent", text: "dimming the lights …" }]);
+        window.dispatchEvent(new CustomEvent("os:screensaver"));
         break;
       case "book-call":
       case "book":
@@ -495,6 +560,12 @@ function OsTerminal({
         }
         break;
       }
+      case "date":
+        push([{ kind: "out", text: new Date().toString() }]);
+        break;
+      case "echo":
+        push([{ kind: "out", text: rest.join(" ") || "" }]);
+        break;
       case "whoami":
         push([{ kind: "out", text: "guest — a founder with a messy idea, probably" }]);
         break;
@@ -509,6 +580,32 @@ function OsTerminal({
         break;
       default:
         push([{ kind: "out", text: `command not found: ${command} — try help` }]);
+    }
+  };
+
+  const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const history = historyRef.current;
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      if (history.length === 0) return;
+      historyIndexRef.current = historyIndexRef.current < 0 ? history.length - 1 : Math.max(0, historyIndexRef.current - 1);
+      setValue(history[historyIndexRef.current]);
+    } else if (event.key === "ArrowDown") {
+      event.preventDefault();
+      if (historyIndexRef.current < 0) return;
+      historyIndexRef.current += 1;
+      if (historyIndexRef.current >= history.length) {
+        historyIndexRef.current = -1;
+        setValue("");
+      } else {
+        setValue(history[historyIndexRef.current]);
+      }
+    } else if (event.key === "Tab") {
+      event.preventDefault();
+      const current = value.trim().toLowerCase();
+      if (!current) return;
+      const match = COMMANDS.find((cmd) => cmd.startsWith(current));
+      if (match) setValue(match + " ");
     }
   };
 
@@ -535,6 +632,7 @@ function OsTerminal({
           ref={inputRef}
           value={value}
           onChange={(event) => setValue(event.target.value)}
+          onKeyDown={onKeyDown}
           aria-label="maydalabs shell"
           autoComplete="off"
           autoCapitalize="off"
