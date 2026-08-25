@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 export type Telemetry = {
   checks: Array<{ id: string; host: string; ok: boolean; status: number; ms: number | null }>;
   blockHeight: number | null;
+  mempoolCount?: number | null;
 };
 
 export function useTelemetry() {

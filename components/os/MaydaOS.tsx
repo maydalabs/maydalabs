@@ -146,7 +146,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
     if (height === null) return;
     if (prevBlockRef.current !== null && height > prevBlockRef.current) {
       window.dispatchEvent(new CustomEvent("os:toast", { detail: { text: `${copy.toasts.block} — ₿ ${height.toLocaleString(locale)}` } }));
-      window.dispatchEvent(new CustomEvent("os:sea-pulse", { detail: { x: 0.5, y: 0.4 } }));
+      window.dispatchEvent(new CustomEvent("os:block"));
       playTick();
     }
     prevBlockRef.current = height;
@@ -376,7 +376,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
           }}
         >
           <div className="os-wallpaper" aria-hidden="true">
-            <OsWallpaper />
+            <OsWallpaper mempoolCount={telemetry?.mempoolCount ?? null} />
           </div>
 
           <OsWindow id="welcome" title={copy.welcome.title} state={windows.welcome} {...windowProps}>

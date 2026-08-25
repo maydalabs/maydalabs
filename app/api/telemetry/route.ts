@@ -39,14 +39,29 @@ async function fetchBlockHeight() {
   }
 }
 
+async function fetchMempoolCount() {
+  try {
+    const response = await fetch("https://mempool.space/api/mempool", {
+      cache: "no-store",
+      signal: AbortSignal.timeout(4500),
+    });
+    if (!response.ok) return null;
+    const payload = (await response.json()) as { count?: number };
+    return typeof payload.count === "number" && Number.isFinite(payload.count) ? payload.count : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function GET() {
-  const [checks, blockHeight] = await Promise.all([
+  const [checks, blockHeight, mempoolCount] = await Promise.all([
     Promise.all(TARGETS.map(checkTarget)),
     fetchBlockHeight(),
+    fetchMempoolCount(),
   ]);
 
   return NextResponse.json(
-    { checks, blockHeight, at: Date.now() },
+    { checks, blockHeight, mempoolCount, at: Date.now() },
     {
       headers: {
         "Cache-Control": "public, max-age=0, s-maxage=60, stale-while-revalidate=300",
