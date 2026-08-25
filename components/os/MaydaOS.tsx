@@ -76,16 +76,20 @@ export function MaydaOS({ locale }: { locale: Locale }) {
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let timer: ReturnType<typeof setTimeout> | undefined;
+    let frame = 0;
     try {
       if (!reduced && !window.sessionStorage.getItem("ml_booted")) {
-        setBooting(true);
         window.sessionStorage.setItem("ml_booted", "1");
+        frame = requestAnimationFrame(() => setBooting(true));
         timer = setTimeout(() => setBooting(false), 1750);
       }
     } catch {
-      // Storage unavailable: boot once per load.
+      // Storage unavailable: skip the boot sequence.
     }
-    return () => clearTimeout(timer);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {
