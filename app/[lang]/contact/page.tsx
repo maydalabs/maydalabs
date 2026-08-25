@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BriefComposer } from "@/components/BriefComposer";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
@@ -37,6 +38,7 @@ export default async function ContactPage({ params }: LocalePageProps) {
         <h1>{copy.heading[0]}<br /><em>{copy.heading[1]}</em></h1><p>{copy.intro}</p>
         <div className="flex flex-col gap-3 sm:flex-row"><Link href={getIntroCallUrl("contact_hero")} target="_blank" rel="noopener noreferrer" className="studio-button">{copy.book} <span aria-hidden>↗</span></Link><a href="mailto:info@maydalabs.com" className="studio-button studio-button-ghost">{copy.email}</a></div>
       </section>
+      <BriefComposer locale={locale} />
       <section className="contact-paths">
         <div className="contact-paths-heading"><p className="studio-kicker">{copy.pathsKicker}</p><h2>{copy.pathsHeading}</h2></div>
         <div className="contact-paths-grid">{copy.points.map(([number, title, description, href]) => <Link key={number} href={localizePath(href, locale)}><span>{number}</span><h3>{title}</h3><p>{description}</p><b>{copy.explore} <i aria-hidden>↗</i></b></Link>)}</div>
