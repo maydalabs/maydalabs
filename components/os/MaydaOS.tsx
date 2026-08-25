@@ -11,6 +11,8 @@ import { type Locale, localizePath } from "@/lib/i18n";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { isRadioOn, playLock, playTick, startRadio, stopRadio } from "@/lib/soundSignal";
 import { OsMatrix } from "@/components/os/OsMatrix";
+import { WALLPAPERS } from "@/components/os/wallpaperScenes";
+import { resolveWallpaperId } from "@/components/os/OsWallpaper";
 import { OsMenuBar } from "@/components/os/OsMenuBar";
 import { OsScreensaver } from "@/components/os/OsScreensaver";
 import { OsTour } from "@/components/os/OsTour";
@@ -712,7 +714,7 @@ function OsWindow({
 
 type TermLine = { kind: "cmd" | "out" | "accent"; text: string };
 
-const COMMANDS = ["help", "work", "open", "proof", "services", "about", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo", "array", "radio", "reset", "matrix", "tour"];
+const COMMANDS = ["help", "work", "open", "proof", "services", "about", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo", "array", "radio", "reset", "matrix", "tour", "wallpaper"];
 
 function OsTerminal({
   locale,
@@ -759,7 +761,7 @@ function OsTerminal({
       case "help":
         push([
           { kind: "out", text: "work · open <tx-01…04> · proof · array · neofetch · services · about" },
-          { kind: "out", text: "radio · matrix · book-call · lang <en|tr|fr> · trash · screensaver · reset" },
+          { kind: "out", text: "wallpaper <1–10> · radio · matrix · book-call · lang <en|tr|fr> · trash · reset" },
           { kind: "out", text: "tour · tab completes · arrows replay history · sudo does what sudo does" },
         ]);
         break;
@@ -854,6 +856,28 @@ function OsTerminal({
           window.dispatchEvent(new CustomEvent("os:tour"));
         }
         break;
+      case "wallpaper": {
+        if (mobile) {
+          push([{ kind: "out", text: "wallpapers live on the big desktop" }]);
+          break;
+        }
+        const keys = Object.keys(WALLPAPERS);
+        if (!arg) {
+          push([
+            ...keys.map((key, index) => ({ kind: "out" as const, text: `${index + 1}. ${key} — ${WALLPAPERS[key].label}` })),
+            { kind: "out", text: "usage: wallpaper <name|number|random>" },
+          ]);
+          break;
+        }
+        const target = arg === "random" ? keys[Math.floor(Math.random() * keys.length)] : resolveWallpaperId(arg);
+        if (target) {
+          push([{ kind: "accent", text: `hanging ${target} — ${WALLPAPERS[target].label}` }]);
+          window.dispatchEvent(new CustomEvent("os:wallpaper", { detail: { id: target } }));
+        } else {
+          push([{ kind: "out", text: `no wallpaper called "${arg}" — run wallpaper to list them` }]);
+        }
+        break;
+      }
       case "radio":
         if (isRadioOn()) {
           stopRadio();
