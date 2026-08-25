@@ -13,6 +13,7 @@ import { isRadioOn, playLock, playTick, startRadio, stopRadio } from "@/lib/soun
 import { OsMatrix } from "@/components/os/OsMatrix";
 import { OsMenuBar } from "@/components/os/OsMenuBar";
 import { OsScreensaver } from "@/components/os/OsScreensaver";
+import { OsTour } from "@/components/os/OsTour";
 import { OsWallpaper } from "@/components/os/OsWallpaper";
 import { OS_COPY } from "@/components/os/osCopy";
 import { useTelemetry, type Telemetry } from "@/components/os/useTelemetry";
@@ -102,6 +103,8 @@ function Glyph({ name, stroke = "#f2f0ea" }: { name: string; stroke?: string }) 
       return <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" {...s} /><circle cx="10" cy="10" r="2" fill={stroke} stroke="none" /><circle cx="10" cy="3.5" r="1.3" fill={stroke} stroke="none" /><circle cx="16.5" cy="10" r="1.3" fill={stroke} stroke="none" /><circle cx="10" cy="16.5" r="1.3" fill={stroke} stroke="none" /></svg>;
     case "trash":
       return <svg width="20" height="20" viewBox="0 0 20 20"><path d="M4 6 H16 M8 6 V4.5 H12 V6 M5.5 6 L6.4 16.5 H13.6 L14.5 6" {...s} /><path d="M8.4 9 V13.5 M11.6 9 V13.5" {...s} opacity="0.6" /></svg>;
+    case "play":
+      return <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" {...s} /><path d="M8.2 6.8 L13 10 L8.2 13.2 Z" {...s} /></svg>;
     default:
       return null;
   }
@@ -307,6 +310,25 @@ export function MaydaOS({ locale }: { locale: Locale }) {
     setWindows((current) => ({ ...current, [id]: { ...current[id], x, y } }));
   }, []);
 
+  const nudgeWindow = useCallback((id: WindowId, dx: number, dy: number) => {
+    setWindows((current) => ({ ...current, [id]: { ...current[id], x: current[id].x + dx, y: current[id].y + dy } }));
+  }, []);
+
+  // The guided tour drives the OS through the same event bus.
+  useEffect(() => {
+    const onAction = (event: Event) => {
+      const detail = (event as CustomEvent).detail ?? {};
+      const id = detail.id as WindowId;
+      if (!id || !(id in INITIAL_WINDOWS)) return;
+      if (detail.action === "open") openWindow(id);
+      else if (detail.action === "nudge" && typeof detail.dx === "number" && typeof detail.dy === "number") {
+        nudgeWindow(id, detail.dx, detail.dy);
+      }
+    };
+    window.addEventListener("os:tour-action", onAction);
+    return () => window.removeEventListener("os:tour-action", onAction);
+  }, [openWindow, nudgeWindow]);
+
   const projectUrl = getIntroCallUrl("os_desktop");
   const checks = telemetry?.checks ?? [
     { id: "hodlstay", host: "hodlstay.com", ok: false, status: 0, ms: null },
@@ -366,7 +388,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
               </h1>
               <p>{copy.welcome.body}</p>
               <div className="os-welcome-actions">
-                <a href={projectUrl} target="_blank" rel="noopener noreferrer" className="studio-button studio-button-small">{copy.welcome.start} <span aria-hidden>↗</span></a>
+                <a href={projectUrl} target="_blank" rel="noopener noreferrer" className="studio-button studio-button-small" data-tour="start">{copy.welcome.start} <span aria-hidden>↗</span></a>
                 <button type="button" className="studio-button studio-button-small studio-button-ghost" onClick={() => openWindow("work")}>{copy.welcome.explore}</button>
               </div>
             </div>
@@ -441,6 +463,8 @@ export function MaydaOS({ locale }: { locale: Locale }) {
 
           <p className="os-desktop-tag" aria-hidden="true">MAYDAOS 26.08 · ISTANBUL / EVERYWHERE</p>
 
+          <OsTour locale={locale} />
+
           <div className="os-toasts" aria-live="polite">
             {toasts.map((toast) => (
               <div key={toast.id} className="os-toast"><i aria-hidden="true" />{toast.text}</div>
@@ -453,12 +477,13 @@ export function MaydaOS({ locale }: { locale: Locale }) {
           <button type="button" className={windows.work.open ? "is-running" : ""} onClick={() => openWindow("work")} title={copy.dock.work}><Glyph name="grid" /></button>
           <button type="button" className={windows.terminal.open ? "is-running" : ""} onClick={() => openWindow("terminal")} title={copy.dock.terminal}><Glyph name="shell" /></button>
           <button type="button" className={windows.monitor.open ? "is-running" : ""} onClick={() => openWindow("monitor")} title={copy.dock.monitor}><Glyph name="monitor" /></button>
-          <button type="button" className={windows.array.open ? "is-running" : ""} onClick={() => openWindow("array")} title={copy.arrayWindow.title}><Glyph name="array" /></button>
+          <button type="button" className={windows.array.open ? "is-running" : ""} onClick={() => openWindow("array")} title={copy.arrayWindow.title} data-tour="dock-array"><Glyph name="array" /></button>
           <i aria-hidden="true" />
           <Link href={localizePath("/services", locale)} title={copy.dock.services}><Glyph name="layers" /></Link>
           <Link href={localizePath("/about", locale)} title={copy.dock.about}><Glyph name="mark" /></Link>
           <a href={getIntroCallUrl("os_dock")} target="_blank" rel="noopener noreferrer" title={copy.dock.call} className="os-dock-accent"><Glyph name="call" stroke="#f7931a" /></a>
           <i aria-hidden="true" />
+          <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("os:tour"))} title={copy.tour.dock}><Glyph name="play" /></button>
           <button type="button" className={windows.trash.open ? "is-running" : ""} onClick={() => openWindow("trash")} title={copy.dock.trash}><Glyph name="trash" /></button>
         </nav>
 
@@ -669,6 +694,7 @@ function OsWindow({
       className={`os-window ${accent ? "os-window-accent" : ""} ${state.max || state.snap ? "is-max" : ""}`}
       style={style}
       aria-label={title}
+      data-window={id}
       onPointerDown={() => onFocus(id)}
     >
       <div className="os-window-bar" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
@@ -686,7 +712,7 @@ function OsWindow({
 
 type TermLine = { kind: "cmd" | "out" | "accent"; text: string };
 
-const COMMANDS = ["help", "work", "open", "proof", "services", "about", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo", "array", "radio", "reset", "matrix"];
+const COMMANDS = ["help", "work", "open", "proof", "services", "about", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo", "array", "radio", "reset", "matrix", "tour"];
 
 function OsTerminal({
   locale,
@@ -734,7 +760,7 @@ function OsTerminal({
         push([
           { kind: "out", text: "work · open <tx-01…04> · proof · array · neofetch · services · about" },
           { kind: "out", text: "radio · matrix · book-call · lang <en|tr|fr> · trash · screensaver · reset" },
-          { kind: "out", text: "tab completes · arrows replay history · sudo does what sudo does" },
+          { kind: "out", text: "tour · tab completes · arrows replay history · sudo does what sudo does" },
         ]);
         break;
       case "work":
@@ -819,6 +845,14 @@ function OsTerminal({
       case "matrix":
         push([{ kind: "accent", text: "there is no template." }]);
         window.dispatchEvent(new CustomEvent("os:matrix"));
+        break;
+      case "tour":
+        if (mobile) {
+          push([{ kind: "out", text: "the tour needs the big desktop" }]);
+        } else {
+          push([{ kind: "accent", text: "sit back — the ghost knows the way" }]);
+          window.dispatchEvent(new CustomEvent("os:tour"));
+        }
         break;
       case "radio":
         if (isRadioOn()) {

@@ -37,6 +37,12 @@ export const OS_COPY = {
     monitorWindow: { title: "system monitor", scanning: "scanning…", noCarrier: "no carrier", block: "btc block height" },
     arrayWindow: { title: "signal array — product map" },
     toasts: { block: "new block mined" },
+    tour: {
+      offer: "New here? Watch the 20-second tour",
+      dock: "Tour",
+      done: "your turn — this desktop is yours",
+      skipped: "tour skipped — reduced motion is on",
+    },
     terminalWindow: { title: "maydalabs — shell", hint: "type `help` to see what this thing can do" },
     dock: { welcome: "Read me", work: "Work", terminal: "Shell", monitor: "Monitor", services: "Services", about: "About", call: "Book a call", trash: "Trash" },
     aboutWindow: {
@@ -125,6 +131,12 @@ export const OS_COPY = {
     monitorWindow: { title: "sistem monitörü", scanning: "taranıyor…", noCarrier: "sinyal yok", block: "btc blok yüksekliği" },
     arrayWindow: { title: "sinyal dizisi — ürün haritası" },
     toasts: { block: "yeni blok kazıldı" },
+    tour: {
+      offer: "Yeni misiniz? 20 saniyelik turu izleyin",
+      dock: "Tur",
+      done: "sıra sizde — bu masaüstü sizin",
+      skipped: "tur atlandı — azaltılmış hareket açık",
+    },
     terminalWindow: { title: "maydalabs — kabuk", hint: "`help` yazarak neler yapabildiğini görün" },
     dock: { welcome: "Beni oku", work: "Projeler", terminal: "Kabuk", monitor: "Monitör", services: "Hizmetler", about: "Hakkımızda", call: "Görüşme ayarla", trash: "Çöp" },
     aboutWindow: {
@@ -213,6 +225,12 @@ export const OS_COPY = {
     monitorWindow: { title: "moniteur système", scanning: "balayage…", noCarrier: "pas de signal", block: "hauteur de bloc btc" },
     arrayWindow: { title: "réseau de signaux — carte produit" },
     toasts: { block: "nouveau bloc miné" },
+    tour: {
+      offer: "Première visite ? Regardez le tour de 20 secondes",
+      dock: "Visite",
+      done: "à vous — ce bureau est le vôtre",
+      skipped: "visite ignorée — mouvement réduit activé",
+    },
     terminalWindow: { title: "maydalabs — shell", hint: "tapez `help` pour voir ce que ça sait faire" },
     dock: { welcome: "Lisez-moi", work: "Projets", terminal: "Shell", monitor: "Moniteur", services: "Services", about: "À propos", call: "Réserver un appel", trash: "Corbeille" },
     aboutWindow: {
