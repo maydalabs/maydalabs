@@ -80,8 +80,13 @@ export function MaydaOS({ locale }: { locale: Locale }) {
     try {
       if (!reduced && !window.sessionStorage.getItem("ml_booted")) {
         window.sessionStorage.setItem("ml_booted", "1");
-        frame = requestAnimationFrame(() => setBooting(true));
-        timer = setTimeout(() => setBooting(false), 1750);
+        // The dismiss timer starts inside the show frame: in throttled
+        // background tabs rAF can fire minutes late, and a detached
+        // timeout would already have passed — leaving boot stuck on.
+        frame = requestAnimationFrame(() => {
+          setBooting(true);
+          timer = setTimeout(() => setBooting(false), 1700);
+        });
       }
     } catch {
       // Storage unavailable: skip the boot sequence.
