@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { HodlStayJourney } from "@/components/HodlStayJourney";
 import { MaydaMark } from "@/components/MaydaMark";
 import { ProductConstellation } from "@/components/ProductConstellation";
 import { SignalDecode } from "@/components/SignalDecode";
@@ -396,7 +396,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
 
           <OsWindow id="hodlstay" title={copy.hodlstayWindow.title} state={windows.hodlstay} {...windowProps} accent>
             <div className="os-preview">
-              <Image src="/work/hodlstay-2026-08-home.png" alt="HodlStay marketplace homepage" width={540} height={338} priority />
+              <HodlStayJourney locale={locale} sizes="540px" />
               <div className="os-preview-caption">
                 <span>{copy.hodlstayWindow.caption}</span>
                 <Link href={localizePath("/case-studies/hodlstay", locale)}>{copy.hodlstayWindow.cta} →</Link>

@@ -8465,3 +8465,112 @@ select {
   background: rgba(242, 240, 234, 0.08);
   color: white;
 }
+
+/* HodlStay journey reel */
+.hodl-journey {
+  display: grid;
+  margin: 0;
+}
+
+.hodl-journey-stage {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1600 / 1000;
+  background: #0a0a09;
+}
+
+.hodl-journey-stage img {
+  object-fit: cover;
+  object-position: top center;
+  opacity: 0;
+  transition: opacity 720ms ease;
+}
+
+.hodl-journey-stage img.is-active {
+  opacity: 1;
+  animation: journey-kenburns 4.8s linear forwards;
+}
+
+@keyframes journey-kenburns {
+  from { transform: scale(1.015); }
+  to { transform: scale(1.07); }
+}
+
+.hodl-journey-live {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.7rem;
+  z-index: 2;
+  padding: 0.28rem 0.5rem;
+  border-radius: 0.35rem;
+  background: rgba(9, 9, 9, 0.72);
+  color: #d7ff68;
+  font-family: var(--font-mono);
+  font-size: 0.48rem;
+  letter-spacing: 0.12em;
+  backdrop-filter: blur(6px);
+}
+
+.hodl-journey-progress {
+  height: 2px;
+  background: rgba(242, 240, 234, 0.1);
+}
+
+.hodl-journey-progress i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--signal);
+  animation-name: journey-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes journey-progress {
+  to { width: 100%; }
+}
+
+.hodl-journey-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.5rem;
+  border-bottom: 1px solid rgba(242, 240, 234, 0.08);
+}
+
+.hodl-journey-bar p {
+  flex: 1;
+  overflow: hidden;
+  margin: 0;
+  color: rgba(242, 240, 234, 0.66);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.hodl-journey-bar p span {
+  color: var(--signal);
+}
+
+.hodl-journey-bar button {
+  display: grid;
+  width: 1.6rem;
+  height: 1.6rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(242, 240, 234, 0.14);
+  border-radius: 0.4rem;
+  background: transparent;
+  color: rgba(242, 240, 234, 0.6);
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.hodl-journey-bar button:hover {
+  border-color: rgba(247, 147, 26, 0.5);
+  color: var(--signal);
+}

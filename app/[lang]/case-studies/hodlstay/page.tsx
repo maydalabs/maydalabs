@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { HodlStayJourney } from "@/components/HodlStayJourney";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
@@ -57,7 +58,7 @@ export default async function HodlStayCaseStudyPage({ params }: LocalePageProps)
       <section className="hodl-hero"><div className="hodl-shell hodl-hero-grid">
         <div className="hodl-hero-copy"><Link href={localizePath("/case-studies", locale)} className="hodl-back-link"><span aria-hidden>←</span> {copy.back}</Link><p className="studio-kicker">{copy.kicker}</p><h1>{copy.hero[0]} <em>{copy.hero[1]}</em></h1><p className="hodl-hero-lead">{copy.lead}</p><div className="hodl-hero-actions"><a href="https://hodlstay.com" target="_blank" rel="noopener noreferrer" className="studio-button">{copy.visit} <Arrow /></a><a href="#story" className="studio-text-link">{copy.read} <span aria-hidden>↓</span></a></div></div>
         <div className="hodl-hero-orbit" aria-hidden="true"><div className="hodl-orbit-ring hodl-orbit-ring-one" /><div className="hodl-orbit-ring hodl-orbit-ring-two" />{copy.orbit.map((label, index) => <span key={label} className={`hodl-orbit-label hodl-orbit-label-${["one", "two", "three"][index]}`}>{label}</span>)}</div>
-        <div className="hodl-hero-screen"><div className="project-browser-chrome"><div><i /><i /><i /></div><span>hodlstay.com</span><b>{copy.status}</b></div><Image src="/work/hodlstay-2026-08-home.png" alt={copy.alt} width={1430} height={894} priority sizes="(max-width: 900px) 100vw, 78vw" /></div>
+        <div className="hodl-hero-screen"><div className="project-browser-chrome"><div><i /><i /><i /></div><span>hodlstay.com</span><b>{copy.status}</b></div><HodlStayJourney locale={locale} sizes="(max-width: 900px) 100vw, 78vw" /></div>
         <div className="hodl-engagement-rail" aria-label={copy.railLabel}>{copy.rail.map(([term, detail]) => <div key={term}><span>{term}</span><strong>{detail}</strong></div>)}</div>
       </div></section>
       <section id="story" className="hodl-thesis"><div className="hodl-shell hodl-thesis-grid"><p className="studio-kicker">{copy.premiseKicker}</p><h2>{copy.premiseTitle}</h2><p>{copy.premise}</p></div></section>
