@@ -12,10 +12,11 @@ import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { playLock, playTick } from "@/lib/soundSignal";
 import { OsMenuBar } from "@/components/os/OsMenuBar";
 import { OsScreensaver } from "@/components/os/OsScreensaver";
+import { OsWallpaper } from "@/components/os/OsWallpaper";
 import { OS_COPY } from "@/components/os/osCopy";
 import { useTelemetry, type Telemetry } from "@/components/os/useTelemetry";
 
-type WindowId = "welcome" | "work" | "hodlstay" | "monitor" | "terminal" | "about" | "trash";
+type WindowId = "welcome" | "work" | "hodlstay" | "monitor" | "terminal" | "about" | "trash" | "array";
 
 type WindowState = { open: boolean; min: boolean; max: boolean; x: number; y: number; z: number; w: number };
 
@@ -27,7 +28,10 @@ const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
   work: { open: false, min: false, max: false, x: 190, y: 160, z: 1, w: 470 },
   about: { open: false, min: false, max: false, x: 420, y: 130, z: 1, w: 360 },
   trash: { open: false, min: false, max: false, x: 500, y: 210, z: 1, w: 400 },
+  array: { open: false, min: false, max: false, x: 320, y: 90, z: 1, w: 680 },
 };
+
+const ENTER_DELAYS: Partial<Record<WindowId, number>> = { welcome: 60, hodlstay: 150, monitor: 240, terminal: 330 };
 
 // Module-evaluation time doubles as the OS boot timestamp for uptime.
 const BOOTED_AT = Date.now();
@@ -51,6 +55,8 @@ function Glyph({ name, stroke = "#f2f0ea" }: { name: string; stroke?: string }) 
       return <svg width="20" height="20" viewBox="0 0 20 20"><path d="M4 3.5 L8.5 10 L4 16.5 Z" {...s} /><path d="M16 3.5 L11.5 10 L16 16.5 Z" {...s} /><circle cx="10" cy="10" r="1.4" fill={stroke} stroke="none" /></svg>;
     case "call":
       return <svg width="20" height="20" viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="13" rx="2" {...s} /><path d="M3 8 H17 M7 2.5 V5.5 M13 2.5 V5.5" {...s} /></svg>;
+    case "array":
+      return <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" {...s} /><circle cx="10" cy="10" r="2" fill={stroke} stroke="none" /><circle cx="10" cy="3.5" r="1.3" fill={stroke} stroke="none" /><circle cx="16.5" cy="10" r="1.3" fill={stroke} stroke="none" /><circle cx="10" cy="16.5" r="1.3" fill={stroke} stroke="none" /></svg>;
     case "trash":
       return <svg width="20" height="20" viewBox="0 0 20 20"><path d="M4 6 H16 M8 6 V4.5 H12 V6 M5.5 6 L6.4 16.5 H13.6 L14.5 6" {...s} /><path d="M8.4 9 V13.5 M11.6 9 V13.5" {...s} opacity="0.6" /></svg>;
     default:
@@ -63,9 +69,17 @@ export function MaydaOS({ locale }: { locale: Locale }) {
   const router = useRouter();
   const desktopRef = useRef<HTMLDivElement>(null);
   const zRef = useRef(6);
+  const staggerRef = useRef(true);
   const [windows, setWindows] = useState(INITIAL_WINDOWS);
   const [booting, setBooting] = useState(false);
   const { telemetry, failed: telemetryFailed } = useTelemetry();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      staggerRef.current = false;
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -154,7 +168,15 @@ export function MaydaOS({ locale }: { locale: Locale }) {
     { id: "satoshi-gazette", host: "satoshigazette.org", ok: false, status: 0, ms: null },
   ];
 
-  const windowProps = { onFocus: focusWindow, onClose: closeWindow, onMinimize: minimizeWindow, onMaximize: toggleMaximize, onMove: moveWindow, desktopRef };
+  const windowProps = {
+    onFocus: focusWindow,
+    onClose: closeWindow,
+    onMinimize: minimizeWindow,
+    onMaximize: toggleMaximize,
+    onMove: moveWindow,
+    desktopRef,
+    stagger: staggerRef,
+  };
 
   return (
     <div className="mayda-os">
@@ -173,7 +195,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
 
         <div className="os-desktop" ref={desktopRef}>
           <div className="os-wallpaper" aria-hidden="true">
-            <ProductConstellation locale={locale} variant="wallpaper" />
+            <OsWallpaper />
           </div>
 
           <OsWindow id="welcome" title={copy.welcome.title} state={windows.welcome} {...windowProps}>
@@ -240,6 +262,12 @@ export function MaydaOS({ locale }: { locale: Locale }) {
             <TrashBin locale={locale} />
           </OsWindow>
 
+          <OsWindow id="array" title={copy.arrayWindow.title} state={windows.array} {...windowProps}>
+            <div className="os-array">
+              <ProductConstellation locale={locale} />
+            </div>
+          </OsWindow>
+
           <OsWindow id="terminal" title={copy.terminalWindow.title} state={windows.terminal} {...windowProps}>
             <OsTerminal
               locale={locale}
@@ -259,6 +287,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
           <button type="button" className={windows.work.open ? "is-running" : ""} onClick={() => openWindow("work")} title={copy.dock.work}><Glyph name="grid" /></button>
           <button type="button" className={windows.terminal.open ? "is-running" : ""} onClick={() => openWindow("terminal")} title={copy.dock.terminal}><Glyph name="shell" /></button>
           <button type="button" className={windows.monitor.open ? "is-running" : ""} onClick={() => openWindow("monitor")} title={copy.dock.monitor}><Glyph name="monitor" /></button>
+          <button type="button" className={windows.array.open ? "is-running" : ""} onClick={() => openWindow("array")} title={copy.arrayWindow.title}><Glyph name="array" /></button>
           <i aria-hidden="true" />
           <Link href={localizePath("/services", locale)} title={copy.dock.services}><Glyph name="layers" /></Link>
           <Link href={localizePath("/about", locale)} title={copy.dock.about}><Glyph name="mark" /></Link>
@@ -373,6 +402,7 @@ function OsWindow({
   onMaximize,
   onMove,
   desktopRef,
+  stagger,
   children,
 }: {
   id: WindowId;
@@ -385,6 +415,7 @@ function OsWindow({
   onMaximize: (id: WindowId) => void;
   onMove: (id: WindowId, x: number, y: number) => void;
   desktopRef: React.RefObject<HTMLDivElement | null>;
+  stagger: React.RefObject<boolean>;
   children: React.ReactNode;
 }) {
   const dragRef = useRef<{ startX: number; startY: number; baseX: number; baseY: number } | null>(null);
@@ -415,9 +446,10 @@ function OsWindow({
     dragRef.current = null;
   };
 
+  const enterDelay = stagger.current ? (ENTER_DELAYS[id] ?? 0) : 0;
   const style = state.max
-    ? { left: 10, top: 8, width: "calc(100% - 20px)", height: "calc(100% - 16px)", zIndex: state.z }
-    : { left: state.x, top: state.y, width: state.w, zIndex: state.z };
+    ? { left: 10, top: 8, width: "calc(100% - 20px)", height: "calc(100% - 16px)", zIndex: state.z, animationDelay: `${enterDelay}ms` }
+    : { left: state.x, top: state.y, width: state.w, zIndex: state.z, animationDelay: `${enterDelay}ms` };
 
   return (
     <section
@@ -441,7 +473,7 @@ function OsWindow({
 
 type TermLine = { kind: "cmd" | "out" | "accent"; text: string };
 
-const COMMANDS = ["help", "work", "open", "proof", "services", "about", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo"];
+const COMMANDS = ["help", "work", "open", "proof", "services", "about", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo", "array"];
 
 function OsTerminal({
   locale,
@@ -481,7 +513,7 @@ function OsTerminal({
     switch (command.toLowerCase()) {
       case "help":
         push([
-          { kind: "out", text: "work · open <tx-01…04> · proof · neofetch · services · about" },
+          { kind: "out", text: "work · open <tx-01…04> · proof · array · neofetch · services · about" },
           { kind: "out", text: "book-call · lang <en|tr|fr> · trash · screensaver · whoami · clear" },
           { kind: "out", text: "tab completes · arrows replay history · sudo does what sudo does" },
         ]);
@@ -541,6 +573,10 @@ function OsTerminal({
       case "trash":
         push([{ kind: "accent", text: "taking out the trash …" }]);
         onOpenWindow("trash");
+        break;
+      case "array":
+        push([{ kind: "accent", text: "raising the signal array …" }]);
+        onOpenWindow("array");
         break;
       case "screensaver":
         push([{ kind: "accent", text: "dimming the lights …" }]);

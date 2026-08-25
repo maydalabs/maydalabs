@@ -7743,23 +7743,55 @@ select {
   inset: 0;
 }
 
-.product-constellation.is-wallpaper {
+.os-signal-sea {
   position: absolute;
   inset: 0;
   overflow: hidden;
+}
+
+.os-signal-sea canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1200ms ease;
+}
+
+.os-signal-sea.is-ready canvas {
+  opacity: 1;
+}
+
+.os-signal-sea::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(9, 9, 9, 0.55) 100%);
+  pointer-events: none;
+}
+
+.os-array {
+  position: relative;
+  height: 430px;
+}
+
+.os-array .product-constellation {
+  position: absolute;
+  inset: 0;
   border: 0;
   border-radius: 0;
-  background: transparent;
   box-shadow: none;
 }
 
-.product-constellation.is-wallpaper::before {
-  opacity: 0.05;
-  mask-image: none;
+.os-window {
+  animation: window-in 340ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
-.product-constellation.is-wallpaper::after {
-  background: radial-gradient(ellipse at 50% 45%, transparent 52%, rgba(9, 9, 9, 0.6) 100%);
+@keyframes window-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
 }
 
 .os-window-lights {
@@ -8161,5 +8193,9 @@ select {
 @media (prefers-reduced-motion: reduce) {
   .os-screensaver {
     display: none;
+  }
+
+  .os-window {
+    animation: none;
   }
 }
