@@ -3220,56 +3220,43 @@ select {
   position: relative;
   display: grid;
   overflow: hidden;
-  min-height: 19rem;
+  width: 100%;
+  aspect-ratio: 5 / 4;
   place-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+  background: #0b0b0a;
+}
+
+.founder-signal-photo {
+  object-fit: cover;
+  object-position: center 24%;
+}
+
+.founder-signal-photo-shade {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
   background:
-    radial-gradient(circle at 50% 45%, rgba(247, 147, 26, 0.18), transparent 38%),
-    #0b0b0a;
+    linear-gradient(to top, rgba(7, 7, 6, 0.48), transparent 42%),
+    radial-gradient(circle at 78% 18%, rgba(247, 147, 26, 0.08), transparent 34%);
+  pointer-events: none;
 }
 
 .founder-signal-grid {
   position: absolute;
+  z-index: 1;
   inset: 0;
+  opacity: 0.45;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
   background-size: 2.2rem 2.2rem;
-  mask-image: linear-gradient(to bottom, black, transparent 92%);
-}
-
-.founder-signal-orbit {
-  position: absolute;
-  width: 13rem;
-  aspect-ratio: 1;
-  border: 1px solid rgba(247, 147, 26, 0.28);
-  border-radius: 50%;
-  box-shadow: 0 0 0 2.5rem rgba(247, 147, 26, 0.025), 0 0 0 5rem rgba(247, 147, 26, 0.018);
-}
-
-.founder-signal-head {
-  position: absolute;
-  top: 4.2rem;
-  width: 5.2rem;
-  height: 6.2rem;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 48% 48% 44% 44%;
-  background: linear-gradient(150deg, #292925, #11110f 72%);
-  box-shadow: inset -1.2rem -0.7rem 2rem rgba(0, 0, 0, 0.46), 0 0 2rem rgba(247, 147, 26, 0.09);
-}
-
-.founder-signal-shoulders {
-  position: absolute;
-  bottom: -3.5rem;
-  width: 16rem;
-  height: 10rem;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 50% 50% 0 0;
-  background: linear-gradient(160deg, #242420, #0d0d0c 70%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.72), transparent 92%);
 }
 
 .founder-signal-portrait > i {
   position: absolute;
+  z-index: 2;
   right: 1rem;
   bottom: 0.8rem;
   color: rgba(247, 147, 26, 0.58);
