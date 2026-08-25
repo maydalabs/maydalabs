@@ -25,8 +25,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
             <div className="mt-4 flex flex-col gap-2 text-sm text-white/60">
               <Link href={localizePath("/case-studies", locale)}>{copy.selectedWork}</Link>
               <Link href={localizePath("/services", locale)}>{copy.nav[1][0]}</Link>
-              <Link href={localizePath("/#approach", locale)}>{copy.nav[2][0]}</Link>
-              <Link href={localizePath("/about", locale)}>{copy.nav[3][0]}</Link>
+              <Link href={localizePath("/about", locale)}>{copy.nav[2][0]}</Link>
             </div>
           </div>
 

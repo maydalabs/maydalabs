@@ -1,4 +1,4 @@
-import { StudioHome } from "@/components/StudioHome";
+import { MaydaOS } from "@/components/os/MaydaOS";
 import { createPageMetadata } from "@/lib/metadata";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 
@@ -27,5 +27,5 @@ export async function generateMetadata({ params }: LocalePageProps) {
 
 export default async function HomePage({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
-  return <StudioHome locale={locale} />;
+  return <MaydaOS locale={locale} />;
 }

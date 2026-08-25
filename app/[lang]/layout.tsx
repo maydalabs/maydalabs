@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../globals.css";
+import { SiteChrome } from "@/components/SiteChrome";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SoundLayer } from "@/components/SoundLayer";
@@ -155,11 +156,15 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
         <div className="flex min-h-screen flex-col">
-          <SiteHeader locale={lang} />
+          <SiteChrome>
+            <SiteHeader locale={lang} />
+          </SiteChrome>
 
           <main className="flex-1">{children}</main>
 
-          <SiteFooter locale={lang} />
+          <SiteChrome>
+            <SiteFooter locale={lang} />
+          </SiteChrome>
         </div>
         <div className="studio-grain" aria-hidden="true" />
         <SoundLayer />

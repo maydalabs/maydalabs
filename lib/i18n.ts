@@ -40,7 +40,6 @@ export const SITE_CHROME_COPY = {
     nav: [
       ["Work", "/case-studies", "work"],
       ["Services", "/services", "services"],
-      ["Approach", "/#approach", "approach"],
       ["About", "/about", ""],
     ],
     startProject: "Start a project",
@@ -65,7 +64,6 @@ export const SITE_CHROME_COPY = {
     nav: [
       ["Projeler", "/case-studies", "work"],
       ["Hizmetler", "/services", "services"],
-      ["Yaklaşım", "/#approach", "approach"],
       ["Hakkımızda", "/about", ""],
     ],
     startProject: "Proje başlat",
@@ -90,7 +88,6 @@ export const SITE_CHROME_COPY = {
     nav: [
       ["Projets", "/case-studies", "work"],
       ["Services", "/services", "services"],
-      ["Approche", "/#approach", "approach"],
       ["À propos", "/about", ""],
     ],
     startProject: "Lancer un projet",
