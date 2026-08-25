@@ -7,7 +7,7 @@ import { trackOsEvent } from "@/lib/osAnalytics";
 
 export type SessionPerspective = "hiring" | "build" | "explore";
 
-const FIRST_SESSION_KEY = "ml_first_session_v1";
+const FIRST_SESSION_KEY = "ml_first_session_v3";
 
 export function OsFirstSession({ locale }: { locale: Locale }) {
   const copy = OS_COPY[locale].firstSession;

@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import { getIntroCallUrl } from "@/lib/marketingLinks";
 import { trackOsEvent } from "@/lib/osAnalytics";
+import { isTerminalBriefDraft, TERMINAL_BRIEF_SESSION_KEY, type TerminalBriefKind } from "@/lib/terminalBrief";
 
 type Option = { id: string; label: string };
 
@@ -28,11 +29,12 @@ const COPY: Record<Locale, {
   bookAction: string;
   mailAction: string;
   mailSubject: string;
+  imported: string;
 }> = {
   en: {
     kicker: "Brief composer / Processed in your browser",
     heading: ["Arrive with a brief,", "leave with a plan."],
-    intro: "Describe the project in your own words and set three markers. Take the structured brief into the call, or send it by email — nothing is stored or transmitted until you choose.",
+    intro: "Describe the situation in your own words and set three markers. The draft stays in this browser; nothing is transmitted until you deliberately copy it, open an email, or choose the calendar.",
     ideaLabel: "The project, in your words",
     ideaPlaceholder: "What are we building, for whom, and what exists today? Rough is fine.",
     stageLabel: "Stage",
@@ -65,11 +67,12 @@ const COPY: Record<Locale, {
     bookAction: "Book the call with this brief",
     mailAction: "Email it instead",
     mailSubject: "Project brief",
+    imported: "Imported from your MaydaOS session. Review and change anything before choosing an external action.",
   },
   tr: {
     kicker: "Brief oluşturucu / Tarayıcınızda işlenir",
     heading: ["Görüşmeye brief'le gelin,", "planla ayrılın."],
-    intro: "Projeyi kendi kelimelerinizle anlatın ve üç işaret seçin. Yapılandırılmış brief'i görüşmeye getirin veya e-postayla gönderin — siz seçene kadar hiçbir şey kaydedilmez veya iletilmez.",
+    intro: "Durumu kendi kelimelerinizle anlatın ve üç işaret seçin. Taslak bu tarayıcıda kalır; siz bilerek kopyalamadan, e-posta açmadan veya takvimi seçmeden hiçbir şey iletilmez.",
     ideaLabel: "Proje, kendi kelimelerinizle",
     ideaPlaceholder: "Ne geliştiriyoruz, kimin için, bugün ne mevcut? Taslak hali yeterli.",
     stageLabel: "Aşama",
@@ -102,11 +105,12 @@ const COPY: Record<Locale, {
     bookAction: "Bu brief ile görüşme ayarla",
     mailAction: "E-postayla gönder",
     mailSubject: "Proje brief'i",
+    imported: "MaydaOS oturumunuzdan alındı. Harici bir eylem seçmeden önce her şeyi inceleyip değiştirebilirsiniz.",
   },
   fr: {
     kicker: "Composeur de brief / Traité dans votre navigateur",
     heading: ["Arrivez avec un brief,", "repartez avec un plan."],
-    intro: "Décrivez le projet avec vos mots et posez trois repères. Apportez le brief structuré à l'échange, ou envoyez-le par e-mail — rien n'est stocké ni transmis avant votre choix.",
+    intro: "Décrivez la situation avec vos mots et posez trois repères. Le brouillon reste dans ce navigateur ; rien n’est transmis avant que vous ne choisissiez délibérément de le copier, d’ouvrir un e-mail ou l’agenda.",
     ideaLabel: "Le projet, avec vos mots",
     ideaPlaceholder: "Que construisons-nous, pour qui, qu'existe-t-il déjà ? Une ébauche suffit.",
     stageLabel: "Stade",
@@ -139,6 +143,7 @@ const COPY: Record<Locale, {
     bookAction: "Réserver l'appel avec ce brief",
     mailAction: "L'envoyer par e-mail",
     mailSubject: "Brief de projet",
+    imported: "Importé depuis votre session MaydaOS. Relisez et modifiez tout avant de choisir une action externe.",
   },
 };
 
@@ -177,6 +182,29 @@ export function BriefComposer({ locale, initialMove = null }: { locale: Locale; 
   const [timeline, setTimeline] = useState<string | null>(null);
   const [context, setContext] = useState("");
   const [copied, setCopied] = useState(false);
+  const [importedKind, setImportedKind] = useState<TerminalBriefKind | null>(null);
+
+  useEffect(() => {
+    let frame = 0;
+    try {
+      const raw = window.sessionStorage.getItem(TERMINAL_BRIEF_SESSION_KEY);
+      if (!raw) return;
+      const candidate: unknown = JSON.parse(raw);
+      if (!isTerminalBriefDraft(candidate)) {
+        window.sessionStorage.removeItem(TERMINAL_BRIEF_SESSION_KEY);
+        return;
+      }
+      frame = window.requestAnimationFrame(() => {
+        window.sessionStorage.removeItem(TERMINAL_BRIEF_SESSION_KEY);
+        setIdea(candidate.summary.slice(0, 600));
+        setImportedKind(candidate.kind);
+        trackOsEvent("brief_imported", { kind: candidate.kind });
+      });
+    } catch {
+      // A blocked or malformed session handoff is ignored.
+    }
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   const labelOf = (options: Option[], id: string | null) => options.find((option) => option.id === id)?.label ?? "—";
 
@@ -218,6 +246,7 @@ export function BriefComposer({ locale, initialMove = null }: { locale: Locale; 
       </div>
       <div className="brief-grid">
         <div className="brief-form">
+          {importedKind ? <p className="brief-imported" role="status"><span aria-hidden>↳</span> {copy.imported}</p> : null}
           <label className="brief-field">
             <span className="brief-label">{copy.ideaLabel}</span>
             <textarea

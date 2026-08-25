@@ -19,6 +19,7 @@ import { OsTour } from "@/components/os/OsTour";
 import { OsWallpaper } from "@/components/os/OsWallpaper";
 import { OS_COPY } from "@/components/os/osCopy";
 import { trackOsEvent } from "@/lib/osAnalytics";
+import { TERMINAL_BRIEF_SESSION_KEY, type TerminalBriefDraft, type TerminalBriefKind } from "@/lib/terminalBrief";
 import { useTelemetry, type Telemetry } from "@/components/os/useTelemetry";
 
 type WindowId = "welcome" | "work" | "hodlstay" | "gazette" | "monitor" | "terminal" | "about" | "trash" | "array";
@@ -30,7 +31,7 @@ const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
   hodlstay: { open: true, min: false, max: false, x: 612, y: 26, z: 2, w: 540 },
   gazette: { open: true, min: false, max: false, x: 548, y: 118, z: 1, w: 540 },
   monitor: { open: true, min: false, max: false, x: 1082, y: 58, z: 3, w: 330 },
-  terminal: { open: true, min: false, max: false, x: 648, y: 428, z: 5, w: 560 },
+  terminal: { open: true, min: false, max: false, x: 648, y: 280, z: 5, w: 600 },
   work: { open: false, min: false, max: false, x: 190, y: 160, z: 1, w: 470 },
   about: { open: false, min: false, max: false, x: 420, y: 130, z: 1, w: 360 },
   trash: { open: false, min: false, max: false, x: 500, y: 210, z: 1, w: 400 },
@@ -39,7 +40,7 @@ const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
 
 const ENTER_DELAYS: Partial<Record<WindowId, number>> = { welcome: 60, hodlstay: 150, monitor: 240, gazette: 300, terminal: 330 };
 
-const DESKTOP_STORAGE_KEY = "ml_desktop_v1";
+const DESKTOP_STORAGE_KEY = "ml_desktop_v3";
 
 function createSessionDesktop(perspective: SessionPerspective | null): Record<WindowId, WindowState> {
   const state = Object.fromEntries(
@@ -530,7 +531,6 @@ export function MaydaOS({ locale }: { locale: Locale }) {
               locale={locale}
               hint={copy.terminalWindow.hint}
               telemetry={telemetry}
-              bootedAt={BOOTED_AT}
               onOpenWindow={openWindow}
               onNavigate={(path) => router.push(localizePath(path, locale))}
               onReset={resetDesktop}
@@ -614,7 +614,6 @@ export function MaydaOS({ locale }: { locale: Locale }) {
               variant="mobile"
               hint={copy.terminalWindow.hint}
               telemetry={telemetry}
-              bootedAt={BOOTED_AT}
               onOpenWindow={() => undefined}
               onNavigate={(path) => router.push(localizePath(path, locale))}
               onStartSession={() => undefined}
@@ -791,14 +790,14 @@ function OsWindow({
 
 type TermLine = { kind: "cmd" | "out" | "accent"; text: string };
 type TerminalSession = { id: string; perspective: SessionPerspective | null };
+type GuidedFlow = { kind: TerminalBriefKind; step: number; answers: string[] };
 
-const COMMANDS = ["help", "session", "work", "open", "proof", "profile", "contact", "services", "about", "brief", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo", "array", "radio", "reset", "matrix", "tour", "wallpaper"];
+const COMMANDS = ["help", "session", "problem", "idea", "back", "cancel", "work", "open", "proof", "profile", "contact", "services", "about", "brief", "book-call", "lang", "whoami", "clear", "sudo", "gui", "neofetch", "trash", "screensaver", "date", "echo", "array", "radio", "reset", "matrix", "tour", "wallpaper"];
 
 function OsTerminal({
   locale,
   hint,
   telemetry,
-  bootedAt,
   variant = "desktop",
   onOpenWindow,
   onNavigate,
@@ -808,7 +807,6 @@ function OsTerminal({
   locale: Locale;
   hint: string;
   telemetry: Telemetry | null;
-  bootedAt: number;
   variant?: "desktop" | "mobile";
   onOpenWindow: (id: WindowId) => void;
   onNavigate: (path: string) => void;
@@ -823,8 +821,12 @@ function OsTerminal({
   const [session, setSession] = useState<TerminalSession>({ id: "GUEST", perspective: null });
   const [showStarter, setShowStarter] = useState(true);
   const [value, setValue] = useState("");
+  const [guidedFlow, setGuidedFlow] = useState<GuidedFlow | null>(null);
+  const [completedDraft, setCompletedDraft] = useState<TerminalBriefDraft | null>(null);
+  const [draftCopied, setDraftCopied] = useState(false);
   const historyRef = useRef<string[]>([]);
   const historyIndexRef = useRef(-1);
+  const sessionSequenceRef = useRef(0);
   const lastExciteRef = useRef(0);
   const logRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -832,15 +834,18 @@ function OsTerminal({
 
   useEffect(() => {
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
-  }, [lines]);
+  }, [lines, guidedFlow, completedDraft]);
 
   const beginSession = useCallback(
     (perspective: SessionPerspective, arrangeDesktop = true) => {
-      const id = `ML-${Date.now().toString(36).slice(-4).toUpperCase()}`;
+      sessionSequenceRef.current += 1;
+      const id = `ML-${String(sessionSequenceRef.current).padStart(4, "0")}`;
       const option = copy.firstSession.options.find((item) => item.id === perspective);
       const guides = copy.firstSession.guides[perspective];
       setSession({ id, perspective });
       setShowStarter(false);
+      setGuidedFlow(null);
+      setCompletedDraft(null);
       setLines([
         { kind: "accent", text: `${copy.firstSession.created} — ${id} · ${option?.label ?? perspective}` },
         ...guides.map((guide) => ({ kind: "out" as const, text: `→ ${guide}` })),
@@ -864,9 +869,106 @@ function OsTerminal({
     return () => window.removeEventListener("os:session-start", onSessionStart);
   }, [beginSession]);
 
+  const startGuide = (kind: TerminalBriefKind) => {
+    const guide = copy.terminalGuide[kind];
+    setShowStarter(false);
+    setCompletedDraft(null);
+    setDraftCopied(false);
+    setGuidedFlow({ kind, step: 0, answers: [] });
+    setLines((current) => [
+      ...current,
+      { kind: "cmd", text: kind },
+      { kind: "accent", text: guide.start },
+      { kind: "out", text: `01 / ${String(guide.questions.length).padStart(2, "0")} — ${guide.questions[0]}` },
+    ]);
+    requestAnimationFrame(() => inputRef.current?.focus());
+  };
+
+  const finishGuide = (flow: GuidedFlow, finalAnswer: string) => {
+    const guide = copy.terminalGuide[flow.kind];
+    const answers = [...flow.answers, finalAnswer];
+    const summary = guide.labels.map((label, index) => `${label}\n${answers[index]}`).join("\n\n");
+    const draft: TerminalBriefDraft = { kind: flow.kind, locale, summary };
+    setGuidedFlow(null);
+    setCompletedDraft(draft);
+    setLines((current) => [
+      ...current,
+      { kind: "cmd", text: finalAnswer },
+      { kind: "accent", text: copy.terminalGuide.ready },
+    ]);
+    trackOsEvent("os_terminal_brief_ready", { kind: flow.kind });
+  };
+
+  const answerGuide = (input: string) => {
+    if (!guidedFlow) return false;
+    const command = input.toLowerCase();
+    const guide = copy.terminalGuide[guidedFlow.kind];
+
+    if (command === "cancel") {
+      setGuidedFlow(null);
+      setCompletedDraft(null);
+      setLines((current) => [...current, { kind: "cmd", text: "cancel" }, { kind: "out", text: copy.terminalGuide.cancelled }]);
+      return true;
+    }
+
+    if (command === "back") {
+      if (guidedFlow.step === 0) {
+        setLines((current) => [...current, { kind: "cmd", text: "back" }, { kind: "out", text: copy.terminalGuide.backAtStart }]);
+        return true;
+      }
+      const nextStep = guidedFlow.step - 1;
+      setGuidedFlow({ ...guidedFlow, step: nextStep, answers: guidedFlow.answers.slice(0, -1) });
+      setLines((current) => [
+        ...current,
+        { kind: "cmd", text: "back" },
+        { kind: "out", text: `${String(nextStep + 1).padStart(2, "0")} / ${String(guide.questions.length).padStart(2, "0")} — ${guide.questions[nextStep]}` },
+      ]);
+      return true;
+    }
+
+    if (guidedFlow.step === guide.questions.length - 1) {
+      finishGuide(guidedFlow, input);
+      return true;
+    }
+
+    const nextStep = guidedFlow.step + 1;
+    setGuidedFlow({ ...guidedFlow, step: nextStep, answers: [...guidedFlow.answers, input] });
+    setLines((current) => [
+      ...current,
+      { kind: "cmd", text: input },
+      { kind: "out", text: `${String(nextStep + 1).padStart(2, "0")} / ${String(guide.questions.length).padStart(2, "0")} — ${guide.questions[nextStep]}` },
+    ]);
+    return true;
+  };
+
+  const continueDraft = () => {
+    if (!completedDraft) return;
+    try {
+      window.sessionStorage.setItem(TERMINAL_BRIEF_SESSION_KEY, JSON.stringify(completedDraft));
+    } catch {
+      setLines((current) => [...current, { kind: "out", text: copy.terminalGuide.handoffUnavailable }]);
+      return;
+    }
+    trackOsEvent("os_terminal_brief_handoff", { kind: completedDraft.kind });
+    onNavigate("/contact#brief");
+  };
+
+  const copyDraft = async () => {
+    if (!completedDraft) return;
+    try {
+      await navigator.clipboard.writeText(completedDraft.summary);
+      setDraftCopied(true);
+      window.setTimeout(() => setDraftCopied(false), 1800);
+      trackOsEvent("os_terminal_brief_copy", { kind: completedDraft.kind });
+    } catch {
+      // The draft remains selectable in the preview.
+    }
+  };
+
   const run = (raw: string) => {
     const input = raw.trim();
     if (!input) return;
+    if (answerGuide(input)) return;
     historyRef.current.push(input);
     historyIndexRef.current = -1;
     const push = (extra: TermLine[]) => setLines((current) => [...current, { kind: "cmd", text: input }, ...extra]);
@@ -878,11 +980,21 @@ function OsTerminal({
     switch (commandName) {
       case "help":
         push([
-          { kind: "out", text: "session new <hiring|build|explore> · profile · work · open <tx-01…04>" },
-          { kind: "out", text: "proof · array · neofetch · services · about · contact" },
+          { kind: "out", text: "problem · idea · session new <hiring|build|explore> · profile · work" },
+          { kind: "out", text: "open <tx-01…04> · proof · array · services · about · contact" },
           { kind: "out", text: "wallpaper <1–10> · radio · matrix · brief · lang <en|tr|fr> · trash · reset" },
           { kind: "out", text: "tour · tab completes · arrows replay history · sudo does what sudo does" },
         ]);
+        break;
+      case "problem":
+        startGuide("problem");
+        break;
+      case "idea":
+        startGuide("idea");
+        break;
+      case "back":
+      case "cancel":
+        push([{ kind: "out", text: "`back` and `cancel` are available while shaping a problem or idea." }]);
         break;
       case "session": {
         const [action, requested] = rest.map((part) => part.toLowerCase());
@@ -938,13 +1050,12 @@ function OsTerminal({
         );
         break;
       case "neofetch": {
-        const seconds = Math.floor((Date.now() - bootedAt) / 1000);
         push([
           { kind: "accent", text: "  ▲▼   guest@maydalabs" },
           { kind: "accent", text: " ▲ ● ▼  ──────────────" },
           { kind: "out", text: `  ▼▲   OS: MaydaOS 26.08 (signal)` },
           { kind: "out", text: `       Shell: mayda-sh 1.0 · Locale: ${locale}` },
-          { kind: "out", text: `       Uptime: ${Math.floor(seconds / 60)}m ${seconds % 60}s · Products: 4 (2 broadcasting)` },
+          { kind: "out", text: "       Uptime: live · Products: 4 (2 broadcasting)" },
           { kind: "out", text: `       Display: Bitcoin orange @ 60 Hz · Memory: enough` },
         ]);
         break;
@@ -1017,7 +1128,7 @@ function OsTerminal({
           ]);
           break;
         }
-        const target = arg === "random" ? keys[Math.floor(Math.random() * keys.length)] : resolveWallpaperId(arg);
+        const target = arg === "random" ? keys[(historyRef.current.length + session.id.length) % keys.length] : resolveWallpaperId(arg);
         if (target) {
           push([{ kind: "accent", text: `hanging ${target} — ${WALLPAPERS[target].label}` }]);
           window.dispatchEvent(new CustomEvent("os:wallpaper", { detail: { id: target } }));
@@ -1108,6 +1219,15 @@ function OsTerminal({
     }
   };
 
+  const quickCommands = session.perspective === "hiring"
+    ? ["profile", "work", "proof", "problem"]
+    : session.perspective === "build"
+      ? ["problem", "idea", "work", "services"]
+      : ["work", "matrix", "tour", "problem"];
+  const quickRoutes = copy.terminalGuide.routes.filter((route) => quickCommands.includes(route.command));
+  const activeGuide = guidedFlow ? copy.terminalGuide[guidedFlow.kind] : null;
+  const promptName = guidedFlow?.kind ?? session.perspective ?? "guest";
+
   return (
     <div className="os-terminal" onClick={() => inputRef.current?.focus()}>
       <div className="os-terminal-log" ref={logRef}>
@@ -1132,6 +1252,37 @@ function OsTerminal({
           </div>
         </div>
       ) : null}
+      {!showStarter && !guidedFlow && !completedDraft ? (
+        <div className="os-terminal-routes" onClick={(event) => event.stopPropagation()}>
+          <span>{copy.firstSession.terminalLabel}</span>
+          <div>
+            {quickRoutes.map((route) => (
+              <button key={route.command} type="button" onClick={() => run(route.command)}>
+                <strong>{route.label}</strong>
+                <small>{route.detail}</small>
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {guidedFlow && activeGuide ? (
+        <div className="os-terminal-question" onClick={(event) => event.stopPropagation()}>
+          <span>{String(guidedFlow.step + 1).padStart(2, "0")} / {String(activeGuide.questions.length).padStart(2, "0")}</span>
+          <strong>{activeGuide.questions[guidedFlow.step]}</strong>
+          <small>{copy.terminalGuide.answerHint}</small>
+        </div>
+      ) : null}
+      {completedDraft ? (
+        <div className="os-terminal-draft" onClick={(event) => event.stopPropagation()}>
+          <pre>{completedDraft.summary}</pre>
+          <small>{copy.terminalGuide.privateNote}</small>
+          <div>
+            <button type="button" className="is-primary" onClick={continueDraft}>{copy.terminalGuide.continueAction} <span aria-hidden>→</span></button>
+            <button type="button" onClick={copyDraft}>{draftCopied ? copy.terminalGuide.copied : copy.terminalGuide.copyAction}</button>
+            <button type="button" onClick={() => startGuide(completedDraft.kind)}>{copy.terminalGuide.restartAction}</button>
+          </div>
+        </div>
+      ) : null}
       <form
         className="os-terminal-input"
         onSubmit={(event) => {
@@ -1140,7 +1291,7 @@ function OsTerminal({
           setValue("");
         }}
       >
-        <span aria-hidden>guest@maydalabs:~$</span>
+        <span aria-hidden>{promptName}@maydalabs:~$</span>
         <input
           ref={inputRef}
           value={value}
@@ -1159,7 +1310,9 @@ function OsTerminal({
           spellCheck={false}
           autoFocus={mobile}
           lang={locale}
+          placeholder={guidedFlow ? "…" : undefined}
         />
+        <button type="submit" aria-label="Submit terminal input">↵</button>
       </form>
     </div>
   );
