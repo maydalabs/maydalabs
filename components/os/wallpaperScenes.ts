@@ -40,15 +40,87 @@ function teardown(ctx: SceneContext, g: ThreeNS.Group, resources: Array<{ dispos
 function makeGlobe(ctx: SceneContext): SceneHandle {
   const { three: T } = ctx;
   const g = group(ctx);
-  g.position.set(9.5, -7.5, 0);
-  const R = 9.2;
+  g.position.set(7, -11.5, -2);
+  g.rotation.z = -0.12;
+  const R = 15;
   const res: Array<{ dispose(): void }> = [];
 
+  // Distant stars behind everything.
+  const STAR_COUNT = 170;
+  const starPositions = new Float32Array(STAR_COUNT * 3);
+  for (let i = 0; i < STAR_COUNT; i += 1) {
+    starPositions[i * 3] = (Math.random() - 0.5) * 110;
+    starPositions[i * 3 + 1] = (Math.random() - 0.3) * 70;
+    starPositions[i * 3 + 2] = -34 - Math.random() * 30;
+  }
+  const starGeo = new T.BufferGeometry();
+  starGeo.setAttribute("position", new T.BufferAttribute(starPositions, 3));
+  const starMat = new T.PointsMaterial({ color: 0xf2f0ea, size: 0.09, transparent: true, opacity: 0.5, depthWrite: false });
+  res.push(starGeo, starMat);
+  ctx.world.add(new T.Points(starGeo, starMat));
+  const stars = ctx.world.children[ctx.world.children.length - 1];
+
+  const planet = new T.Group();
+  g.add(planet);
+
+  // Solid body: occludes the far hemisphere, darker than the sky.
+  const bodyGeo = new T.SphereGeometry(R * 0.985, 48, 32);
+  const bodyMat = new T.MeshBasicMaterial({ color: 0x080807 });
+  res.push(bodyGeo, bodyMat);
+  planet.add(new T.Mesh(bodyGeo, bodyMat));
+
+  // Atmosphere: fresnel rim glow on the limb.
+  const rimGeo = new T.SphereGeometry(R * 1.03, 48, 32);
+  const rimMat = new T.ShaderMaterial({
+    uniforms: { uColor: { value: new T.Color(HOT) } },
+    vertexShader:
+      "varying float vRim; void main(){ vec3 n = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.0); vRim = pow(1.0 - abs(dot(n, normalize(-mv.xyz))), 3.0); gl_Position = projectionMatrix * mv; }",
+    fragmentShader:
+      "uniform vec3 uColor; varying float vRim; void main(){ gl_FragColor = vec4(uColor, vRim * 0.42); }",
+    transparent: true,
+    blending: T.AdditiveBlending,
+    depthWrite: false,
+  });
+  res.push(rimGeo, rimMat);
+  planet.add(new T.Mesh(rimGeo, rimMat));
+
+  // Graticule: mission-control latitude and longitude guides.
+  const gratVerts: number[] = [];
+  for (let lat = -60; lat <= 60; lat += 30) {
+    const r = R * Math.cos((lat * Math.PI) / 180) * 1.001;
+    const y = R * Math.sin((lat * Math.PI) / 180);
+    for (let i = 0; i < 96; i += 1) {
+      const a1 = (i / 96) * Math.PI * 2;
+      const a2 = ((i + 1) / 96) * Math.PI * 2;
+      gratVerts.push(Math.cos(a1) * r, y, Math.sin(a1) * r, Math.cos(a2) * r, y, Math.sin(a2) * r);
+    }
+  }
+  for (let lon = 0; lon < 360; lon += 30) {
+    const a = (lon * Math.PI) / 180;
+    for (let i = 0; i < 64; i += 1) {
+      const p1 = (i / 64) * Math.PI - Math.PI / 2;
+      const p2 = ((i + 1) / 64) * Math.PI - Math.PI / 2;
+      gratVerts.push(
+        Math.cos(p1) * Math.cos(a) * R * 1.001, Math.sin(p1) * R * 1.001, Math.cos(p1) * Math.sin(a) * R * 1.001,
+        Math.cos(p2) * Math.cos(a) * R * 1.001, Math.sin(p2) * R * 1.001, Math.cos(p2) * Math.sin(a) * R * 1.001,
+      );
+    }
+  }
+  const gratGeo = new T.BufferGeometry();
+  gratGeo.setAttribute("position", new T.BufferAttribute(new Float32Array(gratVerts), 3));
+  const gratMat = new T.LineBasicMaterial({ color: 0xf2f0ea, transparent: true, opacity: 0.05 });
+  res.push(gratGeo, gratMat);
+  planet.add(new T.LineSegments(gratGeo, gratMat));
+
+  // Land dots, with a set of ember city lights that twinkle.
   const count = LAND_DOTS.length;
   const positions = new Float32Array(count * 3);
   const colors = new Float32Array(count * 3);
+  const baseColors = new Float32Array(count * 3);
+  const twinklePhase = new Float32Array(count);
+  const isCity = new Uint8Array(count);
   const dust = new T.Color(DUST);
-  const ember = new T.Color(EMBER);
+  const ember = new T.Color(0xd9862e);
   const vecs: ThreeNS.Vector3[] = [];
   for (let i = 0; i < count; i += 1) {
     const [lat, lon] = LAND_DOTS[i] as [number, number];
@@ -61,78 +133,152 @@ function makeGlobe(ctx: SceneContext): SceneHandle {
     );
     vecs.push(v);
     positions.set([v.x, v.y, v.z], i * 3);
-    const c = (Math.random() < 0.12 ? ember : dust).clone().multiplyScalar(0.5 + Math.random() * 0.4);
+    const city = Math.random() < 0.11;
+    isCity[i] = city ? 1 : 0;
+    twinklePhase[i] = Math.random() * Math.PI * 2;
+    const c = (city ? ember : dust).clone().multiplyScalar(city ? 0.95 : 0.62 + Math.random() * 0.35);
+    baseColors.set([c.r, c.g, c.b], i * 3);
     colors.set([c.r, c.g, c.b], i * 3);
   }
   const geo = new T.BufferGeometry();
   geo.setAttribute("position", new T.BufferAttribute(positions, 3));
   geo.setAttribute("color", new T.BufferAttribute(colors, 3));
   res.push(geo);
-  const mat = new T.PointsMaterial({ size: 0.13, vertexColors: true, transparent: true, opacity: 0.85, depthWrite: false });
+  const mat = new T.PointsMaterial({ size: 0.16, vertexColors: true, transparent: true, opacity: 0.95, depthWrite: false });
   res.push(mat);
-  g.add(new T.Points(geo, mat));
+  planet.add(new T.Points(geo, mat));
+  const colorAttr = geo.getAttribute("color") as ThreeNS.BufferAttribute;
 
-  // Faint sphere wire for form.
-  const wireGeo = new T.SphereGeometry(R * 0.995, 24, 16);
-  const wire = new T.LineSegments(new T.WireframeGeometry(wireGeo), new T.LineBasicMaterial({ color: 0xf2f0ea, transparent: true, opacity: 0.018 }));
-  res.push(wireGeo, wire.geometry as ThreeNS.BufferGeometry, wire.material as ThreeNS.Material);
-  g.add(wire);
-
-  // Transaction arcs.
-  type Arc = { line: ThreeNS.Line; mat: ThreeNS.LineBasicMaterial; geo: ThreeNS.BufferGeometry; start: number };
+  // Transaction arcs with bright heads and landing pings.
+  type Arc = {
+    line: ThreeNS.Line;
+    lineGeo: ThreeNS.BufferGeometry;
+    lineMat: ThreeNS.LineBasicMaterial;
+    head: ThreeNS.Points;
+    headGeo: ThreeNS.BufferGeometry;
+    headMat: ThreeNS.PointsMaterial;
+    points: ThreeNS.Vector3[];
+    dest: ThreeNS.Vector3;
+    start: number;
+  };
   const arcs: Arc[] = [];
-  let spawnAt = 2;
+  type Ping = { loop: ThreeNS.LineLoop; geo: ThreeNS.BufferGeometry; mat: ThreeNS.LineBasicMaterial; start: number };
+  const pings: Ping[] = [];
+  let spawnAt = 1.5;
+
   const spawnArc = (now: number) => {
+    if (arcs.length >= 4) return;
     const a = vecs[Math.floor(Math.random() * vecs.length)];
     let b = vecs[Math.floor(Math.random() * vecs.length)];
-    for (let tries = 0; tries < 12 && a.angleTo(b) < 0.7; tries += 1) b = vecs[Math.floor(Math.random() * vecs.length)];
+    for (let tries = 0; tries < 14 && a.angleTo(b) < 0.6; tries += 1) b = vecs[Math.floor(Math.random() * vecs.length)];
     const points: ThreeNS.Vector3[] = [];
-    const STEPS = 42;
-    for (let s = 0; s <= STEPS; s += 1) {
-      const f = s / STEPS;
-      const p = a.clone().lerp(b, f).normalize().multiplyScalar(R * (1 + Math.sin(f * Math.PI) * 0.22));
-      points.push(p);
+    const STEPS = 48;
+    for (let sIdx = 0; sIdx <= STEPS; sIdx += 1) {
+      const f = sIdx / STEPS;
+      points.push(a.clone().lerp(b, f).normalize().multiplyScalar(R * (1 + Math.sin(f * Math.PI) * 0.24)));
     }
-    const ageo = new T.BufferGeometry().setFromPoints(points);
-    const amat = new T.LineBasicMaterial({ color: HOT, transparent: true, opacity: 0.75 });
-    const line = new T.Line(ageo, amat);
-    ageo.setDrawRange(0, 0);
-    g.add(line);
-    arcs.push({ line, mat: amat, geo: ageo, start: now });
+    const lineGeo = new T.BufferGeometry().setFromPoints(points);
+    const lineMat = new T.LineBasicMaterial({ color: HOT, transparent: true, opacity: 0.85 });
+    const line = new T.Line(lineGeo, lineMat);
+    lineGeo.setDrawRange(0, 0);
+    const headGeo = new T.BufferGeometry();
+    headGeo.setAttribute("position", new T.BufferAttribute(new Float32Array([a.x, a.y, a.z]), 3));
+    const headMat = new T.PointsMaterial({ color: 0xffc36d, size: 0.34, transparent: true, opacity: 1, depthWrite: false });
+    const head = new T.Points(headGeo, headMat);
+    planet.add(line);
+    planet.add(head);
+    arcs.push({ line, lineGeo, lineMat, head, headGeo, headMat, points, dest: b, start: now });
+  };
+
+  const spawnPing = (at: ThreeNS.Vector3) => {
+    const pts: ThreeNS.Vector3[] = [];
+    for (let i = 0; i < 24; i += 1) {
+      const a = (i / 24) * Math.PI * 2;
+      pts.push(new T.Vector3(Math.cos(a), Math.sin(a), 0));
+    }
+    const pgeo = new T.BufferGeometry().setFromPoints(pts);
+    const pmat = new T.LineBasicMaterial({ color: HOT, transparent: true, opacity: 0.8 });
+    const loop = new T.LineLoop(pgeo, pmat);
+    loop.position.copy(at.clone().multiplyScalar(1.004));
+    loop.lookAt(at.clone().multiplyScalar(2));
+    loop.scale.setScalar(0.15);
+    planet.add(loop);
+    pings.push({ loop, geo: pgeo, mat: pmat, start: performance.now() / 1000 });
   };
 
   let blockRing: { mesh: ThreeNS.LineLoop; mat: ThreeNS.LineBasicMaterial; geo: ThreeNS.BufferGeometry; start: number } | null = null;
   let excite = 0;
+  let surge = 0;
+  let lastT = 0;
 
   return {
     update(t, dt) {
-      g.rotation.y += dt * 0.02;
+      lastT = t;
+      planet.rotation.y += dt * 0.018;
       excite = Math.max(0, excite - dt * 0.5);
-      mat.opacity = 0.85 + excite * 0.15;
-      if (t > spawnAt && arcs.length < 2) {
+      surge = Math.max(0, surge - dt * 0.55);
+      mat.opacity = 0.95;
+      starMat.opacity = 0.45 + excite * 0.2;
+      stars.rotation.z += dt * 0.0012;
+
+      // City lights twinkle; a surge lifts every settlement at once.
+      for (let i = 0; i < count; i += 1) {
+        const boost = isCity[i]
+          ? 0.82 + 0.24 * Math.sin(t * 0.9 + twinklePhase[i]) + surge * 0.9
+          : 1 + surge * 0.45 + excite * 0.15;
+        colorAttr.setXYZ(i, baseColors[i * 3] * boost, baseColors[i * 3 + 1] * boost, baseColors[i * 3 + 2] * boost);
+      }
+      colorAttr.needsUpdate = true;
+
+      if (t > spawnAt) {
         spawnArc(t);
         const pool = ctx.mempool();
-        const interval = pool === null ? 6 : Math.max(3, 8 - Math.min(pool, 40000) / 8000);
-        spawnAt = t + interval + Math.random() * 2;
+        const interval = pool === null ? 4.5 : Math.max(2.2, 6.5 - Math.min(pool, 40000) / 9000);
+        spawnAt = t + interval + Math.random() * 1.6;
       }
       for (let i = arcs.length - 1; i >= 0; i -= 1) {
         const arc = arcs[i];
         const age = t - arc.start;
-        if (age < 1.6) arc.geo.setDrawRange(0, Math.floor((age / 1.6) * 43));
-        else arc.mat.opacity = Math.max(0, 0.75 - (age - 1.6) * 0.55);
-        if (age > 3.1) {
-          g.remove(arc.line);
-          arc.geo.dispose();
-          arc.mat.dispose();
+        if (age < 1.9) {
+          const f = Math.min(1, age / 1.9);
+          const idx = Math.floor(f * 48);
+          arc.lineGeo.setDrawRange(Math.max(0, idx - 16), Math.min(49, idx + 1) - Math.max(0, idx - 16));
+          const headPoint = arc.points[Math.min(48, idx)];
+          (arc.headGeo.getAttribute("position") as ThreeNS.BufferAttribute).setXYZ(0, headPoint.x, headPoint.y, headPoint.z);
+          (arc.headGeo.getAttribute("position") as ThreeNS.BufferAttribute).needsUpdate = true;
+          if (idx >= 48) spawnPing(arc.dest);
+        } else {
+          arc.lineMat.opacity = Math.max(0, 0.85 - (age - 1.9) * 1.1);
+          arc.headMat.opacity = arc.lineMat.opacity;
+        }
+        if (age > 2.9) {
+          planet.remove(arc.line);
+          planet.remove(arc.head);
+          arc.lineGeo.dispose();
+          arc.lineMat.dispose();
+          arc.headGeo.dispose();
+          arc.headMat.dispose();
           arcs.splice(i, 1);
         }
       }
+      const nowSec = performance.now() / 1000;
+      for (let i = pings.length - 1; i >= 0; i -= 1) {
+        const ping = pings[i];
+        const age = nowSec - ping.start;
+        ping.loop.scale.setScalar(0.15 + age * 1.6);
+        ping.mat.opacity = Math.max(0, 0.8 - age * 1.1);
+        if (age > 0.8) {
+          planet.remove(ping.loop);
+          ping.geo.dispose();
+          ping.mat.dispose();
+          pings.splice(i, 1);
+        }
+      }
       if (blockRing) {
-        const age = t - blockRing.start;
-        const scale = 0.25 + age * 0.65;
-        blockRing.mesh.scale.setScalar(scale);
-        blockRing.mat.opacity = Math.max(0, 0.5 - age * 0.28);
-        if (age > 2) {
+        const age = nowSec - blockRing.start;
+        blockRing.mesh.scale.setScalar(0.3 + age * 0.6);
+        blockRing.mat.opacity = Math.max(0, 0.55 - age * 0.3);
+        if (age > 1.9) {
           g.remove(blockRing.mesh);
           blockRing.geo.dispose();
           blockRing.mat.dispose();
@@ -140,32 +286,43 @@ function makeGlobe(ctx: SceneContext): SceneHandle {
         }
       }
     },
+    onPulse() {
+      spawnArc(lastT);
+    },
     onExcite() {
-      excite = Math.min(0.8, excite + 0.25);
+      excite = Math.min(0.9, excite + 0.28);
     },
     onBlock() {
+      surge = 1;
       if (blockRing) return;
       const pts: ThreeNS.Vector3[] = [];
-      for (let i = 0; i <= 64; i += 1) {
-        const a = (i / 64) * Math.PI * 2;
-        pts.push(new (ctx.three.Vector3)(Math.cos(a) * R * 1.05, 0, Math.sin(a) * R * 1.05));
+      for (let i = 0; i <= 72; i += 1) {
+        const a = (i / 72) * Math.PI * 2;
+        pts.push(new T.Vector3(Math.cos(a) * R * 1.08, 0, Math.sin(a) * R * 1.08));
       }
-      const rgeo = new ctx.three.BufferGeometry().setFromPoints(pts);
-      const rmat = new ctx.three.LineBasicMaterial({ color: HOT, transparent: true, opacity: 0.5 });
-      const mesh = new ctx.three.LineLoop(rgeo, rmat);
-      mesh.rotation.x = Math.PI * 0.12;
+      const rgeo = new T.BufferGeometry().setFromPoints(pts);
+      const rmat = new T.LineBasicMaterial({ color: HOT, transparent: true, opacity: 0.55 });
+      const mesh = new T.LineLoop(rgeo, rmat);
+      mesh.rotation.x = Math.PI * 0.14;
       g.add(mesh);
       blockRing = { mesh, mat: rmat, geo: rgeo, start: performance.now() / 1000 };
     },
     dispose() {
       for (const arc of arcs) {
-        arc.geo.dispose();
-        arc.mat.dispose();
+        arc.lineGeo.dispose();
+        arc.lineMat.dispose();
+        arc.headGeo.dispose();
+        arc.headMat.dispose();
+      }
+      for (const ping of pings) {
+        ping.geo.dispose();
+        ping.mat.dispose();
       }
       if (blockRing) {
         blockRing.geo.dispose();
         blockRing.mat.dispose();
       }
+      ctx.world.remove(stars);
       teardown(ctx, g, res);
     },
   };
