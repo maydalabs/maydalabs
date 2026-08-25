@@ -8574,3 +8574,52 @@ select {
   border-color: rgba(247, 147, 26, 0.5);
   color: var(--signal);
 }
+
+/* Welcome readme document */
+.os-welcome-doc {
+  display: grid;
+  overflow-y: auto;
+  max-height: 13.5rem;
+  padding-right: 0.5rem;
+  gap: 0.7rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(242, 240, 234, 0.16) transparent;
+}
+
+.os-welcome-doc p {
+  margin: 0;
+  color: rgba(242, 240, 234, 0.62);
+  font-size: 0.78rem;
+  line-height: 1.62;
+}
+
+.os-welcome-doc ul {
+  display: grid;
+  margin: 0.1rem 0;
+  padding: 0;
+  gap: 0.3rem;
+  list-style: none;
+}
+
+.os-welcome-doc li a {
+  color: rgba(242, 240, 234, 0.82);
+  font-size: 0.76rem;
+  transition: color 150ms ease;
+}
+
+.os-welcome-doc li a::before {
+  margin-right: 0.5rem;
+  color: var(--signal);
+  content: "→";
+}
+
+.os-welcome-doc li a:hover {
+  color: var(--signal);
+}
+
+.os-welcome-note {
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(242, 240, 234, 0.08);
+  color: rgba(242, 240, 234, 0.42) !important;
+  font-size: 0.7rem !important;
+}

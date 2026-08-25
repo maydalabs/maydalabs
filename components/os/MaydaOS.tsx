@@ -388,7 +388,17 @@ export function MaydaOS({ locale }: { locale: Locale }) {
                 <SignalDecode text={copy.welcome.hero[0]} delay={220} /><br />
                 {copy.welcome.hero[1]} <em><SignalDecode text={copy.welcome.hero[2]} delay={900} /></em>
               </h1>
-              <p>{copy.welcome.body}</p>
+              <div className="os-welcome-doc">
+                {copy.welcome.body.map((paragraph) => (
+                  <p key={paragraph.slice(0, 24)}>{paragraph}</p>
+                ))}
+                <ul>
+                  {copy.welcome.capabilities.map(([label, path]) => (
+                    <li key={label}><Link href={localizePath(path, locale)}>{label}</Link></li>
+                  ))}
+                </ul>
+                <p className="os-welcome-note">{copy.welcome.note}</p>
+              </div>
               <div className="os-welcome-actions">
                 <a href={projectUrl} target="_blank" rel="noopener noreferrer" className="studio-button studio-button-small" data-tour="start">{copy.welcome.start} <span aria-hidden>↗</span></a>
                 <button type="button" className="studio-button studio-button-small studio-button-ghost" onClick={() => openWindow("work")}>{copy.welcome.explore}</button>
