@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MaydaMark } from "@/components/MaydaMark";
 import { SignalDecode } from "@/components/SignalDecode";
 import { LOCALES, LOCALE_LABELS, type Locale, localizePath } from "@/lib/i18n";
@@ -65,8 +65,12 @@ export function MaydaOS({ locale }: { locale: Locale }) {
   const [sound, setSound] = useState(false);
 
   useEffect(() => {
-    setSound(loadSoundPreference());
-    return onSoundChange(setSound);
+    const frame = requestAnimationFrame(() => setSound(loadSoundPreference()));
+    const unsubscribe = onSoundChange(setSound);
+    return () => {
+      cancelAnimationFrame(frame);
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -105,9 +109,12 @@ export function MaydaOS({ locale }: { locale: Locale }) {
         new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Europe/Istanbul" }).format(new Date()),
       );
     };
-    tick();
+    const frame = requestAnimationFrame(tick);
     const interval = setInterval(tick, 30_000);
-    return () => clearInterval(interval);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearInterval(interval);
+    };
   }, [locale]);
 
   // Keep the default layout inside smaller desktop viewports.

@@ -33,8 +33,12 @@ export function SiteHeader({ locale }: { locale: Locale }) {
   }, []);
 
   useEffect(() => {
-    setSound(loadSoundPreference());
-    return onSoundChange(setSound);
+    const frame = requestAnimationFrame(() => setSound(loadSoundPreference()));
+    const unsubscribe = onSoundChange(setSound);
+    return () => {
+      cancelAnimationFrame(frame);
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
