@@ -7985,7 +7985,7 @@ html[data-os-arrived="true"] .os-arrival.is-checking {
 
 .contact-console-signals small {
   margin-top: 0.22rem;
-  color: rgba(242, 240, 234, 0.4);
+  color: rgba(242, 240, 234, 0.58);
   font-size: 0.68rem;
   line-height: 1.45;
 }
