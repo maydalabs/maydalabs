@@ -1,0 +1,6 @@
+@import "./studio.css";
+
+/* MaydaLabs guided-journey stylesheet entry. */
+:root {
+  --journey-release: 260826;
+}
