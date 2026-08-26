@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -24,18 +25,18 @@ type WindowId = "welcome" | "work" | "hodlstay" | "gazette" | "monitor" | "termi
 type WindowState = { open: boolean; min: boolean; max: boolean; snap?: "left" | "right" | null; x: number; y: number; z: number; w: number };
 
 const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
-  welcome: { open: true, min: false, max: false, x: 64, y: 46, z: 4, w: 500 },
-  hodlstay: { open: true, min: false, max: false, x: 612, y: 26, z: 2, w: 540 },
-  gazette: { open: true, min: false, max: false, x: 548, y: 118, z: 1, w: 540 },
-  monitor: { open: true, min: false, max: false, x: 1082, y: 58, z: 3, w: 330 },
-  terminal: { open: true, min: false, max: false, x: 648, y: 280, z: 5, w: 600 },
-  work: { open: false, min: false, max: false, x: 190, y: 160, z: 1, w: 470 },
+  welcome: { open: true, min: false, max: false, x: 48, y: 46, z: 5, w: 590 },
+  work: { open: true, min: false, max: false, x: 658, y: 54, z: 4, w: 650 },
+  monitor: { open: true, min: false, max: false, x: 1068, y: 520, z: 3, w: 330 },
+  hodlstay: { open: false, min: false, max: false, x: 612, y: 26, z: 2, w: 540 },
+  gazette: { open: false, min: false, max: false, x: 548, y: 118, z: 1, w: 540 },
+  terminal: { open: false, min: false, max: false, x: 648, y: 280, z: 1, w: 600 },
   about: { open: false, min: false, max: false, x: 420, y: 130, z: 1, w: 360 },
   trash: { open: false, min: false, max: false, x: 500, y: 210, z: 1, w: 400 },
   array: { open: false, min: false, max: false, x: 320, y: 90, z: 1, w: 680 },
 };
 
-const ENTER_DELAYS: Partial<Record<WindowId, number>> = { welcome: 60, hodlstay: 150, monitor: 240, gazette: 300, terminal: 330 };
+const ENTER_DELAYS: Partial<Record<WindowId, number>> = { welcome: 60, work: 150, monitor: 250 };
 
 const DESKTOP_STORAGE_KEY = "ml_desktop_v3";
 
@@ -247,6 +248,10 @@ export function MaydaOS({ locale }: { locale: Locale }) {
   // Keep the default layout inside smaller desktop viewports.
   useEffect(() => {
     const clamp = () => {
+      // The desktop remains mounted below the mobile breakpoint but has
+      // zero layout width. Do not let that hidden frame overwrite a
+      // returning visitor's real desktop coordinates.
+      if (window.innerWidth < 1024) return;
       const width = desktopRef.current?.clientWidth ?? 1440;
       const height = desktopRef.current?.clientHeight ?? 820;
       setWindows((current) => {
@@ -281,6 +286,10 @@ export function MaydaOS({ locale }: { locale: Locale }) {
     trackOsEvent("os_window_open", { window: id });
     setWindows((current) => ({ ...current, [id]: { ...current[id], open: true, min: false, z } }));
   }, [seaPulse]);
+
+  const trackHomepageIntent = useCallback((intent: string, surface: "desktop" | "mobile" | "menubar") => {
+    trackOsEvent("homepage_intent_click", { intent, surface, locale });
+  }, [locale]);
 
   const closeWindow = useCallback((id: WindowId) => {
     playTick();
@@ -361,7 +370,12 @@ export function MaydaOS({ locale }: { locale: Locale }) {
       ) : null}
 
       <div className="os-desktop-frame os-desktop-only">
-        <OsMenuBar locale={locale} blockHeight={telemetry?.blockHeight ?? null} onBrandClick={() => openWindow("about")} />
+        <OsMenuBar
+          locale={locale}
+          blockHeight={telemetry?.blockHeight ?? null}
+          onBrandClick={() => openWindow("about")}
+          onStartProject={() => trackHomepageIntent("start", "menubar")}
+        />
 
         <div
           className="os-desktop"
@@ -392,24 +406,63 @@ export function MaydaOS({ locale }: { locale: Locale }) {
                 {copy.welcome.body.map((paragraph) => (
                   <p key={paragraph.slice(0, 24)}>{paragraph}</p>
                 ))}
-                <div className="os-welcome-products" aria-label={copy.workWindow.title}>
-                  {copy.workWindow.rows.map((row) => (
-                    <Link key={row.tx} href={localizePath(row.path, locale)}>
-                      <span>{row.tx}</span><strong>{row.name}</strong><small>{row.status}</small>
-                    </Link>
-                  ))}
+                <p className="os-welcome-proof">{copy.welcome.proof}</p>
+                <div className="os-welcome-intents" aria-label={copy.welcome.title}>
+                  <Link
+                    href={localizePath("/contact", locale)}
+                    className="os-welcome-intent is-primary"
+                    data-tour="start"
+                    onClick={() => trackHomepageIntent("start", "desktop")}
+                  >
+                    <span>01</span>
+                    <strong>{copy.welcome.intents.start[0]}</strong>
+                    <small>{copy.welcome.intents.start[1]}</small>
+                    <em aria-hidden="true">→</em>
+                  </Link>
+                  <button
+                    type="button"
+                    className="os-welcome-intent"
+                    onClick={() => {
+                      trackHomepageIntent("work", "desktop");
+                      openWindow("work");
+                    }}
+                  >
+                    <span>02</span>
+                    <strong>{copy.welcome.intents.work[0]}</strong>
+                    <small>{copy.welcome.intents.work[1]}</small>
+                    <em aria-hidden="true">→</em>
+                  </button>
+                  <Link
+                    href={localizePath("/profile", locale)}
+                    className="os-welcome-intent"
+                    onClick={() => trackHomepageIntent("profile", "desktop")}
+                  >
+                    <span>03</span>
+                    <strong>{copy.welcome.intents.profile[0]}</strong>
+                    <small>{copy.welcome.intents.profile[1]}</small>
+                    <em aria-hidden="true">→</em>
+                  </Link>
                 </div>
-                <ul>
-                  {copy.welcome.capabilities.map(([label, path]) => (
-                    <li key={label}><Link href={localizePath(path, locale)}>{label}</Link></li>
-                  ))}
-                </ul>
-                <p className="os-welcome-note">{copy.welcome.note}</p>
               </div>
-              <div className="os-welcome-actions">
-                <Link href={localizePath("/contact", locale)} className="studio-button studio-button-small" data-tour="start">{copy.welcome.start} <span aria-hidden>→</span></Link>
-                <Link href={localizePath("/profile", locale)} className="studio-button studio-button-small studio-button-ghost">{copy.welcome.profile}</Link>
-                <button type="button" className="studio-button studio-button-small studio-button-ghost" onClick={() => openWindow("work")}>{copy.welcome.explore}</button>
+              <div className="os-welcome-secondary">
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackHomepageIntent("tour", "desktop");
+                    window.dispatchEvent(new CustomEvent("os:tour"));
+                  }}
+                >
+                  {copy.tour.offer} <span aria-hidden="true">▶</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackHomepageIntent("explore", "desktop");
+                    minimizeWindow("welcome");
+                  }}
+                >
+                  {copy.welcome.explore} <span aria-hidden="true">↗</span>
+                </button>
               </div>
             </div>
           </OsWindow>
@@ -435,16 +488,47 @@ export function MaydaOS({ locale }: { locale: Locale }) {
           </OsWindow>
 
           <OsWindow id="work" title={copy.workWindow.title} state={windows.work} {...windowProps}>
-            <ul className="os-work-list">
-              {copy.workWindow.rows.map((row) => (
-                <li key={row.tx}>
-                  <span>{row.tx}</span>
-                  <strong>{row.name}</strong>
-                  <small>{row.status}</small>
-                  <Link href={localizePath(row.path, locale)}>{copy.workWindow.open} →</Link>
-                </li>
-              ))}
-            </ul>
+            <div className="os-live-work">
+              <div className="os-live-work-head">
+                <p>{copy.workWindow.intro}</p>
+                <Link
+                  href={localizePath("/case-studies", locale)}
+                  onClick={() => trackHomepageIntent("work_all", "desktop")}
+                >
+                  {copy.workWindow.viewAll} →
+                </Link>
+              </div>
+              <div className="os-live-work-grid">
+                {copy.workWindow.live.map((item) => (
+                  <Link
+                    key={item.tx}
+                    href={localizePath(item.path, locale)}
+                    className="os-live-work-card"
+                    onClick={() => trackHomepageIntent(`work_${item.tx.toLowerCase()}`, "desktop")}
+                  >
+                    <span className="os-live-work-image">
+                      <Image
+                        src={item.image}
+                        alt={item.alt}
+                        width={item.width}
+                        height={item.height}
+                        sizes="(min-width: 1024px) 300px, 1px"
+                      />
+                    </span>
+                    <span className="os-live-work-meta"><i aria-hidden="true" />{item.tx} · {item.status}</span>
+                    <strong>{item.name}</strong>
+                    <small>{item.proof}</small>
+                    <em>{copy.workWindow.open} →</em>
+                  </Link>
+                ))}
+              </div>
+              <div className="os-live-work-private">
+                <span>{copy.workWindow.privateLabel}</span>
+                {copy.workWindow.rows.slice(2).map((row) => (
+                  <Link key={row.tx} href={localizePath(row.path, locale)}>{row.tx} · {row.name}</Link>
+                ))}
+              </div>
+            </div>
           </OsWindow>
 
           <OsWindow id="monitor" title={copy.monitorWindow.title} state={windows.monitor} {...windowProps}>
@@ -530,6 +614,27 @@ export function MaydaOS({ locale }: { locale: Locale }) {
           <h1>{copy.mobile.greeting}</h1>
           <p>{copy.mobile.sub}</p>
         </div>
+        <section className="os-mobile-intro" aria-label={copy.mobile.eyebrow}>
+          <span>{copy.mobile.eyebrow}</span>
+          <p>{copy.mobile.promise}</p>
+          <small>{copy.mobile.proof}</small>
+          <div className="os-mobile-intents">
+            <Link
+              href={localizePath("/contact", locale)}
+              className="studio-button"
+              onClick={() => trackHomepageIntent("start", "mobile")}
+            >
+              {copy.mobile.start} <span aria-hidden="true">→</span>
+            </Link>
+            <Link href={localizePath("/case-studies", locale)} onClick={() => trackHomepageIntent("work", "mobile")}>
+              {copy.mobile.work} <span aria-hidden="true">→</span>
+            </Link>
+            <Link href={localizePath("/profile", locale)} onClick={() => trackHomepageIntent("profile", "mobile")}>
+              {copy.mobile.profile} <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+        </section>
+        <p className="os-mobile-apps-label">{copy.mobile.appsLabel}</p>
         <div className="os-mobile-grid">
           {copy.mobile.apps.map((app) => (
             <Link key={app.path} href={localizePath(app.path, locale)}>
@@ -551,8 +656,6 @@ export function MaydaOS({ locale }: { locale: Locale }) {
             </div>
           ))}
         </div>
-        <Link href={localizePath("/contact", locale)} className="studio-button os-mobile-call">{copy.mobile.call} <span aria-hidden>→</span></Link>
-
         {mobileShell ? (
           <div className="os-mobile-terminal" role="dialog" aria-label={copy.terminalWindow.title}>
             <div className="os-mobile-terminal-bar">

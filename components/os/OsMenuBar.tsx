@@ -12,10 +12,12 @@ export function OsMenuBar({
   locale,
   blockHeight,
   onBrandClick,
+  onStartProject,
 }: {
   locale: Locale;
   blockHeight: number | null;
   onBrandClick?: () => void;
+  onStartProject?: () => void;
 }) {
   const copy = OS_COPY[locale];
   const pathname = usePathname();
@@ -91,6 +93,14 @@ export function OsMenuBar({
         </nav>
       </div>
       <div className="os-menubar-right">
+        <Link
+          href={localizePath("/contact", locale)}
+          className="os-menubar-cta os-menu-explain"
+          data-tooltip={copy.menubarHelp.startProject}
+          onClick={onStartProject}
+        >
+          {copy.menubarHelp.startProjectLabel} <span aria-hidden="true">→</span>
+        </Link>
         <button
           type="button"
           className="os-menubar-palette os-menu-explain"
@@ -127,7 +137,7 @@ export function OsMenuBar({
           ))}
         </span>
         <span className="os-menubar-block" title={copy.menubarHelp.block}>₿ {blockHeight ? blockHeight.toLocaleString(locale) : "———"}</span>
-        <span>{clock || "--:--"} IST</span>
+        <span className="os-menubar-clock">{clock || "--:--"} IST</span>
       </div>
     </header>
   );

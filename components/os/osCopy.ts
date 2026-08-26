@@ -10,6 +10,8 @@ export const OS_COPY = {
     ],
     menubarHelp: {
       brand: "Open MaydaOS system information",
+      startProjectLabel: "Start a project",
+      startProject: "Start with a problem, idea, or rough brief",
       palette: "Search every page, case, and action",
       sound: "Toggle the optional interface sound",
       language: "Switch the interface language",
@@ -28,22 +30,26 @@ export const OS_COPY = {
       kicker: "MaydaLabs — product & growth studio",
       hero: ["We build software", "people can", "feel."],
       body: [
-        "MaydaLabs is a founder-led product and growth studio in Istanbul. Mehmet E. Mayda designs, builds, and operates production software across product engineering, growth systems, Bitcoin, and human-controlled AI workflows.",
-        "HodlStay and Satoshi Gazette are live and publicly inspectable. Mortal Vault and Sofra are active private builds, shown with their current limits intact.",
+        "A founder-led studio for teams that need product strategy, engineering, measurement, and operation to stay connected.",
       ],
-      note: "MaydaOS is part of the evidence: real windows, shell, telemetry, product reels, and a ten-scene three.js engine.",
-      capabilities: [
-        ["Product engineering", "/services"],
-        ["Growth + measurement", "/services"],
-        ["Human-gated AI operations", "/profile"],
-      ],
-      start: "What do you need?",
-      explore: "Open the work",
-      profile: "For hiring teams",
+      proof: "Two live products you can inspect. Two active private builds. One hands-on builder from the first useful version through live operation.",
+      intents: {
+        start: ["Start with your problem", "No polished brief needed."],
+        work: ["Inspect shipped work", "Open the product and the decisions behind it."],
+        profile: ["Evaluating Mehmet?", "See evidence, range, and hiring materials."],
+      },
+      explore: "Explore MaydaOS freely",
     },
     workWindow: {
-      title: "work — transmissions",
+      title: "work — live transmissions",
       open: "Open case",
+      intro: "Two live products. Open the interface, then inspect what was designed, built, and operated.",
+      viewAll: "View all four transmissions",
+      privateLabel: "Also in active private build",
+      live: [
+        { tx: "TX-01", name: "HodlStay", status: "Client build · Live", path: "/case-studies/hodlstay", image: "/work/hodlstay-2026-08-home.jpg", width: 1430, height: 894, alt: "HodlStay global stay marketplace", proof: "A Bitcoin-native stay marketplace spanning discovery, host operations, booking, payments, and migration." },
+        { tx: "TX-02", name: "Satoshi Gazette", status: "Studio product · Live", path: "/case-studies/satoshi-gazette", image: "/work/satoshi-gazette-2026-08-data.jpg", width: 1280, height: 720, alt: "Satoshi Gazette evidence-led Data Desk", proof: "An evidence-led Bitcoin newsroom with editorial systems, data desks, and automation built in." },
+      ],
       rows: [
         { tx: "TX-01", name: "HodlStay", status: "Client build · Broadcasting", path: "/case-studies/hodlstay" },
         { tx: "TX-02", name: "Satoshi Gazette", status: "Studio product · Broadcasting", path: "/case-studies/satoshi-gazette" },
@@ -164,6 +170,13 @@ export const OS_COPY = {
     mobile: {
       greeting: "MaydaOS",
       sub: "Software people can feel.",
+      eyebrow: "Founder-led product & growth studio",
+      promise: "Strategy, engineering, measurement, and operations—from the first useful version to live software.",
+      proof: "2 live products · 2 active private builds",
+      start: "Start with your problem",
+      work: "Inspect shipped work",
+      profile: "Evaluating Mehmet?",
+      appsLabel: "Or explore MaydaOS",
       apps: [
         { label: "Work", path: "/case-studies", glyph: "grid" },
         { label: "Services", path: "/services", glyph: "layers" },
@@ -171,7 +184,6 @@ export const OS_COPY = {
         { label: "Profile", path: "/profile", glyph: "doc" },
         { label: "Contact", path: "/contact", glyph: "send" },
       ],
-      call: "Tell us what you need",
     },
   },
   tr: {
@@ -183,6 +195,8 @@ export const OS_COPY = {
     ],
     menubarHelp: {
       brand: "MaydaOS sistem bilgisini aç",
+      startProjectLabel: "Proje başlat",
+      startProject: "Bir problem, fikir veya ham brief ile başlayın",
       palette: "Tüm sayfa, vaka ve eylemlerde ara",
       sound: "İsteğe bağlı arayüz sesini aç veya kapat",
       language: "Arayüz dilini değiştir",
@@ -201,22 +215,26 @@ export const OS_COPY = {
       kicker: "MaydaLabs — ürün ve büyüme stüdyosu",
       hero: ["İnsanların hissedebileceği", "yazılımlar", "geliştiriyoruz."],
       body: [
-        "MaydaLabs, İstanbul'da kurucu liderliğinde çalışan bir ürün ve büyüme stüdyosudur. Mehmet E. Mayda; ürün mühendisliği, büyüme sistemleri, Bitcoin ve insan kontrollü yapay zekâ akışlarında üretim yazılımları tasarlar, geliştirir ve işletir.",
-        "HodlStay ve Satoshi Gazette canlı ve herkese açık olarak incelenebilir. Mortal Vault ile Sofra, mevcut sınırları korunarak gösterilen aktif özel geliştirmelerdir.",
+        "Ürün stratejisi, mühendislik, ölçüm ve operasyonun birbirinden kopmaması gereken ekipler için kurucu liderliğinde çalışan bir stüdyo.",
       ],
-      note: "MaydaOS kanıtın parçasıdır: gerçek pencereler, kabuk, telemetri, ürün akışları ve on sahneli three.js motoru.",
-      capabilities: [
-        ["Ürün mühendisliği", "/services"],
-        ["Büyüme + ölçüm", "/services"],
-        ["İnsan onay kapılı yapay zekâ", "/profile"],
-      ],
-      start: "Neye ihtiyacınız var?",
-      explore: "Projeleri aç",
-      profile: "İşe alım ekipleri için",
+      proof: "İnceleyebileceğiniz iki canlı ürün. İki aktif özel geliştirme. İlk faydalı sürümden canlı operasyona kadar işin içinde tek bir üretici.",
+      intents: {
+        start: ["Probleminizle başlayın", "Kusursuz bir brief gerekmiyor."],
+        work: ["Yayınlanmış işleri inceleyin", "Ürünü ve arkasındaki kararları açın."],
+        profile: ["Mehmet'i değerlendiriyor musunuz?", "Kanıtları, yetkinlikleri ve işe alım materyallerini görün."],
+      },
+      explore: "MaydaOS'i özgürce keşfedin",
     },
     workWindow: {
-      title: "projeler — yayınlar",
+      title: "projeler — canlı yayınlar",
       open: "Vakayı aç",
+      intro: "İki canlı ürün. Arayüzü açın; ardından neyin tasarlandığını, geliştirildiğini ve işletildiğini inceleyin.",
+      viewAll: "Dört yayının tamamını görün",
+      privateLabel: "Aktif özel geliştirmede olanlar",
+      live: [
+        { tx: "TX-01", name: "HodlStay", status: "Müşteri projesi · Canlı", path: "/case-studies/hodlstay", image: "/work/hodlstay-2026-08-home.jpg", width: 1430, height: 894, alt: "HodlStay küresel konaklama pazarı", proof: "Keşif, ev sahibi operasyonları, rezervasyon, ödeme ve veri göçünü kapsayan Bitcoin-native konaklama pazarı." },
+        { tx: "TX-02", name: "Satoshi Gazette", status: "Stüdyo ürünü · Canlı", path: "/case-studies/satoshi-gazette", image: "/work/satoshi-gazette-2026-08-data.jpg", width: 1280, height: 720, alt: "Satoshi Gazette kanıt odaklı Veri Masası", proof: "Editoryal sistemleri, veri masaları ve otomasyonu ürünün içine yerleştirilmiş kanıt odaklı Bitcoin haber merkezi." },
+      ],
       rows: [
         { tx: "TX-01", name: "HodlStay", status: "Müşteri projesi · Yayında", path: "/case-studies/hodlstay" },
         { tx: "TX-02", name: "Satoshi Gazette", status: "Stüdyo ürünü · Yayında", path: "/case-studies/satoshi-gazette" },
@@ -337,6 +355,13 @@ export const OS_COPY = {
     mobile: {
       greeting: "MaydaOS",
       sub: "Hissedebileceğiniz yazılımlar.",
+      eyebrow: "Kurucu liderliğinde ürün ve büyüme stüdyosu",
+      promise: "İlk faydalı sürümden canlı yazılıma kadar strateji, mühendislik, ölçüm ve operasyon.",
+      proof: "2 canlı ürün · 2 aktif özel geliştirme",
+      start: "Probleminizle başlayın",
+      work: "Yayınlanmış işleri inceleyin",
+      profile: "Mehmet'i değerlendiriyor musunuz?",
+      appsLabel: "Veya MaydaOS'i keşfedin",
       apps: [
         { label: "Projeler", path: "/case-studies", glyph: "grid" },
         { label: "Hizmetler", path: "/services", glyph: "layers" },
@@ -344,7 +369,6 @@ export const OS_COPY = {
         { label: "Profil", path: "/profile", glyph: "doc" },
         { label: "İletişim", path: "/contact", glyph: "send" },
       ],
-      call: "Neye ihtiyacınız olduğunu anlatın",
     },
   },
   fr: {
@@ -356,6 +380,8 @@ export const OS_COPY = {
     ],
     menubarHelp: {
       brand: "Ouvrir les informations système de MaydaOS",
+      startProjectLabel: "Lancer un projet",
+      startProject: "Commencer par un problème, une idée ou un brief brut",
       palette: "Rechercher toutes les pages, études et actions",
       sound: "Activer ou couper le son optionnel de l'interface",
       language: "Changer la langue de l'interface",
@@ -374,22 +400,26 @@ export const OS_COPY = {
       kicker: "MaydaLabs — studio produit et croissance",
       hero: ["Nous créons des logiciels", "que l’on peut", "ressentir."],
       body: [
-        "MaydaLabs est un studio produit et croissance dirigé par son fondateur à Istanbul. Mehmet E. Mayda conçoit, construit et opère des logiciels en production entre ingénierie produit, croissance, Bitcoin et workflows IA sous contrôle humain.",
-        "HodlStay et Satoshi Gazette sont en ligne et inspectables. Mortal Vault et Sofra sont des constructions privées actives, présentées avec leurs limites intactes.",
+        "Un studio dirigé par son fondateur pour les équipes qui veulent garder stratégie produit, ingénierie, mesure et opérations reliées.",
       ],
-      note: "MaydaOS fait partie des preuves : fenêtres, shell, télémétrie, parcours produit et moteur three.js à dix scènes.",
-      capabilities: [
-        ["Ingénierie produit", "/services"],
-        ["Croissance + mesure", "/services"],
-        ["Opérations IA sous validation humaine", "/profile"],
-      ],
-      start: "De quoi avez-vous besoin ?",
-      explore: "Ouvrir les projets",
-      profile: "Pour les équipes recrutement",
+      proof: "Deux produits en ligne à inspecter. Deux constructions privées actives. Un builder impliqué de la première version utile aux opérations en production.",
+      intents: {
+        start: ["Commencez par votre problème", "Aucun brief parfait n'est nécessaire."],
+        work: ["Inspectez le travail livré", "Ouvrez le produit et les décisions qui l'ont façonné."],
+        profile: ["Vous évaluez Mehmet ?", "Voyez les preuves, l'étendue et les éléments de recrutement."],
+      },
+      explore: "Explorez MaydaOS librement",
     },
     workWindow: {
-      title: "projets — transmissions",
+      title: "projets — transmissions en direct",
       open: "Ouvrir le cas",
+      intro: "Deux produits en ligne. Ouvrez l'interface, puis inspectez ce qui a été conçu, construit et opéré.",
+      viewAll: "Voir les quatre transmissions",
+      privateLabel: "Également en construction privée active",
+      live: [
+        { tx: "TX-01", name: "HodlStay", status: "Projet client · En ligne", path: "/case-studies/hodlstay", image: "/work/hodlstay-2026-08-home.jpg", width: 1430, height: 894, alt: "Marketplace mondiale de séjours HodlStay", proof: "Une marketplace de séjours Bitcoin-native couvrant découverte, opérations hôtes, réservation, paiements et migration." },
+        { tx: "TX-02", name: "Satoshi Gazette", status: "Produit studio · En ligne", path: "/case-studies/satoshi-gazette", image: "/work/satoshi-gazette-2026-08-data.jpg", width: 1280, height: 720, alt: "Data Desk de Satoshi Gazette fondé sur les preuves", proof: "Une rédaction Bitcoin fondée sur les preuves, avec systèmes éditoriaux, data desks et automatisation intégrés." },
+      ],
       rows: [
         { tx: "TX-01", name: "HodlStay", status: "Projet client · En émission", path: "/case-studies/hodlstay" },
         { tx: "TX-02", name: "Satoshi Gazette", status: "Produit studio · En émission", path: "/case-studies/satoshi-gazette" },
@@ -510,6 +540,13 @@ export const OS_COPY = {
     mobile: {
       greeting: "MaydaOS",
       sub: "Du logiciel que l’on ressent.",
+      eyebrow: "Studio produit & croissance dirigé par son fondateur",
+      promise: "Stratégie, ingénierie, mesure et opérations — de la première version utile au logiciel en production.",
+      proof: "2 produits en ligne · 2 constructions privées actives",
+      start: "Commencez par votre problème",
+      work: "Inspectez le travail livré",
+      profile: "Vous évaluez Mehmet ?",
+      appsLabel: "Ou explorez MaydaOS",
       apps: [
         { label: "Projets", path: "/case-studies", glyph: "grid" },
         { label: "Services", path: "/services", glyph: "layers" },
@@ -517,7 +554,6 @@ export const OS_COPY = {
         { label: "Profil", path: "/profile", glyph: "doc" },
         { label: "Contact", path: "/contact", glyph: "send" },
       ],
-      call: "Dites-nous ce qu'il vous faut",
     },
   },
 } as const;
