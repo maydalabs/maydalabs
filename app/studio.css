@@ -5444,7 +5444,8 @@ html[data-os-arrived="true"] .os-arrival.is-checking {
 
 .os-arrival-copy h1 em {
   color: var(--signal);
-  font-family: var(--font-studio-serif), serif;
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-style: italic;
   font-weight: 400;
 }
 
