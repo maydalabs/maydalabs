@@ -1,24 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   DEFAULT_LOCALE,
-  LOCALE_COOKIE,
-  type Locale,
   isLocale,
   stripLocaleFromPath,
 } from "@/lib/i18n";
 
-const ONE_YEAR = 60 * 60 * 24 * 365;
 const PUBLIC_FILE = /\.[^/]+$/;
-
-function rememberLocale(response: NextResponse, locale: Locale) {
-  response.cookies.set(LOCALE_COOKIE, locale, {
-    maxAge: ONE_YEAR,
-    path: "/",
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-  });
-  return response;
-}
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -46,10 +33,6 @@ export function proxy(request: NextRequest) {
       // internal destination routable while retaining clean default-locale
       // URLs on the deployed site.
       if (isLocalHost) {
-        if (request.cookies.get(LOCALE_COOKIE)?.value !== DEFAULT_LOCALE) {
-          return rememberLocale(NextResponse.next(), DEFAULT_LOCALE);
-        }
-
         return NextResponse.next();
       }
 
@@ -57,11 +40,7 @@ export function proxy(request: NextRequest) {
       url.pathname = stripLocaleFromPath(pathname);
       const response = NextResponse.redirect(url, 307);
       response.headers.set("Cache-Control", "private, no-store");
-      return rememberLocale(response, DEFAULT_LOCALE);
-    }
-
-    if (request.cookies.get(LOCALE_COOKIE)?.value !== firstSegment) {
-      return rememberLocale(NextResponse.next(), firstSegment);
+      return response;
     }
 
     return NextResponse.next();

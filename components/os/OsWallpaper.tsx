@@ -1,20 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { DEFAULT_WALLPAPER, WALLPAPERS, type SceneHandle } from "@/components/os/wallpaperScenes";
+import type { SceneHandle } from "@/components/os/wallpaperScenes";
+import { DEFAULT_WALLPAPER, resolveWallpaperId, type WallpaperId } from "@/components/os/wallpaperRegistry";
 import { trackOsEvent } from "@/lib/osAnalytics";
 
 const STORAGE_KEY = "ml_wallpaper";
-
-export function resolveWallpaperId(candidate: string | null | undefined): string | null {
-  if (!candidate) return null;
-  const id = candidate.toLowerCase().trim();
-  if (id in WALLPAPERS) return id;
-  const index = Number(id);
-  const keys = Object.keys(WALLPAPERS);
-  if (Number.isInteger(index) && index >= 1 && index <= keys.length) return keys[index - 1];
-  return null;
-}
 
 // The wallpaper engine: hosts one of the ten registered scenes, drives
 // it at ~30fps, forwards the OS event bus, and hot-swaps scenes when
@@ -38,15 +29,21 @@ export function OsWallpaper({ mempoolCount = null }: { mempoolCount?: number | n
 
     let cancelled = false;
     let initialized = false;
+    let initializeScheduled = false;
     let visible = false;
     let destroyScene: (() => void) | undefined;
+    let idleCallback = 0;
+    let initializeTimer = 0;
 
     const initialize = async () => {
       if (initialized) return;
       initialized = true;
 
       try {
-        const THREE = await import("three");
+        const [{ WALLPAPERS }, THREE] = await Promise.all([
+          import("@/components/os/wallpaperScenes"),
+          import("three"),
+        ]);
         if (cancelled) return;
 
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "low-power" });
@@ -64,12 +61,13 @@ export function OsWallpaper({ mempoolCount = null }: { mempoolCount?: number | n
         let handle: SceneHandle | null = null;
         let started = performance.now();
 
-        const mount = (id: string) => {
+        const mount = (id: WallpaperId) => {
           handle?.dispose();
-          handle = WALLPAPERS[id in WALLPAPERS ? id : DEFAULT_WALLPAPER].make(context);
+          const nextHandle = WALLPAPERS[id].make(context);
+          handle = nextHandle;
           started = performance.now();
           if (reducedMotion) {
-            handle.update(0.001, 0.001);
+            nextHandle.update(0.001, 0.001);
             renderer.render(scene, camera);
           }
         };
@@ -183,10 +181,24 @@ export function OsWallpaper({ mempoolCount = null }: { mempoolCount?: number | n
       }
     };
 
+    const scheduleInitialize = () => {
+      if (initialized || initializeScheduled || cancelled) return;
+      initializeScheduled = true;
+      const run = () => {
+        initializeScheduled = false;
+        if (visible && !cancelled) void initialize();
+      };
+      if (typeof window.requestIdleCallback === "function") {
+        idleCallback = window.requestIdleCallback(run, { timeout: 1_600 });
+      } else {
+        initializeTimer = window.setTimeout(run, 700);
+      }
+    };
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         visible = entry.isIntersecting;
-        if (visible) void initialize();
+        if (visible) scheduleInitialize();
       },
       { threshold: 0.05 },
     );
@@ -195,6 +207,8 @@ export function OsWallpaper({ mempoolCount = null }: { mempoolCount?: number | n
     return () => {
       cancelled = true;
       observer.disconnect();
+      if (idleCallback) window.cancelIdleCallback(idleCallback);
+      if (initializeTimer) window.clearTimeout(initializeTimer);
       destroyScene?.();
     };
   }, []);

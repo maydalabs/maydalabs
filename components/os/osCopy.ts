@@ -53,7 +53,7 @@ export const OS_COPY = {
     },
     hodlstayWindow: { title: "hodlstay.com — TX-01", caption: "Bitcoin-native stay marketplace · client build", cta: "Inspect the case" },
     gazetteWindow: { title: "satoshigazette.org — TX-02", caption: "Bitcoin-only newsroom · studio product", cta: "Inspect the case" },
-    monitorWindow: { title: "system monitor", scanning: "scanning…", noCarrier: "no carrier", block: "btc block height" },
+    monitorWindow: { title: "system monitor", scanning: "scanning…", noCarrier: "no carrier", block: "btc block height", network: "btc network", publicStatus: "public status" },
     arrayWindow: { title: "signal array — product map" },
     toasts: { block: "new block mined" },
     tour: {
@@ -226,7 +226,7 @@ export const OS_COPY = {
     },
     hodlstayWindow: { title: "hodlstay.com — TX-01", caption: "Bitcoin-native konaklama pazar yeri · müşteri projesi", cta: "Vakayı incele" },
     gazetteWindow: { title: "satoshigazette.org — TX-02", caption: "Yalnızca Bitcoin haber merkezi · stüdyo ürünü", cta: "Vakayı incele" },
-    monitorWindow: { title: "sistem monitörü", scanning: "taranıyor…", noCarrier: "sinyal yok", block: "btc blok yüksekliği" },
+    monitorWindow: { title: "sistem monitörü", scanning: "taranıyor…", noCarrier: "sinyal yok", block: "btc blok yüksekliği", network: "btc ağı", publicStatus: "açık durum" },
     arrayWindow: { title: "sinyal dizisi — ürün haritası" },
     toasts: { block: "yeni blok kazıldı" },
     tour: {
@@ -399,7 +399,7 @@ export const OS_COPY = {
     },
     hodlstayWindow: { title: "hodlstay.com — TX-01", caption: "Marketplace de séjours Bitcoin-native · projet client", cta: "Voir le cas" },
     gazetteWindow: { title: "satoshigazette.org — TX-02", caption: "Rédaction 100 % Bitcoin · produit du studio", cta: "Voir le cas" },
-    monitorWindow: { title: "moniteur système", scanning: "balayage…", noCarrier: "pas de signal", block: "hauteur de bloc btc" },
+    monitorWindow: { title: "moniteur système", scanning: "balayage…", noCarrier: "pas de signal", block: "hauteur de bloc btc", network: "réseau btc", publicStatus: "statut public" },
     arrayWindow: { title: "réseau de signaux — carte produit" },
     toasts: { block: "nouveau bloc miné" },
     tour: {

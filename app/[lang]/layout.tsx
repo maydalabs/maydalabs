@@ -27,6 +27,7 @@ const studioSerif = Newsreader({
   subsets: ["latin"],
   style: ["normal", "italic"],
   weight: ["400", "500", "600"],
+  preload: false,
   variable: "--font-studio-serif",
 });
 

@@ -20,8 +20,8 @@ Web Analytics page views and Speed Insights are available on every Vercel plan. 
 ## Localization and campaign attribution
 
 - English uses canonical unprefixed URLs. Turkish uses `/tr`; French uses `/fr`.
-- On the first visit, Vercel country headers select Turkish for Turkey and French for France/Monaco. Browser language is the fallback.
-- A manual EN/TR/FR choice overrides location and is stored in the `maydalabs_locale` cookie for one year.
+- The site does not redirect from country or browser-language signals. Visitors choose Turkish or French through explicit localized links.
+- Language selection does not set a preference cookie; the selected locale remains visible in the URL.
 - Inbound `utm_source`, `utm_medium`, `utm_campaign`, and `utm_term` values are retained for the browser session and forwarded to Calendly.
 - Calendly `utm_content` remains the exact MaydaLabs CTA surface, such as `header` or `hodlstay_case_bottom`.
 

@@ -4,7 +4,7 @@ Everything needed to submit **maydalabs.com** to site award galleries.
 Submitting is a founder action (accounts + fees); this kit makes each
 submission a copy-paste job. Screenshots live in `docs/awards/`.
 
-Last verified against production: 2026-08-25.
+Last verified against production: 2026-08-26.
 
 ## The one-liner
 
@@ -20,7 +20,7 @@ Last verified against production: 2026-08-25.
 **Short description** (≤300 chars):
 
 > MaydaLabs rebuilt its studio site as MaydaOS: a desktop with
-> draggable windows, a 23-command shell, a ⌘K palette, and a ghost
+> draggable windows, a guided command shell, a ⌘K palette, and a ghost
 > tour. The monitor pings the studio's live products; new Bitcoin
 > blocks surge through ten three.js wallpapers paced by the real
 > mempool. Everything on screen is functional.
@@ -31,10 +31,10 @@ Last verified against production: 2026-08-25.
 > growth studio in Istanbul. Instead of describing our work, the site
 > demonstrates it: the homepage is a small operating system where every
 > surface is real. Windows drag, snap, minimize, and persist between
-> visits. The shell accepts 23 commands — `proof` pings our shipped
-> products and prints their live response times, `wallpaper` switches
-> between ten three.js scenes, `tour` hands control to a ghost cursor
-> that drives the actual UI. The system monitor and the menubar block
+> visits. The shell can turn a rough idea or problem into a local
+> three-answer brief, hand it to the contact composer, ping shipped products
+> with `proof`, switch between ten three.js scenes with `wallpaper`, and hand
+> control to a ghost cursor with `tour`. The system monitor and menubar block
 > ticker read from mempool.space; when a Bitcoin block is mined, a
 > toast fires and the wallpaper surges. Product windows play reels
 > captured from the live products themselves. The whole OS ships in
@@ -55,17 +55,18 @@ Last verified against production: 2026-08-25.
 
 ## What to point the jury at
 
-1. Type `help`, then `proof` in the shell — live status of shipped
-   products, not claims.
-2. `wallpaper 1` … `wallpaper 10` (or `?wp=` deep links) — ten scenes,
+1. Type `idea` or `problem` to shape a local three-answer brief, then use
+   `review` to inspect it in the contact composer. Nothing is sent by the shell.
+2. Type `proof` in the shell — live status of shipped products, not claims.
+3. `wallpaper 1` … `wallpaper 10` (or `?wp=` deep links) — ten scenes,
    one engine; arcs on the globe pace themselves from live mempool
    pressure.
-3. Watch the block ticker in the menubar; on a new block, the whole OS
+4. Watch the block ticker in the menubar; on a new block, the whole OS
    reacts.
-4. Click the tour offer — the ghost cursor drives the real desktop and
+5. Click the tour offer — the ghost cursor drives the real desktop and
    cancels the instant a human touches anything.
-5. Drag a window to an edge (snap), reload (layout persists), press ⌘K.
-6. The product windows and case heroes play reels captured from the
+6. Drag a window to an edge (snap), reload (layout persists), press ⌘K.
+7. The product windows and case heroes play reels captured from the
    live products.
 
 ## Fresh performance receipts (2026-08-25, production)

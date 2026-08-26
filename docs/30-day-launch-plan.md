@@ -1,6 +1,6 @@
 # MaydaLabs 30-Day Launch Plan
 
-_Status updated: 22 July 2026_
+_Status updated: 26 August 2026_
 
 ## Decisions Locked
 
@@ -9,13 +9,13 @@ _Status updated: 22 July 2026_
 - Proof strategy: lead with Bitcoin-native work and target founders across industries.
 - Commercial model: no public price list; scope and pricing follow a project call.
 - Flagships: HodlStay and Satoshi Gazette.
-- Intake: Calendly and `info@maydalabs.com`; no database or email provider required for launch.
+- Intake: local brief composer, Calendly, and `info@maydalabs.com`; no database or email provider required for launch.
 - Availability language: `Open for new client work` without an artificial cap.
 
 ## Product Status
 
 - [x] New MaydaLabs identity and dark-first visual system.
-- [x] Immersive homepage with signal field, product previews, service router, and scroll-linked build dossier.
+- [x] MaydaOS homepage with persistent desktop windows, mobile launcher, guided shell, product reels, telemetry, tour, and ten-scene wallpaper engine.
 - [x] Services, About, Contact, legal, metadata, sitemap, and social image foundation.
 - [x] Dedicated HodlStay flagship case study.
 - [x] Dedicated Satoshi Gazette flagship case study grounded in current product capabilities.
@@ -24,25 +24,28 @@ _Status updated: 22 July 2026_
 - [x] Permanent redirects retained for old URLs.
 - [x] Vercel Analytics and conversion-intent event layer.
 - [x] Vercel Speed Insights and campaign attribution through to Calendly.
-- [x] English, Turkish, and French routes with location-aware first visit and manual language control.
+- [x] English, Turkish, and French routes with canonical unprefixed English and explicit localized language links.
 - [x] Localized metadata, canonical URLs, `hreflang`, sitemap entries, and dedicated social cards.
 - [x] Primary X profile connected at `@maydalabs`.
 - [x] GTM-ready integration and setup documentation.
+- [x] Guided local intake from MaydaOS to the contact brief composer without transmitting typed answers.
+- [x] Production route, redirect, metadata, telemetry, and intake-handoff QA after the 26 August deployment.
 - [ ] Add the real GTM container ID when an account/container exists.
-- [ ] Final production QA after deployment.
+- [ ] Run a fresh Lighthouse, accessibility, and cross-browser matrix after the optimization pass.
 
-## Finish the Site
+## Current Optimization Queue
 
-1. Verify desktop and mobile behavior on every public route.
-2. Re-test Calendly attribution, email links, flagship links, localized redirects, metadata, sitemap, and social previews after production deployment.
-3. Review Satoshi Gazette case-study language as the newsroom publishes more work; add outcomes only when they are verifiable.
-4. Run accessibility, performance, and browser checks.
-5. Freeze launch copy and visual assets.
+1. Keep public documentation and privacy language aligned with the deployed behavior.
+2. Add repeatable smoke checks for routes, redirects, localized metadata, sitemap, social images, and telemetry.
+3. Remove unreachable legacy homepage source and consolidate its remaining CSS safely.
+4. Decompose the largest MaydaOS, terminal, wallpaper, and stylesheet modules without changing behavior.
+5. Run fresh accessibility, performance, bundle, and browser checks; treat production field data as the long-term source of truth.
+6. Review Satoshi Gazette case-study language as the newsroom publishes more work; add outcomes only when they are verifiable.
 
 ## Marketing Sprint: Start After Site QA
 
 1. Create the MaydaLabs social profiles and use the final brand assets consistently.
-2. Prepare six launch assets: founder introduction, studio launch, HodlStay case post, Satoshi Gazette case post, build-dossier note, and product-system note.
+2. Prepare six launch assets: founder introduction, studio launch, HodlStay case post, Satoshi Gazette case post, MaydaOS walkthrough, and product-system note.
 3. Create one share graphic and one short product walkthrough for each flagship.
 4. Build a focused founder prospect list and match each outreach message to the most relevant case study.
 5. Start with organic posts and direct outreach before paid ads.

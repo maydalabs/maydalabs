@@ -11,8 +11,8 @@ const CONSTELLATION_COPY = {
     title: "Four products. One connected range.",
     navigation: "Explore MaydaLabs projects",
     projects: [
-      { name: "HodlStay", status: "Client project · Live", path: "/case-studies/hodlstay", image: "/work/hodlstay-2026-08-home.png", alt: "HodlStay marketplace homepage", accent: "#f7931a" },
-      { name: "Satoshi Gazette", status: "MaydaLabs product · Live", path: "/case-studies/satoshi-gazette", image: "/work/satoshi-gazette-2026-08-home.png", alt: "Satoshi Gazette Bitcoin newsroom homepage", accent: "#f2f0ea" },
+      { name: "HodlStay", status: "Client project · Live", path: "/case-studies/hodlstay", image: "/work/hodlstay-2026-08-home.jpg", alt: "HodlStay marketplace homepage", accent: "#f7931a" },
+      { name: "Satoshi Gazette", status: "MaydaLabs product · Live", path: "/case-studies/satoshi-gazette", image: "/work/satoshi-gazette-2026-08-home.jpg", alt: "Satoshi Gazette Bitcoin newsroom homepage", accent: "#f2f0ea" },
       { name: "Mortal Vault", status: "Private alpha · Unaudited", path: "/case-studies/mortal-vault", image: null, alt: "", accent: "#f39a36" },
       { name: "Sofra", status: "Private Phase 1", path: "/case-studies/sofra", image: null, alt: "", accent: "#d97555" },
     ],
@@ -22,8 +22,8 @@ const CONSTELLATION_COPY = {
     title: "Dört ürün. Birbirine bağlı tek kapsam.",
     navigation: "MaydaLabs projelerini keşfedin",
     projects: [
-      { name: "HodlStay", status: "Müşteri projesi · Canlı", path: "/case-studies/hodlstay", image: "/work/hodlstay-2026-08-home.png", alt: "HodlStay pazar yeri ana sayfası", accent: "#f7931a" },
-      { name: "Satoshi Gazette", status: "MaydaLabs ürünü · Canlı", path: "/case-studies/satoshi-gazette", image: "/work/satoshi-gazette-2026-08-home.png", alt: "Satoshi Gazette Bitcoin haber merkezi ana sayfası", accent: "#f2f0ea" },
+      { name: "HodlStay", status: "Müşteri projesi · Canlı", path: "/case-studies/hodlstay", image: "/work/hodlstay-2026-08-home.jpg", alt: "HodlStay pazar yeri ana sayfası", accent: "#f7931a" },
+      { name: "Satoshi Gazette", status: "MaydaLabs ürünü · Canlı", path: "/case-studies/satoshi-gazette", image: "/work/satoshi-gazette-2026-08-home.jpg", alt: "Satoshi Gazette Bitcoin haber merkezi ana sayfası", accent: "#f2f0ea" },
       { name: "Mortal Vault", status: "Özel alpha · Denetlenmedi", path: "/case-studies/mortal-vault", image: null, alt: "", accent: "#f39a36" },
       { name: "Sofra", status: "Özel Phase 1", path: "/case-studies/sofra", image: null, alt: "", accent: "#d97555" },
     ],
@@ -33,8 +33,8 @@ const CONSTELLATION_COPY = {
     title: "Quatre produits. Un champ connecté.",
     navigation: "Explorer les projets MaydaLabs",
     projects: [
-      { name: "HodlStay", status: "Projet client · En ligne", path: "/case-studies/hodlstay", image: "/work/hodlstay-2026-08-home.png", alt: "Accueil de la marketplace HodlStay", accent: "#f7931a" },
-      { name: "Satoshi Gazette", status: "Produit MaydaLabs · En ligne", path: "/case-studies/satoshi-gazette", image: "/work/satoshi-gazette-2026-08-home.png", alt: "Accueil de la rédaction Bitcoin Satoshi Gazette", accent: "#f2f0ea" },
+      { name: "HodlStay", status: "Projet client · En ligne", path: "/case-studies/hodlstay", image: "/work/hodlstay-2026-08-home.jpg", alt: "Accueil de la marketplace HodlStay", accent: "#f7931a" },
+      { name: "Satoshi Gazette", status: "Produit MaydaLabs · En ligne", path: "/case-studies/satoshi-gazette", image: "/work/satoshi-gazette-2026-08-home.jpg", alt: "Accueil de la rédaction Bitcoin Satoshi Gazette", accent: "#f2f0ea" },
       { name: "Mortal Vault", status: "Alpha privée · Non auditée", path: "/case-studies/mortal-vault", image: null, alt: "", accent: "#f39a36" },
       { name: "Sofra", status: "Phase 1 privée", path: "/case-studies/sofra", image: null, alt: "", accent: "#d97555" },
     ],

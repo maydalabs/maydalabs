@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import { playTick } from "@/lib/soundSignal";
 
@@ -89,19 +89,37 @@ function JourneyReel({ data, locale, sizes }: { data: ReelData; locale: Locale; 
   const slides = data.slides;
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [mountedSlides, setMountedSlides] = useState<Set<number>>(() => {
+    const initial = new Set([0]);
+    if (slides.length > 1) initial.add(1);
+    if (slides.length > 2) initial.add(slides.length - 1);
+    return initial;
+  });
+
+  const selectSlide = useCallback((nextIndex: number) => {
+    const normalized = (nextIndex + slides.length) % slides.length;
+    setMountedSlides((current) => {
+      const next = new Set(current);
+      next.add(normalized);
+      next.add((normalized + 1) % slides.length);
+      next.add((normalized - 1 + slides.length) % slides.length);
+      return next.size === current.size ? current : next;
+    });
+    setIndex(normalized);
+  }, [slides.length]);
 
   useEffect(() => {
     if (paused) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const timer = setTimeout(() => {
-      setIndex((current) => (current + 1) % slides.length);
+      selectSlide(index + 1);
       playTick();
     }, HOLD_MS);
     return () => clearTimeout(timer);
-  }, [index, paused, slides.length]);
+  }, [index, paused, selectSlide]);
 
   const step = (direction: number) => {
-    setIndex((current) => (current + direction + slides.length) % slides.length);
+    selectSlide(index + direction);
   };
 
   return (
@@ -113,17 +131,17 @@ function JourneyReel({ data, locale, sizes }: { data: ReelData; locale: Locale; 
       onBlur={() => setPaused(false)}
     >
       <div className="hodl-journey-stage">
-        {slides.map((src, slideIndex) => (
+        {slides.map((src, slideIndex) => mountedSlides.has(slideIndex) ? (
           <Image
             key={src}
             src={src}
-            alt={captions[slideIndex]}
+            alt={slideIndex === index ? captions[slideIndex] : ""}
+            aria-hidden={slideIndex !== index}
             fill
             sizes={sizes}
-            priority={slideIndex === 0}
             className={slideIndex === index ? "is-active" : ""}
           />
-        ))}
+        ) : null)}
         <span className="hodl-journey-live" aria-hidden="true">● CAPTURED FROM THE LIVE PRODUCT</span>
       </div>
       <div className="hodl-journey-progress" aria-hidden="true">

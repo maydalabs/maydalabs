@@ -31,11 +31,11 @@ functional rather than decorative:
 
 - Draggable, snappable windows with a persisted desktop layout, a dock,
   a menubar, and a ⌘K command palette
-- A guided command shell: `session new` creates a clean hiring, building,
-  or exploration perspective; `proof` pings the studio's shipped products and
-  prints live response times, `wallpaper` switches scenes, `tour` hands
-  control to a ghost cursor that drives the real UI and yields the
-  moment a human touches anything
+- A guided command shell: `idea` and `problem` turn three rough answers into
+  a local project draft, `review` hands that draft to the contact composer,
+  and `meet` opens the 30-minute calendar; `proof` pings the studio's shipped
+  products, `wallpaper` switches scenes, and `tour` drives the real UI with a
+  ghost cursor that yields the moment a human touches anything
 - Live telemetry: the system monitor and the menubar block ticker read
   from the products and mempool.space; a newly mined Bitcoin block
   fires a toast and a wallpaper surge
@@ -126,8 +126,8 @@ flowchart LR
 
 <table>
   <tr>
-    <td width="50%"><img src="public/work/hodlstay-2026-08-home.png" alt="HodlStay live marketplace" /></td>
-    <td width="50%"><img src="public/work/satoshi-gazette-2026-08-data.png" alt="Satoshi Gazette evidence-led Data Desk" /></td>
+    <td width="50%"><img src="public/work/hodlstay-2026-08-home.jpg" alt="HodlStay live marketplace" /></td>
+    <td width="50%"><img src="public/work/satoshi-gazette-2026-08-data.jpg" alt="Satoshi Gazette evidence-led Data Desk" /></td>
   </tr>
   <tr>
     <td><strong>HodlStay</strong><br />Marketplace, payments, operations, lifecycle, and growth.</td>
@@ -144,6 +144,7 @@ components/os/    MaydaOS: windows, shell, wallpaper engine, tour, telemetry
 lib/              Localization, metadata, analytics, and marketing-link helpers
 public/           Brand and case-study assets approved for public display
 docs/             Supporting product, launch, and awards documentation
+scripts/          Dependency-free production verification
 ```
 
 ## Run locally
@@ -161,7 +162,12 @@ change, run:
 ```bash
 npm run lint
 npm run build
+npm run smoke:live
 ```
+
+`smoke:live` checks production routes, redirects, localized metadata, robots,
+the sitemap, social images, and the public telemetry response. Set
+`SMOKE_BASE_URL` and `SMOKE_CANONICAL_URL` to inspect another deployment.
 
 The repository includes an environment-variable example file. Never commit
 real credentials or private operational data.

@@ -1,5 +1,6 @@
 import type * as ThreeNS from "three";
 import LAND_DOTS from "@/components/os/landDots.json";
+import type { WallpaperId } from "@/components/os/wallpaperRegistry";
 
 // Ten wallpaper scenes for MaydaOS. Each factory builds into its own
 // group, returns a handle the engine drives at ~30fps, and reacts to
@@ -1097,17 +1098,15 @@ function makeSnow(ctx: SceneContext): SceneHandle {
   };
 }
 
-export const WALLPAPERS: Record<string, { label: string; make: (ctx: SceneContext) => SceneHandle }> = {
-  globe: { label: "node globe — a planet of peers", make: makeGlobe },
-  hive: { label: "hive lattice — cellular shield", make: makeHive },
-  gyro: { label: "gyroscope — independent orbits", make: makeGyro },
-  mycelium: { label: "mycelium — living network", make: makeMycelium },
-  silk: { label: "silk field — many routes", make: makeSilk },
-  choir: { label: "consensus choir — arcs that align", make: makeChoir },
-  backbone: { label: "backbone — the grid below", make: makeBackbone },
-  city: { label: "server city — the racks at night", make: makeCity },
-  chart: { label: "star chart — navigation without a lighthouse", make: makeChart },
-  snow: { label: "settlement snow — the mempool as weather", make: makeSnow },
+export const WALLPAPERS: Record<WallpaperId, { make: (ctx: SceneContext) => SceneHandle }> = {
+  globe: { make: makeGlobe },
+  hive: { make: makeHive },
+  gyro: { make: makeGyro },
+  mycelium: { make: makeMycelium },
+  silk: { make: makeSilk },
+  choir: { make: makeChoir },
+  backbone: { make: makeBackbone },
+  city: { make: makeCity },
+  chart: { make: makeChart },
+  snow: { make: makeSnow },
 };
-
-export const DEFAULT_WALLPAPER = "globe";
