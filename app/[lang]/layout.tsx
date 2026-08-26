@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../globals.css";
@@ -30,6 +31,8 @@ const studioSerif = Newsreader({
   preload: false,
   variable: "--font-studio-serif",
 });
+
+const arrivalStateScript = `try{if(localStorage.getItem("ml_arrival_entered_v1")){document.documentElement.dataset.osArrived="true"}}catch{}`;
 
 export async function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
@@ -149,8 +152,12 @@ export default async function RootLayout({
       lang={lang}
       className={`${studioSans.variable} ${studioSerif.variable}`}
       data-scroll-behavior="smooth"
+      suppressHydrationWarning
     >
       <body className="min-h-screen overflow-x-hidden bg-background text-foreground antialiased">
+        <Script id="maydaos-arrival-state" strategy="beforeInteractive">
+          {arrivalStateScript}
+        </Script>
         <GoogleTagManager />
         <script
           type="application/ld+json"

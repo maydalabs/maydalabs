@@ -11,6 +11,7 @@ import { SignalDecode } from "@/components/SignalDecode";
 import { type Locale, localizePath } from "@/lib/i18n";
 import { playLock, playTick } from "@/lib/soundSignal";
 import { OsMatrix } from "@/components/os/OsMatrix";
+import { OsArrival, type ArrivalPhase } from "@/components/os/OsArrival";
 import { OsMenuBar } from "@/components/os/OsMenuBar";
 import { OsScreensaver } from "@/components/os/OsScreensaver";
 import { OsTerminal } from "@/components/os/OsTerminal";
@@ -25,9 +26,9 @@ type WindowId = "welcome" | "work" | "hodlstay" | "gazette" | "monitor" | "termi
 type WindowState = { open: boolean; min: boolean; max: boolean; snap?: "left" | "right" | null; x: number; y: number; z: number; w: number };
 
 const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
-  welcome: { open: true, min: false, max: false, x: 48, y: 46, z: 5, w: 590 },
-  work: { open: true, min: false, max: false, x: 658, y: 54, z: 4, w: 650 },
-  monitor: { open: true, min: false, max: false, x: 1068, y: 520, z: 3, w: 330 },
+  welcome: { open: false, min: false, max: false, x: 48, y: 46, z: 2, w: 590 },
+  work: { open: true, min: false, max: false, x: 340, y: 94, z: 5, w: 760 },
+  monitor: { open: false, min: false, max: false, x: 1068, y: 520, z: 3, w: 330 },
   hodlstay: { open: false, min: false, max: false, x: 612, y: 26, z: 2, w: 540 },
   gazette: { open: false, min: false, max: false, x: 548, y: 118, z: 1, w: 540 },
   terminal: { open: false, min: false, max: false, x: 648, y: 280, z: 1, w: 600 },
@@ -36,9 +37,21 @@ const INITIAL_WINDOWS: Record<WindowId, WindowState> = {
   array: { open: false, min: false, max: false, x: 320, y: 90, z: 1, w: 680 },
 };
 
-const ENTER_DELAYS: Partial<Record<WindowId, number>> = { welcome: 60, work: 150, monitor: 250 };
+const ENTER_DELAYS: Partial<Record<WindowId, number>> = { work: 120 };
 
 const DESKTOP_STORAGE_KEY = "ml_desktop_v3";
+const ARRIVAL_STORAGE_KEY = "ml_arrival_entered_v1";
+
+function freshDesktop(viewportWidth = 1440): Record<WindowId, WindowState> {
+  const layoutWidth = Math.max(1440, viewportWidth);
+  return {
+    ...INITIAL_WINDOWS,
+    work: {
+      ...INITIAL_WINDOWS.work,
+      x: Math.round((layoutWidth - INITIAL_WINDOWS.work.w) / 2),
+    },
+  };
+}
 
 // Stored layouts are untrusted input from a previous visit: every field
 // is validated, widths stay design-owned, and a layout with no open
@@ -120,7 +133,9 @@ export function MaydaOS({ locale }: { locale: Locale }) {
   const zRef = useRef(6);
   const staggerRef = useRef(true);
   const lastSplashRef = useRef(0);
+  const arrivalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [windows, setWindows] = useState(INITIAL_WINDOWS);
+  const [arrivalPhase, setArrivalPhase] = useState<ArrivalPhase>("checking");
   const [booting, setBooting] = useState(false);
   const [mobileShell, setMobileShell] = useState(false);
   const [toasts, setToasts] = useState<Array<{ id: number; text: string }>>([]);
@@ -160,6 +175,26 @@ export function MaydaOS({ locale }: { locale: Locale }) {
     windowsRef.current = windows;
   }, [windows]);
 
+  // The arrival foyer is shown until the visitor makes one meaningful
+  // choice. Returning visitors resume the desktop without an interstitial.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      try {
+        if (window.localStorage.getItem(ARRIVAL_STORAGE_KEY)) {
+          document.documentElement.dataset.osArrived = "true";
+          setArrivalPhase("hidden");
+          return;
+        }
+      } catch {
+        // Storage unavailable: show the useful path instead of blocking it.
+      }
+      delete document.documentElement.dataset.osArrived;
+      setArrivalPhase("visible");
+      trackOsEvent("arrival_impression", { locale });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [locale]);
+
   // Returning visitors find their desktop the way they left it.
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -167,6 +202,8 @@ export function MaydaOS({ locale }: { locale: Locale }) {
       if (restored) {
         zRef.current = restored.maxZ + 1;
         setWindows(restored.state);
+      } else {
+        setWindows(freshDesktop(window.innerWidth));
       }
     });
     return () => cancelAnimationFrame(frame);
@@ -186,11 +223,21 @@ export function MaydaOS({ locale }: { locale: Locale }) {
   const resetDesktop = useCallback(() => {
     try {
       window.localStorage.removeItem(DESKTOP_STORAGE_KEY);
+      window.localStorage.removeItem(ARRIVAL_STORAGE_KEY);
     } catch {
       // Nothing to clear.
     }
+    if (arrivalTimerRef.current) clearTimeout(arrivalTimerRef.current);
+    delete document.documentElement.dataset.osArrived;
     zRef.current = 6;
-    setWindows(INITIAL_WINDOWS);
+    staggerRef.current = true;
+    setWindows(freshDesktop(window.innerWidth));
+    setMobileShell(false);
+    setArrivalPhase("visible");
+  }, []);
+
+  useEffect(() => () => {
+    if (arrivalTimerRef.current) clearTimeout(arrivalTimerRef.current);
   }, []);
 
   useEffect(() => {
@@ -226,8 +273,12 @@ export function MaydaOS({ locale }: { locale: Locale }) {
     let timer: ReturnType<typeof setTimeout> | undefined;
     let frame = 0;
     try {
-      if (!reduced && !window.sessionStorage.getItem("ml_booted")) {
-        window.sessionStorage.setItem("ml_booted", "1");
+      const sessionBooted = window.sessionStorage.getItem("ml_booted");
+      const returningVisitor = Boolean(window.localStorage.getItem(ARRIVAL_STORAGE_KEY));
+      if (!sessionBooted) window.sessionStorage.setItem("ml_booted", "1");
+      // The foyer is the first visitor's arrival sequence. The kernel boot
+      // remains a returning-session detail instead of delaying that LCP.
+      if (!reduced && returningVisitor && !sessionBooted) {
         // The dismiss timer starts inside the show frame: in throttled
         // background tabs rAF can fire minutes late, and a detached
         // timeout would already have passed — leaving boot stuck on.
@@ -290,6 +341,32 @@ export function MaydaOS({ locale }: { locale: Locale }) {
   const trackHomepageIntent = useCallback((intent: string, surface: "desktop" | "mobile" | "menubar") => {
     trackOsEvent("homepage_intent_click", { intent, surface, locale });
   }, [locale]);
+
+  const markArrivalComplete = useCallback((intent: string) => {
+    try {
+      window.localStorage.setItem(ARRIVAL_STORAGE_KEY, "1");
+    } catch {
+      // The route or desktop remains usable without persistence.
+    }
+    document.documentElement.dataset.osArrived = "true";
+    trackOsEvent("arrival_intent_click", { intent, locale });
+  }, [locale]);
+
+  const revealDesktop = useCallback((intent: "enter" | "work") => {
+    markArrivalComplete(intent);
+    playLock();
+    setArrivalPhase("leaving");
+    if (arrivalTimerRef.current) clearTimeout(arrivalTimerRef.current);
+    const delay = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 620;
+    arrivalTimerRef.current = setTimeout(() => setArrivalPhase("hidden"), delay);
+  }, [markArrivalComplete]);
+
+  const inspectArrivalWork = useCallback(() => {
+    zRef.current += 1;
+    const z = zRef.current;
+    setWindows((current) => ({ ...current, work: { ...current.work, open: true, min: false, z } }));
+    revealDesktop("work");
+  }, [revealDesktop]);
 
   const closeWindow = useCallback((id: WindowId) => {
     playTick();
@@ -369,7 +446,20 @@ export function MaydaOS({ locale }: { locale: Locale }) {
         </div>
       ) : null}
 
-      <div className="os-desktop-frame os-desktop-only">
+      <OsArrival
+        locale={locale}
+        phase={arrivalPhase}
+        onEnter={() => revealDesktop("enter")}
+        onInspectWork={inspectArrivalWork}
+        onRoute={markArrivalComplete}
+        onProofSwitch={(transmission) => trackOsEvent("arrival_proof_switch", { transmission, locale })}
+      />
+
+      <div
+        className={`os-desktop-frame os-desktop-only ${arrivalPhase === "checking" || arrivalPhase === "visible" ? "is-arrival-covered" : ""}`}
+        aria-hidden={arrivalPhase !== "hidden" ? "true" : undefined}
+        inert={arrivalPhase !== "hidden" ? true : undefined}
+      >
         <OsMenuBar
           locale={locale}
           blockHeight={telemetry?.blockHeight ?? null}
@@ -512,7 +602,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
                         alt={item.alt}
                         width={item.width}
                         height={item.height}
-                        sizes="(min-width: 1024px) 300px, 1px"
+                        sizes="(min-width: 1024px) 350px, 1px"
                       />
                     </span>
                     <span className="os-live-work-meta"><i aria-hidden="true" />{item.tx} · {item.status}</span>
@@ -599,12 +689,16 @@ export function MaydaOS({ locale }: { locale: Locale }) {
           <button type="button" className={windows.trash.open ? "is-running" : ""} onClick={() => openWindow("trash")} aria-label={copy.dock.trash} data-tooltip={`${copy.dock.trash} — ${copy.dockHelp.trash}`}><Glyph name="trash" /></button>
         </nav>
 
-        <OsScreensaver locale={locale} />
+        {arrivalPhase === "hidden" ? <OsScreensaver locale={locale} /> : null}
       </div>
 
       <OsMatrix />
 
-      <div className="os-mobile os-mobile-only">
+      <div
+        className={`os-mobile os-mobile-only ${arrivalPhase === "checking" || arrivalPhase === "visible" ? "is-arrival-covered" : ""}`}
+        aria-hidden={arrivalPhase !== "hidden" ? "true" : undefined}
+        inert={arrivalPhase !== "hidden" ? true : undefined}
+      >
         <div className="os-mobile-status">
           <span aria-label={telemetry?.blockHeight ? `${copy.monitorWindow.block}: ${telemetry.blockHeight.toLocaleString(locale)}` : copy.monitorWindow.scanning}>₿ {copy.monitorWindow.network}</span>
           <span>MAYDAOS 26.08</span>
@@ -614,26 +708,6 @@ export function MaydaOS({ locale }: { locale: Locale }) {
           <h1>{copy.mobile.greeting}</h1>
           <p>{copy.mobile.sub}</p>
         </div>
-        <section className="os-mobile-intro" aria-label={copy.mobile.eyebrow}>
-          <span>{copy.mobile.eyebrow}</span>
-          <p>{copy.mobile.promise}</p>
-          <small>{copy.mobile.proof}</small>
-          <div className="os-mobile-intents">
-            <Link
-              href={localizePath("/contact", locale)}
-              className="studio-button"
-              onClick={() => trackHomepageIntent("start", "mobile")}
-            >
-              {copy.mobile.start} <span aria-hidden="true">→</span>
-            </Link>
-            <Link href={localizePath("/case-studies", locale)} onClick={() => trackHomepageIntent("work", "mobile")}>
-              {copy.mobile.work} <span aria-hidden="true">→</span>
-            </Link>
-            <Link href={localizePath("/profile", locale)} onClick={() => trackHomepageIntent("profile", "mobile")}>
-              {copy.mobile.profile} <span aria-hidden="true">→</span>
-            </Link>
-          </div>
-        </section>
         <p className="os-mobile-apps-label">{copy.mobile.appsLabel}</p>
         <div className="os-mobile-grid">
           {copy.mobile.apps.map((app) => (

@@ -96,6 +96,7 @@ export function OsMenuBar({
         <Link
           href={localizePath("/contact", locale)}
           className="os-menubar-cta os-menu-explain"
+          data-tour="start"
           data-tooltip={copy.menubarHelp.startProject}
           onClick={onStartProject}
         >
