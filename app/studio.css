@@ -2831,7 +2831,7 @@ select {
 
 .contact-direct > p:last-child {
   margin-top: 1.25rem;
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(255, 255, 255, 0.55);
   font-size: 0.8rem;
 }
 
@@ -6802,33 +6802,47 @@ html[data-os-arrived="true"] .os-arrival.is-checking {
 .os-window-lights {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.05rem;
 }
 
 .os-light {
+  position: relative;
   display: block;
-  width: 0.72rem;
-  height: 0.72rem;
+  flex: 0 0 1.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: rgba(242, 240, 234, 0.18);
+  background: transparent;
   cursor: pointer;
+}
+
+.os-light::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 50%;
+  background: rgba(242, 240, 234, 0.18);
+  content: "";
+  transform: translate(-50%, -50%);
   transition: background 150ms ease, box-shadow 150ms ease;
 }
 
-.os-window-bar:hover .os-light-close,
-.os-page-bar:hover .os-light-close {
+.os-window-bar:hover .os-light-close::before,
+.os-page-bar:hover .os-light-close::before {
   background: #ff5b3d;
 }
 
-.os-window-bar:hover .os-light-min,
-.os-page-bar:hover .os-light-min {
+.os-window-bar:hover .os-light-min::before,
+.os-page-bar:hover .os-light-min::before {
   background: #ffc36d;
 }
 
-.os-window-bar:hover .os-light-max,
-.os-page-bar:hover .os-light-max {
+.os-window-bar:hover .os-light-max::before,
+.os-page-bar:hover .os-light-max::before {
   background: #d7ff68;
 }
 
@@ -6978,7 +6992,7 @@ html[data-os-arrived="true"] .os-arrival.is-checking {
 
 .os-page-bar-meta {
   margin-left: auto;
-  color: rgba(242, 240, 234, 0.28);
+  color: rgba(242, 240, 234, 0.58);
   font-family: var(--font-mono);
   font-size: 0.56rem;
   letter-spacing: 0.14em;
@@ -7885,4 +7899,777 @@ html[data-os-arrived="true"] .os-arrival.is-checking {
   flex-wrap: wrap;
   gap: 0.6rem;
   padding: 0 1.3rem 1.3rem;
+}
+
+/* Project console — a focused conversion handoff from the arrival foyer. */
+.contact-console-page {
+  width: min(100% - 2rem, 1660px);
+}
+
+.contact-console-hero {
+  display: grid;
+  min-height: calc(100svh - 72px);
+  padding-block: clamp(1rem, 2vw, 2rem) clamp(4rem, 7vw, 7rem);
+  align-items: start;
+  border-bottom: 1px solid var(--border);
+  gap: clamp(2rem, 4vw, 4.5rem);
+}
+
+.contact-console-intro {
+  display: grid;
+  padding-top: clamp(2.5rem, 6vh, 5rem);
+  align-content: start;
+}
+
+.contact-console-intro > .studio-kicker {
+  margin-top: 1.4rem;
+}
+
+.contact-console-intro h1 {
+  max-width: 10ch;
+  margin: 1.1rem 0 0;
+  font-size: clamp(3.4rem, 5.3vw, 5.8rem);
+  font-weight: 540;
+  line-height: 0.9;
+  letter-spacing: -0.065em;
+}
+
+.contact-console-intro h1 em {
+  color: var(--signal);
+  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.contact-console-lead {
+  max-width: 35rem;
+  margin: 1.7rem 0 0;
+  color: rgba(242, 240, 234, 0.54);
+  font-size: 0.98rem;
+  line-height: 1.75;
+}
+
+.contact-console-signals {
+  display: grid;
+  margin-top: clamp(2rem, 5vh, 3.5rem);
+  border-top: 1px solid var(--border);
+}
+
+.contact-console-signals > div {
+  display: grid;
+  grid-template-columns: 2.25rem 1fr;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--border);
+  gap: 0.8rem;
+}
+
+.contact-console-signals span {
+  color: var(--signal);
+  font-family: var(--font-mono);
+  font-size: 0.57rem;
+  letter-spacing: 0.08em;
+}
+
+.contact-console-signals p,
+.contact-console-signals strong,
+.contact-console-signals small {
+  display: block;
+  margin: 0;
+}
+
+.contact-console-signals strong {
+  color: rgba(242, 240, 234, 0.88);
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+
+.contact-console-signals small {
+  margin-top: 0.22rem;
+  color: rgba(242, 240, 234, 0.4);
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+.contact-console-direct {
+  display: flex;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.contact-console-direct a {
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid rgba(242, 240, 234, 0.18);
+  color: rgba(242, 240, 234, 0.58);
+  font-size: 0.7rem;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+
+.contact-console-direct a:hover {
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+.contact-console-direct a.is-primary {
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--signal);
+  border-radius: 0.5rem;
+  background: var(--signal);
+  color: #120a02;
+  font-weight: 700;
+}
+
+.project-console {
+  min-width: 0;
+  scroll-margin-top: 5rem;
+  overflow: hidden;
+  border: 1px solid rgba(242, 240, 234, 0.18);
+  border-radius: 1rem;
+  background:
+    linear-gradient(rgba(242, 240, 234, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(242, 240, 234, 0.015) 1px, transparent 1px),
+    #0b0b09;
+  background-size: 32px 32px, 32px 32px, auto;
+  box-shadow: 0 2rem 7rem rgba(0, 0, 0, 0.42);
+}
+
+.project-console-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  min-height: 2.35rem;
+  padding-inline: 0.9rem;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  background: rgba(242, 240, 234, 0.025);
+  gap: 0.75rem;
+}
+
+.project-console-bar > div {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.project-console-bar i {
+  width: 0.54rem;
+  height: 0.54rem;
+  border-radius: 999px;
+  background: rgba(242, 240, 234, 0.16);
+}
+
+.project-console-bar span,
+.project-console-bar b {
+  color: rgba(242, 240, 234, 0.36);
+  font-family: var(--font-mono);
+  font-size: 0.53rem;
+  font-weight: 500;
+  letter-spacing: 0.11em;
+}
+
+.project-console-bar b {
+  color: rgba(215, 255, 104, 0.66);
+}
+
+.project-console-progress {
+  display: grid;
+  padding: 1rem clamp(1rem, 2vw, 1.5rem);
+  border-bottom: 1px solid var(--border);
+  gap: 1rem;
+}
+
+.project-console-progress > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.project-console-progress p,
+.project-console-progress small {
+  margin: 0;
+  color: rgba(242, 240, 234, 0.4);
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.project-console-progress small {
+  color: var(--signal);
+}
+
+.project-console-progress ol {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem;
+  list-style: none;
+}
+
+.project-console-progress li {
+  display: flex;
+  min-width: 0;
+  padding: 0.55rem 0.65rem;
+  align-items: center;
+  border: 1px solid rgba(242, 240, 234, 0.08);
+  border-radius: 0.45rem;
+  color: rgba(242, 240, 234, 0.3);
+  font-size: 0.61rem;
+  gap: 0.5rem;
+}
+
+.project-console-progress li span {
+  color: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+}
+
+.project-console-progress li.is-current {
+  border-color: rgba(247, 147, 26, 0.52);
+  background: rgba(247, 147, 26, 0.065);
+  color: rgba(242, 240, 234, 0.9);
+}
+
+.project-console-progress li.is-complete {
+  color: rgba(215, 255, 104, 0.68);
+}
+
+.project-console-body {
+  display: grid;
+  min-width: 0;
+}
+
+.project-console-form {
+  display: grid;
+  min-width: 0;
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  align-content: start;
+  gap: 1.35rem;
+}
+
+.project-console-step-heading {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.project-console-step-heading > p {
+  margin: 0;
+  color: var(--signal);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.12em;
+}
+
+.project-console-step-heading h2 {
+  margin: 0;
+  scroll-margin-top: 5.5rem;
+  font-size: clamp(1.65rem, 2.4vw, 2.3rem);
+  font-weight: 560;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.project-console-step-heading h2:focus {
+  outline: none;
+}
+
+.project-console-step-heading > small {
+  max-width: 36rem;
+  color: rgba(242, 240, 234, 0.43);
+  font-size: 0.74rem;
+  line-height: 1.55;
+}
+
+.project-console-imported {
+  display: flex;
+  margin: 0;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgba(247, 147, 26, 0.28);
+  border-radius: 0.55rem;
+  background: rgba(247, 147, 26, 0.06);
+  color: rgba(242, 240, 234, 0.55);
+  font-size: 0.64rem;
+  line-height: 1.5;
+  gap: 0.5rem;
+}
+
+.project-console-imported span {
+  color: var(--signal);
+}
+
+.project-console-field {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.project-console-field legend,
+.project-console-input > span {
+  padding: 0;
+  color: rgba(242, 240, 234, 0.74);
+  font-size: 0.74rem;
+  font-weight: 650;
+}
+
+.project-console-field > p,
+.project-console-input > small {
+  margin: 0.3rem 0 0;
+  color: rgba(242, 240, 234, 0.35);
+  font-size: 0.63rem;
+  line-height: 1.45;
+}
+
+.project-console-choices {
+  display: flex;
+  margin-top: 0.7rem;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.project-console-choices button {
+  padding: 0.52rem 0.8rem;
+  border: 1px solid rgba(242, 240, 234, 0.15);
+  border-radius: 999px;
+  background: rgba(242, 240, 234, 0.02);
+  color: rgba(242, 240, 234, 0.57);
+  font-size: 0.7rem;
+  transition: border-color 150ms ease, background 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.project-console-choices button:hover,
+.project-console-choices button:focus-visible {
+  border-color: rgba(247, 147, 26, 0.5);
+  color: rgba(242, 240, 234, 0.9);
+}
+
+.project-console-choices button.is-selected {
+  border-color: rgba(247, 147, 26, 0.64);
+  background: rgba(247, 147, 26, 0.1);
+  color: var(--signal);
+}
+
+.project-console-field.is-cards .project-console-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.project-console-field.is-cards button {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 5.5rem;
+  padding: 0.72rem 0.8rem;
+  align-content: start;
+  border-radius: 0.55rem;
+  text-align: left;
+  gap: 0.28rem;
+}
+
+.project-console-field.is-cards button:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.project-console-field.is-cards button > span {
+  color: var(--signal);
+  font-family: var(--font-mono);
+  font-size: 0.48rem;
+}
+
+.project-console-field.is-cards button strong {
+  color: rgba(242, 240, 234, 0.85);
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+
+.project-console-field.is-cards button small {
+  padding-right: 1rem;
+  color: rgba(242, 240, 234, 0.34);
+  font-size: 0.59rem;
+  line-height: 1.35;
+}
+
+.project-console-field.is-cards button i {
+  position: absolute;
+  right: 0.7rem;
+  bottom: 0.55rem;
+  color: var(--signal);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-style: normal;
+}
+
+.project-console-error,
+.project-console-input > em {
+  display: block;
+  margin: 0.5rem 0 0;
+  color: #ff8c76;
+  font-size: 0.62rem;
+  font-style: normal;
+  line-height: 1.45;
+}
+
+.project-console-input {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  gap: 0.45rem;
+}
+
+.project-console-input input,
+.project-console-input textarea {
+  width: 100%;
+  padding: 0.78rem 0.85rem;
+  border: 1px solid rgba(242, 240, 234, 0.16);
+  border-radius: 0.55rem;
+  background: rgba(242, 240, 234, 0.025);
+  color: rgba(242, 240, 234, 0.9);
+  font-size: 0.76rem;
+  line-height: 1.55;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.project-console-input textarea {
+  min-height: 8rem;
+  padding-bottom: 1.6rem;
+  resize: vertical;
+}
+
+.project-console-input input:focus-visible,
+.project-console-input textarea:focus-visible {
+  outline: none;
+  border-color: rgba(247, 147, 26, 0.62);
+  background: rgba(242, 240, 234, 0.045);
+}
+
+.project-console-input input[aria-invalid="true"],
+.project-console-input textarea[aria-invalid="true"] {
+  border-color: rgba(255, 91, 61, 0.65);
+}
+
+.project-console-input input::placeholder,
+.project-console-input textarea::placeholder {
+  color: rgba(242, 240, 234, 0.26);
+}
+
+.project-console-input > b {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.55rem;
+  color: rgba(242, 240, 234, 0.25);
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  font-weight: 500;
+}
+
+.project-console-input > em + b,
+.project-console-input > b:has(+ em) {
+  bottom: 1.8rem;
+}
+
+.project-console-identity {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.project-console-navigation {
+  display: flex;
+  padding-top: 0.2rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.project-console-navigation button {
+  min-height: 2.65rem;
+  padding: 0.68rem 1rem;
+  border: 1px solid rgba(242, 240, 234, 0.16);
+  border-radius: 0.55rem;
+  color: rgba(242, 240, 234, 0.58);
+  font-size: 0.7rem;
+}
+
+.project-console-navigation button.is-next {
+  display: flex;
+  min-width: 10rem;
+  border-color: var(--signal);
+  background: var(--signal);
+  color: #120a02;
+  font-weight: 700;
+  justify-content: space-between;
+}
+
+.project-console-navigation button:hover,
+.project-console-navigation button:focus-visible {
+  border-color: var(--signal);
+}
+
+.project-console-preview {
+  display: grid;
+  min-width: 0;
+  padding: 1.15rem;
+  align-content: start;
+  border-top: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.25);
+  gap: 0.8rem;
+}
+
+.project-console-preview > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: rgba(242, 240, 234, 0.42);
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.11em;
+}
+
+.project-console-preview > div:first-child i {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #d7ff68;
+  box-shadow: 0 0 14px rgba(215, 255, 104, 0.5);
+}
+
+.project-console-preview pre {
+  min-height: 12rem;
+  margin: 0;
+  overflow: auto;
+  color: rgba(242, 240, 234, 0.62);
+  font-family: var(--font-mono);
+  font-size: 0.57rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.project-console-preview > p {
+  display: flex;
+  margin: 0;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--border);
+  color: rgba(242, 240, 234, 0.34);
+  font-size: 0.57rem;
+  line-height: 1.5;
+  gap: 0.45rem;
+}
+
+.project-console-preview > p span {
+  flex: none;
+  color: #d7ff68;
+}
+
+.project-console-preview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.project-console-preview-actions button {
+  padding: 0.4rem 0.55rem;
+  border: 1px solid rgba(242, 240, 234, 0.1);
+  border-radius: 0.35rem;
+  color: rgba(242, 240, 234, 0.38);
+  font-family: var(--font-mono);
+  font-size: 0.48rem;
+}
+
+.project-console-preview-actions button:disabled {
+  opacity: 0.35;
+}
+
+.project-console-status {
+  padding: 0.55rem 0.65rem;
+  border: 1px solid rgba(215, 255, 104, 0.2);
+  border-radius: 0.4rem;
+  background: rgba(215, 255, 104, 0.04);
+  color: rgba(215, 255, 104, 0.7);
+  font-size: 0.58rem;
+}
+
+.project-console-ready {
+  display: grid;
+  padding: 1rem;
+  border: 1px solid rgba(247, 147, 26, 0.42);
+  border-radius: 0.65rem;
+  background: linear-gradient(145deg, rgba(247, 147, 26, 0.13), rgba(247, 147, 26, 0.035));
+  gap: 0.55rem;
+}
+
+.project-console-ready > p {
+  margin: 0;
+  color: var(--signal);
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.project-console-ready h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.project-console-ready > small {
+  color: rgba(242, 240, 234, 0.46);
+  font-size: 0.65rem;
+  line-height: 1.5;
+}
+
+.project-console-ready > div {
+  display: grid;
+  margin-top: 0.4rem;
+  gap: 0.45rem;
+}
+
+.project-console-ready a,
+.project-console-ready button {
+  display: flex;
+  min-height: 2.65rem;
+  padding: 0.7rem 0.8rem;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(242, 240, 234, 0.16);
+  border-radius: 0.5rem;
+  color: rgba(242, 240, 234, 0.78);
+  font-size: 0.68rem;
+  text-align: left;
+}
+
+.project-console-ready .project-console-primary {
+  border-color: var(--signal);
+  background: var(--signal);
+  color: #120a02;
+  font-weight: 700;
+}
+
+.contact-console-next {
+  display: grid;
+  padding-block: clamp(5rem, 9vw, 9rem);
+  border-bottom: 1px solid var(--border);
+  gap: clamp(3rem, 6vw, 6rem);
+}
+
+.contact-console-next > div:first-child h2 {
+  max-width: 12ch;
+  margin: 1rem 0 0;
+  font-size: clamp(2.7rem, 5.8vw, 5.8rem);
+  font-weight: 540;
+  line-height: 0.94;
+  letter-spacing: -0.065em;
+}
+
+.contact-console-next .contact-grid h3 {
+  margin: 6rem 0 0;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 520;
+  letter-spacing: -0.05em;
+}
+
+@media (min-width: 760px) {
+  .project-console-identity {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .contact-console-hero {
+    grid-template-columns: minmax(19rem, 0.72fr) minmax(0, 1.28fr);
+  }
+
+  .contact-console-intro {
+    position: sticky;
+    top: 4.5rem;
+  }
+
+  .project-console-body {
+    grid-template-columns: minmax(0, 1.45fr) minmax(14rem, 0.55fr);
+  }
+
+  .project-console-preview {
+    border-top: 0;
+    border-left: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 699px) {
+  .contact-console-page {
+    width: min(100% - 1rem, 1660px);
+  }
+
+  .contact-console-hero {
+    padding-top: 0.5rem;
+    gap: 2.5rem;
+  }
+
+  .contact-console-intro {
+    padding: 2.5rem 0.5rem 0;
+  }
+
+  .contact-console-intro h1 {
+    font-size: clamp(3.1rem, 15.5vw, 4.2rem);
+  }
+
+  .contact-console-lead {
+    font-size: 0.88rem;
+  }
+
+  .contact-console-signals {
+    display: none;
+  }
+
+  .contact-console-direct {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .contact-console-direct a.is-primary {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .project-console {
+    border-radius: 0.75rem;
+  }
+
+  .project-console-bar b {
+    display: none;
+  }
+
+  .project-console-bar {
+    grid-template-columns: auto 1fr;
+  }
+
+  .project-console-progress li {
+    padding-inline: 0.45rem;
+    font-size: 0;
+  }
+
+  .project-console-progress li span {
+    font-size: 0.52rem;
+  }
+
+  .project-console-field.is-cards button {
+    min-height: 4.4rem;
+  }
+
+  .project-console-field.is-cards button small {
+    display: none;
+  }
+
+  .project-console-navigation button.is-next {
+    min-width: 9rem;
+  }
+
+  .contact-console-next .contact-grid article {
+    min-height: 19rem;
+  }
+
+  .contact-console-next .contact-grid h3 {
+    margin-top: 4rem;
+  }
 }
