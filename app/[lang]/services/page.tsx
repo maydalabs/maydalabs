@@ -12,6 +12,7 @@ const META = {
 const COPY = {
   en: {
     kicker: "Capabilities / Connected by design", heading: ["One studio.", "Three ways to move."], intro: "Start with the product, the storefront, or the growth problem. We connect the other layers when the job requires them.", map: ["PRODUCT", "COMMERCE", "GROWTH"], fit: "Strong fit when", outputs: "What we can connect", discuss: "Discuss this kind of project",
+    pathsLabel: "Choose the closest signal", paths: [["01", "Product build", "Idea, product, or rebuild", "product-builds"], ["02", "Commerce system", "Storefront, checkout, or operations", "commerce"], ["03", "Growth system", "Measurement, conversion, or lifecycle", "growth-systems"]],
     services: [
       { id: "product-builds", number: "01", eyebrow: "Zero to one / Rebuilds", title: "Build the product, not just the screens.", lead: "We turn an ambitious idea, an incomplete product, or a tangled operation into software people can understand and use.", fit: ["A new product needs its first credible release", "An existing build has outgrown its foundations", "A marketplace needs both customer and operator journeys"], outputs: ["Product strategy and release scope", "UX, interface, and brand system", "Web or mobile application delivery", "Payments, data, and third-party integrations", "QA, launch preparation, and handover"], surface: "services_product", tone: "dark" },
       { id: "commerce", number: "02", eyebrow: "Shopify / Custom commerce", title: "Turn the storefront into a system.", lead: "The best commerce work connects the brand people see with the operational machinery they never should have to think about.", fit: ["A template store no longer reflects the brand", "Purchase, subscription, or account flows create friction", "Commerce operations are split across disconnected tools"], outputs: ["Shopify theme and storefront builds", "Custom commerce experiences", "Subscriptions and customer accounts", "Checkout and conversion architecture", "Operational integrations and automation"], surface: "services_commerce", tone: "light" },
@@ -23,6 +24,7 @@ const COPY = {
   },
   tr: {
     kicker: "Yetkinlikler / Tasarım gereği bağlantılı", heading: ["Tek stüdyo.", "İlerlemenin üç yolu."], intro: "Ürünle, mağazayla ya da büyüme problemiyle başlayın. İş gerektirdiğinde diğer katmanları biz birbirine bağlarız.", map: ["ÜRÜN", "E-TİCARET", "BÜYÜME"], fit: "Şu durumlarda güçlü uyum", outputs: "Birbirine bağlayabileceklerimiz", discuss: "Bu tür bir projeyi konuşalım",
+    pathsLabel: "En yakın sinyali seçin", paths: [["01", "Ürün geliştirme", "Fikir, ürün veya yeniden geliştirme", "product-builds"], ["02", "E-ticaret sistemi", "Mağaza, ödeme veya operasyon", "commerce"], ["03", "Büyüme sistemi", "Ölçüm, dönüşüm veya yaşam döngüsü", "growth-systems"]],
     services: [
       { id: "product-builds", number: "01", eyebrow: "Sıfırdan ürün / Yeniden geliştirme", title: "Sadece ekranları değil, ürünü geliştirin.", lead: "İddialı bir fikri, yarım kalmış bir ürünü ya da karmaşık bir operasyonu insanların anlayıp kullanabileceği yazılıma dönüştürüyoruz.", fit: ["Yeni bir ürünün güven veren ilk sürüme ihtiyacı varsa", "Mevcut ürün temellerini aşmışsa", "Bir pazar yerinin hem müşteri hem operatör yolculuklarına ihtiyacı varsa"], outputs: ["Ürün stratejisi ve sürüm kapsamı", "UX, arayüz ve marka sistemi", "Web veya mobil uygulama geliştirme", "Ödeme, veri ve üçüncü taraf entegrasyonları", "QA, lansman hazırlığı ve devir"], surface: "services_product", tone: "dark" },
       { id: "commerce", number: "02", eyebrow: "Shopify / Özel e-ticaret", title: "Mağazayı bir sisteme dönüştürün.", lead: "En iyi e-ticaret çalışması, insanların gördüğü markayı hiç düşünmek zorunda kalmamaları gereken operasyon mekanizmasına bağlar.", fit: ["Şablon mağaza artık markayı yansıtmıyorsa", "Satın alma, abonelik veya hesap akışları sürtünme yaratıyorsa", "E-ticaret operasyonları bağlantısız araçlara dağılmışsa"], outputs: ["Shopify tema ve mağaza geliştirme", "Özel e-ticaret deneyimleri", "Abonelikler ve müşteri hesapları", "Ödeme ve dönüşüm mimarisi", "Operasyon entegrasyonları ve otomasyon"], surface: "services_commerce", tone: "light" },
@@ -34,6 +36,7 @@ const COPY = {
   },
   fr: {
     kicker: "Compétences / Connectées par conception", heading: ["Un studio.", "Trois façons d’avancer."], intro: "Commencez par le produit, la boutique ou le problème de croissance. Nous relions les autres couches lorsque le projet l’exige.", map: ["PRODUIT", "E-COMMERCE", "CROISSANCE"], fit: "Une bonne adéquation si", outputs: "Ce que nous pouvons connecter", discuss: "Discuter de ce type de projet",
+    pathsLabel: "Choisissez le signal le plus proche", paths: [["01", "Construction produit", "Idée, produit ou refonte", "product-builds"], ["02", "Système e-commerce", "Boutique, paiement ou opérations", "commerce"], ["03", "Système de croissance", "Mesure, conversion ou cycle de vie", "growth-systems"]],
     services: [
       { id: "product-builds", number: "01", eyebrow: "De zéro à un / Refontes", title: "Construisez le produit, pas seulement les écrans.", lead: "Nous transformons une idée ambitieuse, un produit incomplet ou une opération complexe en logiciel compréhensible et utilisable.", fit: ["Un nouveau produit a besoin d’une première version crédible", "Un produit existant a dépassé ses fondations", "Une marketplace doit servir clients et opérateurs"], outputs: ["Stratégie produit et périmètre de livraison", "UX, interface et système de marque", "Développement web ou mobile", "Paiements, données et intégrations tierces", "QA, préparation au lancement et transmission"], surface: "services_product", tone: "dark" },
       { id: "commerce", number: "02", eyebrow: "Shopify / E-commerce sur mesure", title: "Transformez la boutique en système.", lead: "Le meilleur e-commerce relie la marque visible à la mécanique opérationnelle que le client ne devrait jamais avoir à considérer.", fit: ["Une boutique template ne reflète plus la marque", "Achat, abonnement ou compte créent des frictions", "Les opérations sont dispersées entre des outils isolés"], outputs: ["Thèmes Shopify et boutiques", "Expériences e-commerce sur mesure", "Abonnements et comptes clients", "Architecture checkout et conversion", "Intégrations opérationnelles et automatisation"], surface: "services_commerce", tone: "light" },
@@ -68,6 +71,10 @@ export default async function ServicesPage({ params }: LocalePageProps) {
             <span>{copy.map[2]}</span><b />
           </div>
         </div>
+        <nav className="services-hero-paths" id="service-paths" aria-label={copy.pathsLabel}>
+          <p>{copy.pathsLabel}</p>
+          <div>{copy.paths.map(([number, title, detail, id]) => <a key={id} href={`#${id}`} data-journey-intent={`service_${id}`} data-journey-source="services_hero"><span>{number}</span><strong>{title}</strong><small>{detail}</small><em aria-hidden="true">↓</em></a>)}</div>
+        </nav>
       </section>
 
       <section className="service-detail-stack" aria-label="MaydaLabs services">
@@ -81,7 +88,7 @@ export default async function ServicesPage({ params }: LocalePageProps) {
                 <section><p>{copy.outputs}</p><ul>{service.outputs.map((item) => <li key={item}>{item}</li>)}</ul></section>
               </div>
             </div>
-            <Link href={localizePath(`/contact?need=${service.id === "product-builds" ? "product" : service.id === "commerce" ? "commerce" : "growth"}#brief`, locale)} className={service.tone === "dark" ? "studio-button" : "studio-button studio-button-light"}>{copy.discuss} <Arrow /></Link>
+            <Link href={localizePath(`/contact?need=${service.id === "product-builds" ? "product" : service.id === "commerce" ? "commerce" : "growth"}#brief`, locale)} className={service.tone === "dark" ? "studio-button" : "studio-button studio-button-light"} data-journey-intent="stage_brief" data-journey-source={service.surface}>{copy.discuss} <Arrow /></Link>
           </article>
         ))}
       </section>
@@ -95,8 +102,8 @@ export default async function ServicesPage({ params }: LocalePageProps) {
         <div className="studio-availability"><span /> {copy.availability}</div><p className="studio-kicker">{copy.scope}</p>
         <h2>{copy.cta[0]}<br /><em>{copy.cta[1]}</em></h2>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link href={localizePath("/contact#needs", locale)} className="studio-button studio-button-light">{copy.book} <Arrow /></Link>
-          <Link href={localizePath("/case-studies", locale)} className="studio-button studio-button-outline-light">{copy.seeWork}</Link>
+          <Link href={localizePath("/contact#brief", locale)} className="studio-button studio-button-light" data-journey-intent="stage_brief" data-journey-source="services_final">{copy.book} <Arrow /></Link>
+          <Link href={localizePath("/case-studies#hodlstay", locale)} className="studio-button studio-button-outline-light" data-journey-intent="stage_proof" data-journey-source="services_final">{copy.seeWork}</Link>
         </div>
         <p className="studio-final-note">{copy.note}</p>
       </section>

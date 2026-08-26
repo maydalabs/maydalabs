@@ -174,6 +174,14 @@ export function SiteAnalytics() {
         return;
       }
 
+      const journeyIntent = anchor.dataset.journeyIntent;
+      if (journeyIntent) {
+        emit("guided_journey_click", {
+          intent: journeyIntent,
+          source: anchor.dataset.journeySource ?? "unknown",
+        });
+      }
+
       let url = new URL(anchor.href, window.location.href);
 
       if (url.hostname.endsWith("calendly.com")) {

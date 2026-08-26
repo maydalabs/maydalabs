@@ -350,6 +350,8 @@ export function MaydaOS({ locale }: { locale: Locale }) {
     }
     document.documentElement.dataset.osArrived = "true";
     trackOsEvent("arrival_intent_click", { intent, locale });
+    const journeyIntent = intent === "start" ? "stage_brief" : intent === "services" ? "stage_fit" : intent.startsWith("proof_") ? "stage_proof" : null;
+    if (journeyIntent) trackOsEvent("guided_journey_click", { intent: journeyIntent, source: "foyer", locale });
   }, [locale]);
 
   const revealDesktop = useCallback((intent: "enter" | "work") => {
@@ -362,11 +364,12 @@ export function MaydaOS({ locale }: { locale: Locale }) {
   }, [markArrivalComplete]);
 
   const inspectArrivalWork = useCallback(() => {
+    trackOsEvent("guided_journey_click", { intent: "stage_proof", source: "foyer", locale });
     zRef.current += 1;
     const z = zRef.current;
     setWindows((current) => ({ ...current, work: { ...current.work, open: true, min: false, z } }));
     revealDesktop("work");
-  }, [revealDesktop]);
+  }, [locale, revealDesktop]);
 
   const closeWindow = useCallback((id: WindowId) => {
     playTick();
@@ -502,6 +505,8 @@ export function MaydaOS({ locale }: { locale: Locale }) {
                     href={localizePath("/contact", locale)}
                     className="os-welcome-intent is-primary"
                     data-tour="start"
+                    data-journey-intent="stage_brief"
+                    data-journey-source="desktop_welcome"
                     onClick={() => trackHomepageIntent("start", "desktop")}
                   >
                     <span>01</span>
@@ -514,6 +519,7 @@ export function MaydaOS({ locale }: { locale: Locale }) {
                     className="os-welcome-intent"
                     onClick={() => {
                       trackHomepageIntent("work", "desktop");
+                      trackOsEvent("guided_journey_click", { intent: "stage_proof", source: "desktop_welcome", locale });
                       openWindow("work");
                     }}
                   >
@@ -523,13 +529,15 @@ export function MaydaOS({ locale }: { locale: Locale }) {
                     <em aria-hidden="true">→</em>
                   </button>
                   <Link
-                    href={localizePath("/profile", locale)}
+                    href={localizePath("/services#service-paths", locale)}
                     className="os-welcome-intent"
-                    onClick={() => trackHomepageIntent("profile", "desktop")}
+                    data-journey-intent="stage_fit"
+                    data-journey-source="desktop_welcome"
+                    onClick={() => trackHomepageIntent("services", "desktop")}
                   >
                     <span>03</span>
-                    <strong>{copy.welcome.intents.profile[0]}</strong>
-                    <small>{copy.welcome.intents.profile[1]}</small>
+                    <strong>{copy.welcome.intents.services[0]}</strong>
+                    <small>{copy.welcome.intents.services[1]}</small>
                     <em aria-hidden="true">→</em>
                   </Link>
                 </div>
@@ -553,6 +561,9 @@ export function MaydaOS({ locale }: { locale: Locale }) {
                 >
                   {copy.welcome.explore} <span aria-hidden="true">↗</span>
                 </button>
+                <Link href={localizePath("/profile", locale)} onClick={() => trackHomepageIntent("profile", "desktop")}>
+                  {copy.welcome.intents.profile[0]} <span aria-hidden="true">→</span>
+                </Link>
               </div>
             </div>
           </OsWindow>

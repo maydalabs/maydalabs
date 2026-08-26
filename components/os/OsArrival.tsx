@@ -78,6 +78,7 @@ export function OsArrival({
             <p className="os-arrival-proofline">{copy.arrival.proof}</p>
 
             <div className="os-arrival-actions">
+              <p className="os-arrival-actions-label">{copy.arrival.choose}</p>
               <Link
                 href={localizePath("/contact", locale)}
                 className="os-arrival-primary"
@@ -91,17 +92,22 @@ export function OsArrival({
                   <span><strong>{copy.welcome.intents.work[0]}</strong><small>{copy.welcome.intents.work[1]}</small></span>
                   <em aria-hidden="true">↘</em>
                 </button>
-                <Link href={localizePath("/profile", locale)} onClick={() => onRoute("profile")}>
-                  <span><strong>{copy.welcome.intents.profile[0]}</strong><small>{copy.welcome.intents.profile[1]}</small></span>
+                <Link href={localizePath("/services#service-paths", locale)} onClick={() => onRoute("services")}>
+                  <span><strong>{copy.welcome.intents.services[0]}</strong><small>{copy.welcome.intents.services[1]}</small></span>
                   <em aria-hidden="true">→</em>
                 </Link>
               </div>
             </div>
 
-            <button type="button" className="os-arrival-enter" onClick={onEnter}>
-              <span><strong>{copy.arrival.enter}</strong><small>{copy.arrival.enterHint}</small></span>
-              <em aria-hidden="true">↘</em>
-            </button>
+            <div className="os-arrival-utility">
+              <button type="button" className="os-arrival-enter" onClick={onEnter}>
+                <span><strong>{copy.arrival.enter}</strong><small>{copy.arrival.enterHint}</small></span>
+                <em aria-hidden="true">↘</em>
+              </button>
+              <Link href={localizePath("/profile", locale)} onClick={() => onRoute("profile")}>
+                {copy.welcome.intents.profile[0]} <span aria-hidden="true">→</span>
+              </Link>
+            </div>
           </div>
 
           <div className="os-arrival-showcase">

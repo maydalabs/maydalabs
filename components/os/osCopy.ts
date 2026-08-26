@@ -31,6 +31,7 @@ export const OS_COPY = {
       eyebrow: "Product strategy · engineering · growth systems",
       body: "MaydaLabs turns ambitious product ideas and operational friction into software that ships, measures, and keeps working.",
       proof: "2 live products · 2 active private builds · founder-led end to end",
+      choose: "Choose your starting point",
       enter: "Enter MaydaOS",
       enterHint: "Open the desktop, shell, telemetry, and product tools.",
       proofLabel: "Live product evidence",
@@ -48,6 +49,7 @@ export const OS_COPY = {
       intents: {
         start: ["Start with your problem", "No polished brief needed."],
         work: ["Inspect shipped work", "Open the product and the decisions behind it."],
+        services: ["Find the right direction", "Match product, commerce, or growth to the problem."],
         profile: ["Evaluating Mehmet?", "See evidence, range, and hiring materials."],
       },
       explore: "Explore MaydaOS freely",
@@ -222,6 +224,7 @@ export const OS_COPY = {
       eyebrow: "Ürün stratejisi · mühendislik · büyüme sistemleri",
       body: "MaydaLabs; iddialı ürün fikirlerini ve operasyonel sürtünmeleri yayına çıkan, ölçülen ve çalışmaya devam eden yazılımlara dönüştürür.",
       proof: "2 canlı ürün · 2 aktif özel geliştirme · uçtan uca kurucu liderliği",
+      choose: "Başlangıç noktanızı seçin",
       enter: "MaydaOS'e girin",
       enterHint: "Masaüstünü, kabuğu, telemetriyi ve ürün araçlarını açın.",
       proofLabel: "Canlı ürün kanıtı",
@@ -239,6 +242,7 @@ export const OS_COPY = {
       intents: {
         start: ["Probleminizle başlayın", "Kusursuz bir brief gerekmiyor."],
         work: ["Yayınlanmış işleri inceleyin", "Ürünü ve arkasındaki kararları açın."],
+        services: ["Doğru yönü bulun", "Ürün, e-ticaret veya büyümeyi probleminizle eşleştirin."],
         profile: ["Mehmet'i değerlendiriyor musunuz?", "Kanıtları, yetkinlikleri ve işe alım materyallerini görün."],
       },
       explore: "MaydaOS'i özgürce keşfedin",
@@ -413,6 +417,7 @@ export const OS_COPY = {
       eyebrow: "Stratégie produit · ingénierie · systèmes de croissance",
       body: "MaydaLabs transforme les idées produit ambitieuses et les frictions opérationnelles en logiciels livrés, mesurés et durables.",
       proof: "2 produits en ligne · 2 constructions privées · pilotage fondateur de bout en bout",
+      choose: "Choisissez votre point de départ",
       enter: "Entrer dans MaydaOS",
       enterHint: "Ouvrez le bureau, le shell, la télémétrie et les outils produit.",
       proofLabel: "Preuves produit en direct",
@@ -430,6 +435,7 @@ export const OS_COPY = {
       intents: {
         start: ["Commencez par votre problème", "Aucun brief parfait n'est nécessaire."],
         work: ["Inspectez le travail livré", "Ouvrez le produit et les décisions qui l'ont façonné."],
+        services: ["Trouvez la bonne direction", "Reliez produit, e-commerce ou croissance au problème."],
         profile: ["Vous évaluez Mehmet ?", "Voyez les preuves, l'étendue et les éléments de recrutement."],
       },
       explore: "Explorez MaydaOS librement",

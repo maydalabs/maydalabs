@@ -6,6 +6,14 @@ import { type Locale, localizePath, stripLocaleFromPath } from "@/lib/i18n";
 import { OsMenuBar } from "@/components/os/OsMenuBar";
 import { OsPalette } from "@/components/os/OsPalette";
 import { useTelemetry } from "@/components/os/useTelemetry";
+import { JourneyGuide, type JourneyStage } from "@/components/JourneyGuide";
+
+function getJourneyStage(pathname: string): JourneyStage | null {
+  if (pathname.startsWith("/case-studies")) return "proof";
+  if (pathname === "/services") return "fit";
+  if (pathname === "/contact") return "brief";
+  return null;
+}
 
 // Inner document pages render inside MaydaOS window chrome on desktop;
 // on phones they behave as full-screen apps under the classic header.
@@ -23,6 +31,7 @@ export function OsShell({
   const pathname = usePathname();
   const normalized = stripLocaleFromPath(pathname);
   const isDesktopHome = normalized === "/";
+  const journeyStage = getJourneyStage(normalized);
 
   if (isDesktopHome) {
     return (
@@ -50,7 +59,8 @@ export function OsShell({
           <span className="os-window-title">~{normalized}</span>
           <span className="os-page-bar-meta">MAYDAOS 26.08</span>
         </div>
-        <div className="os-page-body">
+        <div className={`os-page-body${journeyStage ? " has-journey-guide" : ""}`}>
+          {journeyStage ? <JourneyGuide locale={locale} current={journeyStage} /> : null}
           {children}
           {footer}
         </div>
