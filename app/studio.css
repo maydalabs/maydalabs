@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+/* Global studio and MaydaOS presentation layer. */
+
 :root {
   --background: #090909;
   --foreground: #f2f0ea;
