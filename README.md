@@ -122,6 +122,17 @@ flowchart LR
 - Application, publication, and outreach payloads stay reviewable before action.
 - The system records what factually happened, rather than assuming success.
 
+## Commercial operating model
+
+MaydaLabs now treats business development as four connected but distinct
+lanes: Sell, Prove, Distribute, and Capital. Research leads do not count as
+qualified opportunities, content drafts do not count as distribution, and
+capital research stays on hold until one owned product has an explicit thesis.
+
+The current offer hypotheses, portfolio boundaries, channel order, and
+consequential-action rules are documented in
+[`docs/commercial-operating-model.md`](docs/commercial-operating-model.md).
+
 ## Product proof, side by side
 
 <table>

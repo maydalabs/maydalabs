@@ -1,6 +1,6 @@
 # MaydaLabs 30-Day Launch Plan
 
-_Status updated: 26 August 2026_
+_Status updated: 1 September 2026_
 
 ## Decisions Locked
 
@@ -8,6 +8,9 @@ _Status updated: 26 August 2026_
 - Positioning: product and growth studio for founders.
 - Proof strategy: lead with Bitcoin-native work and target founders across industries.
 - Commercial model: no public price list; scope and pricing follow a project call.
+- Commercial operating order: Sell → Prove → Distribute → Capital.
+- Offer state: three evidence-backed hypotheses exist; one offer and one buyer
+  profile must be selected before prospecting or paid acquisition is promoted.
 - Flagships: HodlStay and Satoshi Gazette.
 - Intake: local brief composer, Calendly, and `info@maydalabs.com`; no database or email provider required for launch.
 - Availability language: `Open for new client work` without an artificial cap.
@@ -42,15 +45,29 @@ _Status updated: 26 August 2026_
 5. Run fresh accessibility, performance, bundle, and browser checks; treat production field data as the long-term source of truth.
 6. Review Satoshi Gazette case-study language as the newsroom publishes more work; add outcomes only when they are verifiable.
 
-## Marketing Sprint: Start After Site QA
+## Commercial Sprint: Start After Site QA
 
-1. Create the MaydaLabs social profiles and use the final brand assets consistently.
-2. Prepare six launch assets: founder introduction, studio launch, HodlStay case post, Satoshi Gazette case post, MaydaOS walkthrough, and product-system note.
-3. Create one share graphic and one short product walkthrough for each flagship.
-4. Build a focused founder prospect list and match each outreach message to the most relevant case study.
-5. Start with organic posts and direct outreach before paid ads.
-6. After conversion tracking is verified, test one narrow paid campaign with one audience, one case-study landing page, and one primary conversion: `project_call_click`.
-7. Review traffic, qualified calls, replies, and objections after seven days; change the message from evidence rather than impressions.
+1. Select one offer hypothesis and one initial buyer profile; record why it is
+   narrower and more credible than the alternatives.
+2. Reconcile the client journey: decide the MaydaLabs/MaydaOS hierarchy and move
+   hiring materials out of the primary commercial path if approved.
+3. Package proof for the chosen offer. Request the HodlStay quote only after
+   exact approval and preserve every private-alpha or Phase 1 limitation.
+4. Re-verify the current need, contact identity, and offer fit for every research
+   lead. A lead becomes an opportunity only after those facts are canonical.
+5. Finish the LinkedIn company page manually, verify the MaydaLabs X account,
+   and use the final brand assets consistently.
+6. Revise the prepared founder/company drafts into Mehmet's direct voice, then
+   publish useful proof through founder LinkedIn and the owned site first.
+7. Create one share graphic and one short product walkthrough for each flagship
+   only when it supports the chosen offer.
+8. Start with organic posts and carefully selected direct outreach before paid
+   ads. Record replies, objections, calls, and non-response honestly.
+9. After conversion tracking and message fit are verified, propose one narrow
+   paid campaign with one audience, one landing path, one budget/stop rule, and
+   one primary conversion: `project_call_click`.
+10. Review traffic, qualified conversations, proposals, and objections after
+    seven days; change the message from evidence rather than impressions.
 
 ## Inputs Still Needed
 
@@ -58,3 +75,8 @@ _Status updated: 26 August 2026_
 - Any public HodlStay or Satoshi Gazette outcomes, milestones, or testimonials that can be verified.
 - Final social account URLs after the MaydaLabs profiles are created.
 - Target geography and initial customer profile before paid campaign setup.
+- Mehmet's choice of the first repeatable offer and buyer profile.
+- A separate product thesis before any accelerator, grant, or investor lane is activated.
+
+The full evidence and action boundary is in
+[`commercial-operating-model.md`](commercial-operating-model.md).
