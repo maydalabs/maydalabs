@@ -344,8 +344,8 @@ export function MultiplierMap({
                           name="token"
                           inputMode="numeric"
                           autoComplete="one-time-code"
-                          pattern="[0-9]{6}"
-                          maxLength={6}
+                          pattern="[0-9]{6,10}"
+                          maxLength={10}
                           required
                         />
                       </label>

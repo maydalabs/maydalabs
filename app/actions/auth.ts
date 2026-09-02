@@ -67,7 +67,7 @@ export async function verifyOtpAction(
     .toLowerCase();
   const token = String(formData.get("token") ?? "").trim();
   if (!isValidEmail(email)) return { status: "error", code: "invalid_email" };
-  if (!/^\d{6}$/.test(token)) return { status: "error", code: "invalid_code", email };
+  if (!/^\d{6,10}$/.test(token)) return { status: "error", code: "invalid_code", email };
 
   const headerStore = await headers();
   const clientKey = clientKeyFromHeaders(headerStore);

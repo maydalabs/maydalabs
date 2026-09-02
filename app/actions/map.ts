@@ -70,7 +70,7 @@ export async function saveMapAction(
 }
 
 /**
- * One round trip for the anonymous flow: verify the emailed six-digit code,
+ * One round trip for the anonymous flow: verify the emailed one-time code,
  * establish the session, then save the map for the now-signed-in user.
  */
 export async function verifyOtpAndSaveMapAction(
@@ -83,7 +83,7 @@ export async function verifyOtpAndSaveMapAction(
     .toLowerCase();
   const token = String(formData.get("token") ?? "").trim();
   if (!email) return { status: "error", code: "invalid_email" };
-  if (!/^\d{6}$/.test(token)) return { status: "error", code: "invalid_code" };
+  if (!/^\d{6,10}$/.test(token)) return { status: "error", code: "invalid_code" };
 
   const headerStore = await headers();
   const clientKey = clientKeyFromHeaders(headerStore);

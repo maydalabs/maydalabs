@@ -7,7 +7,7 @@ import { isLocale, localizePath, type Locale } from "@/lib/i18n";
 
 /**
  * Confirmation endpoint for the sign-in email's fallback link
- * (`?token_hash=...&type=email`). The primary flow is the six-digit code;
+ * (`?token_hash=...&type=email`). The primary flow is the emailed code;
  * this route exists so the emailed link also works.
  */
 export async function GET(

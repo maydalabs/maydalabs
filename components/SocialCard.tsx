@@ -30,7 +30,7 @@ const CARD_COPY: Record<Locale, Record<SocialCardKind, CardCopy>> = {
     about: { eyebrow: "About", title: "Founder-led, evidence first." },
     contact: { eyebrow: "Start a conversation", title: "Bring the constraint." },
     portal: { eyebrow: "Portal", title: "Your maps and briefs." },
-    auth: { eyebrow: "Sign in", title: "A six-digit code. No password." },
+    auth: { eyebrow: "Sign in", title: "A one-time code. No password." },
     legal: { eyebrow: "MaydaLabs", title: "The fine print, kept honest." },
   },
   tr: {
@@ -47,7 +47,7 @@ const CARD_COPY: Record<Locale, Record<SocialCardKind, CardCopy>> = {
     about: { eyebrow: "Hakkında", title: "Kurucu liderliğinde, önce kanıt." },
     contact: { eyebrow: "Bir görüşme başlatın", title: "Kısıtı getirin." },
     portal: { eyebrow: "Portal", title: "Haritalarınız ve brief'leriniz." },
-    auth: { eyebrow: "Giriş", title: "Altı haneli kod. Parola yok." },
+    auth: { eyebrow: "Giriş", title: "Tek kullanımlık kod. Parola yok." },
     legal: { eyebrow: "MaydaLabs", title: "Küçük yazılar, dürüst tutulur." },
   },
   fr: {
@@ -64,7 +64,7 @@ const CARD_COPY: Record<Locale, Record<SocialCardKind, CardCopy>> = {
     about: { eyebrow: "À propos", title: "Dirigé par le fondateur, preuves d’abord." },
     contact: { eyebrow: "Démarrer un échange", title: "Apportez la contrainte." },
     portal: { eyebrow: "Portail", title: "Vos cartes et vos briefs." },
-    auth: { eyebrow: "Connexion", title: "Un code à six chiffres. Sans mot de passe." },
+    auth: { eyebrow: "Connexion", title: "Un code à usage unique. Sans mot de passe." },
     legal: { eyebrow: "MaydaLabs", title: "Les petites lignes, honnêtes." },
   },
 };
