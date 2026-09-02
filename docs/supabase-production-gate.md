@@ -58,45 +58,74 @@ share SG's database.
 
 **Claude, after that (no credentials handled):**
 
-3. **Push the schema** — applies exactly the three migrations in
+3. **Push the schema** — applies exactly the four migrations in
    `supabase/migrations/` and verifies the tables, policies, and view:
    ```bash
    npx supabase db push
    ```
    Then a read-only check: `npx supabase migration list`.
 3. **Auth settings in the dashboard:** Authentication → URL configuration:
-   Site URL `https://maydalabs.com`, redirect URLs
-   `https://maydalabs.com/**`. Authentication → Email templates → *Magic
-   Link*: paste `supabase/templates/magic_link.html` (six-digit code first,
-   confirm link as fallback).
-4. **SMTP via Resend** (Authentication → Emails → SMTP Settings). Supabase's
-   built-in sender is limited to a few emails per hour and is not for
-   production; the dashboard also refuses to edit email templates until
-   custom SMTP is enabled. Mehmet already runs Resend for Satoshi Gazette
-   (team `satoshigazette`, verified domain `satoshigazette.org`, a
-   sending-only key named "Supabase auth SMTP" used by SG's project). For
-   MaydaLabs, keep the brands separate — auth email must come from
-   maydalabs.com, never from the publication's domain:
-   1. Resend → team switcher → **Create team** `maydalabs` (each team has
-      its own free tier: 3,000 emails/month, one verified domain).
-   2. Domains → Add domain `maydalabs.com` (or the subdomain
-      `mail.maydalabs.com` to keep the root domain's mail untouched) → add
-      the DNS records Resend shows (DKIM TXT, SPF/MX for the sending
-      subdomain, optional DMARC) where maydalabs.com's DNS lives → wait for
-      **Verified**.
-   3. API keys → Create API key `Supabase auth SMTP`, permission
-      **Sending access** only, domain restricted to maydalabs.com. Copy it
-      once.
-   4. Supabase → Authentication → Emails → SMTP Settings → Enable custom
-      SMTP: Sender email `auth@maydalabs.com` (or `no-reply@…`), Sender
-      name `MaydaLabs`, Host `smtp.resend.com`, Port `465`, Username
-      `resend`, Password = the API key. Save. (Supabase's rate-limit
-      settings for email can then be raised under Authentication → Rate
-      Limits; 30/hour is plenty for pilots.)
-   5. Now the **Templates** tab becomes editable: paste
-      `supabase/templates/magic_link.html` into *Magic link or OTP*, subject
-      `Your MaydaLabs sign-in code`. Do the same for *Confirm sign up*.
-   Until this is done, sign-in codes will not reliably arrive.
+   Site URL `https://maydalabs.com` (no trailing slash — the email template
+   builds its fallback link from it), redirect URLs `https://maydalabs.com/**`.
+   Authentication → Emails → Templates: paste `supabase/templates/magic_link.html`
+   into **both** *Confirm sign up* and *Magic Link*, subject
+   `Your MaydaLabs sign-in code`. (Hosted projects have "Confirm email" on, so
+   a first-time sign-in uses the *Confirm sign up* template and a returning
+   sign-in uses *Magic Link*; `/auth/confirm` accepts the token hash of
+   either because it verifies with `type=email`.) Templates stay locked
+   until custom SMTP is on — do step 4 first.
+4. **SMTP via Resend — the Supabase integration wizard** (Resend →
+   Settings → Integrations → Supabase). Supabase's built-in sender is
+   limited to a few emails per hour and is not for production. Facts
+   checked 3 Sep 2026: Resend's Free plan allows 3 domains, 3,000
+   emails/month, 100/day; creating a second team asked for a paid plan,
+   so MaydaLabs auth mail goes through the team on Mehmet's personal
+   Resend login, renamed **MaydaLabs** (satoshigazette.org stays on its
+   own team — auth mail must never come from the publication's domain).
+   The wizard has four steps and was started 2 Sep (project `maydalabs`
+   chosen):
+   1. **Link domain** — Name `maydalabs.com` (root; same pattern as SG.
+      Resend's own deliverability guide prefers a dedicated subdomain such
+      as `auth.maydalabs.com`; at pilot volumes the root is fine and gives
+      `auth@maydalabs.com` as the sender). Advanced options → Region
+      **eu-west-1** (same region as the Supabase project; fixed at
+      creation). Add domain.
+   2. **DNS** — maydalabs.com's DNS is at Namecheap
+      (`dns1/dns2.registrar-servers.com`), not Vercel, so the records are
+      added by hand under Advanced DNS. Resend shows three; Namecheap wants
+      the host *without* the domain:
+      - MX, host `send`, value `feedback-smtp.eu-west-1.amazonses.com`, priority 10
+      - TXT, host `send`, value `v=spf1 include:amazonses.com ~all`
+      - TXT, host `resend._domainkey`, value `p=…` (copy from Resend)
+      None of these touch the Google Workspace MX on the root. While in
+      there, fix the root's own mail hygiene (as of 3 Sep the root has
+      **no SPF and no DMARC**, which hurts outreach sent from
+      info@maydalabs.com): TXT host `@` → `v=spf1 include:_spf.google.com ~all`;
+      TXT host `_dmarc` → `v=DMARC1; p=none; rua=mailto:info@maydalabs.com`;
+      and turn on Google DKIM (Google Admin → Apps → Gmail → Authenticate
+      email → generate record → add TXT host `google._domainkey`). Back in
+      Resend: Verify DNS records; on the domain page keep **click tracking
+      and open tracking off** (tracking rewrites auth links and breaks
+      them).
+   3. **Add an API key** — the wizard creates it (sending access). If it
+      instead asks you to create one: name `Supabase auth SMTP`, permission
+      *Sending access*, domain `maydalabs.com`.
+   4. **Configure SMTP** — Sender email `auth@maydalabs.com`, Sender name
+      `MaydaLabs`. Resend writes the SMTP settings into the Supabase
+      project through the access it was granted (that is what the wizard's
+      "Revoke access" undoes). Confirm afterwards in Supabase →
+      Authentication → Emails → SMTP Settings: enabled, host
+      `smtp.resend.com`, port `465`, username `resend`. If the wizard
+      shows the credentials instead of writing them, paste exactly those
+      values there. Authentication → Rate Limits: 30 emails/hour is plenty.
+   Then step 3 (templates + URL configuration), then the first sign-in and
+   the operator insert in step 6. Until SMTP is on, sign-in codes will not
+   reliably arrive.
+   *Resend's Vercel integration is not needed:* it auto-adds DNS only when
+   Vercel hosts the DNS (ours is Namecheap) or provisions a new Resend
+   account from the Vercel Marketplace (we have one). The site sends no
+   email of its own yet; when notifications ship, a sending-only key goes
+   into Vercel as `RESEND_API_KEY` by hand.
 5. **Env vars on Vercel** — two options:
    - *Marketplace integration (fewest clicks):* Vercel → Integrations →
      Supabase → connect the `maydalabs` Supabase project to the
