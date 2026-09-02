@@ -5,14 +5,19 @@ external account, money, or a remote project is Mehmet's action._
 
 ## Where the database is today
 
-- **Local only.** `npx supabase start` runs a full Supabase stack in Docker
-  on this Mac (Postgres, Auth, PostgREST, Mailpit for captured email).
-  Keys live in `.env.local` (gitignored).
-- **Schema is code.** `supabase/migrations/` holds three versioned
+- **Remote project exists: `maydalabs`** (ref `ltmypxcyzcxmzedgmakh`,
+  West EU / eu-west-1, Free plan under the Vercel-Marketplace-managed
+  MaydaLabs org). Created by Mehmet on 2 Sep 2026; the three migrations
+  were pushed the same day with `npx supabase db push` and verified with
+  `npx supabase migration list` (local == remote).
+- **Local stack still works** for development and tests: `npx supabase
+  start` runs the full stack in Docker with keys in `.env.local`.
+- **Schema is code.** `supabase/migrations/` holds the three versioned
   migrations: core tables, RLS + grants, and the operator-status view.
   `lib/supabase/database.types.ts` is generated from them.
-- **Nothing exists remotely.** No Supabase project has been created; no
-  migration has been applied anywhere but this machine.
+- **Note on the CLI:** current versions link without asking for the
+  database password — `db push` authenticates through the CLI login
+  role, so the password is only needed for direct `psql` connections.
 - **The deployed site degrades on purpose.** Without the env vars, every
   marketing page works, `/start` still computes the map, and the account /
   intake surfaces fail closed with a visible error instead of a 500.
