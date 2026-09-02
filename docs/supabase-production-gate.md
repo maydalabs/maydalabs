@@ -69,10 +69,34 @@ share SG's database.
    `https://maydalabs.com/**`. Authentication → Email templates → *Magic
    Link*: paste `supabase/templates/magic_link.html` (six-digit code first,
    confirm link as fallback).
-4. **SMTP** (Authentication → SMTP settings): Supabase's built-in sender is
-   rate-limited to a few emails per hour and is not for production. Point
-   it at your Google Workspace SMTP or a transactional provider. Until this
-   is done, sign-in codes will not reliably arrive.
+4. **SMTP via Resend** (Authentication → Emails → SMTP Settings). Supabase's
+   built-in sender is limited to a few emails per hour and is not for
+   production; the dashboard also refuses to edit email templates until
+   custom SMTP is enabled. Mehmet already runs Resend for Satoshi Gazette
+   (team `satoshigazette`, verified domain `satoshigazette.org`, a
+   sending-only key named "Supabase auth SMTP" used by SG's project). For
+   MaydaLabs, keep the brands separate — auth email must come from
+   maydalabs.com, never from the publication's domain:
+   1. Resend → team switcher → **Create team** `maydalabs` (each team has
+      its own free tier: 3,000 emails/month, one verified domain).
+   2. Domains → Add domain `maydalabs.com` (or the subdomain
+      `mail.maydalabs.com` to keep the root domain's mail untouched) → add
+      the DNS records Resend shows (DKIM TXT, SPF/MX for the sending
+      subdomain, optional DMARC) where maydalabs.com's DNS lives → wait for
+      **Verified**.
+   3. API keys → Create API key `Supabase auth SMTP`, permission
+      **Sending access** only, domain restricted to maydalabs.com. Copy it
+      once.
+   4. Supabase → Authentication → Emails → SMTP Settings → Enable custom
+      SMTP: Sender email `auth@maydalabs.com` (or `no-reply@…`), Sender
+      name `MaydaLabs`, Host `smtp.resend.com`, Port `465`, Username
+      `resend`, Password = the API key. Save. (Supabase's rate-limit
+      settings for email can then be raised under Authentication → Rate
+      Limits; 30/hour is plenty for pilots.)
+   5. Now the **Templates** tab becomes editable: paste
+      `supabase/templates/magic_link.html` into *Magic link or OTP*, subject
+      `Your MaydaLabs sign-in code`. Do the same for *Confirm sign up*.
+   Until this is done, sign-in codes will not reliably arrive.
 5. **Env vars on Vercel** — two options:
    - *Marketplace integration (fewest clicks):* Vercel → Integrations →
      Supabase → connect the `maydalabs` Supabase project to the

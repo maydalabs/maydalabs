@@ -258,4 +258,80 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       expect(foreign ?? []).toHaveLength(0);
     });
   });
+  describe("pilots (client vs operator)", () => {
+    let pilotId: string;
+    let publishedUpdateId: string;
+
+    it("blocks non-operators from creating a pilot", async () => {
+      const { error } = await userA.from("pilots").insert({
+        client_email: emailA,
+        company: "Client Co",
+        workflow: "Weekly note",
+      });
+      expect(error).not.toBeNull();
+    });
+
+    it("lets an operator create a pilot attached to the client", async () => {
+      const { data, error } = await userB
+        .from("pilots")
+        .insert({
+          client_user_id: idA,
+          client_email: emailA,
+          company: "Client Co",
+          workflow: "Weekly note",
+          status: "operating",
+        })
+        .select("id")
+        .single();
+      expect(error).toBeNull();
+      pilotId = data!.id;
+    });
+
+    it("shows the client their own pilot but blocks status changes", async () => {
+      const { data: own } = await userA.from("pilots").select("id, status");
+      expect(own).toEqual([{ id: pilotId, status: "operating" }]);
+
+      const { data: changed } = await userA
+        .from("pilots")
+        .update({ status: "completed" })
+        .eq("id", pilotId)
+        .select("id");
+      expect(changed ?? []).toHaveLength(0);
+    });
+
+    it("shows the client only published updates; operators see drafts too", async () => {
+      const { data: published, error: publishError } = await userB
+        .from("pilot_updates")
+        .insert({ pilot_id: pilotId, title: "Week 1", published: true, output_count: 12 })
+        .select("id")
+        .single();
+      expect(publishError).toBeNull();
+      publishedUpdateId = published!.id;
+
+      const { error: draftError } = await userB
+        .from("pilot_updates")
+        .insert({ pilot_id: pilotId, title: "Draft", published: false });
+      expect(draftError).toBeNull();
+
+      const { data: clientView } = await userA.from("pilot_updates").select("id, title");
+      expect(clientView).toEqual([{ id: publishedUpdateId, title: "Week 1" }]);
+
+      const { data: operatorView } = await userB.from("pilot_updates").select("id");
+      expect(operatorView).toHaveLength(2);
+    });
+
+    it("blocks clients from writing or deleting updates", async () => {
+      const { error } = await userA
+        .from("pilot_updates")
+        .insert({ pilot_id: pilotId, title: "Not mine to write" });
+      expect(error).not.toBeNull();
+
+      const { data: deleted } = await userA
+        .from("pilot_updates")
+        .delete()
+        .eq("id", publishedUpdateId)
+        .select("id");
+      expect(deleted ?? []).toHaveLength(0);
+    });
+  });
 });

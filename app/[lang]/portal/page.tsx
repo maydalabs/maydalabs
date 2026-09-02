@@ -7,6 +7,8 @@ import {
   SubscriptionForm,
 } from "@/components/PortalPanels";
 import { MAP_COPY } from "@/components/multiplierMapCopy";
+import { PILOT_COPY } from "@/components/pilotCopy";
+import { PilotSummary, type PilotUpdateRecord } from "@/components/PilotView";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
@@ -165,7 +167,14 @@ export default async function PortalPage({ params }: LocalePageProps) {
   if (!claims) redirect(localizePath("/auth/sign-in", locale));
 
   const supabase = await createSupabaseServerClient();
-  const [{ data: maps }, { data: briefs }, { data: profile }, { data: subscription }] =
+  const [
+    { data: maps },
+    { data: briefs },
+    { data: profile },
+    { data: subscription },
+    { data: pilots },
+    { data: pilotUpdates },
+  ] =
     await Promise.all([
       supabase
         .from("multiplier_maps")
@@ -178,7 +187,27 @@ export default async function PortalPage({ params }: LocalePageProps) {
         .order("created_at", { ascending: false }),
       supabase.from("profiles").select("display_name, company_name, job_role").maybeSingle(),
       supabase.from("subscriptions").select("status").maybeSingle(),
+      // RLS already scopes these; the explicit filters keep an operator's own
+      // portal from showing the whole book.
+      supabase
+        .from("pilots")
+        .select("id, company, workflow, offer, status, starts_on, ends_on, summary, next_step")
+        .eq("client_user_id", claims.sub)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("pilot_updates")
+        .select("id, pilot_id, kind, title, body, period_label, output_count, approval_latency_minutes, source_coverage_pct, cost_usd, created_at")
+        .eq("published", true)
+        .order("created_at", { ascending: false }),
     ]);
+
+  const pilotCopy = PILOT_COPY[locale];
+  const updatesByPilot = new Map<string, PilotUpdateRecord[]>();
+  for (const update of pilotUpdates ?? []) {
+    const list = updatesByPilot.get(update.pilot_id) ?? [];
+    list.push(update);
+    updatesByPilot.set(update.pilot_id, list);
+  }
 
   const dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
 
@@ -194,6 +223,25 @@ export default async function PortalPage({ params }: LocalePageProps) {
         </div>
         <SignOutButton locale={locale} label={copy.signOut} />
       </header>
+
+      <section className="mayda-portal-section" aria-labelledby="portal-pilot">
+        <h2 id="portal-pilot" className="mayda-subheading">
+          {pilotCopy.sectionHeading}
+        </h2>
+        {pilots?.length ? (
+          pilots.map((pilot) => (
+            <PilotSummary
+              key={pilot.id}
+              pilot={pilot}
+              updates={updatesByPilot.get(pilot.id) ?? []}
+              locale={locale}
+              compact
+            />
+          ))
+        ) : (
+          <div className="mayda-portal-empty">{pilotCopy.empty}</div>
+        )}
+      </section>
 
       <section className="mayda-portal-section" aria-labelledby="portal-maps">
         <h2 id="portal-maps" className="mayda-subheading">

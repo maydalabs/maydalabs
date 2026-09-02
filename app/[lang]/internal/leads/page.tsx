@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
+import { InternalNav } from "@/components/InternalNav";
 import { LeadReviewForm } from "@/components/LeadReviewForm";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { localizePath } from "@/lib/i18n";
@@ -49,6 +50,7 @@ export default async function InternalLeadsPage({ params }: LocalePageProps) {
 
   return (
     <div className="mayda-shell mayda-section" style={{ maxWidth: "56rem" }}>
+      <InternalNav locale={locale} current="/internal/leads" />
       <header className="mayda-stack">
         <p className="mayda-kicker">Internal / Operators only</p>
         <h1 className="mayda-heading">Lead intake review</h1>

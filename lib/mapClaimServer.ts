@@ -48,4 +48,11 @@ export async function claimAnonymousRecords(userId: string, verifiedEmail: strin
     .update({ user_id: userId })
     .eq("email", email)
     .is("user_id", null);
+
+  // Pilots created for this address before the client had an account.
+  await admin
+    .from("pilots")
+    .update({ client_user_id: userId })
+    .eq("client_email", email)
+    .is("client_user_id", null);
 }
