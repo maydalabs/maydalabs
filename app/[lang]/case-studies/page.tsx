@@ -1,46 +1,168 @@
 import Image from "next/image";
 import Link from "next/link";
-import { InProgressVisual } from "@/components/InProgressVisual";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
 
 const COPY = {
   en: {
-    meta: { title: "Selected work", socialTitle: "Selected product work · MaydaLabs", description: "Four MaydaLabs product cases: live HodlStay and Satoshi Gazette work, plus Mortal Vault and Sofra in active private development." },
-    kicker: "Selected work / Evidence with status", heading: ["Four products.", "One point of view."], intro: "Two products are live and open to inspect. Two are private working builds with their current boundaries stated plainly. Together they show product, engineering, operations, and growth as one connected discipline.", engagement: "Engagement", full: "Open full case study", visit: "Visit", private: "No public release yet", challenge: "The challenge", built: "The system we built", stack: "Core stack", inside: "Inside the product", galleryHeading: "A marketplace is more than its landing page.", proofKicker: "The system behind the screen", proofHeading: "Four hard problems, connected.", heroInspect: "Inspect the live cases", heroFit: "Match your problem to the work", availability: "Open for new client work", cta: "Seen enough proof? Find the right direction.", fit: "Match your problem", start: "Start the brief",
+    meta: {
+      title: "Work",
+      socialTitle: "Real products, clearly labelled · MaydaLabs",
+      description:
+        "Four MaydaLabs cases: two live products you can open today, two private lab builds with their boundaries stated plainly. Every case is labelled by ownership and status.",
+    },
+    kicker: "Work / Evidence with status",
+    heading: ["Real products.", "Honest labels."],
+    intro:
+      "Two products are live and open to inspect right now. Two are private lab builds whose boundaries are stated plainly. Every case tells you what the situation was, what exactly MaydaLabs owned, what shipped, and who owns the result.",
+    open: "Open the case",
     cases: [
-      { id: "hodlstay", number: "01", name: "HodlStay", category: "Marketplace · Travel · Bitcoin", title: "A global stay marketplace, rebuilt around a sharper product idea.", summary: "HodlStay evolved from AirBTC into a premium travel product with Bitcoin-friendly booking built in. The current live product connects category-led stay discovery, detailed stay dossiers, conference travel, host operations, and the systems behind each journey.", engagement: "End-to-end client product build, prepared for handover on completion.", challenge: "Turn a promising niche platform into a credible, scalable marketplace without losing the community and Bitcoin roots that made it distinct.", built: ["Unified marketplace discovery and current stay dossiers", "Host onboarding, listing, calendar, and payout operations", "Booking, availability, review, and payment lifecycles", "AirBTC to HodlStay product and brand evolution", "Dedicated conference accommodation product"], stack: ["Next.js", "React", "Supabase", "BTCPay", "Resend", "Vercel"], image: "/work/hodlstay-2026-08-home.jpg", width: 1430, height: 894, alt: "Current HodlStay global booking marketplace", status: "Client project · Live", domain: "hodlstay.com", url: "https://hodlstay.com", gallery: [["/work/hodlstay-2026-08-stays.jpg", "Current HodlStay stay discovery and search interface", "Discovery", "Category-led search, dates, guests, filters, and current public inventory."], ["/work/hodlstay-2026-08-listing.jpg", "Current HodlStay stay dossier and booking interface", "Stay dossier", "Property story, media, host context, pricing, and booking entry."], ["/work/hodlstay-2026-08-conferences.jpg", "Current HodlStay conference accommodation interface", "Conference product", "A dedicated event accommodation journey for attendees, organizers, and hosts."]], proof: [["01", "Unified discovery", "One search layer presents a coherent discovery experience across the marketplace’s eligible inventory."], ["02", "Availability safety", "Imported calendar blocks, manual host blocks, and internal bookings are checked together to reduce double-booking risk."], ["03", "Bitcoin payment lifecycle", "Host acceptance connects to BTCPay checkout, signed webhook verification, booking settlement, and a traceable payout record."], ["04", "Operational migration", "Legacy WordPress and founder spreadsheet records are reconciled into a structured launch pipeline with explicit exception handling."]] },
-      { id: "satoshi-gazette", number: "02", name: "Satoshi Gazette", category: "Media · Data · AI-assisted operations", title: "A Bitcoin newsroom designed as an information product.", summary: "Satoshi Gazette now combines populated editorial desks, long-form stories, current Wire updates, briefings, live market context, and a primary-evidence Data Desk. The public newsroom is live while the operating system continues to evolve behind it.", engagement: "", challenge: "Build a publication that feels authoritative and editorial while the operating system behind it stays fast, structured, and ready for responsible AI assistance.", built: ["Editorial information architecture and visual system", "Current story, Wire, briefing, and Data Desk surfaces", "Publishing workflows and internal newsroom tooling", "Live Bitcoin market and network context", "Guarded retrieval and AI-assisted production foundations"], stack: ["Next.js", "React", "Supabase", "Editorial CMS", "Market data", "AI workflows"], image: "/work/satoshi-gazette-2026-08-home.jpg", width: 1280, height: 720, alt: "Current Satoshi Gazette Bitcoin newsroom", status: "Live · Active build", domain: "satoshigazette.org", url: "https://satoshigazette.org", gallery: [], proof: [] },
+      {
+        id: "hodlstay",
+        image: "/work/hodlstay-2026-08-home.jpg",
+        alt: "Current HodlStay global booking marketplace homepage",
+        tags: ["Client build", "Live"],
+        name: "HodlStay",
+        text: "A global stay marketplace rebuilt from AirBTC: discovery, host operations, availability, Bitcoin payments, and migration as one system.",
+      },
+      {
+        id: "satoshi-gazette",
+        image: "/work/satoshi-gazette-2026-08-home.jpg",
+        alt: "Current Satoshi Gazette newsroom homepage",
+        tags: ["Owned publication", "Live"],
+        name: "Satoshi Gazette",
+        text: "An independent Bitcoin publication built and operated as a product: editorial surfaces, data desks, and a guarded publishing pipeline.",
+      },
+      {
+        id: "mortal-vault",
+        image: "/work/mortal-vault-demo-home.jpg",
+        alt: "Mortal Vault owner interface demo screen",
+        tags: ["Lab product", "Private alpha · Unaudited"],
+        name: "Mortal Vault",
+        text: "A self-custodial continuity vault: owner check-ins, delayed beneficiary claims, and security work treated as a release gate.",
+      },
+      {
+        id: "sofra",
+        image: "/work/sofra-demo-home.jpg",
+        alt: "Sofra marketplace demo screen with fictional data",
+        tags: ["Lab product", "Private Phase 1 · Demo-safe"],
+        name: "Sofra",
+        text: "A managed household dinner marketplace where trust and privacy boundaries are part of the product model. Demo data only.",
+      },
     ],
-    developmentCases: [
-      { id: "mortal-vault", variant: "mortal", number: "03", name: "Mortal Vault", category: "Crypto · Self-custody · Continuity", title: "A continuity vault engineered around explicit time, role, and risk boundaries.", summary: "Mortal Vault is a private alpha for owner check-ins and delayed beneficiary claims. The current repository includes a bounded Solidity lifecycle, owner and beneficiary interfaces, event-backed history, reminder planning, and security testing.", engagement: "MaydaLabs product · Active private development.", challenge: "Make a high-consequence self-custody lifecycle understandable without hiding the irreversible risks or implying legal and security guarantees the product cannot make.", built: ["Owner and beneficiary contract lifecycle", "Delayed claim with owner challenge window", "Event-backed activity and deterministic reminder rules", "Adversarial, fuzz, invariant, and static-analysis gates", "Testnet-first network and release configuration"], stack: ["Solidity", "Hardhat", "Next.js", "ethers", "EVM testnets", "Security testing"], status: "Private alpha · Unaudited" },
-      { id: "sofra", variant: "sofra", number: "04", name: "Sofra", category: "Marketplace · Hospitality · Trust", title: "A managed household dinner marketplace where trust is part of the product model.", summary: "Sofra is a private Türkiye-first Phase 1 product for scheduled dinners in verified households. It connects bilingual guest, host, and operator journeys while protecting exact household, dietary, assessment, and safety data.", engagement: "MaydaLabs product · Active private development.", challenge: "Design a warm consumer experience on top of a rigorous approval, privacy, booking, incident, and operating model—without exposing the household behind the table.", built: ["Public table discovery and guest journeys", "Host application and managed approval lifecycle", "Operator, booking, pricing, and incident surfaces", "Explicit public/private data projections", "English and Turkish product architecture"], stack: ["Next.js", "TypeScript", "Supabase", "next-intl", "Vitest", "Playwright"], status: "Private Phase 1 · Demo-safe" },
-    ],
+    disciplineKicker: "How proof works here",
+    discipline:
+      "Client work is labelled client work. Owned products are labelled owned. Private-stage builds say exactly what is and isn't claimed. No metrics appear unless the underlying source can be inspected, and no testimonial appears unless a real client approved its exact wording.",
+    ctaHeading: "Match your situation to the work.",
+    mapCta: "Map my next move",
+    talkCta: "Start a conversation",
   },
   tr: {
-    meta: { title: "Seçili projeler", socialTitle: "Seçili ürün projeleri · MaydaLabs", description: "Canlı HodlStay ve Satoshi Gazette ile aktif özel geliştirmedeki Mortal Vault ve Sofra'yı kapsayan dört MaydaLabs ürün vakası." },
-    kicker: "Seçili projeler / Durumuyla birlikte kanıt", heading: ["Dört ürün.", "Tek bakış açısı."], intro: "İki ürün canlı ve incelenebilir. İki özel çalışan ürün ise mevcut sınırları açıkça belirtilerek sunuluyor. Birlikte ürün, mühendislik, operasyon ve büyümeyi bağlı tek disiplin olarak gösteriyorlar.", engagement: "Çalışma", full: "Tam vaka çalışmasını aç", visit: "Ziyaret et", private: "Henüz açık sürüm yok", challenge: "Problem", built: "Geliştirdiğimiz sistem", stack: "Temel teknoloji", inside: "Ürünün içinden", galleryHeading: "Bir pazar yeri açılış sayfasından fazlasıdır.", proofKicker: "Ekranın arkasındaki sistem", proofHeading: "Birbirine bağlı dört zor problem.", heroInspect: "Canlı vakaları inceleyin", heroFit: "Probleminizi işle eşleştirin", availability: "Yeni müşteri projelerine açık", cta: "Yeterince kanıt gördünüz mü? Doğru yönü bulun.", fit: "Probleminizi eşleştirin", start: "Brief'i başlatın",
+    meta: {
+      title: "Projeler",
+      socialTitle: "Gerçek ürünler, net etiketler · MaydaLabs",
+      description:
+        "Dört MaydaLabs vakası: bugün açabileceğiniz iki canlı ürün, sınırları açıkça belirtilmiş iki özel lab geliştirmesi. Her vaka sahiplik ve durumla etiketlidir.",
+    },
+    kicker: "Projeler / Durumuyla birlikte kanıt",
+    heading: ["Gerçek ürünler.", "Dürüst etiketler."],
+    intro:
+      "İki ürün canlı ve şu anda incelenebilir. İkisi, sınırları açıkça belirtilen özel lab geliştirmeleri. Her vaka durumun ne olduğunu, MaydaLabs'in tam olarak neyi üstlendiğini, neyin yayınlandığını ve sonucun kime ait olduğunu söyler.",
+    open: "Vakayı aç",
     cases: [
-      { id: "hodlstay", number: "01", name: "HodlStay", category: "Pazar yeri · Seyahat · Bitcoin", title: "Daha keskin bir ürün fikri etrafında yeniden kurulan küresel konaklama pazarı.", summary: "HodlStay, AirBTC’den Bitcoin dostu rezervasyonu deneyime yerleştiren premium bir seyahat ürününe dönüştü. Çalışma; keşif, ev sahibi operasyonları, misafir yolculukları, eski veri göçü, iş ortağı envanteri, ödemeler ve marka sistemini kapsıyor.", engagement: "Tam kapsamlı müşteri ürünü geliştirmesi; tamamlandığında devre hazır.", challenge: "Topluluğu ve Bitcoin köklerini kaybetmeden umut vadeden niş platformu güven veren, ölçeklenebilir bir pazar yerine dönüştürmek.", built: ["Birleşik pazar yeri keşfi ve konaklama dosyaları", "Ev sahibi katılımı, ilan, takvim ve ödeme operasyonları", "Rezervasyon, uygunluk, yorum ve ödeme yaşam döngüleri", "AirBTC’den HodlStay’e ürün ve marka dönüşümü", "Konferans konaklaması ve iş ortağı envanter akışları"], stack: ["Next.js", "React", "Supabase", "BTCPay", "Resend", "Vercel"], image: "/work/hodlstay-2026-08-home.jpg", width: 1430, height: 894, alt: "HodlStay küresel rezervasyon pazarı", status: "Müşteri projesi · Canlı", domain: "hodlstay.com", url: "https://hodlstay.com", gallery: [["/work/hodlstay-2026-08-stays.jpg", "HodlStay konaklama keşfi ve arama arayüzü", "Keşif", "Kategori odaklı arama, tarihler, misafirler, filtreler ve canlı envanter."], ["/work/hodlstay-2026-08-listing.jpg", "HodlStay konaklama dosyası ve rezervasyon arayüzü", "Konaklama dosyası", "Mülk hikâyesi, medya, ev sahibi bağlamı, fiat ve sats fiyatlandırması ve rezervasyon girişi."], ["/work/hodlstay-2026-08-conferences.jpg", "HodlStay konferans konaklama arayüzü", "Konferans ürünü", "Etkinlikler, katılımcılar, organizatörler ve ev sahipleri için özel konaklama yolları."]], proof: [["01", "Birleşik keşif", "Tek arama katmanı yerel HodlStay envanteriyle uygun HotelPlanner ve Dtravel iş ortağı arzını birlikte sunabilir."], ["02", "Uygunluk güvenliği", "İçe aktarılan iCal blokları, manuel ev sahibi blokları ve dahili rezervasyonlar çifte rezervasyon riskini azaltmak için birlikte kontrol edilir."], ["03", "Bitcoin ödeme yaşam döngüsü", "Ev sahibi kabulü; BTCPay ödeme, imzalı webhook doğrulaması, rezervasyon mutabakatı ve izlenebilir ödeme kaydına bağlanır."], ["04", "Operasyonel veri göçü", "Eski WordPress ve kurucu tablo kayıtları açık istisna yönetimiyle yapılandırılmış lansman hattına dönüştürülür."]] },
-      { id: "satoshi-gazette", number: "02", name: "Satoshi Gazette", category: "Medya · Veri · Yapay zekâ destekli operasyon", title: "Bilgi ürünü olarak tasarlanmış bir Bitcoin haber merkezi.", summary: "Satoshi Gazette; canlı piyasa katmanı, yapılandırılmış editoryal masalar, uzun haberler, Wire güncellemeleri ve bültenleri birleştiriyor. Haber merkezi ve yayın akışları vitrin seviyesine taşınırken canlı ürün aktif geliştirme aşamasında.", engagement: "", challenge: "Arka plandaki işletim sistemi hızlı, yapılandırılmış ve sorumlu yapay zekâ desteğine hazır kalırken otoriter ve editoryal hissettiren bir yayın kurmak.", built: ["Editoryal bilgi mimarisi ve görsel sistem", "Piyasa, madencilik, politika, Wire ve bülten yüzeyleri", "Yayın akışları ve dahili haber merkezi araçları", "Canlı Bitcoin piyasa ve ağ bağlamı", "Yapay zekâ destekli araştırma ve üretim temelleri"], stack: ["Next.js", "React", "Supabase", "Editoryal CMS", "Piyasa verisi", "Yapay zekâ akışları"], image: "/work/satoshi-gazette-2026-08-home.jpg", width: 1280, height: 720, alt: "Satoshi Gazette Bitcoin haber merkezi", status: "Canlı · Aktif geliştirme", domain: "satoshigazette.org", url: "https://satoshigazette.org", gallery: [], proof: [] },
+      {
+        id: "hodlstay",
+        image: "/work/hodlstay-2026-08-home.jpg",
+        alt: "Güncel HodlStay küresel rezervasyon pazarı ana sayfası",
+        tags: ["Müşteri ürünü", "Canlı"],
+        name: "HodlStay",
+        text: "AirBTC'den yeniden kurulan küresel konaklama pazarı: keşif, ev sahibi operasyonları, uygunluk, Bitcoin ödemeleri ve veri göçü tek sistem olarak.",
+      },
+      {
+        id: "satoshi-gazette",
+        image: "/work/satoshi-gazette-2026-08-home.jpg",
+        alt: "Güncel Satoshi Gazette haber merkezi ana sayfası",
+        tags: ["Sahip olunan yayın", "Canlı"],
+        name: "Satoshi Gazette",
+        text: "Ürün olarak inşa edilip işletilen bağımsız bir Bitcoin yayını: editoryal yüzeyler, veri masaları ve korumalı yayınlama hattı.",
+      },
+      {
+        id: "mortal-vault",
+        image: "/work/mortal-vault-demo-home.jpg",
+        alt: "Mortal Vault sahip arayüzü demo ekranı",
+        tags: ["Lab ürünü", "Özel alfa · Denetlenmedi"],
+        name: "Mortal Vault",
+        text: "Self-custody süreklilik kasası: sahip check-in'leri, gecikmeli lehtar talepleri ve sürüm kapısı olarak ele alınan güvenlik çalışması.",
+      },
+      {
+        id: "sofra",
+        image: "/work/sofra-demo-home.jpg",
+        alt: "Kurgusal verilerle Sofra pazar yeri demo ekranı",
+        tags: ["Lab ürünü", "Özel Faz 1 · Demo güvenli"],
+        name: "Sofra",
+        text: "Güven ve gizlilik sınırlarının ürün modelinin parçası olduğu yönetilen ev yemeği pazarı. Yalnızca demo verisi.",
+      },
     ],
-    developmentCases: [
-      { id: "mortal-vault", variant: "mortal", number: "03", name: "Mortal Vault", category: "Kripto · Self-custody · Süreklilik", title: "Açık zaman, rol ve risk sınırları etrafında geliştirilen süreklilik kasası.", summary: "Mortal Vault, sahip check-in'leri ve gecikmeli lehtar talepleri için özel alpha üründür. Mevcut repository sınırlı Solidity yaşam döngüsü, sahip ve lehtar arayüzleri, event tabanlı geçmiş, hatırlatma planı ve güvenlik testleri içerir.", engagement: "MaydaLabs ürünü · Aktif özel geliştirme.", challenge: "Yüksek sonuçlu bir self-custody yaşam döngüsünü geri döndürülemez riskleri gizlemeden ve hukuki ya da güvenlik garantisi ima etmeden anlaşılır kılmak.", built: ["Sahip ve lehtar sözleşme yaşam döngüsü", "Sahip itiraz pencereli gecikmeli talep", "Event tabanlı aktivite ve deterministik hatırlatmalar", "Adversarial, fuzz, invariant ve statik analiz kapıları", "Testnet öncelikli ağ ve sürüm yapılandırması"], stack: ["Solidity", "Hardhat", "Next.js", "ethers", "EVM testnetleri", "Güvenlik testleri"], status: "Özel alpha · Denetlenmedi" },
-      { id: "sofra", variant: "sofra", number: "04", name: "Sofra", category: "Pazar yeri · Ağırlama · Güven", title: "Güvenin ürün modelinin parçası olduğu yönetilen ev yemeği pazarı.", summary: "Sofra, doğrulanmış hanelerde planlı akşam yemekleri için Türkiye odaklı özel Phase 1 üründür. Tam hane, beslenme, değerlendirme ve güvenlik verilerini korurken iki dilli misafir, ev sahibi ve operatör yolculuklarını bağlar.", engagement: "MaydaLabs ürünü · Aktif özel geliştirme.", challenge: "Sofranın arkasındaki haneyi açığa çıkarmadan sıcak tüketici deneyimini disiplinli onay, gizlilik, rezervasyon, olay ve işletim modeli üzerine kurmak.", built: ["Açık sofra keşfi ve misafir yolculukları", "Ev sahibi başvurusu ve yönetilen onay yaşam döngüsü", "Operatör, rezervasyon, fiyat ve olay yüzeyleri", "Açık/özel veri projeksiyonları", "İngilizce ve Türkçe ürün mimarisi"], stack: ["Next.js", "TypeScript", "Supabase", "next-intl", "Vitest", "Playwright"], status: "Özel Phase 1 · Demo güvenli" },
-    ],
+    disciplineKicker: "Burada kanıt nasıl çalışır",
+    discipline:
+      "Müşteri işi müşteri işi olarak etiketlenir. Sahip olunan ürünler sahip olunan olarak. Özel aşamadaki geliştirmeler neyin iddia edilip edilmediğini tam olarak söyler. Kaynağı denetlenemeyen hiçbir metrik ve tam ifadesi gerçek bir müşteri tarafından onaylanmamış hiçbir referans burada yer almaz.",
+    ctaHeading: "Durumunuzu işle eşleştirin.",
+    mapCta: "Sonraki hamlemi haritala",
+    talkCta: "Bir görüşme başlat",
   },
   fr: {
-    meta: { title: "Projets sélectionnés", socialTitle: "Projets produit sélectionnés · MaydaLabs", description: "Quatre cas MaydaLabs : HodlStay et Satoshi Gazette en ligne, Mortal Vault et Sofra en construction privée." },
-    kicker: "Projets sélectionnés / Preuve et statut", heading: ["Quatre produits.", "Un seul point de vue."], intro: "Deux produits sont en ligne et ouverts à l’inspection. Deux constructions privées affichent clairement leurs limites actuelles. Ensemble, ils relient produit, ingénierie, opérations et croissance.", engagement: "Mission", full: "Ouvrir l’étude de cas", visit: "Visiter", private: "Aucune sortie publique", challenge: "Le défi", built: "Le système construit", stack: "Technologies clés", inside: "Dans le produit", galleryHeading: "Une marketplace dépasse sa landing page.", proofKicker: "Le système derrière l’écran", proofHeading: "Quatre problèmes difficiles, connectés.", heroInspect: "Inspecter les cas en ligne", heroFit: "Relier votre problème au travail", availability: "Ouvert à de nouveaux projets clients", cta: "Assez de preuves ? Trouvez la bonne direction.", fit: "Relier votre problème", start: "Commencer le brief",
+    meta: {
+      title: "Réalisations",
+      socialTitle: "De vrais produits, clairement étiquetés · MaydaLabs",
+      description:
+        "Quatre cas MaydaLabs : deux produits en ligne à ouvrir aujourd'hui, deux builds de lab privés aux limites clairement énoncées. Chaque cas est étiqueté par propriété et statut.",
+    },
+    kicker: "Réalisations / Preuves et statut",
+    heading: ["De vrais produits.", "Des étiquettes honnêtes."],
+    intro:
+      "Deux produits sont en ligne et inspectables maintenant. Deux sont des builds de lab privés aux limites clairement énoncées. Chaque cas dit quelle était la situation, ce que MaydaLabs a exactement pris en charge, ce qui a été livré et à qui appartient le résultat.",
+    open: "Ouvrir le cas",
     cases: [
-      { id: "hodlstay", number: "01", name: "HodlStay", category: "Marketplace · Voyage · Bitcoin", title: "Une marketplace mondiale de séjours reconstruite autour d’une idée plus forte.", summary: "HodlStay a évolué d’AirBTC vers un produit de voyage premium intégrant la réservation compatible Bitcoin. Le travail couvre découverte, opérations hôtes, parcours voyageurs, migration, inventaire partenaire, paiements et système de marque.", engagement: "Construction produit client de bout en bout, préparée pour transmission.", challenge: "Transformer une plateforme de niche prometteuse en marketplace crédible et évolutive sans perdre la communauté et les racines Bitcoin qui la distinguent.", built: ["Découverte unifiée et dossiers de séjour", "Intégration hôtes, annonces, calendriers et versements", "Cycles de réservation, disponibilité, avis et paiement", "Évolution produit et marque d’AirBTC à HodlStay", "Hébergement de conférences et inventaire partenaire"], stack: ["Next.js", "React", "Supabase", "BTCPay", "Resend", "Vercel"], image: "/work/hodlstay-2026-08-home.jpg", width: 1430, height: 894, alt: "Marketplace mondiale de réservation HodlStay", status: "Projet client · En ligne", domain: "hodlstay.com", url: "https://hodlstay.com", gallery: [["/work/hodlstay-2026-08-stays.jpg", "Interface de découverte et recherche HodlStay", "Découverte", "Recherche par catégorie, dates, voyageurs, filtres et inventaire en direct."], ["/work/hodlstay-2026-08-listing.jpg", "Dossier de propriété et réservation HodlStay", "Dossier de séjour", "Histoire du lieu, médias, contexte hôte, prix fiat et sats et entrée de réservation."], ["/work/hodlstay-2026-08-conferences.jpg", "Interface d’hébergement conférence HodlStay", "Produit conférence", "Parcours dédiés aux événements, participants, organisateurs et hôtes."]], proof: [["01", "Découverte unifiée", "Une seule couche de recherche présente l’inventaire HodlStay et les offres partenaires HotelPlanner et Dtravel éligibles."], ["02", "Sécurité de disponibilité", "Blocs iCal importés, blocages manuels et réservations internes sont vérifiés ensemble pour réduire les doubles réservations."], ["03", "Cycle de paiement Bitcoin", "L’acceptation hôte mène au checkout BTCPay, à la vérification webhook, au règlement et à un versement traçable."], ["04", "Migration opérationnelle", "Les données WordPress et feuilles fondateur sont réconciliées dans un pipeline de lancement structuré avec gestion explicite des exceptions."]] },
-      { id: "satoshi-gazette", number: "02", name: "Satoshi Gazette", category: "Média · Données · Opérations assistées par IA", title: "Une rédaction Bitcoin conçue comme un produit d’information.", summary: "Satoshi Gazette réunit marché en direct, rubriques éditoriales, reportages longs, fil Wire et briefings. Le produit est en construction active pendant que rédaction et workflows de publication atteignent leur niveau vitrine.", engagement: "", challenge: "Construire une publication éditoriale et crédible tout en gardant son système d’exploitation rapide, structuré et prêt pour une assistance IA responsable.", built: ["Architecture de l’information et système visuel", "Marché, minage, politique, Wire et briefings", "Workflows de publication et outils internes", "Contexte marché et réseau Bitcoin en direct", "Fondations de recherche et production assistées par IA"], stack: ["Next.js", "React", "Supabase", "CMS éditorial", "Données marché", "Workflows IA"], image: "/work/satoshi-gazette-2026-08-home.jpg", width: 1280, height: 720, alt: "Rédaction Bitcoin Satoshi Gazette", status: "En ligne · Construction active", domain: "satoshigazette.org", url: "https://satoshigazette.org", gallery: [], proof: [] },
+      {
+        id: "hodlstay",
+        image: "/work/hodlstay-2026-08-home.jpg",
+        alt: "Page d'accueil actuelle de la marketplace mondiale HodlStay",
+        tags: ["Produit client", "En ligne"],
+        name: "HodlStay",
+        text: "Une marketplace mondiale de séjours reconstruite depuis AirBTC : découverte, opérations hôtes, disponibilité, paiements Bitcoin et migration en un seul système.",
+      },
+      {
+        id: "satoshi-gazette",
+        image: "/work/satoshi-gazette-2026-08-home.jpg",
+        alt: "Page d'accueil actuelle de la rédaction Satoshi Gazette",
+        tags: ["Publication détenue", "En ligne"],
+        name: "Satoshi Gazette",
+        text: "Une publication Bitcoin indépendante construite et opérée comme un produit : surfaces éditoriales, data desks et pipeline de publication contrôlé.",
+      },
+      {
+        id: "mortal-vault",
+        image: "/work/mortal-vault-demo-home.jpg",
+        alt: "Écran de démo de l'interface propriétaire Mortal Vault",
+        tags: ["Produit lab", "Alpha privée · Non auditée"],
+        name: "Mortal Vault",
+        text: "Un coffre de continuité en autogarde : check-ins du propriétaire, réclamations différées et sécurité traitée comme condition de sortie.",
+      },
+      {
+        id: "sofra",
+        image: "/work/sofra-demo-home.jpg",
+        alt: "Écran de démo de la marketplace Sofra avec données fictives",
+        tags: ["Produit lab", "Phase 1 privée · Démo sûre"],
+        name: "Sofra",
+        text: "Une marketplace gérée de dîners chez l'habitant où confiance et confidentialité font partie du modèle produit. Données de démo uniquement.",
+      },
     ],
-    developmentCases: [
-      { id: "mortal-vault", variant: "mortal", number: "03", name: "Mortal Vault", category: "Crypto · Autogarde · Continuité", title: "Un coffre de continuité conçu autour de limites explicites de temps, rôle et risque.", summary: "Mortal Vault est une alpha privée pour les check-ins et réclamations différées. Le dépôt comprend cycle Solidity borné, interfaces, historique d’événements, rappels et tests de sécurité.", engagement: "Produit MaydaLabs · Construction privée active.", challenge: "Rendre compréhensible un cycle d’autogarde à conséquences fortes sans cacher les risques irréversibles ni suggérer de garanties légales ou de sécurité.", built: ["Cycle contractuel propriétaire et bénéficiaire", "Réclamation différée avec délai de recours", "Historique et rappels déterministes", "Tests adversariaux, fuzz, invariants et analyse statique", "Configuration testnet et conditions de sortie"], stack: ["Solidity", "Hardhat", "Next.js", "ethers", "Testnets EVM", "Tests de sécurité"], status: "Alpha privée · Non auditée" },
-      { id: "sofra", variant: "sofra", number: "04", name: "Sofra", category: "Marketplace · Hospitalité · Confiance", title: "Une marketplace gérée de dîners où la confiance fait partie du modèle produit.", summary: "Sofra est un produit privé en Phase 1, pensé pour la Türkiye et des dîners planifiés dans des foyers vérifiés. Il relie les parcours bilingues tout en protégeant les données exactes du foyer et de sécurité.", engagement: "Produit MaydaLabs · Construction privée active.", challenge: "Créer une expérience chaleureuse sur un modèle rigoureux d’approbation, confidentialité, réservation, incidents et opérations sans exposer le foyer.", built: ["Découverte publique et parcours invité", "Candidature hôte et approbation gérée", "Surfaces opérateur, réservation, prix et incidents", "Projections de données public/privé", "Architecture produit anglaise et turque"], stack: ["Next.js", "TypeScript", "Supabase", "next-intl", "Vitest", "Playwright"], status: "Phase 1 privée · Démo sûre" },
-    ],
+    disciplineKicker: "Comment la preuve fonctionne ici",
+    discipline:
+      "Le travail client est étiqueté travail client. Les produits détenus sont étiquetés détenus. Les builds en phase privée disent exactement ce qui est revendiqué et ce qui ne l'est pas. Aucune métrique n'apparaît sans source inspectable, et aucun témoignage sans l'accord d'un vrai client sur sa formulation exacte.",
+    ctaHeading: "Reliez votre situation au travail.",
+    mapCta: "Cartographier ma prochaine étape",
+    talkCta: "Démarrer un échange",
   },
 } as const;
 
@@ -49,33 +171,79 @@ export async function generateMetadata({ params }: LocalePageProps) {
   return createPageMetadata({ ...COPY[locale].meta, path: "/case-studies", locale, socialCard: "work" });
 }
 
-function Arrow() { return <span aria-hidden>↗</span>; }
-
-export default async function CaseStudiesPage({ params }: LocalePageProps) {
+export default async function WorkIndexPage({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
   const copy = COPY[locale];
+
   return (
-    <div className="studio-inner-page">
-      <section className="studio-inner-hero case-index-hero"><p className="studio-kicker">{copy.kicker}</p><h1>{copy.heading[0]}<br /><em>{copy.heading[1]}</em></h1><p>{copy.intro}</p><div className="case-index-hero-actions"><a href="#hodlstay" className="studio-button">{copy.heroInspect} <span aria-hidden="true">↓</span></a><Link href={localizePath("/services#service-paths", locale)} className="studio-text-link" data-journey-intent="stage_fit" data-journey-source="work_hero">{copy.heroFit} <Arrow /></Link></div></section>
-      {copy.cases.map((item) => (
-        <article id={item.id} key={item.id} className="case-detail scroll-mt-28">
-          <div className="case-detail-heading"><p>{item.number} / {item.name}</p><span>{item.category}</span></div>
-          <div className="case-detail-title"><h2>{item.title}</h2><div><p>{item.summary}</p>{item.engagement ? <p className="case-detail-engagement"><span>{copy.engagement}</span>{item.engagement}</p> : null}<div className="case-detail-links"><Link href={localizePath(`/case-studies/${item.id}`, locale)} className="studio-text-link">{copy.full} <Arrow /></Link><a href={item.url} target="_blank" rel="noopener noreferrer" className="studio-text-link">{copy.visit} {item.domain} <Arrow /></a></div></div></div>
-          <div className="case-detail-screen"><div className="project-browser-chrome"><div><i /><i /><i /></div><span>{item.domain}</span><b>{item.status}</b></div><Image src={item.image} alt={item.alt} width={item.id === "satoshi-gazette" ? 1280 : 1430} height={item.id === "satoshi-gazette" ? 720 : 894} sizes="(max-width: 900px) 100vw, 90vw" /></div>
-          <div className="case-detail-grid"><section><p className="studio-kicker">{copy.challenge}</p><p>{item.challenge}</p></section><section><p className="studio-kicker">{copy.built}</p><ul>{item.built.map((entry) => <li key={entry}>{entry}</li>)}</ul></section><section><p className="studio-kicker">{copy.stack}</p><div>{item.stack.map((entry) => <span key={entry}>{entry}</span>)}</div></section></div>
-          {item.gallery.length ? <section className="case-gallery" aria-label={`${item.name} product gallery`}><div className="case-subheading"><p className="studio-kicker">{copy.inside}</p><h3>{copy.galleryHeading}</h3></div><div className="case-gallery-grid">{item.gallery.map(([src, alt, label, detail]) => <figure key={src}><div className="case-gallery-frame"><Image src={src} alt={alt} width={1430} height={894} sizes="(max-width: 900px) 100vw, 72vw" /></div><figcaption><strong>{label}</strong><span>{detail}</span></figcaption></figure>)}</div></section> : null}
-          {item.proof.length ? <section className="case-proof"><div className="case-subheading"><p className="studio-kicker">{copy.proofKicker}</p><h3>{copy.proofHeading}</h3></div><div className="case-proof-grid">{item.proof.map(([number, title, description]) => <article key={number}><span>{number}</span><h4>{title}</h4><p>{description}</p></article>)}</div></section> : null}
-        </article>
-      ))}
-      {copy.developmentCases.map((item) => (
-        <article id={item.id} key={item.id} className="case-detail scroll-mt-28">
-          <div className="case-detail-heading"><p>{item.number} / {item.name}</p><span>{item.category}</span></div>
-          <div className="case-detail-title"><h2>{item.title}</h2><div><p>{item.summary}</p><p className="case-detail-engagement"><span>{copy.engagement}</span>{item.engagement}</p><div className="case-detail-links"><Link href={localizePath(`/case-studies/${item.id}`, locale)} className="studio-text-link">{copy.full} <Arrow /></Link><span className="case-detail-private-note">{copy.private}</span></div></div></div>
-          <div className="case-detail-screen case-detail-development"><InProgressVisual locale={locale} variant={item.variant} /></div>
-          <div className="case-detail-grid"><section><p className="studio-kicker">{copy.challenge}</p><p>{item.challenge}</p></section><section><p className="studio-kicker">{copy.built}</p><ul>{item.built.map((entry) => <li key={entry}>{entry}</li>)}</ul></section><section><p className="studio-kicker">{copy.stack}</p><div>{item.stack.map((entry) => <span key={entry}>{entry}</span>)}</div></section></div>
-        </article>
-      ))}
-      <section className="studio-inner-cta"><p className="studio-kicker">{copy.availability}</p><h2>{copy.cta}</h2><div className="case-index-final-actions"><Link href={localizePath("/services#service-paths", locale)} className="studio-button" data-journey-intent="stage_fit" data-journey-source="work_final">{copy.fit} <Arrow /></Link><Link href={localizePath("/contact#brief", locale)} className="studio-button studio-button-ghost" data-journey-intent="stage_brief" data-journey-source="work_final">{copy.start} <Arrow /></Link></div></section>
+    <div className="mayda-shell">
+      <section className="mayda-section">
+        <header className="mayda-stack" style={{ maxWidth: "44rem" }}>
+          <p className="mayda-kicker">{copy.kicker}</p>
+          <h1 className="mayda-display" style={{ fontSize: "clamp(2.2rem,5vw,3.8rem)" }}>
+            {copy.heading[0]}
+            <br />
+            <span className="mayda-multiply">{copy.heading[1]}</span>
+          </h1>
+          <p className="mayda-lead">{copy.intro}</p>
+        </header>
+      </section>
+
+      <section className="mayda-section" style={{ paddingTop: 0 }}>
+        <div className="mayda-grid-2">
+          {copy.cases.map((item) => (
+            <Link
+              key={item.id}
+              href={localizePath(`/case-studies/${item.id}`, locale)}
+              className="mayda-work-card"
+            >
+              <figure>
+                <Image
+                  src={item.image}
+                  alt={item.alt}
+                  width={1430}
+                  height={894}
+                  sizes="(max-width: 720px) 100vw, 46vw"
+                />
+              </figure>
+              <div className="mayda-work-card-body">
+                <div className="mayda-work-card-tags">
+                  <span className="mayda-tag is-cobalt">{item.tags[0]}</span>
+                  <span className="mayda-tag">{item.tags[1]}</span>
+                </div>
+                <h2 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 600, letterSpacing: "-0.02em" }}>
+                  {item.name}
+                </h2>
+                <p>{item.text}</p>
+                <span className="mayda-text-link" style={{ alignSelf: "flex-start", marginTop: "0.4rem" }}>
+                  {copy.open} <span aria-hidden>→</span>
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mayda-section-tight">
+        <div className="mayda-card" style={{ borderColor: "var(--mint-line)" }}>
+          <p className="mayda-kicker">{copy.disciplineKicker}</p>
+          <p className="mayda-body" style={{ maxWidth: "48rem" }}>
+            {copy.discipline}
+          </p>
+        </div>
+      </section>
+
+      <section className="mayda-final-cta">
+        <h2 className="mayda-heading">{copy.ctaHeading}</h2>
+        <div className="mayda-hero-actions" style={{ justifyContent: "center" }}>
+          <Link href={localizePath("/start", locale)} className="mayda-button">
+            {copy.mapCta} <span aria-hidden>→</span>
+          </Link>
+          <Link href={localizePath("/contact", locale)} className="mayda-button mayda-button-outline">
+            {copy.talkCta}
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

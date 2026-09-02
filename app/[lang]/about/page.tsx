@@ -7,229 +7,113 @@ const COPY = {
   en: {
     meta: {
       title: "About",
-      socialTitle: "A small studio for serious ideas · MaydaLabs",
+      socialTitle: "Founder-led, evidence first · MaydaLabs",
       description:
-        "Meet Mehmet E. Mayda, the founder and full-stack product builder behind MaydaLabs.",
+        "MaydaLabs is the build and acceleration company of Mehmet E. Mayda — deliberately small, founder-led, and allergic to unverifiable claims.",
     },
-    kicker: "About / MaydaLabs",
-    heading: ["A small studio for", "serious ideas."],
-    intro:
-      "MaydaLabs exists to close the distance between an ambitious idea and a product people can actually use, trust, and buy from.",
-    statement:
-      "We are product people who understand growth, and growth people who can ship the product.",
-    body: [
-      "The studio is founder-led and deliberately compact. Strategy, design, engineering, and launch thinking stay connected instead of crossing a chain of account managers and handoffs.",
-      "Our flagship work begins in Bitcoin because it demands real answers to difficult questions: trust, payments, global users, regulation, community, and product clarity. That edge travels well. We work with founders across industries.",
+    kicker: "About",
+    heading: ["Deliberately small.", "Built on inspectable work."],
+    lead: "MaydaLabs is the build and acceleration company of Mehmet E. Mayda — founder and full-stack product builder, working from Istanbul with founder-led businesses anywhere.",
+    story: [
+      "There is no pretend agency floor here. Engagements are led and largely built by one accountable person, extended by carefully scoped automation and AI systems where they genuinely help. That constraint is a feature: you talk to the person who builds, and the person who builds owns the outcome.",
+      "The work spans complete products — marketplaces, publications, operational systems — because founder-led businesses rarely have problems that respect a single discipline. Product, automation, growth, and security get treated as one connected system.",
+      "Everything shown as proof on this site carries its real label: client work is client work, owned products are owned products, and private-stage builds say so. If a claim can't be inspected, it doesn't get made.",
     ],
-    founderKicker: "Founder / Builder",
-    founderName: "Mehmet E. Mayda",
-    founderRole: "Full-stack product builder · Marketing systems & growth",
-    founderIntro:
-      "I build production web products and the systems around them — payments, lifecycle email, analytics, technical SEO, localization, editorial operations, and AI-assisted workflows.",
-    founderBody:
-      "My background crosses software building and hands-on marketing operations. That lets me own the product surface together with the acquisition, measurement, content, and reliability systems that make it useful.",
-    founderSignals: [
-      [
-        "Product engineering",
-        "Next.js and React applications, marketplaces, data models, integrations, and operational workflows.",
-      ],
-      [
-        "Growth systems",
-        "Analytics, lifecycle email, technical SEO, localization, campaigns, and conversion surfaces.",
-      ],
-      [
-        "Bitcoin + AI operations",
-        "HodlStay, Satoshi Gazette, and approval-gated AI-assisted research and production systems.",
-      ],
+    factsLabel: "Plain facts",
+    facts: [
+      ["Founded and led by", "Mehmet E. Mayda"],
+      ["Based in", "Istanbul, working worldwide"],
+      ["Languages", "English, Turkish, French site"],
+      ["Model", "Founder-led builds, leveraged by automation"],
     ],
-    founderLinks: {
-      github: "View GitHub",
-      linkedin: "View LinkedIn",
-      email: "Email Mehmet",
-      profile: "Full working profile",
-    },
-    principlesKicker: "Operating principles",
-    principlesHeading: "How we think.",
+    principlesKicker: "How the company behaves",
     principles: [
-      [
-        "01",
-        "Make the idea legible",
-        "Clarity is part of the product. If people cannot understand it, they cannot choose it.",
-      ],
-      [
-        "02",
-        "Build against reality",
-        "Working software teaches us more than a month of abstract debate.",
-      ],
-      [
-        "03",
-        "Own the whole journey",
-        "The product, marketing, measurement, and operations are one customer experience.",
-      ],
-      [
-        "04",
-        "Use AI with judgment",
-        "AI expands our output. Human taste and accountability decide what deserves to ship.",
-      ],
+      ["Evidence first", "Live products over decks. Real screenshots over concepts. Labels over vibes."],
+      ["One accountable owner", "The person you talk to is the person who ships and answers for it."],
+      ["Leverage over headcount", "Automation and carefully scoped AI extend one builder — they don't impersonate a team."],
+      ["Boundaries respected", "Client confidentiality, editorial independence of owned publications, and your ownership of everything delivered."],
     ],
-    ctaKicker: "Work with the studio",
-    ctaHeading: "Have a serious idea?",
-    cta: "Start a conversation",
+    profileNote: "Looking for the deeper founder background — track record, stack, hiring context?",
+    profileCta: "Read the founder profile",
+    ctaHeading: "See how the work happens, or start yours.",
+    approachCta: "Read the approach",
+    mapCta: "Map my next move",
   },
   tr: {
     meta: {
-      title: "Hakkımızda",
-      socialTitle: "Ciddi fikirler için küçük bir stüdyo · MaydaLabs",
+      title: "Hakkında",
+      socialTitle: "Kurucu liderliğinde, önce kanıt · MaydaLabs",
       description:
-        "MaydaLabs’in kurucusu ve full-stack ürün geliştiricisi Mehmet E. Mayda ile tanışın.",
+        "MaydaLabs, Mehmet E. Mayda'nın inşa ve hızlandırma şirketidir — bilinçli olarak küçük, kurucu liderliğinde ve doğrulanamayan iddialara alerjik.",
     },
-    kicker: "Hakkımızda / MaydaLabs",
-    heading: ["Ciddi fikirler için", "küçük bir stüdyo."],
-    intro:
-      "MaydaLabs, iddialı bir fikir ile insanların gerçekten kullanabileceği, güvenebileceği ve satın alabileceği bir ürün arasındaki mesafeyi kapatmak için var.",
-    statement:
-      "Büyümeyi anlayan ürün insanlarıyız; ürünü yayınlayabilen büyüme insanlarıyız.",
-    body: [
-      "Stüdyo kurucu liderliğinde ve bilinçli olarak kompakt. Strateji, tasarım, mühendislik ve lansman düşüncesi; hesap yöneticileri ve devir zincirlerinde kaybolmadan bağlantılı kalır.",
-      "Amiral projelerimiz Bitcoin ile başlıyor; çünkü güven, ödemeler, küresel kullanıcılar, regülasyon, topluluk ve ürün netliği gibi zor sorulara gerçek cevaplar gerektiriyor. Bu keskinlik her yere taşınabilir. Farklı sektörlerden kurucularla çalışıyoruz.",
+    kicker: "Hakkında",
+    heading: ["Bilinçli olarak küçük.", "Denetlenebilir iş üzerine kurulu."],
+    lead: "MaydaLabs, Mehmet E. Mayda'nın inşa ve hızlandırma şirketidir — kurucu ve full-stack ürün geliştirici; İstanbul'dan, dünyanın her yerindeki kurucu liderliğindeki işletmelerle çalışır.",
+    story: [
+      "Burada yapay bir ajans katı yok. Çalışmaları sorumluluğu üstlenen tek kişi yönetir ve büyük ölçüde inşa eder; gerçekten işe yaradığı yerde dikkatle kapsamlanmış otomasyon ve yapay zekâ sistemleri onu genişletir. Bu kısıt bir özelliktir: konuştuğunuz kişi inşa eden kişidir ve inşa eden kişi sonucun sahibidir.",
+      "İş, eksiksiz ürünlere uzanır — pazar yerleri, yayınlar, operasyon sistemleri — çünkü kurucu liderliğindeki işletmelerin problemleri nadiren tek bir disipline saygı duyar. Ürün, otomasyon, büyüme ve güvenlik birbirine bağlı tek sistem olarak ele alınır.",
+      "Bu sitede kanıt olarak gösterilen her şey gerçek etiketini taşır: müşteri işi müşteri işidir, sahip olunan ürünler sahip olunan ürünlerdir ve özel aşamadaki geliştirmeler bunu söyler. Bir iddia denetlenemiyorsa, dile getirilmez.",
     ],
-    founderKicker: "Kurucu / Geliştirici",
-    founderName: "Mehmet E. Mayda",
-    founderRole: "Full-stack ürün geliştirici · Pazarlama sistemleri ve büyüme",
-    founderIntro:
-      "Üretimde çalışan web ürünlerini ve onları çevreleyen sistemleri geliştiriyorum: ödemeler, yaşam döngüsü e-postaları, analitik, teknik SEO, yerelleştirme, editoryal operasyonlar ve yapay zekâ destekli iş akışları.",
-    founderBody:
-      "Geçmişim yazılım geliştirme ile uygulamalı pazarlama operasyonlarını bir araya getiriyor. Böylece ürün yüzeyini; edinim, ölçüm, içerik ve güvenilirlik sistemleriyle birlikte sahiplenebiliyorum.",
-    founderSignals: [
-      [
-        "Ürün mühendisliği",
-        "Next.js ve React uygulamaları, pazaryerleri, veri modelleri, entegrasyonlar ve operasyonel iş akışları.",
-      ],
-      [
-        "Büyüme sistemleri",
-        "Analitik, yaşam döngüsü e-postaları, teknik SEO, yerelleştirme, kampanyalar ve dönüşüm yüzeyleri.",
-      ],
-      [
-        "Bitcoin + yapay zekâ operasyonları",
-        "HodlStay, Satoshi Gazette ve onay kapılı yapay zekâ destekli araştırma ve üretim sistemleri.",
-      ],
+    factsLabel: "Yalın gerçekler",
+    facts: [
+      ["Kuran ve yöneten", "Mehmet E. Mayda"],
+      ["Merkez", "İstanbul, dünya çapında çalışır"],
+      ["Diller", "İngilizce, Türkçe, Fransızca site"],
+      ["Model", "Otomasyonla kaldıraçlanan kurucu liderliğinde inşa"],
     ],
-    founderLinks: {
-      github: "GitHub’ı incele",
-      linkedin: "LinkedIn’i görüntüle",
-      email: "Mehmet’e e-posta gönder",
-      profile: "Detaylı çalışma profili",
-    },
-    principlesKicker: "Çalışma ilkeleri",
-    principlesHeading: "Nasıl düşünüyoruz.",
+    principlesKicker: "Şirket nasıl davranır",
     principles: [
-      [
-        "01",
-        "Fikri anlaşılır kıl",
-        "Netlik ürünün bir parçasıdır. İnsanlar anlayamazsa seçemez.",
-      ],
-      [
-        "02",
-        "Gerçekliğe karşı geliştir",
-        "Çalışan yazılım bize bir aylık soyut tartışmadan daha fazlasını öğretir.",
-      ],
-      [
-        "03",
-        "Tüm yolculuğu sahiplen",
-        "Ürün, pazarlama, ölçüm ve operasyon tek bir müşteri deneyimidir.",
-      ],
-      [
-        "04",
-        "Yapay zekâyı muhakemeyle kullan",
-        "Yapay zekâ çıktımızı büyütür. Nelerin yayına değer olduğuna insan zevki ve sorumluluğu karar verir.",
-      ],
+      ["Önce kanıt", "Sunum yerine canlı ürünler. Konsept yerine gerçek ekran görüntüleri. Havadan söz yerine etiketler."],
+      ["Tek sorumlu sahip", "Konuştuğunuz kişi, işi yayınlayan ve hesabını veren kişidir."],
+      ["Kadro yerine kaldıraç", "Otomasyon ve dikkatle kapsamlanmış yapay zekâ tek geliştiriciyi genişletir — ekip taklidi yapmaz."],
+      ["Sınırlara saygı", "Müşteri gizliliği, sahip olunan yayınların editoryal bağımsızlığı ve teslim edilen her şeyin sizin mülkiyetiniz olması."],
     ],
-    ctaKicker: "Stüdyo ile çalışın",
-    ctaHeading: "Ciddi bir fikriniz mi var?",
-    cta: "Görüşme başlat",
+    profileNote: "Daha derin kurucu geçmişi mi arıyorsunuz — geçmiş işler, stack, işe alım bağlamı?",
+    profileCta: "Kurucu profilini okuyun",
+    ctaHeading: "İşin nasıl yapıldığını görün veya kendi işinizi başlatın.",
+    approachCta: "Yaklaşımı okuyun",
+    mapCta: "Sonraki hamlemi haritala",
   },
   fr: {
     meta: {
       title: "À propos",
-      socialTitle: "Un petit studio pour des idées sérieuses · MaydaLabs",
+      socialTitle: "Dirigé par le fondateur, preuves d'abord · MaydaLabs",
       description:
-        "Découvrez Mehmet E. Mayda, fondateur et builder produit full-stack de MaydaLabs.",
+        "MaydaLabs est l'entreprise de construction et d'accélération de Mehmet E. Mayda — délibérément petite, dirigée par son fondateur et allergique aux affirmations invérifiables.",
     },
-    kicker: "À propos / MaydaLabs",
-    heading: ["Un petit studio pour", "des idées sérieuses."],
-    intro:
-      "MaydaLabs réduit la distance entre une idée ambitieuse et un produit que les gens peuvent réellement utiliser, croire et acheter.",
-    statement:
-      "Nous sommes des spécialistes produit qui comprennent la croissance, et des spécialistes croissance capables de livrer le produit.",
-    body: [
-      "Le studio est dirigé par son fondateur et volontairement compact. Stratégie, design, ingénierie et lancement restent connectés au lieu de traverser une chaîne de gestionnaires et de transmissions.",
-      "Nos projets phares commencent dans Bitcoin, un domaine qui exige des réponses réelles sur la confiance, les paiements, les utilisateurs mondiaux, la réglementation, la communauté et la clarté produit. Cette exigence voyage bien. Nous travaillons avec des fondateurs de tous secteurs.",
+    kicker: "À propos",
+    heading: ["Délibérément petite.", "Fondée sur un travail inspectable."],
+    lead: "MaydaLabs est l'entreprise de construction et d'accélération de Mehmet E. Mayda — fondateur et builder produit full-stack, travaillant depuis Istanbul avec des entreprises de fondateurs partout dans le monde.",
+    story: [
+      "Pas de faux plateau d'agence ici. Les missions sont dirigées et largement construites par une personne responsable, étendue par des systèmes d'automatisation et d'IA soigneusement cadrés là où ils aident vraiment. Cette contrainte est une qualité : vous parlez à la personne qui construit, et la personne qui construit répond du résultat.",
+      "Le travail couvre des produits complets — marketplaces, publications, systèmes opérationnels — parce que les problèmes des entreprises de fondateurs respectent rarement une seule discipline. Produit, automatisation, croissance et sécurité sont traités comme un seul système connecté.",
+      "Tout ce qui sert de preuve sur ce site porte sa vraie étiquette : le travail client est du travail client, les produits détenus sont des produits détenus, et les builds en phase privée le disent. Une affirmation qui ne peut pas être inspectée n'est pas faite.",
     ],
-    founderKicker: "Fondateur / Builder",
-    founderName: "Mehmet E. Mayda",
-    founderRole: "Builder produit full-stack · Systèmes marketing et croissance",
-    founderIntro:
-      "Je construis des produits web en production et les systèmes qui les entourent : paiements, e-mails de cycle de vie, analytics, SEO technique, localisation, opérations éditoriales et workflows assistés par l’IA.",
-    founderBody:
-      "Mon parcours relie la construction logicielle aux opérations marketing concrètes. Je peux ainsi prendre en charge le produit avec les systèmes d’acquisition, de mesure, de contenu et de fiabilité qui le rendent utile.",
-    founderSignals: [
-      [
-        "Ingénierie produit",
-        "Applications Next.js et React, marketplaces, modèles de données, intégrations et workflows opérationnels.",
-      ],
-      [
-        "Systèmes de croissance",
-        "Analytics, e-mails de cycle de vie, SEO technique, localisation, campagnes et surfaces de conversion.",
-      ],
-      [
-        "Bitcoin + opérations IA",
-        "HodlStay, Satoshi Gazette et systèmes de recherche et de production assistés par l’IA avec validation humaine.",
-      ],
+    factsLabel: "Faits simples",
+    facts: [
+      ["Fondée et dirigée par", "Mehmet E. Mayda"],
+      ["Basée à", "Istanbul, travaille dans le monde entier"],
+      ["Langues", "Site en anglais, turc, français"],
+      ["Modèle", "Construction menée par le fondateur, démultipliée par l'automatisation"],
     ],
-    founderLinks: {
-      github: "Voir GitHub",
-      linkedin: "Voir LinkedIn",
-      email: "Écrire à Mehmet",
-      profile: "Profil de travail complet",
-    },
-    principlesKicker: "Principes de fonctionnement",
-    principlesHeading: "Notre façon de penser.",
+    principlesKicker: "Comment l'entreprise se comporte",
     principles: [
-      [
-        "01",
-        "Rendre l’idée lisible",
-        "La clarté fait partie du produit. Si les gens ne le comprennent pas, ils ne peuvent pas le choisir.",
-      ],
-      [
-        "02",
-        "Construire face au réel",
-        "Un logiciel fonctionnel nous apprend plus qu’un mois de débat abstrait.",
-      ],
-      [
-        "03",
-        "Prendre en charge tout le parcours",
-        "Produit, marketing, mesure et opérations forment une seule expérience client.",
-      ],
-      [
-        "04",
-        "Utiliser l’IA avec discernement",
-        "L’IA augmente notre capacité. Le goût et la responsabilité humaine décident ce qui mérite d’être livré.",
-      ],
+      ["Les preuves d'abord", "Des produits en ligne plutôt que des decks. De vraies captures plutôt que des concepts. Des étiquettes plutôt que du vent."],
+      ["Un seul responsable", "La personne à qui vous parlez est celle qui livre et qui en répond."],
+      ["Du levier plutôt que des effectifs", "L'automatisation et une IA soigneusement cadrée étendent un builder — elles n'imitent pas une équipe."],
+      ["Des frontières respectées", "Confidentialité client, indépendance éditoriale des publications détenues, et votre propriété de tout ce qui est livré."],
     ],
-    ctaKicker: "Travailler avec le studio",
-    ctaHeading: "Vous avez une idée sérieuse ?",
-    cta: "Démarrer une conversation",
+    profileNote: "Vous cherchez le parcours détaillé du fondateur — réalisations, stack, contexte de recrutement ?",
+    profileCta: "Lire le profil du fondateur",
+    ctaHeading: "Voyez comment le travail se fait, ou commencez le vôtre.",
+    approachCta: "Lire l'approche",
+    mapCta: "Cartographier ma prochaine étape",
   },
 } as const;
 
 export async function generateMetadata({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
-  return createPageMetadata({
-    ...COPY[locale].meta,
-    path: "/about",
-    locale,
-    socialCard: "about",
-  });
+  return createPageMetadata({ ...COPY[locale].meta, path: "/about", locale, socialCard: "about" });
 }
 
 export default async function AboutPage({ params }: LocalePageProps) {
@@ -237,93 +121,68 @@ export default async function AboutPage({ params }: LocalePageProps) {
   const copy = COPY[locale];
 
   return (
-    <div className="studio-inner-page">
-      <section className="studio-inner-hero">
-        <p className="studio-kicker">{copy.kicker}</p>
-        <h1>
-          {copy.heading[0]}
-          <br />
-          <em>{copy.heading[1]}</em>
-        </h1>
-        <p>{copy.intro}</p>
+    <div className="mayda-shell">
+      <section className="mayda-section">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:gap-16">
+          <header className="mayda-stack">
+            <p className="mayda-kicker">{copy.kicker}</p>
+            <h1 className="mayda-display" style={{ fontSize: "clamp(2.2rem,5vw,3.8rem)" }}>
+              {copy.heading[0]}
+              <br />
+              <span className="mayda-multiply">{copy.heading[1]}</span>
+            </h1>
+            <p className="mayda-lead">{copy.lead}</p>
+            <div className="mayda-stack" style={{ marginTop: "0.6rem" }}>
+              {copy.story.map((paragraph) => (
+                <p key={paragraph.slice(0, 24)} className="mayda-body" style={{ maxWidth: "42rem" }}>
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          </header>
+
+          <aside className="mayda-card" style={{ alignSelf: "start" }} aria-label={copy.factsLabel}>
+            <p className="mayda-kicker">{copy.factsLabel}</p>
+            <dl className="mayda-dl">
+              {copy.facts.map(([term, detail]) => (
+                <div key={term}>
+                  <dt>{term}</dt>
+                  <dd>{detail}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="mayda-body mt-5" style={{ fontSize: "0.9rem" }}>
+              {copy.profileNote}{" "}
+              <Link href={localizePath("/profile", locale)} className="mayda-text-link">
+                {copy.profileCta} <span aria-hidden>→</span>
+              </Link>
+            </p>
+          </aside>
+        </div>
       </section>
 
-      <section className="about-statement">
-        <p>{copy.statement}</p>
-        <div>
-          {copy.body.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-        </div>
-      </section>
-
-      <section className="about-founder" id="mehmet-e-mayda">
-        <div className="about-founder-heading">
-          <p className="studio-kicker">{copy.founderKicker}</p>
-          <h2>{copy.founderName}</h2>
-          <p className="about-founder-role">{copy.founderRole}</p>
-        </div>
-        <div className="about-founder-story">
-          <p className="about-founder-intro">{copy.founderIntro}</p>
-          <p>{copy.founderBody}</p>
-          <div className="about-founder-links" aria-label={`${copy.founderName} profiles`}>
-            <a
-              href="https://github.com/maydalabs"
-              target="_blank"
-              rel="me noopener noreferrer"
-            >
-              {copy.founderLinks.github} ↗
-            </a>
-            <a
-              href="https://www.linkedin.com/in/mehmet-e-mayda/"
-              target="_blank"
-              rel="me noopener noreferrer"
-            >
-              {copy.founderLinks.linkedin} ↗
-            </a>
-            <a href="mailto:info@maydalabs.com">{copy.founderLinks.email} ↗</a>
-            <Link href={localizePath("/profile", locale)}>{copy.founderLinks.profile} →</Link>
-          </div>
-        </div>
-        <div className="about-founder-signals">
-          {copy.founderSignals.map(([title, description]) => (
-            <article key={title}>
-              <h3>{title}</h3>
-              <p>{description}</p>
+      <section className="mayda-section" style={{ paddingTop: 0 }}>
+        <p className="mayda-kicker">{copy.principlesKicker}</p>
+        <div className="mayda-grid-2" style={{ marginTop: "1.4rem" }}>
+          {copy.principles.map(([title, text]) => (
+            <article key={title} className="mayda-card">
+              <h2 className="mayda-subheading">{title}</h2>
+              <p className="mayda-body mt-3">{text}</p>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="about-principles">
-        <div className="studio-section-heading">
-          <div>
-            <p className="studio-kicker">{copy.principlesKicker}</p>
-            <h2>{copy.principlesHeading}</h2>
-          </div>
+      <section className="mayda-final-cta">
+        <h2 className="mayda-heading">{copy.ctaHeading}</h2>
+        <div className="mayda-hero-actions" style={{ justifyContent: "center" }}>
+          <Link href={localizePath("/approach", locale)} className="mayda-button mayda-button-outline">
+            {copy.approachCta}
+          </Link>
+          <Link href={localizePath("/start", locale)} className="mayda-button">
+            {copy.mapCta} <span aria-hidden>→</span>
+          </Link>
         </div>
-        <div className="studio-process-grid">
-          {copy.principles.map(([number, title, description]) => (
-            <article key={number}>
-              <span>{number}</span>
-              <div>
-                <h3>{title}</h3>
-                <p>{description}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="studio-inner-cta">
-        <p className="studio-kicker">{copy.ctaKicker}</p>
-        <h2>{copy.ctaHeading}</h2>
-        <Link
-          href={localizePath("/contact", locale)}
-          className="studio-button"
-        >
-          {copy.cta} <span aria-hidden>↗</span>
-        </Link>
       </section>
     </div>
   );

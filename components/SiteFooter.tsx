@@ -1,46 +1,51 @@
 import Link from "next/link";
-import { MaydaMark } from "@/components/MaydaMark";
+import { Wordmark } from "@/components/Wordmark";
 import { SITE_CHROME_COPY, type Locale, localizePath } from "@/lib/i18n";
 
 export function SiteFooter({ locale }: { locale: Locale }) {
   const copy = SITE_CHROME_COPY[locale];
 
   return (
-    <footer className="studio-footer">
-      <div className="studio-shell">
-        <div className="grid gap-10 border-b border-white/10 pb-12 pt-14 md:grid-cols-[1.5fr_1fr_1fr] md:pt-20">
+    <footer className="mayda-footer">
+      <div className="mayda-shell-wide">
+        <div className="grid gap-10 border-b border-[color:var(--border)] pb-12 pt-14 md:grid-cols-[1.6fr_1fr_1fr_1fr] md:pt-20">
           <div>
-            <Link href={localizePath("/", locale)} className="group inline-flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-white">
-              <MaydaMark className="h-8 w-8" />
-              <span>MaydaLabs</span>
+            <Link href={localizePath("/", locale)} aria-label={copy.homeLabel}>
+              <Wordmark />
             </Link>
-            <p className="mt-5 max-w-md text-[clamp(1.45rem,2.8vw,2.8rem)] font-medium leading-[1.06] tracking-[-0.045em] text-white">
+            <p className="mt-5 max-w-md text-[clamp(1.4rem,2.6vw,2.4rem)] font-semibold leading-[1.08] tracking-[-0.03em]">
               {copy.footerStatement}
             </p>
           </div>
 
           <div>
-            <p className="studio-footer-label">{copy.explore}</p>
-            <div className="mt-4 flex flex-col gap-2 text-sm text-white/60">
-              <Link href={localizePath("/case-studies", locale)}>{copy.selectedWork}</Link>
-              <Link href={localizePath("/services", locale)}>{copy.nav[1][0]}</Link>
-              <Link href={localizePath("/about", locale)}>{copy.nav[2][0]}</Link>
-              <Link href={localizePath("/profile", locale)}>{copy.nav[3][0]}</Link>
+            <p className="mayda-footer-label">{copy.explore}</p>
+            <div className="mt-4 flex flex-col gap-2 text-sm text-[color:var(--mist)]">
+              {copy.nav.map(([label, href]) => (
+                <Link key={href} href={localizePath(href, locale)}>
+                  {label}
+                </Link>
+              ))}
+              <Link href={localizePath("/profile", locale)}>{copy.founderProfile}</Link>
+              <Link href={localizePath("/os", locale)}>{copy.maydaOsLab}</Link>
             </div>
           </div>
 
           <div>
-            <p className="studio-footer-label">{copy.startSomething}</p>
-            <div className="mt-4 flex flex-col gap-2 text-sm text-white/60">
-              <Link href={localizePath("/contact", locale)}>
-                {copy.bookCall} →
-              </Link>
+            <p className="mayda-footer-label">{copy.startColumn}</p>
+            <div className="mt-4 flex flex-col gap-2 text-sm text-[color:var(--mist)]">
+              <Link href={localizePath("/start", locale)}>{copy.mapCta} →</Link>
+              <Link href={localizePath("/contact", locale)}>{copy.conversation}</Link>
               <a href="mailto:info@maydalabs.com">info@maydalabs.com</a>
-              <a
-                href="https://x.com/maydalabs"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+            </div>
+          </div>
+
+          <div>
+            <p className="mayda-footer-label">{copy.account}</p>
+            <div className="mt-4 flex flex-col gap-2 text-sm text-[color:var(--mist)]">
+              <Link href={localizePath("/auth/sign-in", locale)}>{copy.signIn}</Link>
+              <Link href={localizePath("/portal", locale)}>{copy.portal}</Link>
+              <a href="https://x.com/maydalabs" target="_blank" rel="noopener noreferrer">
                 X · @maydalabs ↗
               </a>
               <a
@@ -61,7 +66,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 py-6 text-[0.72rem] uppercase tracking-[0.15em] text-white/55 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 py-6 text-[0.72rem] uppercase tracking-[0.15em] text-[color:var(--mist)] sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} MaydaLabs · {copy.location}</p>
           <div className="flex gap-5">
             <Link href={localizePath("/privacy", locale)}>{copy.privacy}</Link>

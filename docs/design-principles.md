@@ -1,6 +1,12 @@
 # MaydaLabs Design Principles
 
-_Current system: July 2026_
+> **Superseded (2 September 2026):** this document describes the retired v2
+> "Signal Gate" system (#090909 / #f2f0ea / #f7931a, MaydaOS surfaces). The
+> active v3 system — the Multiplier Field (Void/Frost/Cobalt/Mint/Mist),
+> typographic wordmark, `app/field.css` — is recorded in
+> `docs/v3-implementation-brief.md`. Kept for history.
+
+_Superseded system: July 2026_
 
 ## Direction
 

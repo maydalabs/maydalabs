@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { MaydaMark } from "@/components/MaydaMark";
-import { isSoundEnabled, loadSoundPreference, onSoundChange, setSoundEnabled } from "@/lib/soundSignal";
+import { Wordmark } from "@/components/Wordmark";
 import {
   LOCALES,
   LOCALE_LABELS,
@@ -18,11 +17,9 @@ export function SiteHeader({ locale }: { locale: Locale }) {
   const pathname = usePathname();
   const normalizedPathname = stripLocaleFromPath(pathname);
   const copy = SITE_CHROME_COPY[locale];
-  const navItems = copy.nav.map(([label, href, section]) => ({ label, href, section }));
+  const navItems = copy.nav.map(([label, href]) => ({ label, href }));
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState<string | null>(null);
-  const [sound, setSound] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 18);
@@ -31,56 +28,10 @@ export function SiteHeader({ locale }: { locale: Locale }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setSound(loadSoundPreference()));
-    const unsubscribe = onSoundChange(setSound);
-    return () => {
-      cancelAnimationFrame(frame);
-      unsubscribe();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (normalizedPathname !== "/") {
-      return;
-    }
-
-    let frame = 0;
-    const updateActiveSection = () => {
-      frame = 0;
-      const marker = window.scrollY + window.innerHeight * 0.34;
-      let current: string | null = null;
-
-      for (const id of ["work", "services", "approach"]) {
-        const section = document.getElementById(id);
-        if (section && section.offsetTop <= marker) current = id;
-      }
-
-      setActiveSection(current);
-    };
-
-    const onScroll = () => {
-      if (!frame) frame = window.requestAnimationFrame(updateActiveSection);
-    };
-
-    frame = window.requestAnimationFrame(updateActiveSection);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      if (frame) window.cancelAnimationFrame(frame);
-    };
-  }, [normalizedPathname]);
-
-  const isActive = (item: (typeof navItems)[number]) => {
-    if (item.href === "/case-studies" && normalizedPathname.startsWith("/case-studies")) return true;
-    if (item.href === "/services" && normalizedPathname === "/services") return true;
-    if (item.href === "/about" && normalizedPathname === "/about") return true;
-    if (item.href === "/profile" && normalizedPathname === "/profile") return true;
-    return normalizedPathname === "/" && item.section === activeSection;
-  };
+  const isActive = (href: string) =>
+    href === "/case-studies"
+      ? normalizedPathname.startsWith("/case-studies")
+      : normalizedPathname === href;
 
   const localeSwitchHref = (nextLocale: Locale) => {
     if (nextLocale !== "en") return localizePath(normalizedPathname, nextLocale);
@@ -106,29 +57,19 @@ export function SiteHeader({ locale }: { locale: Locale }) {
   );
 
   return (
-    <header className={`studio-header ${scrolled || open ? "is-scrolled" : ""}`}>
-      <div className="studio-shell flex h-[72px] items-center justify-between gap-5">
-        <Link href={localizePath("/", locale)} className="group flex items-center gap-3" aria-label={copy.homeLabel}>
-          <MaydaMark className="h-8 w-8 text-white" />
-          <span className="text-[0.82rem] font-bold uppercase tracking-[0.18em] text-white">
-            MaydaLabs
-          </span>
+    <header className={`mayda-header ${scrolled || open ? "is-scrolled" : ""}`}>
+      <div className="mayda-shell-wide flex h-[68px] items-center justify-between gap-5">
+        <Link href={localizePath("/", locale)} aria-label={copy.homeLabel}>
+          <Wordmark />
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex" aria-label={copy.navigationLabel}>
           {navItems.map((item) => (
             <Link
-              key={item.label}
+              key={item.href}
               href={localizePath(item.href, locale)}
-              className={`studio-nav-link ${isActive(item) ? "is-active" : ""}`}
-              aria-current={
-                (item.href === "/case-studies" && normalizedPathname.startsWith("/case-studies")) ||
-                (item.href === "/services" && normalizedPathname === "/services") ||
-                (item.href === "/about" && normalizedPathname === "/about") ||
-                (item.href === "/profile" && normalizedPathname === "/profile")
-                  ? "page"
-                  : undefined
-              }
+              className={`mayda-nav-link ${isActive(item.href) ? "is-active" : ""}`}
+              aria-current={isActive(item.href) ? "page" : undefined}
             >
               {item.label}
             </Link>
@@ -136,57 +77,45 @@ export function SiteHeader({ locale }: { locale: Locale }) {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <button
-            type="button"
-            className={`studio-sound-toggle ${sound ? "is-on" : ""}`}
-            aria-pressed={sound}
-            aria-label={sound ? copy.soundOn : copy.soundOff}
-            onClick={() => setSoundEnabled(!isSoundEnabled())}
-          >
-            SND<span aria-hidden />
-          </button>
-          {languageLinks("studio-language-switcher")}
-          <Link
-            href={localizePath("/contact", locale)}
-            className="studio-button studio-button-small"
-          >
-            {copy.startProject} <span aria-hidden>↗</span>
+          {languageLinks("mayda-language-switcher")}
+          <Link href={localizePath("/start", locale)} className="mayda-button mayda-button-small">
+            {copy.mapCta} <span aria-hidden>→</span>
           </Link>
         </div>
 
         <button
           type="button"
-          className="studio-menu-button md:hidden"
+          className="mayda-menu-button md:hidden"
           aria-label={open ? copy.closeMenu : copy.openMenu}
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
         >
-          <span className={open ? "translate-y-[4px] rotate-45" : ""} />
+          <span className={open ? "translate-y-[3px] rotate-45" : ""} />
           <span className={open ? "-translate-y-[3px] -rotate-45" : ""} />
         </button>
       </div>
 
       {open ? (
-        <nav className="studio-mobile-nav md:hidden" aria-label={copy.mobileNavigationLabel}>
+        <nav className="mayda-mobile-nav md:hidden" aria-label={copy.mobileNavigationLabel}>
           {navItems.map((item, index) => (
             <Link
-              key={item.label}
+              key={item.href}
               href={localizePath(item.href, locale)}
               onClick={() => setOpen(false)}
-              className={isActive(item) ? "is-active" : ""}
+              className={isActive(item.href) ? "is-active" : ""}
             >
               <span>0{index + 1}</span>
               {item.label}
             </Link>
           ))}
           <Link
-            href={localizePath("/contact", locale)}
+            href={localizePath("/start", locale)}
             onClick={() => setOpen(false)}
-            className="studio-button mt-3"
+            className="mayda-button mt-4"
           >
-            {copy.startProject} <span aria-hidden>↗</span>
+            {copy.mapCta} <span aria-hidden>→</span>
           </Link>
-          {languageLinks("studio-language-switcher studio-language-switcher-mobile")}
+          {languageLinks("mayda-language-switcher mt-4 self-start")}
         </nav>
       ) : null}
     </header>

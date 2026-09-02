@@ -1,13 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import "../journey.css";
-import { OsShell } from "@/components/os/OsShell";
+import "../field.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { SoundLayer } from "@/components/SoundLayer";
 import { GoogleTagManager } from "@/components/GoogleTagManager";
 import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { SITE_URL } from "@/lib/site";
@@ -17,22 +14,14 @@ import {
   type Locale,
   isLocale,
 } from "@/lib/i18n";
-import { Newsreader, Space_Grotesk } from "next/font/google";
+import { Space_Grotesk } from "next/font/google";
 
-const studioSans = Space_Grotesk({
+const fieldSans = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-studio-sans",
+  variable: "--font-field-sans",
 });
 
-const studioSerif = Newsreader({
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  weight: ["400", "500", "600"],
-  preload: false,
-  variable: "--font-studio-serif",
-});
-
-const arrivalStateScript = `try{if(localStorage.getItem("ml_arrival_entered_v1")){document.documentElement.dataset.osArrived="true"}}catch{}`;
+const hasVercelRuntime = process.env.VERCEL === "1";
 
 export async function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
@@ -50,7 +39,7 @@ export async function generateMetadata({
   return {
     metadataBase: new URL(SITE_URL),
     title: {
-      default: "MaydaLabs — Product & growth studio",
+      default: "MaydaLabs — Build and acceleration company",
       template: "%s · MaydaLabs",
     },
     description,
@@ -68,7 +57,7 @@ export async function generateMetadata({
 
 export const viewport: Viewport = {
   colorScheme: "dark",
-  themeColor: "#090909",
+  themeColor: "#0A0B0F",
 };
 
 function getStructuredData(locale: Locale) {
@@ -77,7 +66,7 @@ function getStructuredData(locale: Locale) {
     "@graph": [
       {
         "@type": "ProfessionalService",
-        "@id": `${SITE_URL}/#studio`,
+        "@id": `${SITE_URL}/#company`,
         name: "MaydaLabs",
         url: SITE_URL,
         description: SITE_DESCRIPTIONS[locale],
@@ -96,13 +85,14 @@ function getStructuredData(locale: Locale) {
           "https://www.linkedin.com/in/mehmet-e-mayda/",
         ],
         knowsAbout: [
-          "Product strategy",
+          "Product engineering",
           "Web applications",
-          "Mobile applications",
+          "Workflow automation",
+          "Applied AI systems",
+          "Lifecycle marketing",
+          "Conversion optimization",
+          "Security foundations",
           "Online marketplaces",
-          "Shopify",
-          "Growth systems",
-          "Bitcoin products",
         ],
       },
       {
@@ -111,7 +101,7 @@ function getStructuredData(locale: Locale) {
         name: "Mehmet E. Mayda",
         url: `${SITE_URL}/profile`,
         jobTitle: "Founder and Full-Stack Product Builder",
-        worksFor: { "@id": `${SITE_URL}/#studio` },
+        worksFor: { "@id": `${SITE_URL}/#company` },
         address: {
           "@type": "PostalAddress",
           addressLocality: "Istanbul",
@@ -150,28 +140,25 @@ export default async function RootLayout({
   return (
     <html
       lang={lang}
-      className={`${studioSans.variable} ${studioSerif.variable}`}
+      className={fieldSans.variable}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <body className="min-h-screen overflow-x-hidden bg-background text-foreground antialiased">
-        <Script id="maydaos-arrival-state" strategy="beforeInteractive">
-          {arrivalStateScript}
-        </Script>
         <GoogleTagManager />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-        <main className="min-h-screen">
-          <OsShell locale={lang} header={<SiteHeader locale={lang} />} footer={<SiteFooter locale={lang} />}>
-            {children}
-          </OsShell>
-        </main>
-        <div className="studio-grain" aria-hidden="true" />
-        <SoundLayer />
-        <Analytics />
-        <SpeedInsights />
+        <SiteHeader locale={lang} />
+        <main className="min-h-screen">{children}</main>
+        <SiteFooter locale={lang} />
+        {hasVercelRuntime ? (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        ) : null}
         <SiteAnalytics />
       </body>
     </html>

@@ -1,0 +1,1481 @@
+@import "tailwindcss";
+
+/*
+ * MaydaLabs v3 — the Multiplier Field.
+ * One global presentation layer: tokens, base, and the mayda-* component
+ * classes. One input becoming several connected outputs is the only
+ * decorative idea; everything else stays typographic and legible.
+ */
+
+:root {
+  --void: #0a0b0f;
+  --frost: #f4f7fa;
+  --cobalt: #4b6bff;
+  --mint: #42f5b6;
+  --mist: #aab2c0;
+  --error: #ff6b6b;
+
+  --background: var(--void);
+  --foreground: var(--frost);
+  --surface: #0e1016;
+  --surface-raised: #12151d;
+  --surface-card: rgba(18, 21, 29, 0.72);
+  --border: rgba(244, 247, 250, 0.11);
+  --border-strong: rgba(244, 247, 250, 0.22);
+  --muted: var(--mist);
+  --cobalt-soft: rgba(75, 107, 255, 0.16);
+  --cobalt-line: rgba(75, 107, 255, 0.45);
+  --mint-soft: rgba(66, 245, 182, 0.14);
+  --mint-line: rgba(66, 245, 182, 0.5);
+  --error-soft: rgba(255, 107, 107, 0.14);
+  --chrome-height: 4.25rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-cobalt: var(--cobalt);
+  --color-mint: var(--mint);
+  --color-error: var(--error);
+  --font-sans: var(--font-field-sans), "Space Grotesk", sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "IBM Plex Mono", Menlo, monospace;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.125rem;
+  --radius-xl: 1.75rem;
+}
+
+/* Base element styles live in the base layer; the mayda-* component
+   classes live in the components layer so Tailwind utility classes
+   (a later layer) can always override them in markup. */
+@layer base {
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  color-scheme: dark;
+  background: var(--background);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-field-sans), "Space Grotesk", sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--cobalt);
+  color: var(--frost);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+}
+
+@layer components {
+
+/* ---------------------------------------------------------------- layout */
+
+.mayda-shell {
+  width: min(100% - 2.5rem, 1200px);
+  margin-inline: auto;
+}
+
+.mayda-shell-wide {
+  width: min(100% - 2.5rem, 1400px);
+  margin-inline: auto;
+}
+
+.mayda-section {
+  padding-block: clamp(4rem, 9vw, 7.5rem);
+}
+
+.mayda-section-tight {
+  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.mayda-divider {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+/* ------------------------------------------------------------ typography */
+
+.mayda-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 1.1rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mist);
+}
+
+.mayda-kicker::before {
+  content: "";
+  width: 1.1rem;
+  height: 1px;
+  background: var(--cobalt);
+  flex: none;
+}
+
+.mayda-display {
+  margin: 0;
+  font-size: clamp(2.4rem, 6.4vw, 4.6rem);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.mayda-heading {
+  margin: 0;
+  font-size: clamp(1.7rem, 3.6vw, 2.6rem);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+}
+
+.mayda-subheading {
+  margin: 0;
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+.mayda-lead {
+  margin: 0;
+  max-width: 40rem;
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  line-height: 1.55;
+  color: var(--mist);
+}
+
+.mayda-lead strong,
+.mayda-body strong {
+  color: var(--frost);
+  font-weight: 600;
+}
+
+.mayda-body {
+  margin: 0;
+  max-width: 38rem;
+  color: var(--mist);
+  line-height: 1.65;
+}
+
+.mayda-accent {
+  color: var(--mint);
+}
+
+.mayda-accent-cobalt {
+  color: var(--cobalt);
+}
+
+/* Sparing cobalt→mint moment for one phrase per page at most. */
+.mayda-multiply {
+  background: linear-gradient(92deg, var(--cobalt) 8%, var(--mint) 92%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.mayda-mono {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+}
+
+/* --------------------------------------------------------------- buttons */
+
+.mayda-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.5rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--cobalt);
+  color: var(--frost);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.mayda-button:hover {
+  background: #5d7aff;
+  transform: translateY(-1px);
+}
+
+.mayda-button:active {
+  transform: translateY(0);
+}
+
+.mayda-button[disabled],
+.mayda-button[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.mayda-button-outline {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--frost);
+}
+
+.mayda-button-outline:hover {
+  background: rgba(244, 247, 250, 0.06);
+  border-color: var(--frost);
+}
+
+.mayda-button-mint {
+  background: var(--mint);
+  color: var(--void);
+}
+
+.mayda-button-mint:hover {
+  background: #63f7c4;
+}
+
+.mayda-button-small {
+  padding: 0.55rem 1.05rem;
+  font-size: 0.85rem;
+}
+
+.mayda-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  color: var(--frost);
+  border-bottom: 1px solid var(--border-strong);
+  padding-bottom: 0.1rem;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+
+.mayda-text-link:hover {
+  color: var(--mint);
+  border-color: var(--mint-line);
+}
+
+/* ---------------------------------------------------------------- chrome */
+
+.mayda-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid transparent;
+  background: rgba(10, 11, 15, 0.55);
+  backdrop-filter: blur(6px);
+  transition: background 250ms ease, border-color 250ms ease;
+}
+
+.mayda-header.is-scrolled {
+  border-color: var(--border);
+  background: rgba(10, 11, 15, 0.88);
+}
+
+.mayda-wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.14rem;
+  font-weight: 700;
+  font-size: 1.02rem;
+  letter-spacing: -0.03em;
+  color: var(--frost);
+  white-space: nowrap;
+}
+
+.mayda-wordmark i {
+  font-style: normal;
+  font-size: 0.66em;
+  line-height: 1;
+  transform: translateY(-0.5em);
+  color: var(--cobalt);
+  transition: color 200ms ease;
+}
+
+a:hover .mayda-wordmark i,
+a:focus-visible .mayda-wordmark i {
+  color: var(--mint);
+}
+
+.mayda-nav-link {
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--mist);
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.mayda-nav-link:hover {
+  color: var(--frost);
+}
+
+.mayda-nav-link.is-active {
+  color: var(--frost);
+  background: rgba(244, 247, 250, 0.07);
+}
+
+.mayda-language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.18rem;
+}
+
+.mayda-language-switcher a {
+  padding: 0.22rem 0.5rem;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--mist);
+}
+
+.mayda-language-switcher a:hover {
+  color: var(--frost);
+}
+
+.mayda-language-switcher a[aria-current="true"] {
+  background: rgba(244, 247, 250, 0.1);
+  color: var(--frost);
+}
+
+.mayda-menu-button {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 42px;
+  height: 42px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.mayda-menu-button span {
+  display: block;
+  height: 1.5px;
+  background: var(--frost);
+  transition: transform 200ms ease;
+}
+
+.mayda-mobile-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem 1.25rem 1.5rem;
+  border-top: 1px solid var(--border);
+  background: rgba(10, 11, 15, 0.97);
+}
+
+.mayda-mobile-nav > a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  padding: 0.7rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.mayda-mobile-nav > a span {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--cobalt);
+}
+
+.mayda-mobile-nav > a.is-active {
+  color: var(--mint);
+}
+
+.mayda-footer {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.mayda-footer-label {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--mist);
+}
+
+.mayda-footer a:hover {
+  color: var(--frost);
+}
+
+/* ---------------------------------------------------------------- badges */
+
+.mayda-availability {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--mint-line);
+  border-radius: 999px;
+  background: var(--mint-soft);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mint);
+}
+
+.mayda-availability span {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--mint);
+}
+
+.mayda-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mist);
+  white-space: nowrap;
+}
+
+.mayda-tag.is-cobalt {
+  border-color: var(--cobalt-line);
+  background: var(--cobalt-soft);
+  color: #9dafff;
+}
+
+.mayda-tag.is-mint {
+  border-color: var(--mint-line);
+  background: var(--mint-soft);
+  color: var(--mint);
+}
+
+/* ----------------------------------------------------------------- cards */
+
+.mayda-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  padding: clamp(1.4rem, 3vw, 2.1rem);
+  transition: border-color 200ms ease, transform 200ms ease;
+}
+
+a.mayda-card:hover,
+.mayda-card.is-link:hover {
+  border-color: var(--cobalt-line);
+  transform: translateY(-2px);
+}
+
+.mayda-card-number {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--cobalt);
+}
+
+.mayda-grid-2 {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.mayda-grid-3 {
+  display: grid;
+  gap: 1.1rem;
+}
+
+@media (min-width: 720px) {
+  .mayda-grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mayda-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ----------------------------------------------------------- data tables */
+
+.mayda-dl {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+}
+
+.mayda-dl > div {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.6fr) 1.4fr;
+  gap: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.mayda-dl dt {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--mist);
+  padding-top: 0.2rem;
+}
+
+.mayda-dl dd {
+  margin: 0;
+  color: var(--frost);
+}
+
+/* ----------------------------------------------------------------- forms */
+
+.mayda-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.mayda-field > span {
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.mayda-field > small {
+  color: var(--mist);
+  font-size: 0.8rem;
+}
+
+.mayda-field input,
+.mayda-field textarea,
+.mayda-field select {
+  width: 100%;
+  padding: 0.75rem 0.95rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--frost);
+  transition: border-color 160ms ease;
+}
+
+.mayda-field input::placeholder,
+.mayda-field textarea::placeholder {
+  color: rgba(170, 178, 192, 0.55);
+}
+
+.mayda-field input:focus,
+.mayda-field textarea:focus,
+.mayda-field select:focus {
+  outline: none;
+  border-color: var(--cobalt);
+}
+
+.mayda-field input[aria-invalid="true"],
+.mayda-field textarea[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+.mayda-field-error {
+  margin: 0;
+  color: var(--error);
+  font-size: 0.8rem;
+}
+
+.mayda-form-status {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 0.9rem;
+  color: var(--mist);
+}
+
+.mayda-form-status.is-success {
+  border-color: var(--mint-line);
+  background: var(--mint-soft);
+  color: var(--mint);
+}
+
+.mayda-form-status.is-error {
+  border-color: var(--error);
+  background: var(--error-soft);
+  color: var(--error);
+}
+
+.mayda-checkbox {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  cursor: pointer;
+  color: var(--mist);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.mayda-checkbox input {
+  margin-top: 0.28rem;
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--cobalt);
+  flex: none;
+}
+
+/* Honeypot: visually removed, still focus-skipped. */
+.mayda-hp {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------- choice controls */
+
+.mayda-choices {
+  display: grid;
+  gap: 0.6rem;
+}
+
+@media (min-width: 640px) {
+  .mayda-choices {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mayda-choices.is-compact {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.mayda-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding: 0.9rem 1.05rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.mayda-choice:hover {
+  border-color: var(--cobalt-line);
+  transform: translateY(-1px);
+}
+
+.mayda-choice strong {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.mayda-choice small {
+  color: var(--mist);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.mayda-choice[aria-pressed="true"],
+.mayda-choice.is-selected {
+  border-color: var(--cobalt);
+  background: var(--cobalt-soft);
+}
+
+.mayda-choice[aria-pressed="true"] strong {
+  color: var(--frost);
+}
+
+fieldset.mayda-fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+fieldset.mayda-fieldset > legend {
+  padding: 0;
+  margin-bottom: 0.15rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+fieldset.mayda-fieldset > p {
+  margin: 0;
+  color: var(--mist);
+  font-size: 0.82rem;
+}
+
+/* --------------------------------------------------------- the field art */
+
+.field-figure {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.field-figure .field-line {
+  stroke: var(--cobalt-line);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.field-figure .field-line.is-input {
+  stroke: var(--cobalt);
+  stroke-width: 2;
+}
+
+.field-figure .field-line.is-output {
+  stroke: url(#field-gradient);
+}
+
+.field-figure .field-node {
+  fill: var(--void);
+  stroke: var(--cobalt);
+  stroke-width: 1.5;
+}
+
+.field-figure .field-tip {
+  fill: var(--mint);
+}
+
+.field-figure .field-pulse {
+  stroke: var(--mint);
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .field-figure .field-pulse {
+    stroke-dasharray: 26 640;
+    animation: field-pulse-flow 5.2s linear infinite;
+  }
+
+  .field-figure .field-pulse.is-second {
+    animation-delay: 1.4s;
+  }
+
+  .field-figure .field-pulse.is-third {
+    animation-delay: 2.9s;
+  }
+
+  .field-figure .field-tip {
+    animation: field-tip-glow 5.2s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field-figure .field-pulse {
+    display: none;
+  }
+}
+
+@keyframes field-pulse-flow {
+  from {
+    stroke-dashoffset: 660;
+  }
+
+  to {
+    stroke-dashoffset: -660;
+  }
+}
+
+@keyframes field-tip-glow {
+  0%,
+  100% {
+    opacity: 0.65;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ------------------------------------------------------------- hero bits */
+
+.mayda-hero {
+  position: relative;
+  padding-block: clamp(4.5rem, 11vw, 8.5rem) clamp(3.5rem, 8vw, 6rem);
+  overflow: hidden;
+}
+
+.mayda-hero-grid {
+  display: grid;
+  gap: 3rem;
+  align-items: center;
+}
+
+@media (min-width: 960px) {
+  .mayda-hero-grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  }
+}
+
+.mayda-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: center;
+}
+
+.mayda-situations {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 860px) {
+  .mayda-situations {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.mayda-situation {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: clamp(1.3rem, 2.4vw, 1.8rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  transition: border-color 200ms ease, transform 200ms ease;
+}
+
+.mayda-situation:hover {
+  border-color: var(--mint-line);
+  transform: translateY(-2px);
+}
+
+.mayda-situation h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.mayda-situation p {
+  margin: 0;
+  color: var(--mist);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.mayda-situation .mayda-text-link {
+  margin-top: auto;
+  align-self: flex-start;
+  font-size: 0.9rem;
+}
+
+/* -------------------------------------------------------------- proof UI */
+
+.mayda-proof-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2rem;
+  align-items: center;
+  padding: 1rem 0;
+  border-block: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  color: var(--mist);
+}
+
+.mayda-proof-strip strong {
+  color: var(--frost);
+  font-weight: 500;
+}
+
+.mayda-work-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  overflow: hidden;
+  transition: border-color 200ms ease, transform 200ms ease;
+}
+
+.mayda-work-card:hover {
+  border-color: var(--cobalt-line);
+  transform: translateY(-3px);
+}
+
+.mayda-work-card figure {
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.mayda-work-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.mayda-work-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.3rem 1.4rem 1.5rem;
+}
+
+.mayda-work-card-body h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.mayda-work-card-body p {
+  margin: 0;
+  color: var(--mist);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.mayda-work-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.3rem;
+}
+
+/* ---------------------------------------------------------- case template */
+
+.mayda-case-hero {
+  padding-block: clamp(3.5rem, 8vw, 6rem) clamp(2.5rem, 6vw, 4rem);
+}
+
+.mayda-case-rail {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.4rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+}
+
+@media (min-width: 720px) {
+  .mayda-case-rail {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.mayda-case-rail > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.mayda-case-rail span {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--mist);
+}
+
+.mayda-case-rail strong {
+  font-weight: 500;
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+.mayda-case-section {
+  display: grid;
+  gap: 1.5rem;
+  padding-block: clamp(2.2rem, 5vw, 3.6rem);
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 900px) {
+  .mayda-case-section {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 3rem;
+  }
+}
+
+.mayda-case-section > header h2 {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.6vw, 1.8rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.mayda-case-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color: var(--mist);
+  line-height: 1.65;
+}
+
+.mayda-case-section-body p {
+  margin: 0;
+}
+
+.mayda-case-section-body ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mayda-case-section-body li::marker {
+  color: var(--cobalt);
+}
+
+.mayda-case-gallery {
+  display: grid;
+  gap: 1.2rem;
+  padding-block: clamp(2.2rem, 5vw, 3.6rem);
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 860px) {
+  .mayda-case-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.mayda-case-gallery figure {
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.mayda-case-gallery img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.mayda-case-gallery figcaption {
+  padding: 0.75rem 1rem;
+  font-size: 0.82rem;
+  color: var(--mist);
+  border-top: 1px solid var(--border);
+}
+
+.mayda-browser-chrome {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-raised);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--mist);
+}
+
+.mayda-browser-chrome > div {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.mayda-browser-chrome i {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--border-strong);
+}
+
+.mayda-browser-chrome b {
+  margin-left: auto;
+  font-weight: 500;
+  color: var(--mint);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ map */
+
+.mayda-map-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface-card);
+  overflow: hidden;
+}
+
+.mayda-map-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.mayda-map-progress ol {
+  display: flex;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mist);
+}
+
+.mayda-map-progress li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.mayda-map-progress li::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+}
+
+.mayda-map-progress li.is-current {
+  color: var(--frost);
+}
+
+.mayda-map-progress li.is-current::before {
+  border-color: var(--cobalt);
+  background: var(--cobalt);
+}
+
+.mayda-map-progress li.is-complete::before {
+  border-color: var(--mint);
+  background: var(--mint);
+}
+
+.mayda-map-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: clamp(1.4rem, 3.5vw, 2.4rem);
+}
+
+.mayda-map-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mayda-map-nav .is-back {
+  background: none;
+  border: none;
+  padding: 0.5rem 0;
+  color: var(--mist);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.mayda-map-nav .is-back:hover {
+  color: var(--frost);
+}
+
+.mayda-map-result {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.mayda-map-result-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.mayda-map-move {
+  border: 1px solid var(--cobalt-line);
+  border-radius: var(--radius-lg);
+  background: var(--cobalt-soft);
+  padding: 1.3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mayda-map-move h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  letter-spacing: -0.02em;
+}
+
+.mayda-map-move p {
+  margin: 0;
+  color: var(--frost);
+  opacity: 0.85;
+  line-height: 1.55;
+}
+
+.mayda-map-steps {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: map-step;
+}
+
+.mayda-map-steps li {
+  display: flex;
+  gap: 0.9rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  counter-increment: map-step;
+  color: var(--mist);
+  line-height: 1.5;
+  font-size: 0.94rem;
+}
+
+.mayda-map-steps li::before {
+  content: counter(map-step, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--mint);
+  padding-top: 0.2rem;
+}
+
+.mayda-map-note {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-left: 2px solid var(--cobalt);
+  background: var(--surface);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--mist);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.mayda-map-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+/* ---------------------------------------------------------------- portal */
+
+.mayda-portal-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.mayda-portal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-block: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.mayda-portal-section:last-child {
+  border-bottom: 0;
+}
+
+.mayda-portal-empty {
+  padding: 1.6rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  color: var(--mist);
+  font-size: 0.92rem;
+}
+
+.mayda-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.mayda-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.mayda-row strong {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.mayda-row small {
+  color: var(--mist);
+  font-size: 0.8rem;
+}
+
+.mayda-status {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  color: var(--mist);
+  white-space: nowrap;
+}
+
+.mayda-status.is-new {
+  border-color: var(--cobalt-line);
+  color: #9dafff;
+  background: var(--cobalt-soft);
+}
+
+.mayda-status.is-active {
+  border-color: var(--mint-line);
+  color: var(--mint);
+  background: var(--mint-soft);
+}
+
+.mayda-status.is-muted {
+  opacity: 0.75;
+}
+
+/* --------------------------------------------------------------- footer CTA */
+
+.mayda-final-cta {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+  padding-block: clamp(4rem, 9vw, 7rem);
+}
+
+/* -------------------------------------------------------- route entrance */
+
+.route-enter {
+  animation: route-enter 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes route-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ------------------------------------------------------------- utilities */
+
+.mayda-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.mayda-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mayda-stack-lg {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

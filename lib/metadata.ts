@@ -8,7 +8,8 @@ import {
 
 export type SocialCardKind =
   | "studio"
-  | "services"
+  | "start"
+  | "approach"
   | "work"
   | "hodlstay"
   | "satoshi-gazette"
@@ -17,6 +18,8 @@ export type SocialCardKind =
   | "profile"
   | "about"
   | "contact"
+  | "portal"
+  | "auth"
   | "legal";
 
 type PageMetadata = {

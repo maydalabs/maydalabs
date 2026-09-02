@@ -1,80 +1,317 @@
-import Image from "next/image";
-import Link from "next/link";
-import { SatoshiGazetteJourney } from "@/components/HodlStayJourney";
-import { localizePath } from "@/lib/i18n";
+import { CaseStudy, type CaseStudyCopy } from "@/components/CaseStudy";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
 
-const COPY = {
+const META = {
   en: {
-    meta: { title: "Satoshi Gazette case study", socialTitle: "Satoshi Gazette: a newsroom operating system · MaydaLabs", description: "How MaydaLabs is building Satoshi Gazette as a Bitcoin newsroom product, connecting public desks, reviewed evidence, editorial workflows, retrieval, and distribution." }, back: "Selected work", kicker: "Flagship 02 / Active product build", hero: ["Building a newsroom as a", "product."], lead: "Satoshi Gazette connects a public Bitcoin publication to the evidence, editorial state, retrieval, and distribution systems required to operate it with discipline.", visit: "Visit live product", inspect: "Inspect the system", identity: ["BITCOIN-ONLY", "NEWSROOM SYSTEM"], status: "Live · Active build", alt: "Satoshi Gazette live Bitcoin newsroom homepage", summaryLabel: "Product summary", summary: [["Product", "Bitcoin-only newsroom"], ["Status", "Live · Active build"], ["Scope", "Product · Editorial UX · Data · Operations"], ["Evidence model", "Reviewed · Role-aware · Retrievable"]], premiseKicker: "The premise / Publication is the surface", premise: ["Not a publication skin.", "A newsroom operating system."], premiseCopy: "Editorial authority does not come from typography alone. The product has to preserve evidence, make state visible to operators, separate public reading from internal control, and keep human judgment in the consequential parts of the workflow.", systemKicker: "System architecture / Three connected layers", systemHeading: ["The reader sees clarity.", "The newsroom sees control."], systemIntro: "Each layer has a different job. Together, they let the product move quickly without flattening editorial work into content automation.",
-    layers: [["01", "Public signal", "One publication, multiple reading speeds.", "News, Wire, briefings, market context, mining, macro, and policy give readers a fast scan or a deeper route through the same editorial world.", ["Desks", "Wire", "Briefings", "Market context"]], ["02", "Editorial spine", "A newsroom needs state, not scattered documents.", "Submissions, candidates, evidence review, editing, and publication move through an explicit lifecycle built for operator control.", ["Intake", "Candidates", "Source review", "Publish"]], ["03", "Knowledge + distribution", "Research should remain traceable after publishing.", "Role-aware source links support citation-first retrieval, while distribution drafts and review queues extend the story without bypassing editorial judgment.", ["Evidence", "Ask retrieval", "Drafts", "Review queue"]]],
-    pipelineKicker: "Editorial lifecycle / Signal becomes record", pipelineHeading: "Every handoff is a state change.", pipelineLabel: "Satoshi Gazette editorial workflow", pipeline: [["01", "Submission", "Raw signal enters"], ["02", "Candidate", "Editorial value assessed"], ["03", "Evidence", "Sources reviewed and linked"], ["04", "Publish", "Story enters the newsroom"], ["05", "Distribute", "Platform drafts enter review"]], pipelineNote: "HUMAN REVIEW REMAINS IN THE LOOP", surfacesKicker: "Live product / Current surfaces", surfacesHeading: "A publication that behaves like one system.", surfacesIntro: "These frames show the live product during its active newsroom build. They are working surfaces, not concept mockups.", surfaces: [["01", "Front page", "One front page, multiple signal layers.", "The masthead connects live market context, editorial desks, the Wire, briefings, and major stories without turning the product into a dashboard.", "/work/satoshi-gazette-live-home.png", "Satoshi Gazette live homepage with market context and editorial desks"], ["02", "The Wire", "Fast reporting with structured source and time.", "Wire entries are designed for high-signal updates: source identity and source time are part of the content model, not loose text added after publication.", "/work/satoshi-gazette-live-wire.png", "Satoshi Gazette Wire product surface"], ["03", "Macro desk", "New desks inherit the same newsroom system.", "The Macro desk demonstrates how the publication can expand its editorial coverage without creating a separate visual or operational product each time.", "/work/satoshi-gazette-live-macro.png", "Satoshi Gazette Macro editorial desk"]],
-    proofKicker: "Trust architecture / Product truths", proofHeading: "Four decisions that keep the system honest.", proof: [["E1", "Evidence has a role", "Reviewed source documents can be connected as primary, supporting, background, or counterpoint evidence instead of becoming an undifferentiated link pile."], ["E2", "Publishing has a lifecycle", "Submission, candidate, editorial review, publishing, and distribution are separate operating states with clear human decision points."], ["E3", "Retrieval has guardrails", "Ask Satoshi is Bitcoin-only, citation-led, and designed to fall back when evidence is weak rather than improvise certainty."], ["E4", "Public and internal stay separate", "The reading experience remains editorial while newsroom controls, source review, publishing, and distribution tooling stay behind the public surface."]], contributionKicker: "Individual ownership / Mehmet E. Mayda", contributionHeading: "Brand, newsroom, and software shaped by one hands-on product builder.", contributionIntro: "As MaydaLabs founder and full-stack product builder, Mehmet owns the product direction and implementation across the public experience and the guarded operating system. AI accelerates research and production where useful; editorial responsibility stays human.", contribution: [["Product", "Strategy, system architecture, release shaping"], ["Editorial UX", "Information hierarchy, desks, story and wire surfaces"], ["Engineering", "Application, data models, APIs, publishing workflows"], ["Knowledge", "Reviewed sources, citation roles, retrieval foundations"], ["Operations", "Intake, editorial control, publishing, distribution review"]], availability: "Open for new client work", ctaKicker: "Building an information-heavy product?", cta: ["Bring the complexity.", "We will design the system."], start: "Start a project", services: "Explore services",
+    title: "Satoshi Gazette case study",
+    socialTitle: "Satoshi Gazette: a newsroom built as a product · MaydaLabs",
+    description:
+      "How MaydaLabs built Satoshi Gazette as a Bitcoin newsroom product: public desks, reviewed evidence, editorial workflows, and guarded distribution.",
   },
   tr: {
-    meta: { title: "Satoshi Gazette vaka çalışması", socialTitle: "Satoshi Gazette: haber merkezi işletim sistemi · MaydaLabs", description: "MaydaLabs'in Satoshi Gazette'i açık masalar, incelenmiş kanıtlar, editoryal akışlar, erişim ve dağıtımı bağlayan Bitcoin haber merkezi ürünü olarak nasıl geliştirdiği." }, back: "Seçili projeler", kicker: "Amiral proje 02 / Aktif ürün geliştirme", hero: ["Haber merkezini bir", "ürün olarak geliştirmek."], lead: "Satoshi Gazette, açık Bitcoin yayınını disiplinli işletmek için gereken kanıt, editoryal durum, bilgi erişimi ve dağıtım sistemlerine bağlıyor.", visit: "Canlı ürünü aç", inspect: "Sistemi incele", identity: ["SADECE BITCOIN", "HABER MERKEZİ SİSTEMİ"], status: "Canlı · Aktif geliştirme", alt: "Satoshi Gazette canlı Bitcoin haber merkezi ana sayfası", summaryLabel: "Ürün özeti", summary: [["Ürün", "Sadece Bitcoin haber merkezi"], ["Durum", "Canlı · Aktif geliştirme"], ["Kapsam", "Ürün · Editoryal UX · Veri · Operasyon"], ["Kanıt modeli", "İncelenmiş · Rol tabanlı · Erişilebilir"]], premiseKicker: "Temel fikir / Yayın görünen yüzeydir", premise: ["Bir yayın kaplaması değil.", "Haber merkezi işletim sistemi."], premiseCopy: "Editoryal otorite yalnızca tipografiden gelmez. Ürün kanıtı korumalı, operatörlere durumu görünür kılmalı, açık okuma deneyimini dahili kontrolden ayırmalı ve sonuç doğuran adımlarda insan muhakemesini korumalıdır.", systemKicker: "Sistem mimarisi / Birbirine bağlı üç katman", systemHeading: ["Okur netliği görür.", "Haber merkezi kontrolü görür."], systemIntro: "Her katmanın farklı bir işi var. Birlikte, editoryal çalışmayı içerik otomasyonuna indirgemeden ürünün hızlı ilerlemesini sağlarlar.",
-    layers: [["01", "Açık sinyal", "Tek yayın, farklı okuma hızları.", "Haberler, Wire, bültenler, piyasa bağlamı, madencilik, makro ve politika; okura aynı editoryal dünya içinde hızlı tarama veya derin rota sunar.", ["Masalar", "Wire", "Bültenler", "Piyasa bağlamı"]], ["02", "Editoryal omurga", "Haber merkezinin dağınık belgeler değil, duruma ihtiyacı var.", "Başvurular, adaylar, kanıt incelemesi, düzenleme ve yayın; operatör kontrolü için açık bir yaşam döngüsünde ilerler.", ["Alım", "Adaylar", "Kaynak incelemesi", "Yayınla"]], ["03", "Bilgi + dağıtım", "Araştırma yayınlandıktan sonra da izlenebilir kalmalı.", "Rol tabanlı kaynak bağlantıları alıntı öncelikli erişimi destekler; dağıtım taslakları ve inceleme kuyrukları editoryal muhakemeyi atlamadan haberi genişletir.", ["Kanıt", "Ask erişimi", "Taslaklar", "İnceleme kuyruğu"]]],
-    pipelineKicker: "Editoryal yaşam döngüsü / Sinyal kayda dönüşür", pipelineHeading: "Her devir bir durum değişimidir.", pipelineLabel: "Satoshi Gazette editoryal iş akışı", pipeline: [["01", "Başvuru", "Ham sinyal girer"], ["02", "Aday", "Editoryal değer değerlendirilir"], ["03", "Kanıt", "Kaynaklar incelenir ve bağlanır"], ["04", "Yayın", "Haber merkeze girer"], ["05", "Dağıtım", "Platform taslakları incelemeye girer"]], pipelineNote: "İNSAN İNCELEMESİ DÖNGÜDE KALIR", surfacesKicker: "Canlı ürün / Mevcut yüzeyler", surfacesHeading: "Tek sistem gibi davranan bir yayın.", surfacesIntro: "Bu çerçeveler aktif haber merkezi geliştirmesi sırasında canlı ürünü gösteriyor. Konsept maket değil, çalışan yüzeyler.", surfaces: [["01", "Ana sayfa", "Tek ana sayfa, birden fazla sinyal katmanı.", "Masthead; canlı piyasa bağlamını, editoryal masaları, Wire'ı, bültenleri ve büyük haberleri ürünü panele çevirmeden birleştirir.", "/work/satoshi-gazette-live-home.png", "Piyasa bağlamı ve editoryal masalarıyla Satoshi Gazette ana sayfası"], ["02", "Wire", "Yapılandırılmış kaynak ve zamanla hızlı habercilik.", "Wire kayıtlarında kaynak kimliği ve kaynak zamanı, yayından sonra eklenen gevşek metin değil içerik modelinin parçasıdır.", "/work/satoshi-gazette-live-wire.png", "Satoshi Gazette Wire ürün yüzeyi"], ["03", "Makro masası", "Yeni masalar aynı haber merkezi sistemini devralır.", "Makro masası, yayının her seferinde ayrı görsel veya operasyonel ürün oluşturmadan editoryal kapsamını nasıl büyütebildiğini gösterir.", "/work/satoshi-gazette-live-macro.png", "Satoshi Gazette Makro editoryal masası"]],
-    proofKicker: "Güven mimarisi / Ürün gerçekleri", proofHeading: "Sistemi dürüst tutan dört karar.", proof: [["E1", "Kanıtın bir rolü var", "İncelenmiş kaynak belgeleri ayrışmamış bağlantı yığını olmak yerine birincil, destekleyici, arka plan veya karşı görüş kanıtı olarak bağlanabilir."], ["E2", "Yayının yaşam döngüsü var", "Başvuru, aday, editoryal inceleme, yayın ve dağıtım; açık insan karar noktalarına sahip ayrı işletim durumlarıdır."], ["E3", "Bilgi erişiminin sınırları var", "Ask Satoshi sadece Bitcoin odaklı, alıntı öncelikli ve kanıt zayıf olduğunda kesinlik uydurmak yerine geri çekilecek şekilde tasarlanır."], ["E4", "Açık ve dahili alan ayrı kalır", "Okuma deneyimi editoryal kalırken kontrol, kaynak incelemesi, yayın ve dağıtım araçları açık yüzeyin arkasında kalır."]], contributionKicker: "Bireysel sahiplik / Mehmet E. Mayda", contributionHeading: "Marka, haber merkezi ve yazılım uygulamalı tek ürün geliştirici tarafından şekillendirildi.", contributionIntro: "MaydaLabs kurucusu ve full-stack ürün geliştiricisi olarak Mehmet, açık deneyim ve korumalı işletim sistemi boyunca ürün yönünü ve uygulamayı sahiplenir. Yapay zekâ faydalı olduğu yerde araştırma ve üretimi hızlandırır; editoryal sorumluluk insanda kalır.", contribution: [["Ürün", "Strateji, sistem mimarisi, sürüm şekillendirme"], ["Editoryal UX", "Bilgi hiyerarşisi, masalar, haber ve Wire yüzeyleri"], ["Mühendislik", "Uygulama, veri modelleri, API'ler, yayın akışları"], ["Bilgi", "İncelenmiş kaynaklar, alıntı rolleri, erişim temelleri"], ["Operasyon", "Alım, editoryal kontrol, yayın, dağıtım incelemesi"]], availability: "Yeni müşteri projelerine açık", ctaKicker: "Bilgi yoğun bir ürün mü geliştiriyorsunuz?", cta: ["Karmaşıklığı getirin.", "Sistemi tasarlayalım."], start: "Proje başlat", services: "Hizmetleri keşfet",
+    title: "Satoshi Gazette vaka çalışması",
+    socialTitle: "Satoshi Gazette: ürün olarak kurulmuş bir haber odası · MaydaLabs",
+    description:
+      "MaydaLabs'in Satoshi Gazette'i Bitcoin haber merkezi ürünü olarak nasıl kurduğu: açık masalar, incelenmiş kanıt, editoryal akışlar ve korumalı dağıtım.",
   },
   fr: {
-    meta: { title: "Étude de cas Satoshi Gazette", socialTitle: "Satoshi Gazette : un système d’exploitation de rédaction · MaydaLabs", description: "Comment MaydaLabs construit Satoshi Gazette comme produit de rédaction Bitcoin reliant rubriques publiques, preuves vérifiées, workflows, recherche et distribution." }, back: "Projets sélectionnés", kicker: "Projet phare 02 / Construction active", hero: ["Construire une rédaction comme un", "produit."], lead: "Satoshi Gazette relie une publication Bitcoin publique aux preuves, états éditoriaux, systèmes de recherche et de distribution nécessaires à une exploitation rigoureuse.", visit: "Voir le produit", inspect: "Inspecter le système", identity: ["RÉDACTION", "100 % BITCOIN"], status: "En ligne · Construction active", alt: "Page d’accueil de la rédaction Bitcoin Satoshi Gazette", summaryLabel: "Résumé du produit", summary: [["Produit", "Rédaction 100 % Bitcoin"], ["Statut", "En ligne · Construction active"], ["Périmètre", "Produit · UX éditoriale · Données · Opérations"], ["Modèle de preuve", "Vérifié · Rôles définis · Recherchable"]], premiseKicker: "Le principe / La publication est la surface", premise: ["Pas une peau de publication.", "Un système d’exploitation de rédaction."], premiseCopy: "L’autorité éditoriale ne vient pas seulement de la typographie. Le produit doit préserver les preuves, rendre l’état visible aux opérateurs, séparer lecture publique et contrôle interne et garder le jugement humain dans les étapes décisives.", systemKicker: "Architecture système / Trois couches connectées", systemHeading: ["Le lecteur voit la clarté.", "La rédaction voit le contrôle."], systemIntro: "Chaque couche a un rôle différent. Ensemble, elles permettent au produit d’avancer vite sans réduire le travail éditorial à l’automatisation de contenu.",
-    layers: [["01", "Signal public", "Une publication, plusieurs vitesses de lecture.", "Actualités, Wire, briefings, marché, minage, macro et politique offrent un scan rapide ou un parcours profond dans le même univers éditorial.", ["Rubriques", "Wire", "Briefings", "Contexte marché"]], ["02", "Colonne éditoriale", "Une rédaction a besoin d’états, pas de documents dispersés.", "Soumissions, candidats, revue des preuves, édition et publication avancent dans un cycle explicite sous contrôle opérateur.", ["Intake", "Candidats", "Revue sources", "Publier"]], ["03", "Connaissance + distribution", "La recherche doit rester traçable après publication.", "Les liens de sources par rôle soutiennent une recherche fondée sur les citations; brouillons et files de revue prolongent l’article sans contourner le jugement éditorial.", ["Preuves", "Recherche Ask", "Brouillons", "File de revue"]]],
-    pipelineKicker: "Cycle éditorial / Le signal devient trace", pipelineHeading: "Chaque transmission est un changement d’état.", pipelineLabel: "Workflow éditorial Satoshi Gazette", pipeline: [["01", "Soumission", "Le signal brut entre"], ["02", "Candidat", "La valeur éditoriale est évaluée"], ["03", "Preuves", "Les sources sont vérifiées et reliées"], ["04", "Publication", "L’article entre dans la rédaction"], ["05", "Distribution", "Les brouillons entrent en revue"]], pipelineNote: "LA REVUE HUMAINE RESTE DANS LA BOUCLE", surfacesKicker: "Produit en ligne / Surfaces actuelles", surfacesHeading: "Une publication qui se comporte comme un système.", surfacesIntro: "Ces écrans montrent le produit pendant sa construction active. Ce sont des surfaces fonctionnelles, pas des maquettes conceptuelles.", surfaces: [["01", "Page d’accueil", "Une page, plusieurs couches de signal.", "Le masthead relie marché en direct, rubriques, Wire, briefings et articles majeurs sans transformer le produit en dashboard.", "/work/satoshi-gazette-live-home.png", "Accueil Satoshi Gazette avec marché et rubriques"], ["02", "The Wire", "Information rapide avec source et heure structurées.", "Dans le Wire, identité et heure de la source font partie du modèle de contenu plutôt que d’être du texte ajouté après publication.", "/work/satoshi-gazette-live-wire.png", "Surface produit Wire de Satoshi Gazette"], ["03", "Rubrique Macro", "Les nouvelles rubriques héritent du même système.", "La rubrique Macro montre comment la publication étend sa couverture sans créer à chaque fois un autre produit visuel ou opérationnel.", "/work/satoshi-gazette-live-macro.png", "Rubrique éditoriale Macro de Satoshi Gazette"]],
-    proofKicker: "Architecture de confiance / Vérités produit", proofHeading: "Quatre décisions qui gardent le système honnête.", proof: [["E1", "La preuve a un rôle", "Les sources vérifiées peuvent être primaires, complémentaires, contextuelles ou contradictoires plutôt qu’un amas de liens indifférenciés."], ["E2", "La publication a un cycle", "Soumission, candidat, revue, publication et distribution sont des états distincts avec des décisions humaines claires."], ["E3", "La recherche a des garde-fous", "Ask Satoshi est limité à Bitcoin, fondé sur les citations et conçu pour se retirer lorsque les preuves sont faibles plutôt que d’inventer une certitude."], ["E4", "Public et interne restent séparés", "La lecture reste éditoriale tandis que contrôle, sources, publication et distribution restent derrière la surface publique."]], contributionKicker: "Ownership individuel / Mehmet E. Mayda", contributionHeading: "Marque, rédaction et logiciel façonnés par un builder produit impliqué.", contributionIntro: "En tant que fondateur et builder produit full-stack de MaydaLabs, Mehmet prend en charge la direction et la réalisation du produit, de l’expérience publique au système opérationnel gardé. L’IA accélère la recherche et la production; la responsabilité éditoriale reste humaine.", contribution: [["Produit", "Stratégie, architecture système, définition des versions"], ["UX éditoriale", "Hiérarchie, rubriques, articles et Wire"], ["Ingénierie", "Application, modèles de données, API, publication"], ["Connaissance", "Sources vérifiées, rôles de citation, recherche"], ["Opérations", "Intake, contrôle éditorial, publication, revue distribution"]], availability: "Ouvert à de nouveaux projets clients", ctaKicker: "Vous construisez un produit riche en information ?", cta: ["Apportez la complexité.", "Nous concevrons le système."], start: "Lancer un projet", services: "Explorer les services",
+    title: "Étude de cas Satoshi Gazette",
+    socialTitle: "Satoshi Gazette : une rédaction construite comme un produit · MaydaLabs",
+    description:
+      "Comment MaydaLabs a construit Satoshi Gazette comme produit de rédaction Bitcoin : rubriques publiques, preuves vérifiées, workflows éditoriaux et distribution contrôlée.",
   },
 } as const;
+
+const COPY: Record<"en" | "tr" | "fr", CaseStudyCopy> = {
+  en: {
+    back: "Work",
+    kicker: "Case 02 / Media · Data · Guarded operations",
+    ownershipTag: "Owned publication",
+    statusTag: "Live",
+    title: ["A newsroom built", "as a product."],
+    lead: "Satoshi Gazette connects a public Bitcoin publication to the evidence, editorial state, and distribution systems required to operate it with discipline.",
+    visit: { label: "Visit the live publication", url: "https://satoshigazette.org" },
+    railLabel: "Product summary",
+    rail: [
+      ["Product", "Bitcoin-only newsroom"],
+      ["Status", "Live at satoshigazette.org"],
+      ["Scope", "Product · Editorial UX · Data · Operations"],
+      ["Ownership", "MaydaLabs-owned, editorially independent"],
+    ],
+    sections: [
+      {
+        heading: "Context",
+        paragraphs: [
+          "Satoshi Gazette is an independent Bitcoin publication that MaydaLabs built and owns as a product. Editorial authority does not come from typography alone: the product has to preserve evidence, make state visible to operators, separate public reading from internal control, and keep human judgment in the consequential parts of the workflow.",
+        ],
+      },
+      {
+        heading: "Constraint",
+        paragraphs: [
+          "Build a publication that feels authoritative and editorial while the operating system behind it stays fast, structured, and ready for responsible AI assistance — without flattening editorial work into content automation.",
+        ],
+      },
+      {
+        heading: "MaydaLabs' exact scope",
+        items: [
+          "Editorial information architecture and the visual system",
+          "The public product: front page, desks, Wire, briefings, and the Data Desk",
+          "Publishing workflows and internal newsroom tooling",
+          "Data models, APIs, and live Bitcoin market and network context",
+          "Reviewed-source evidence model and retrieval foundations",
+          "Distribution drafting and review queues behind the public surface",
+        ],
+      },
+      {
+        heading: "What was built",
+        items: [
+          "A public signal layer: news desks, the Wire, briefings, and market context offering fast scans or deep routes through one editorial world",
+          "An editorial spine: submissions, candidates, evidence review, editing, and publication moving through an explicit lifecycle under operator control",
+          "Evidence with roles: reviewed sources connected as primary, supporting, background, or counterpoint instead of an undifferentiated link pile",
+          "Wire entries where source identity and source time are part of the content model, preserving provenance on a fast surface",
+          "A primary-evidence Data Desk (Corporate Bitcoin Treasuries) presenting selected observations with dates, source documents, scope limits, and methodology",
+          "Guarded retrieval foundations (Ask Satoshi): Bitcoin-only, citation-led, designed to fall back when evidence is weak rather than improvise certainty",
+        ],
+      },
+      {
+        heading: "Verifiable evidence",
+        paragraphs: [
+          "The publication is live and public at satoshigazette.org — front page, desks, Wire, briefings, and the Data Desk can all be read right now. The screenshots below are captures of the live product.",
+          "No reader-traffic, growth, or revenue figures are claimed. The guarded internal systems are described here as capabilities; their internals stay private.",
+        ],
+      },
+      {
+        heading: "Current status",
+        paragraphs: [
+          "Live and publishing, with the operating system behind it continuing to evolve.",
+        ],
+      },
+      {
+        heading: "Ownership",
+        paragraphs: [
+          "Satoshi Gazette is a MaydaLabs-owned operating publication — not a client, and not studio advertising. Its editorial standards, corrections, and publication decisions remain independent of MaydaLabs' commercial work. Mehmet owns the product direction and implementation; AI accelerates research and production where useful, and editorial responsibility stays human.",
+        ],
+      },
+    ],
+    gallery: [
+      {
+        src: "/work/satoshi-gazette-2026-08-home.jpg",
+        alt: "Current Satoshi Gazette homepage with populated stories and Wire",
+        caption: "Front page — market context, desks, leading stories, and the Wire in one masthead.",
+      },
+      {
+        src: "/work/satoshi-gazette-2026-08-wire.jpg",
+        alt: "Current populated Satoshi Gazette Wire",
+        caption: "The Wire — fast reporting with structured source identity and source time.",
+      },
+      {
+        src: "/work/satoshi-gazette-2026-08-data.jpg",
+        alt: "Satoshi Gazette Corporate Bitcoin Treasuries Data Desk",
+        caption: "Data Desk — primary evidence with dates, sources, scope limits, and methodology.",
+      },
+    ],
+    galleryHost: "satoshigazette.org",
+    ctaKicker: "Building an information-heavy product?",
+    ctaHeading: "Bring the complexity. We'll design the system.",
+    ctaStart: "Map my next move",
+    ctaWork: "All work",
+  },
+  tr: {
+    back: "Projeler",
+    kicker: "Vaka 02 / Medya · Veri · Korumalı operasyon",
+    ownershipTag: "Sahip olunan yayın",
+    statusTag: "Canlı",
+    title: ["Ürün olarak kurulmuş", "bir haber odası."],
+    lead: "Satoshi Gazette, açık bir Bitcoin yayınını; onu disiplinle işletmek için gereken kanıt, editoryal durum ve dağıtım sistemlerine bağlar.",
+    visit: { label: "Canlı yayını aç", url: "https://satoshigazette.org" },
+    railLabel: "Ürün özeti",
+    rail: [
+      ["Ürün", "Sadece Bitcoin haber merkezi"],
+      ["Durum", "satoshigazette.org'da canlı"],
+      ["Kapsam", "Ürün · Editoryal UX · Veri · Operasyon"],
+      ["Sahiplik", "MaydaLabs'e ait, editoryal olarak bağımsız"],
+    ],
+    sections: [
+      {
+        heading: "Bağlam",
+        paragraphs: [
+          "Satoshi Gazette, MaydaLabs'in ürün olarak kurduğu ve sahibi olduğu bağımsız bir Bitcoin yayınıdır. Editoryal otorite yalnızca tipografiden gelmez: ürün kanıtı korumalı, operatörlere durumu görünür kılmalı, açık okuma deneyimini dahili kontrolden ayırmalı ve sonuç doğuran adımlarda insan muhakemesini korumalıdır.",
+        ],
+      },
+      {
+        heading: "Kısıt",
+        paragraphs: [
+          "Arkasındaki işletim sistemi hızlı, yapılandırılmış ve sorumlu yapay zekâ desteğine hazır kalırken otoriter ve editoryal hissettiren bir yayın kurmak — editoryal çalışmayı içerik otomasyonuna indirgemeden.",
+        ],
+      },
+      {
+        heading: "MaydaLabs'in tam kapsamı",
+        items: [
+          "Editoryal bilgi mimarisi ve görsel sistem",
+          "Açık ürün: ana sayfa, masalar, Wire, bültenler ve Veri Masası",
+          "Yayın akışları ve dahili haber merkezi araçları",
+          "Veri modelleri, API'ler ve canlı Bitcoin piyasa/ağ bağlamı",
+          "İncelenmiş kaynak kanıt modeli ve erişim temelleri",
+          "Açık yüzeyin arkasında dağıtım taslakları ve inceleme kuyrukları",
+        ],
+      },
+      {
+        heading: "Ne inşa edildi",
+        items: [
+          "Açık sinyal katmanı: haber masaları, Wire, bültenler ve piyasa bağlamı; aynı editoryal dünyada hızlı tarama veya derin rota",
+          "Editoryal omurga: başvurular, adaylar, kanıt incelemesi, düzenleme ve yayın; operatör kontrolünde açık bir yaşam döngüsünde",
+          "Rolleri olan kanıt: incelenmiş kaynaklar ayrışmamış bağlantı yığını yerine birincil, destekleyici, arka plan veya karşı görüş olarak bağlanır",
+          "Kaynak kimliği ve kaynak zamanının içerik modelinin parçası olduğu, hızlı yüzeyde provenansı koruyan Wire kayıtları",
+          "Birincil kanıt Veri Masası (Corporate Bitcoin Treasuries): seçili gözlemler tarih, kaynak belge, kapsam sınırı ve metodolojiyle sunulur",
+          "Korumalı erişim temelleri (Ask Satoshi): sadece Bitcoin, alıntı öncelikli, kanıt zayıfken kesinlik uydurmak yerine geri çekilir",
+        ],
+      },
+      {
+        heading: "Doğrulanabilir kanıt",
+        paragraphs: [
+          "Yayın satoshigazette.org'da canlı ve herkese açık — ana sayfa, masalar, Wire, bültenler ve Veri Masası şu anda okunabilir. Aşağıdaki ekran görüntüleri canlı ürünün kayıtlarıdır.",
+          "Okur trafiği, büyüme veya gelir rakamı iddia edilmiyor. Korumalı dahili sistemler burada yetkinlik olarak anlatılır; iç işleyişleri özel kalır.",
+        ],
+      },
+      {
+        heading: "Mevcut durum",
+        paragraphs: ["Canlı ve yayın yapıyor; arkasındaki işletim sistemi gelişmeye devam ediyor."],
+      },
+      {
+        heading: "Sahiplik",
+        paragraphs: [
+          "Satoshi Gazette, MaydaLabs'e ait bir işletim yayınıdır — müşteri değildir, stüdyo reklamı da değildir. Editoryal standartları, düzeltmeleri ve yayın kararları MaydaLabs'in ticari işinden bağımsız kalır. Ürün yönü ve uygulama Mehmet'e aittir; yapay zekâ faydalı olduğu yerde araştırma ve üretimi hızlandırır, editoryal sorumluluk insanda kalır.",
+        ],
+      },
+    ],
+    gallery: [
+      {
+        src: "/work/satoshi-gazette-2026-08-home.jpg",
+        alt: "Haberler ve Wire ile dolu güncel Satoshi Gazette ana sayfası",
+        caption: "Ana sayfa — piyasa bağlamı, masalar, ana haberler ve Wire tek masthead'de.",
+      },
+      {
+        src: "/work/satoshi-gazette-2026-08-wire.jpg",
+        alt: "Güncel dolu Satoshi Gazette Wire",
+        caption: "Wire — yapılandırılmış kaynak kimliği ve zamanıyla hızlı habercilik.",
+      },
+      {
+        src: "/work/satoshi-gazette-2026-08-data.jpg",
+        alt: "Satoshi Gazette Corporate Bitcoin Treasuries Veri Masası",
+        caption: "Veri Masası — tarih, kaynak, kapsam sınırı ve metodolojiyle birincil kanıt.",
+      },
+    ],
+    galleryHost: "satoshigazette.org",
+    ctaKicker: "Bilgi yoğun bir ürün mü geliştiriyorsunuz?",
+    ctaHeading: "Karmaşıklığı getirin. Sistemi tasarlayalım.",
+    ctaStart: "Sonraki hamlemi haritala",
+    ctaWork: "Tüm projeler",
+  },
+  fr: {
+    back: "Réalisations",
+    kicker: "Cas 02 / Média · Données · Opérations contrôlées",
+    ownershipTag: "Publication détenue",
+    statusTag: "En ligne",
+    title: ["Une rédaction construite", "comme un produit."],
+    lead: "Satoshi Gazette relie une publication Bitcoin publique aux systèmes de preuves, d'état éditorial et de distribution nécessaires pour l'exploiter avec rigueur.",
+    visit: { label: "Voir la publication en ligne", url: "https://satoshigazette.org" },
+    railLabel: "Résumé du produit",
+    rail: [
+      ["Produit", "Rédaction 100 % Bitcoin"],
+      ["Statut", "En ligne sur satoshigazette.org"],
+      ["Périmètre", "Produit · UX éditoriale · Données · Opérations"],
+      ["Propriété", "Détenue par MaydaLabs, éditorialement indépendante"],
+    ],
+    sections: [
+      {
+        heading: "Contexte",
+        paragraphs: [
+          "Satoshi Gazette est une publication Bitcoin indépendante que MaydaLabs a construite et détient comme produit. L'autorité éditoriale ne vient pas de la typographie seule : le produit doit préserver les preuves, rendre l'état visible aux opérateurs, séparer lecture publique et contrôle interne, et garder le jugement humain dans les étapes décisives.",
+        ],
+      },
+      {
+        heading: "Contrainte",
+        paragraphs: [
+          "Construire une publication crédible et éditoriale pendant que le système d'exploitation derrière elle reste rapide, structuré et prêt pour une assistance IA responsable — sans réduire le travail éditorial à de l'automatisation de contenu.",
+        ],
+      },
+      {
+        heading: "Le périmètre exact de MaydaLabs",
+        items: [
+          "Architecture de l'information éditoriale et système visuel",
+          "Le produit public : page d'accueil, rubriques, Wire, briefings et Data Desk",
+          "Workflows de publication et outils internes de rédaction",
+          "Modèles de données, API et contexte marché/réseau Bitcoin en direct",
+          "Modèle de preuves à sources vérifiées et fondations de recherche",
+          "Brouillons de distribution et files de revue derrière la surface publique",
+        ],
+      },
+      {
+        heading: "Ce qui a été construit",
+        items: [
+          "Une couche de signal public : rubriques, Wire, briefings et contexte marché offrant un scan rapide ou un parcours profond dans un même univers éditorial",
+          "Une colonne éditoriale : soumissions, candidats, revue des preuves, édition et publication dans un cycle explicite sous contrôle opérateur",
+          "Des preuves avec des rôles : sources vérifiées reliées comme primaires, complémentaires, contextuelles ou contradictoires plutôt qu'un amas de liens",
+          "Des entrées Wire où identité et heure de la source font partie du modèle de contenu, préservant la provenance sur une surface rapide",
+          "Un Data Desk à preuves primaires (Corporate Bitcoin Treasuries) : observations sélectionnées avec dates, sources, limites de périmètre et méthodologie",
+          "Des fondations de recherche contrôlées (Ask Satoshi) : limité à Bitcoin, fondé sur les citations, conçu pour se retirer quand les preuves sont faibles",
+        ],
+      },
+      {
+        heading: "Preuves vérifiables",
+        paragraphs: [
+          "La publication est en ligne et publique sur satoshigazette.org — page d'accueil, rubriques, Wire, briefings et Data Desk sont lisibles maintenant. Les captures ci-dessous viennent du produit en ligne.",
+          "Aucun chiffre de lectorat, de croissance ou de revenu n'est revendiqué. Les systèmes internes contrôlés sont décrits comme des capacités ; leur fonctionnement interne reste privé.",
+        ],
+      },
+      {
+        heading: "Statut actuel",
+        paragraphs: ["En ligne et en publication, le système d'exploitation continuant d'évoluer derrière."],
+      },
+      {
+        heading: "Propriété",
+        paragraphs: [
+          "Satoshi Gazette est une publication détenue par MaydaLabs — ni un client, ni une vitrine publicitaire du studio. Ses standards éditoriaux, corrections et décisions de publication restent indépendants du travail commercial de MaydaLabs. Mehmet possède la direction produit et la réalisation ; l'IA accélère recherche et production quand c'est utile, la responsabilité éditoriale reste humaine.",
+        ],
+      },
+    ],
+    gallery: [
+      {
+        src: "/work/satoshi-gazette-2026-08-home.jpg",
+        alt: "Accueil Satoshi Gazette actuel avec articles et Wire",
+        caption: "Page d'accueil — marché, rubriques, articles majeurs et Wire dans un même masthead.",
+      },
+      {
+        src: "/work/satoshi-gazette-2026-08-wire.jpg",
+        alt: "Wire Satoshi Gazette actuel et peuplé",
+        caption: "The Wire — information rapide avec source et heure structurées.",
+      },
+      {
+        src: "/work/satoshi-gazette-2026-08-data.jpg",
+        alt: "Data Desk Corporate Bitcoin Treasuries de Satoshi Gazette",
+        caption: "Data Desk — preuves primaires avec dates, sources, limites et méthode.",
+      },
+    ],
+    galleryHost: "satoshigazette.org",
+    ctaKicker: "Vous construisez un produit riche en information ?",
+    ctaHeading: "Apportez la complexité. Nous concevrons le système.",
+    ctaStart: "Cartographier ma prochaine étape",
+    ctaWork: "Toutes les réalisations",
+  },
+};
 
 export async function generateMetadata({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
-  return createPageMetadata({ ...COPY[locale].meta, path: "/case-studies/satoshi-gazette", locale, socialCard: "satoshi-gazette" });
+  return createPageMetadata({
+    ...META[locale],
+    path: "/case-studies/satoshi-gazette",
+    locale,
+    socialCard: "satoshi-gazette",
+  });
 }
-
-function Arrow() { return <span aria-hidden>↗</span>; }
-
-const CURRENT_SURFACES = {
-  en: [
-    ["01", "Front page", "A populated newsroom with multiple signal layers.", "The current public masthead connects market context, editorial desks, four leading stories, six Wire updates, briefings, and deep reading routes.", "/work/satoshi-gazette-2026-08-home.jpg", "Current Satoshi Gazette homepage with populated stories and Wire"],
-    ["02", "The Wire", "Fast reporting with structured source and time.", "Current Wire entries keep source identity and source time inside the content model, preserving provenance on a high-speed surface.", "/work/satoshi-gazette-2026-08-wire.jpg", "Current populated Satoshi Gazette Wire"],
-    ["03", "Data Desk", "Primary evidence becomes a legible public ledger.", "The Corporate Bitcoin Treasuries desk presents selected observations with dates, source documents, scope limits, and methodology instead of implying a complete live ranking.", "/work/satoshi-gazette-2026-08-data.jpg", "Satoshi Gazette Corporate Bitcoin Treasuries primary-evidence Data Desk"],
-  ],
-  tr: [
-    ["01", "Ana sayfa", "Birden fazla sinyal katmanına sahip dolu haber merkezi.", "Mevcut açık masthead; piyasa bağlamını, editoryal masaları, dört ana haberi, altı Wire güncellemesini, bültenleri ve derin okuma yollarını bağlıyor.", "/work/satoshi-gazette-2026-08-home.jpg", "Haberler ve Wire ile dolu güncel Satoshi Gazette ana sayfası"],
-    ["02", "Wire", "Yapılandırılmış kaynak ve zamanla hızlı habercilik.", "Mevcut Wire kayıtları kaynak kimliği ve zamanını içerik modelinin içinde tutarak hızlı yüzeyde provenansı koruyor.", "/work/satoshi-gazette-2026-08-wire.jpg", "Güncel dolu Satoshi Gazette Wire"],
-    ["03", "Veri Masası", "Birincil kanıt anlaşılır açık kayda dönüşüyor.", "Corporate Bitcoin Treasuries masası; seçili gözlemleri tarih, kaynak belge, kapsam sınırı ve metodolojiyle sunuyor; tam ve canlı sıralama izlenimi vermiyor.", "/work/satoshi-gazette-2026-08-data.jpg", "Satoshi Gazette Corporate Bitcoin Treasuries birincil kanıt Veri Masası"],
-  ],
-  fr: [
-    ["01", "Page d’accueil", "Une rédaction peuplée de plusieurs couches de signal.", "Le masthead public relie marché, rubriques, quatre articles majeurs, six dépêches Wire, briefings et parcours de lecture profonde.", "/work/satoshi-gazette-2026-08-home.jpg", "Accueil Satoshi Gazette actuel avec articles et Wire"],
-    ["02", "The Wire", "Information rapide avec source et heure structurées.", "Les entrées actuelles gardent l’identité et l’heure de la source dans le modèle de contenu afin de préserver la provenance.", "/work/satoshi-gazette-2026-08-wire.jpg", "Wire Satoshi Gazette actuel et peuplé"],
-    ["03", "Data Desk", "La preuve primaire devient un registre public lisible.", "Corporate Bitcoin Treasuries présente des observations sélectionnées avec dates, sources, limites et méthode sans suggérer un classement mondial complet et en direct.", "/work/satoshi-gazette-2026-08-data.jpg", "Data Desk Satoshi Gazette Corporate Bitcoin Treasuries fondé sur les preuves"],
-  ],
-} as const;
-
-const RETRIEVAL_BOUNDARY = {
-  en: "The guarded Ask Satoshi retrieval foundation remains behind the public surface and in active development; it is Bitcoin-only, citation-led, and designed to fall back when evidence is weak.",
-  tr: "Korumalı Ask Satoshi erişim temeli açık yüzeyin arkasında ve aktif geliştirmede kalıyor; yalnızca Bitcoin odaklı, alıntı öncelikli ve kanıt zayıfsa geri çekilecek şekilde tasarlanıyor.",
-  fr: "La fondation de recherche Ask Satoshi reste derrière la surface publique et en construction; elle est limitée à Bitcoin, fondée sur les citations et conçue pour se retirer si les preuves sont faibles.",
-} as const;
 
 export default async function SatoshiGazetteCaseStudyPage({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
-  const copy = COPY[locale];
-  return (
-    <div className="sg-case">
-      <section className="sg-hero"><div className="sg-shell sg-hero-grid">
-        <div className="sg-hero-copy"><Link href={localizePath("/case-studies", locale)} className="sg-back-link"><span aria-hidden>←</span> {copy.back}</Link><p className="studio-kicker">{copy.kicker}</p><h1>{copy.hero[0]} <em>{copy.hero[1]}</em></h1><p className="sg-hero-lead">{copy.lead}</p><div className="sg-hero-actions"><a href="https://satoshigazette.org" target="_blank" rel="noopener noreferrer" className="studio-button">{copy.visit} <Arrow /></a><a href="#system" className="studio-text-link">{copy.inspect} <span aria-hidden>↓</span></a></div></div>
-        <div className="sg-hero-identity" aria-hidden="true"><span>EC / 1</span><Image src="/work/satoshi-gazette-ec1-mark.svg" alt="" width={64} height={64} /><p>{copy.identity[0]}<br />{copy.identity[1]}</p></div>
-        <div className="sg-hero-screen"><div className="project-browser-chrome"><div><i /><i /><i /></div><span>satoshigazette.org</span><b>{copy.status}</b></div><SatoshiGazetteJourney locale={locale} sizes="(max-width: 900px) 100vw, 82vw" /></div>
-        <div className="sg-status-rail" aria-label={copy.summaryLabel}>{copy.summary.map(([term, detail]) => <div key={term}><span>{term}</span><strong>{detail}</strong></div>)}</div>
-      </div></section>
-      <section className="sg-thesis"><div className="sg-shell sg-thesis-grid"><p className="studio-kicker">{copy.premiseKicker}</p><h2>{copy.premise[0]}<br /><em>{copy.premise[1]}</em></h2><p>{copy.premiseCopy}</p></div></section>
-      <section id="system" className="sg-system"><div className="sg-shell"><div className="sg-section-heading"><div><p className="studio-kicker">{copy.systemKicker}</p><h2>{copy.systemHeading[0]}<br /><em>{copy.systemHeading[1]}</em></h2></div><p>{copy.systemIntro}</p></div><div className="sg-layer-stack">{copy.layers.map(([number, label, title, description, items]) => <article key={number}><div className="sg-layer-index"><span>{number}</span><p>{label}</p></div><div className="sg-layer-copy"><h3>{title}</h3><p>{description}</p></div><div className="sg-layer-items">{items.map((item) => <span key={item}>{item}</span>)}</div></article>)}</div></div></section>
-      <section className="sg-pipeline"><div className="sg-shell"><div className="sg-pipeline-heading"><p className="studio-kicker">{copy.pipelineKicker}</p><h2>{copy.pipelineHeading}</h2></div><div className="sg-pipeline-track" aria-label={copy.pipelineLabel}>{copy.pipeline.map(([number, title, detail]) => <div key={number}><span>{number}</span><i aria-hidden="true" /><strong>{title}</strong><p>{detail}</p></div>)}</div><p className="sg-pipeline-note">{copy.pipelineNote}</p></div></section>
-      <section className="sg-surfaces"><div className="sg-shell"><div className="sg-section-heading"><div><p className="studio-kicker">{copy.surfacesKicker}</p><h2>{copy.surfacesHeading}</h2></div><p>{copy.surfacesIntro}</p></div><div className="sg-surface-list">{CURRENT_SURFACES[locale].map(([number, label, title, description, src, alt]) => <figure key={number}><figcaption><div><span>{number}</span><p>{label}</p></div><h3>{title}</h3><p>{description}</p></figcaption><div className="sg-surface-frame"><div className="project-browser-chrome"><div><i /><i /><i /></div><span>satoshigazette.org</span><b>{label}</b></div><Image src={src} alt={alt} width={1280} height={720} sizes="(max-width: 900px) 100vw, 78vw" /></div></figure>)}</div></div></section>
-      <section className="sg-proof"><div className="sg-shell"><div className="sg-proof-heading"><p className="studio-kicker">{copy.proofKicker}</p><h2>{copy.proofHeading}</h2></div><div className="sg-proof-grid">{copy.proof.map(([number, title, description], index) => <article key={number}><span>{number}</span><h3>{title}</h3><p>{index === 2 ? RETRIEVAL_BOUNDARY[locale] : description}</p></article>)}</div></div></section>
-      <section className="sg-contribution"><div className="sg-shell sg-contribution-layout"><div><p className="studio-kicker">{copy.contributionKicker}</p><h2>{copy.contributionHeading}</h2><p>{copy.contributionIntro}</p></div><dl>{copy.contribution.map(([term, detail]) => <div key={term}><dt>{term}</dt><dd>{detail}</dd></div>)}</dl></div></section>
-      <section className="studio-final-cta sg-final-cta"><div className="studio-availability"><span /> {copy.availability}</div><p className="studio-kicker">{copy.ctaKicker}</p><h2>{copy.cta[0]}<br /><em>{copy.cta[1]}</em></h2><div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"><Link href={localizePath("/contact", locale)} className="studio-button studio-button-light">{copy.start} <Arrow /></Link><Link href={localizePath("/services", locale)} className="studio-button studio-button-outline-light">{copy.services}</Link></div></section>
-    </div>
-  );
+  return <CaseStudy locale={locale} copy={COPY[locale]} />;
 }

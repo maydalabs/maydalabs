@@ -32,10 +32,15 @@ const routes = [
   "/",
   "/tr",
   "/fr",
-  "/services",
+  "/start",
+  "/os",
+  "/tr/os",
+  "/fr/os",
+  "/approach",
   "/about",
   "/profile",
   "/contact",
+  "/auth/sign-in",
   "/privacy",
   "/terms",
   "/case-studies",
@@ -57,10 +62,11 @@ for (const path of routes) {
 const redirects = [
   ...(!isLocalBase ? [["/en", 307, "/"]] : []),
   ["/pricing", 308, "/contact"],
-  ["/programs", 308, "/services"],
+  ["/programs", 308, "/approach"],
   ["/playbooks", 308, "/case-studies"],
   ["/newsletter", 308, "/"],
-  ["/roi-quickcheck", 308, "/services"],
+  ["/roi-quickcheck", 308, "/start"],
+  ["/services", 308, "/approach"],
 ];
 
 for (const [path, status, destination] of redirects) {
@@ -76,7 +82,7 @@ for (const [path, status, destination] of redirects) {
 
 await check("English metadata is canonical and localized", async () => {
   const html = await (await request("/")).text();
-  assert(html.includes("<title>MaydaLabs — Product &amp; growth studio</title>"), "unexpected English title");
+  assert(html.includes("<title>MaydaLabs — Build and acceleration company</title>"), "unexpected English title");
   assert(html.includes(`rel="canonical" href="${canonicalUrl}"`), "missing canonical URL");
   assert(html.includes(`hrefLang="tr" href="${canonicalUrl}/tr"`), "missing Turkish alternate");
   assert(html.includes(`hrefLang="fr" href="${canonicalUrl}/fr"`), "missing French alternate");
@@ -87,14 +93,27 @@ await check("Turkish and French metadata is localized", async () => {
     request("/tr").then((response) => response.text()),
     request("/fr").then((response) => response.text()),
   ]);
-  assert(turkish.includes("<title>MaydaLabs — Ürün ve büyüme stüdyosu</title>"), "unexpected Turkish title");
-  assert(french.includes("<title>MaydaLabs — Studio produit et croissance</title>"), "unexpected French title");
+  assert(turkish.includes("<title>MaydaLabs — İnşa ve hızlandırma şirketi</title>"), "unexpected Turkish title");
+  assert(french.includes("<title>MaydaLabs — Entreprise de construction et d’accélération</title>"), "unexpected French title");
 });
 
 await check("localized routes do not set a language-preference cookie", async () => {
   const response = await request("/tr");
   const cookie = response.headers.get("set-cookie") || "";
   assert(!cookie.includes("maydalabs_locale"), "legacy language-preference cookie is still present");
+});
+
+await check("MaydaOS is a localized noindex Lab route", async () => {
+  const [english, turkish, french] = await Promise.all([
+    request("/os").then((response) => response.text()),
+    request("/tr/os").then((response) => response.text()),
+    request("/fr/os").then((response) => response.text()),
+  ]);
+  assert(english.includes("<title>MaydaOS Lab · MaydaLabs</title>"), "unexpected MaydaOS title");
+  assert(english.includes('name="robots" content="noindex, follow"'), "MaydaOS is missing noindex");
+  assert(english.includes('data-mayda-os="v3"'), "MaydaOS v3 Lab shell is missing");
+  assert(turkish.includes("MaydaOS geri döndü."), "Turkish MaydaOS copy is missing");
+  assert(french.includes("MaydaOS est de retour."), "French MaydaOS copy is missing");
 });
 
 await check("robots and sitemap expose the public routes", async () => {
@@ -106,6 +125,11 @@ await check("robots and sitemap expose the public routes", async () => {
   for (const path of ["/tr", "/fr", "/case-studies/hodlstay", "/case-studies/sofra"]) {
     assert(sitemap.includes(`${canonicalUrl}${path}`), `sitemap is missing ${path}`);
   }
+});
+
+await check("sitemap excludes the noindex MaydaOS Lab", async () => {
+  const sitemap = await (await request("/sitemap.xml")).text();
+  assert(!sitemap.includes(canonicalUrl + "/os"), "noindex MaydaOS route leaked into sitemap");
 });
 
 await check("social image endpoint returns PNG", async () => {

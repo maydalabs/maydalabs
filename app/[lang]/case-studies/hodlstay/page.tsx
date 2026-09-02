@@ -1,62 +1,323 @@
-import Image from "next/image";
-import Link from "next/link";
-import { HodlStayJourney } from "@/components/HodlStayJourney";
-import { localizePath } from "@/lib/i18n";
+import { CaseStudy, type CaseStudyCopy } from "@/components/CaseStudy";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
 
-const COPY = {
+const META = {
   en: {
-    meta: { title: "HodlStay case study", socialTitle: "HodlStay: a global stay marketplace · MaydaLabs", description: "How MaydaLabs evolved AirBTC into HodlStay, connecting marketplace discovery, host operations, availability, payments, migration, and handover." }, back: "Selected work", kicker: "Flagship 01 / Client product build", hero: ["From AirBTC to a stay worth", "holding onto."], lead: "A Bitcoin-native travel idea evolved into a broader global marketplace, connecting the guest experience with the operational system required to run it.", visit: "Visit live product", read: "Read the build story", orbit: ["GUEST", "HOST", "OPS"], status: "Client project · Live", alt: "HodlStay global booking marketplace homepage", railLabel: "Engagement summary", rail: [["Engagement", "End-to-end client build"], ["Status", "Live · Active delivery"], ["Scope", "Product · Brand · Build · Launch"], ["Ownership", "Prepared for client handover"]],
-    premiseKicker: "The premise / More than a booking page", premiseTitle: "A marketplace is the customer experience and the machinery behind it.", premise: "The visible product only works when inventory, trust, availability, payment state, partner supply, and operator decisions agree. HodlStay was shaped around that whole system.", transformationHeading: ["Change the frame.", "Keep the signal."], transformation: [["01", "Reframe", "Move beyond the niche without erasing the roots.", "AirBTC had a distinct community and a clear Bitcoin origin. The product direction evolved into HodlStay: a broader premium travel proposition with Bitcoin-friendly booking built into the experience rather than treated as the whole experience."], ["02", "Rebuild", "Treat every side of the marketplace as one product.", "Guest discovery, stay dossiers, host onboarding, calendars, booking requests, payment state, reviews, and internal operations were shaped as one connected system instead of isolated screens."], ["03", "Transfer", "Build toward ownership, not dependence.", "The engagement is a client product build prepared for handover on completion. Product decisions, operating logic, launch preparation, and documentation are structured so the client can own what comes next."]],
-    systemKicker: "Product architecture / One operating view", systemHeading: ["One product.", "Five connected systems."], systemIntro: "Every surface is designed around the state changes and responsibilities on both sides of the marketplace.", core: "MARKETPLACE CORE", systems: [["01", "Guest discovery", "Destination, date, guest, category, and inventory paths that lead into a credible stay decision."], ["02", "Stay dossier", "Property story, media, host context, availability, fiat and sats pricing, and booking entry in one surface."], ["03", "Host operations", "Onboarding, listings, calendars, booking responses, reviews, payouts, and the operational views behind them."], ["04", "Booking and settlement", "Availability checks, acceptance state, BTCPay checkout, verified webhooks, settlement, and payout records."], ["05", "Inventory and migration", "Native supply, eligible partner inventory, iCal blocks, and legacy records reconciled into the launch system."]],
-    galleryKicker: "Inside the product / Real surfaces", galleryHeading: "The interface is where the systems become understandable.", gallery: [["01", "Discovery", "A search surface that behaves like the front door to a marketplace.", "Categories, dates, guests, filters, and live inventory are organized to make the next decision obvious without flattening every stay into the same template.", "/work/hodlstay-2026-08-stays.jpg", "HodlStay stay discovery and search interface"], ["02", "Stay dossier", "Enough context to move from interest to intent.", "The property page connects story, imagery, host trust, pricing, availability, and booking entry while keeping Bitcoin pricing legible rather than ornamental.", "/work/hodlstay-2026-08-listing.jpg", "HodlStay property dossier and booking interface"], ["03", "Conference product", "A focused product path inside the wider platform.", "Event accommodation creates a dedicated journey for attendees, organizers, and participating hosts without splitting the marketplace into a separate product.", "/work/hodlstay-2026-08-conferences.jpg", "HodlStay conference accommodation interface"]],
-    proofKicker: "Depth over decoration", proofHeading: "Four hard problems, connected.", proof: [["01", "Unified inventory", "One discovery layer can present native HodlStay supply alongside eligible HotelPlanner and Dtravel partner inventory."], ["02", "Availability safety", "Imported iCal blocks, manual host blocks, and internal bookings are checked together to reduce double-booking risk."], ["03", "Bitcoin payment lifecycle", "Host acceptance connects to BTCPay checkout, signed webhook verification, booking settlement, and a traceable payout record."], ["04", "Operational migration", "Legacy WordPress and founder spreadsheet records are reconciled into a structured launch pipeline with explicit exception handling."]],
-    contributionKicker: "Individual ownership / Mehmet E. Mayda", contributionHeading: "One hands-on builder across the product and its operating system.", contributionIntro: "This is client work, not a MaydaLabs-owned venture. As MaydaLabs founder and full-stack product builder, Mehmet leads the product strategy and hands-on delivery, while the product is prepared for client ownership and handover.", contribution: [["Product", "Strategy, information architecture, release shaping"], ["Experience", "Brand evolution, UX, interface system, responsive behavior"], ["Engineering", "Marketplace application, data, payments, partner integrations"], ["Operations", "Host and guest lifecycles, migration, launch preparation"], ["Engagement", "End-to-end client build, prepared for handover"]], availability: "Open for new client work", ctaKicker: "Have a product with this much complexity?", cta: ["Bring the messy system.", "We will find the signal."], start: "Start a project", services: "Explore services",
+    title: "HodlStay case study",
+    socialTitle: "HodlStay: a global stay marketplace · MaydaLabs",
+    description:
+      "How MaydaLabs rebuilt AirBTC into HodlStay: marketplace discovery, host operations, availability safety, Bitcoin payments, and operational migration as one system.",
   },
   tr: {
-    meta: { title: "HodlStay vaka çalışması", socialTitle: "HodlStay: küresel konaklama pazarı · MaydaLabs", description: "MaydaLabs'in AirBTC'yi pazar yeri keşfi, ev sahibi operasyonları, uygunluk, ödemeler, veri göçü ve devri birleştiren HodlStay'e nasıl dönüştürdüğü." }, back: "Seçili projeler", kicker: "Amiral proje 01 / Müşteri ürünü", hero: ["AirBTC’den hodl etmeye değer", "bir konaklamaya."], lead: "Bitcoin-native bir seyahat fikri, misafir deneyimini işletmek için gereken operasyon sistemiyle birleştiren daha geniş küresel pazar yerine dönüştü.", visit: "Canlı ürünü aç", read: "Geliştirme hikâyesini oku", orbit: ["MİSAFİR", "EV SAHİBİ", "OPERASYON"], status: "Müşteri projesi · Canlı", alt: "HodlStay küresel rezervasyon pazarı ana sayfası", railLabel: "Çalışma özeti", rail: [["Çalışma", "Uçtan uca müşteri ürünü"], ["Durum", "Canlı · Aktif geliştirme"], ["Kapsam", "Ürün · Marka · Geliştirme · Lansman"], ["Sahiplik", "Müşteri devrine hazırlandı"]],
-    premiseKicker: "Temel fikir / Bir rezervasyon sayfasından fazlası", premiseTitle: "Pazar yeri, müşteri deneyimi ve arkasındaki mekanizmadır.", premise: "Görünen ürün ancak envanter, güven, uygunluk, ödeme durumu, iş ortağı arzı ve operatör kararları aynı gerçeği söylediğinde çalışır. HodlStay bu bütün sistem etrafında şekillendirildi.", transformationHeading: ["Çerçeveyi değiştir.", "Sinyali koru."], transformation: [["01", "Yeniden çerçevele", "Kökleri silmeden nişin ötesine geç.", "AirBTC’nin belirgin bir topluluğu ve net Bitcoin kökeni vardı. Ürün yönü HodlStay’e evrildi: Bitcoin dostu rezervasyonu tüm deneyim yerine deneyimin doğal bir parçası yapan daha geniş premium seyahat önerisi."], ["02", "Yeniden geliştir", "Pazar yerinin her tarafını tek ürün olarak ele al.", "Misafir keşfi, konaklama dosyaları, ev sahibi katılımı, takvimler, rezervasyon talepleri, ödeme durumu, yorumlar ve dahili operasyonlar izole ekranlar yerine tek bir bağlantılı sistem olarak şekillendirildi."], ["03", "Devret", "Bağımlılığa değil, sahipliğe doğru geliştir.", "Bu çalışma tamamlandığında devredilmek üzere hazırlanan müşteri ürünü geliştirmesidir. Ürün kararları, işletim mantığı, lansman hazırlığı ve dokümantasyon müşterinin sonraki adımlara sahip olabilmesi için yapılandırılır."]],
-    systemKicker: "Ürün mimarisi / Tek işletim görünümü", systemHeading: ["Tek ürün.", "Birbirine bağlı beş sistem."], systemIntro: "Her yüzey pazar yerinin iki tarafındaki durum değişimleri ve sorumluluklar etrafında tasarlanır.", core: "PAZAR YERİ ÇEKİRDEĞİ", systems: [["01", "Misafir keşfi", "Güven veren konaklama kararına götüren destinasyon, tarih, misafir, kategori ve envanter yolları."], ["02", "Konaklama dosyası", "Mülk hikâyesi, medya, ev sahibi bağlamı, uygunluk, fiat ve sats fiyatlandırması ve rezervasyon girişi tek yüzeyde."], ["03", "Ev sahibi operasyonları", "Katılım, ilanlar, takvimler, rezervasyon yanıtları, yorumlar, ödemeler ve arkasındaki operasyon görünümleri."], ["04", "Rezervasyon ve mutabakat", "Uygunluk kontrolleri, kabul durumu, BTCPay ödeme, doğrulanmış webhooklar, mutabakat ve ödeme kayıtları."], ["05", "Envanter ve veri göçü", "Yerel arz, uygun iş ortağı envanteri, iCal blokları ve eski kayıtlar lansman sisteminde uzlaştırılır."]],
-    galleryKicker: "Ürünün içinden / Gerçek yüzeyler", galleryHeading: "Sistemler arayüzde anlaşılır hale gelir.", gallery: [["01", "Keşif", "Pazar yerinin giriş kapısı gibi çalışan arama yüzeyi.", "Kategoriler, tarihler, misafirler, filtreler ve canlı envanter; her konaklamayı aynı şablona sıkıştırmadan sonraki kararı açık kılacak şekilde düzenlenir.", "/work/hodlstay-2026-08-stays.jpg", "HodlStay konaklama keşfi ve arama arayüzü"], ["02", "Konaklama dosyası", "İlgiden niyete geçmek için yeterli bağlam.", "Mülk sayfası hikâye, görsel, ev sahibi güveni, fiyat, uygunluk ve rezervasyon girişini birleştirirken Bitcoin fiyatını dekor değil anlaşılır bilgi olarak tutar.", "/work/hodlstay-2026-08-listing.jpg", "HodlStay konaklama dosyası ve rezervasyon arayüzü"], ["03", "Konferans ürünü", "Geniş platform içinde odaklanmış bir ürün yolu.", "Etkinlik konaklaması, pazar yerini ayrı ürüne bölmeden katılımcılar, organizatörler ve ev sahipleri için özel yolculuk oluşturur.", "/work/hodlstay-2026-08-conferences.jpg", "HodlStay konferans konaklama arayüzü"]],
-    proofKicker: "Dekorasyondan önce derinlik", proofHeading: "Birbirine bağlı dört zor problem.", proof: [["01", "Birleşik envanter", "Tek keşif katmanı yerel HodlStay arzını uygun HotelPlanner ve Dtravel iş ortağı envanteriyle birlikte sunabilir."], ["02", "Uygunluk güvenliği", "İçe aktarılan iCal blokları, manuel ev sahibi blokları ve dahili rezervasyonlar çifte rezervasyon riskini azaltmak için birlikte kontrol edilir."], ["03", "Bitcoin ödeme yaşam döngüsü", "Ev sahibi kabulü BTCPay ödeme, imzalı webhook doğrulaması, rezervasyon mutabakatı ve izlenebilir ödeme kaydına bağlanır."], ["04", "Operasyonel veri göçü", "Eski WordPress ve kurucu tablo kayıtları açık istisna yönetimiyle yapılandırılmış lansman hattında uzlaştırılır."]],
-    contributionKicker: "Bireysel sahiplik / Mehmet E. Mayda", contributionHeading: "Ürün ve işletim sisteminin tamamında uygulamalı tek geliştirici.", contributionIntro: "Bu bir müşteri çalışmasıdır; MaydaLabs girişimi değildir. MaydaLabs kurucusu ve full-stack ürün geliştiricisi olarak Mehmet, ürün stratejisine ve uygulamalı geliştirmeye liderlik eder; ürün müşteri sahipliği ve devri için hazırlanır.", contribution: [["Ürün", "Strateji, bilgi mimarisi, sürüm şekillendirme"], ["Deneyim", "Marka dönüşümü, UX, arayüz sistemi, responsive davranış"], ["Mühendislik", "Pazar yeri uygulaması, veri, ödemeler, iş ortağı entegrasyonları"], ["Operasyon", "Ev sahibi ve misafir yaşam döngüleri, veri göçü, lansman hazırlığı"], ["Çalışma", "Uçtan uca müşteri ürünü, devre hazır"]], availability: "Yeni müşteri projelerine açık", ctaKicker: "Bu kadar karmaşık bir ürününüz mü var?", cta: ["Dağınık sistemi getirin.", "Sinyali bulalım."], start: "Proje başlat", services: "Hizmetleri keşfet",
+    title: "HodlStay vaka çalışması",
+    socialTitle: "HodlStay: küresel konaklama pazarı · MaydaLabs",
+    description:
+      "MaydaLabs'in AirBTC'yi HodlStay'e nasıl dönüştürdüğü: pazar yeri keşfi, ev sahibi operasyonları, uygunluk güvenliği, Bitcoin ödemeleri ve operasyonel veri göçü tek sistem olarak.",
   },
   fr: {
-    meta: { title: "Étude de cas HodlStay", socialTitle: "HodlStay : une marketplace mondiale de séjours · MaydaLabs", description: "Comment MaydaLabs a fait évoluer AirBTC vers HodlStay en reliant découverte, opérations hôtes, disponibilité, paiements, migration et transmission." }, back: "Projets sélectionnés", kicker: "Projet phare 01 / Produit client", hero: ["D’AirBTC à un séjour qui mérite", "d’être conservé."], lead: "Une idée de voyage Bitcoin-native est devenue une marketplace mondiale reliant l’expérience voyageur au système opérationnel nécessaire pour la faire vivre.", visit: "Voir le produit", read: "Lire l’histoire de construction", orbit: ["VOYAGEUR", "HÔTE", "OPS"], status: "Projet client · En ligne", alt: "Page d’accueil de la marketplace mondiale HodlStay", railLabel: "Résumé de la mission", rail: [["Mission", "Construction client de bout en bout"], ["Statut", "En ligne · Livraison active"], ["Périmètre", "Produit · Marque · Code · Lancement"], ["Propriété", "Préparé pour transmission au client"]],
-    premiseKicker: "Le principe / Plus qu’une page de réservation", premiseTitle: "Une marketplace est l’expérience client et la mécanique qui la soutient.", premise: "Le produit visible ne fonctionne que lorsque inventaire, confiance, disponibilité, paiement, offre partenaire et décisions opérateur concordent. HodlStay a été construit autour de ce système complet.", transformationHeading: ["Changer le cadre.", "Garder le signal."], transformation: [["01", "Recadrer", "Dépasser la niche sans effacer les racines.", "AirBTC possédait une communauté distincte et une origine Bitcoin claire. Le produit a évolué vers HodlStay : une proposition de voyage premium plus large où la réservation compatible Bitcoin fait partie de l’expérience sans devenir toute l’expérience."], ["02", "Reconstruire", "Traiter chaque côté de la marketplace comme un seul produit.", "Découverte, dossiers, intégration hôtes, calendriers, demandes, paiements, avis et opérations internes ont été conçus comme un système connecté plutôt que comme des écrans isolés."], ["03", "Transmettre", "Construire pour la propriété, pas la dépendance.", "La mission est une construction client préparée pour transmission. Décisions produit, logique opérationnelle, lancement et documentation permettent au client de prendre en charge la suite."]],
-    systemKicker: "Architecture produit / Une vue opérationnelle", systemHeading: ["Un produit.", "Cinq systèmes connectés."], systemIntro: "Chaque surface est conçue autour des changements d’état et responsabilités des deux côtés de la marketplace.", core: "CŒUR MARKETPLACE", systems: [["01", "Découverte voyageur", "Destination, dates, voyageurs, catégories et inventaire conduisent à une décision de séjour crédible."], ["02", "Dossier de séjour", "Histoire du lieu, médias, contexte hôte, disponibilité, prix fiat et sats et entrée de réservation sur une seule surface."], ["03", "Opérations hôtes", "Intégration, annonces, calendriers, réponses, avis, versements et vues opérationnelles associées."], ["04", "Réservation et règlement", "Vérifications, acceptation, checkout BTCPay, webhooks vérifiés, règlement et versements."], ["05", "Inventaire et migration", "Offre native, inventaire partenaire, blocs iCal et données historiques réconciliés dans le système de lancement."]],
-    galleryKicker: "Dans le produit / Surfaces réelles", galleryHeading: "L’interface rend les systèmes compréhensibles.", gallery: [["01", "Découverte", "Une recherche qui agit comme la porte d’entrée de la marketplace.", "Catégories, dates, voyageurs, filtres et inventaire rendent la prochaine décision évidente sans réduire chaque séjour au même template.", "/work/hodlstay-2026-08-stays.jpg", "Interface de découverte et recherche HodlStay"], ["02", "Dossier de séjour", "Assez de contexte pour passer de l’intérêt à l’intention.", "La page relie histoire, images, confiance, prix, disponibilité et réservation tout en gardant le prix Bitcoin lisible plutôt qu’ornemental.", "/work/hodlstay-2026-08-listing.jpg", "Dossier de propriété et réservation HodlStay"], ["03", "Produit conférence", "Un parcours ciblé dans une plateforme plus large.", "L’hébergement événementiel crée un parcours dédié aux participants, organisateurs et hôtes sans séparer la marketplace en un autre produit.", "/work/hodlstay-2026-08-conferences.jpg", "Interface d’hébergement conférence HodlStay"]],
-    proofKicker: "La profondeur avant la décoration", proofHeading: "Quatre problèmes difficiles, connectés.", proof: [["01", "Inventaire unifié", "Une couche de découverte présente l’offre HodlStay et les inventaires partenaires HotelPlanner et Dtravel éligibles."], ["02", "Sécurité de disponibilité", "Blocs iCal importés, blocages manuels et réservations internes sont vérifiés ensemble pour réduire les doubles réservations."], ["03", "Cycle de paiement Bitcoin", "L’acceptation hôte mène au checkout BTCPay, à la vérification des webhooks, au règlement et à un versement traçable."], ["04", "Migration opérationnelle", "Les données WordPress et feuilles fondateur sont réconciliées dans un pipeline structuré avec gestion explicite des exceptions."]],
-    contributionKicker: "Ownership individuel / Mehmet E. Mayda", contributionHeading: "Un builder impliqué sur le produit et son système opérationnel.", contributionIntro: "Il s’agit d’un travail client, pas d’une entreprise détenue par MaydaLabs. En tant que fondateur et builder produit full-stack, Mehmet dirige la stratégie et la réalisation concrète, tandis que le produit est préparé pour la propriété et la transmission au client.", contribution: [["Produit", "Stratégie, architecture de l’information, définition des versions"], ["Expérience", "Évolution de marque, UX, interface, responsive"], ["Ingénierie", "Application marketplace, données, paiements, intégrations"], ["Opérations", "Cycles hôtes et voyageurs, migration, lancement"], ["Mission", "Construction client de bout en bout, prête à transmettre"]], availability: "Ouvert à de nouveaux projets clients", ctaKicker: "Votre produit est aussi complexe ?", cta: ["Apportez le système encore flou.", "Nous trouverons le signal."], start: "Lancer un projet", services: "Explorer les services",
+    title: "Étude de cas HodlStay",
+    socialTitle: "HodlStay : une marketplace mondiale de séjours · MaydaLabs",
+    description:
+      "Comment MaydaLabs a reconstruit AirBTC en HodlStay : découverte, opérations hôtes, sécurité de disponibilité, paiements Bitcoin et migration opérationnelle en un seul système.",
   },
 } as const;
 
+const COPY: Record<"en" | "tr" | "fr", CaseStudyCopy> = {
+  en: {
+    back: "Work",
+    kicker: "Case 01 / Marketplace · Travel · Bitcoin",
+    ownershipTag: "Client build",
+    statusTag: "Live",
+    title: ["From AirBTC to a stay", "worth holding onto."],
+    lead: "A Bitcoin-native travel idea rebuilt into a broader global stay marketplace — the guest experience connected to the operational system required to run it.",
+    visit: { label: "Visit the live product", url: "https://hodlstay.com" },
+    railLabel: "Engagement summary",
+    rail: [
+      ["Engagement", "End-to-end client build"],
+      ["Status", "Live at hodlstay.com"],
+      ["Scope", "Product · Brand · Build · Launch"],
+      ["Ownership", "Client product"],
+    ],
+    sections: [
+      {
+        heading: "Context",
+        paragraphs: [
+          "AirBTC was a niche travel platform with a distinct community and a clear Bitcoin origin. The product direction evolved into HodlStay: a broader premium travel proposition where Bitcoin-friendly booking is built into the experience rather than being the whole experience.",
+          "A marketplace is the customer experience and the machinery behind it. The visible product only works when inventory, trust, availability, payment state, partner supply, and operator decisions agree — HodlStay was shaped around that whole system.",
+        ],
+      },
+      {
+        heading: "Constraint",
+        paragraphs: [
+          "Turn a promising niche platform into a credible, scalable marketplace without losing the community and Bitcoin roots that made it distinct — while reconciling legacy records, partner inventory, and real host operations into one launchable system.",
+        ],
+      },
+      {
+        heading: "MaydaLabs' exact scope",
+        items: [
+          "Product strategy, information architecture, and release shaping",
+          "Brand evolution from AirBTC to HodlStay, UX, and the interface system",
+          "The full marketplace application: frontend, backend, and data",
+          "Host onboarding, listings, calendars, booking responses, reviews, and payouts",
+          "Booking, availability, and payment lifecycles including BTCPay checkout",
+          "Partner inventory and iCal integrations, plus legacy data migration",
+          "Launch preparation, operational documentation, and handover structure",
+        ],
+      },
+      {
+        heading: "What was built",
+        items: [
+          "Unified discovery: one search layer across native supply and eligible HotelPlanner and Dtravel partner inventory",
+          "Stay dossiers connecting story, media, host trust, fiat and sats pricing, availability, and booking entry",
+          "Availability safety: imported iCal blocks, manual host blocks, and internal bookings checked together to reduce double-booking risk",
+          "Bitcoin payment lifecycle: host acceptance into BTCPay checkout, signed webhook verification, settlement, and a traceable payout record",
+          "Operational migration: legacy WordPress and founder spreadsheet records reconciled into a structured launch pipeline with explicit exception handling",
+          "A dedicated conference accommodation journey inside the wider platform",
+        ],
+      },
+      {
+        heading: "Verifiable evidence",
+        paragraphs: [
+          "The product is live and public at hodlstay.com — discovery, stay dossiers, and the conference product can be inspected directly. The screenshots below are captures of the live product, not concept mockups.",
+          "No traffic, conversion, or revenue figures are claimed here: those belong to the client, and this site does not publish numbers whose source you cannot inspect.",
+        ],
+      },
+      {
+        heading: "Current status",
+        paragraphs: [
+          "HodlStay is live and serving guests and hosts at hodlstay.com.",
+        ],
+      },
+      {
+        heading: "Ownership",
+        paragraphs: [
+          "This is client work, not a MaydaLabs-owned venture. Mehmet led the product strategy and hands-on delivery end to end, and the build is structured for client ownership: product decisions, operating logic, and documentation are organized so the client owns what comes next.",
+        ],
+      },
+    ],
+    gallery: [
+      {
+        src: "/work/hodlstay-2026-08-stays.jpg",
+        alt: "HodlStay stay discovery and search interface",
+        caption: "Discovery — categories, dates, guests, filters, and live inventory.",
+      },
+      {
+        src: "/work/hodlstay-2026-08-listing.jpg",
+        alt: "HodlStay property dossier and booking interface",
+        caption: "Stay dossier — story, media, host context, pricing, and booking entry.",
+      },
+      {
+        src: "/work/hodlstay-2026-08-conferences.jpg",
+        alt: "HodlStay conference accommodation interface",
+        caption: "Conference product — a focused journey inside the wider platform.",
+      },
+    ],
+    galleryHost: "hodlstay.com",
+    ctaKicker: "Have a product with this much complexity?",
+    ctaHeading: "Bring the messy system. We'll find the multiplier.",
+    ctaStart: "Map my next move",
+    ctaWork: "All work",
+  },
+  tr: {
+    back: "Projeler",
+    kicker: "Vaka 01 / Pazar yeri · Seyahat · Bitcoin",
+    ownershipTag: "Müşteri ürünü",
+    statusTag: "Canlı",
+    title: ["AirBTC'den elde tutmaya değer", "bir konaklamaya."],
+    lead: "Bitcoin-native bir seyahat fikri, daha geniş bir küresel konaklama pazarına dönüştürüldü — misafir deneyimi, onu işletmek için gereken operasyon sistemine bağlandı.",
+    visit: { label: "Canlı ürünü aç", url: "https://hodlstay.com" },
+    railLabel: "Çalışma özeti",
+    rail: [
+      ["Çalışma", "Uçtan uca müşteri ürünü"],
+      ["Durum", "hodlstay.com'da canlı"],
+      ["Kapsam", "Ürün · Marka · Geliştirme · Lansman"],
+      ["Sahiplik", "Müşteri ürünü"],
+    ],
+    sections: [
+      {
+        heading: "Bağlam",
+        paragraphs: [
+          "AirBTC, belirgin bir topluluğa ve net bir Bitcoin kökenine sahip niş bir seyahat platformuydu. Ürün yönü HodlStay'e evrildi: Bitcoin dostu rezervasyonun tüm deneyim olmak yerine deneyimin doğal parçası olduğu daha geniş, premium bir seyahat önerisi.",
+          "Bir pazar yeri, müşteri deneyimi ve arkasındaki mekanizmadır. Görünen ürün ancak envanter, güven, uygunluk, ödeme durumu, iş ortağı arzı ve operatör kararları aynı gerçeği söylediğinde çalışır — HodlStay bu bütün sistem etrafında şekillendirildi.",
+        ],
+      },
+      {
+        heading: "Kısıt",
+        paragraphs: [
+          "Umut vadeden niş platformu, onu farklı kılan topluluğu ve Bitcoin köklerini kaybetmeden güvenilir, ölçeklenebilir bir pazar yerine dönüştürmek — eski kayıtları, iş ortağı envanterini ve gerçek ev sahibi operasyonlarını tek lansmanlanabilir sistemde birleştirirken.",
+        ],
+      },
+      {
+        heading: "MaydaLabs'in tam kapsamı",
+        items: [
+          "Ürün stratejisi, bilgi mimarisi ve sürüm şekillendirme",
+          "AirBTC'den HodlStay'e marka dönüşümü, UX ve arayüz sistemi",
+          "Eksiksiz pazar yeri uygulaması: frontend, backend ve veri",
+          "Ev sahibi katılımı, ilanlar, takvimler, rezervasyon yanıtları, yorumlar ve ödemeler",
+          "BTCPay ödemesi dahil rezervasyon, uygunluk ve ödeme yaşam döngüleri",
+          "İş ortağı envanteri ve iCal entegrasyonları ile eski veri göçü",
+          "Lansman hazırlığı, operasyon dokümantasyonu ve devir yapısı",
+        ],
+      },
+      {
+        heading: "Ne inşa edildi",
+        items: [
+          "Birleşik keşif: yerel arz ile uygun HotelPlanner ve Dtravel iş ortağı envanterini sunan tek arama katmanı",
+          "Hikâye, medya, ev sahibi güveni, fiat ve sats fiyatlandırması, uygunluk ve rezervasyon girişini birleştiren konaklama dosyaları",
+          "Uygunluk güvenliği: içe aktarılan iCal blokları, manuel ev sahibi blokları ve dahili rezervasyonlar çifte rezervasyon riskini azaltmak için birlikte kontrol edilir",
+          "Bitcoin ödeme yaşam döngüsü: ev sahibi kabulünden BTCPay ödemesine, imzalı webhook doğrulaması, mutabakat ve izlenebilir ödeme kaydına",
+          "Operasyonel veri göçü: eski WordPress ve kurucu tablo kayıtları, açık istisna yönetimiyle yapılandırılmış lansman hattında uzlaştırıldı",
+          "Geniş platform içinde özel bir konferans konaklama yolculuğu",
+        ],
+      },
+      {
+        heading: "Doğrulanabilir kanıt",
+        paragraphs: [
+          "Ürün hodlstay.com'da canlı ve herkese açık — keşif, konaklama dosyaları ve konferans ürünü doğrudan incelenebilir. Aşağıdaki ekran görüntüleri konsept maket değil, canlı ürünün kayıtlarıdır.",
+          "Burada trafik, dönüşüm veya gelir rakamı iddia edilmiyor: bunlar müşteriye aittir ve bu site kaynağını denetleyemeyeceğiniz sayılar yayınlamaz.",
+        ],
+      },
+      {
+        heading: "Mevcut durum",
+        paragraphs: ["HodlStay canlı; hodlstay.com'da misafirlere ve ev sahiplerine hizmet veriyor."],
+      },
+      {
+        heading: "Sahiplik",
+        paragraphs: [
+          "Bu bir müşteri çalışmasıdır; MaydaLabs'e ait bir girişim değildir. Mehmet ürün stratejisini ve uygulamalı geliştirmeyi uçtan uca yürüttü; geliştirme müşteri sahipliği için yapılandırıldı: ürün kararları, işletim mantığı ve dokümantasyon, bundan sonrasına müşterinin sahip olabilmesi için düzenlendi.",
+        ],
+      },
+    ],
+    gallery: [
+      {
+        src: "/work/hodlstay-2026-08-stays.jpg",
+        alt: "HodlStay konaklama keşfi ve arama arayüzü",
+        caption: "Keşif — kategoriler, tarihler, misafirler, filtreler ve canlı envanter.",
+      },
+      {
+        src: "/work/hodlstay-2026-08-listing.jpg",
+        alt: "HodlStay konaklama dosyası ve rezervasyon arayüzü",
+        caption: "Konaklama dosyası — hikâye, medya, ev sahibi bağlamı, fiyat ve rezervasyon girişi.",
+      },
+      {
+        src: "/work/hodlstay-2026-08-conferences.jpg",
+        alt: "HodlStay konferans konaklama arayüzü",
+        caption: "Konferans ürünü — geniş platform içinde odaklanmış bir yolculuk.",
+      },
+    ],
+    galleryHost: "hodlstay.com",
+    ctaKicker: "Bu kadar karmaşık bir ürününüz mü var?",
+    ctaHeading: "Dağınık sistemi getirin. Çarpanı birlikte bulalım.",
+    ctaStart: "Sonraki hamlemi haritala",
+    ctaWork: "Tüm projeler",
+  },
+  fr: {
+    back: "Réalisations",
+    kicker: "Cas 01 / Marketplace · Voyage · Bitcoin",
+    ownershipTag: "Produit client",
+    statusTag: "En ligne",
+    title: ["D'AirBTC à un séjour qui mérite", "d'être conservé."],
+    lead: "Une idée de voyage Bitcoin-native reconstruite en marketplace mondiale de séjours — l'expérience voyageur reliée au système opérationnel nécessaire pour la faire vivre.",
+    visit: { label: "Voir le produit en ligne", url: "https://hodlstay.com" },
+    railLabel: "Résumé de la mission",
+    rail: [
+      ["Mission", "Construction client de bout en bout"],
+      ["Statut", "En ligne sur hodlstay.com"],
+      ["Périmètre", "Produit · Marque · Code · Lancement"],
+      ["Propriété", "Produit client"],
+    ],
+    sections: [
+      {
+        heading: "Contexte",
+        paragraphs: [
+          "AirBTC était une plateforme de voyage de niche avec une communauté distincte et une origine Bitcoin claire. Le produit a évolué vers HodlStay : une proposition de voyage premium plus large où la réservation compatible Bitcoin fait partie de l'expérience sans être toute l'expérience.",
+          "Une marketplace est l'expérience client et la mécanique qui la soutient. Le produit visible ne fonctionne que lorsque inventaire, confiance, disponibilité, paiements, offre partenaire et décisions opérateur concordent — HodlStay a été construit autour de ce système complet.",
+        ],
+      },
+      {
+        heading: "Contrainte",
+        paragraphs: [
+          "Transformer une plateforme de niche prometteuse en marketplace crédible et évolutive sans perdre la communauté et les racines Bitcoin qui la distinguent — tout en réconciliant données historiques, inventaire partenaire et opérations hôtes réelles dans un seul système lançable.",
+        ],
+      },
+      {
+        heading: "Le périmètre exact de MaydaLabs",
+        items: [
+          "Stratégie produit, architecture de l'information et définition des versions",
+          "Évolution de marque d'AirBTC à HodlStay, UX et système d'interface",
+          "L'application marketplace complète : frontend, backend et données",
+          "Intégration hôtes, annonces, calendriers, réponses de réservation, avis et versements",
+          "Cycles de réservation, disponibilité et paiement, checkout BTCPay compris",
+          "Inventaire partenaire, intégrations iCal et migration des données historiques",
+          "Préparation du lancement, documentation opérationnelle et structure de transmission",
+        ],
+      },
+      {
+        heading: "Ce qui a été construit",
+        items: [
+          "Découverte unifiée : une seule couche de recherche sur l'offre native et l'inventaire partenaire HotelPlanner et Dtravel éligible",
+          "Dossiers de séjour reliant histoire, médias, confiance hôte, prix fiat et sats, disponibilité et réservation",
+          "Sécurité de disponibilité : blocs iCal importés, blocages manuels et réservations internes vérifiés ensemble pour réduire les doubles réservations",
+          "Cycle de paiement Bitcoin : acceptation hôte vers checkout BTCPay, vérification de webhooks signés, règlement et versement traçable",
+          "Migration opérationnelle : données WordPress et feuilles fondateur réconciliées dans un pipeline structuré avec gestion explicite des exceptions",
+          "Un parcours d'hébergement de conférences dédié au sein de la plateforme",
+        ],
+      },
+      {
+        heading: "Preuves vérifiables",
+        paragraphs: [
+          "Le produit est en ligne et public sur hodlstay.com — découverte, dossiers de séjour et produit conférence sont inspectables directement. Les captures ci-dessous viennent du produit en ligne, pas de maquettes conceptuelles.",
+          "Aucun chiffre de trafic, conversion ou revenu n'est revendiqué ici : ils appartiennent au client, et ce site ne publie pas de nombres dont la source ne peut pas être inspectée.",
+        ],
+      },
+      {
+        heading: "Statut actuel",
+        paragraphs: ["HodlStay est en ligne et sert voyageurs et hôtes sur hodlstay.com."],
+      },
+      {
+        heading: "Propriété",
+        paragraphs: [
+          "C'est un travail client, pas une entreprise détenue par MaydaLabs. Mehmet a dirigé la stratégie produit et la réalisation de bout en bout, et la construction est structurée pour la propriété du client : décisions produit, logique opérationnelle et documentation sont organisées pour que le client possède la suite.",
+        ],
+      },
+    ],
+    gallery: [
+      {
+        src: "/work/hodlstay-2026-08-stays.jpg",
+        alt: "Interface de découverte et recherche HodlStay",
+        caption: "Découverte — catégories, dates, voyageurs, filtres et inventaire en direct.",
+      },
+      {
+        src: "/work/hodlstay-2026-08-listing.jpg",
+        alt: "Dossier de propriété et réservation HodlStay",
+        caption: "Dossier de séjour — histoire, médias, contexte hôte, prix et réservation.",
+      },
+      {
+        src: "/work/hodlstay-2026-08-conferences.jpg",
+        alt: "Interface d'hébergement conférence HodlStay",
+        caption: "Produit conférence — un parcours ciblé dans la plateforme.",
+      },
+    ],
+    galleryHost: "hodlstay.com",
+    ctaKicker: "Votre produit est aussi complexe ?",
+    ctaHeading: "Apportez le système encore flou. Nous trouverons le multiplicateur.",
+    ctaStart: "Cartographier ma prochaine étape",
+    ctaWork: "Toutes les réalisations",
+  },
+};
+
 export async function generateMetadata({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
-  return createPageMetadata({ ...COPY[locale].meta, path: "/case-studies/hodlstay", locale, socialCard: "hodlstay" });
+  return createPageMetadata({
+    ...META[locale],
+    path: "/case-studies/hodlstay",
+    locale,
+    socialCard: "hodlstay",
+  });
 }
-
-function Arrow() { return <span aria-hidden>↗</span>; }
 
 export default async function HodlStayCaseStudyPage({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
-  const copy = COPY[locale];
-  return (
-    <div className="hodl-case">
-      <section className="hodl-hero"><div className="hodl-shell hodl-hero-grid">
-        <div className="hodl-hero-copy"><Link href={localizePath("/case-studies", locale)} className="hodl-back-link"><span aria-hidden>←</span> {copy.back}</Link><p className="studio-kicker">{copy.kicker}</p><h1>{copy.hero[0]} <em>{copy.hero[1]}</em></h1><p className="hodl-hero-lead">{copy.lead}</p><div className="hodl-hero-actions"><a href="https://hodlstay.com" target="_blank" rel="noopener noreferrer" className="studio-button">{copy.visit} <Arrow /></a><a href="#story" className="studio-text-link">{copy.read} <span aria-hidden>↓</span></a></div></div>
-        <div className="hodl-hero-orbit" aria-hidden="true"><div className="hodl-orbit-ring hodl-orbit-ring-one" /><div className="hodl-orbit-ring hodl-orbit-ring-two" />{copy.orbit.map((label, index) => <span key={label} className={`hodl-orbit-label hodl-orbit-label-${["one", "two", "three"][index]}`}>{label}</span>)}</div>
-        <div className="hodl-hero-screen"><div className="project-browser-chrome"><div><i /><i /><i /></div><span>hodlstay.com</span><b>{copy.status}</b></div><HodlStayJourney locale={locale} sizes="(max-width: 900px) 100vw, 78vw" /></div>
-        <div className="hodl-engagement-rail" aria-label={copy.railLabel}>{copy.rail.map(([term, detail]) => <div key={term}><span>{term}</span><strong>{detail}</strong></div>)}</div>
-      </div></section>
-      <section id="story" className="hodl-thesis"><div className="hodl-shell hodl-thesis-grid"><p className="studio-kicker">{copy.premiseKicker}</p><h2>{copy.premiseTitle}</h2><p>{copy.premise}</p></div></section>
-      <section className="hodl-transformation"><div className="hodl-shell hodl-transformation-layout"><div className="hodl-sticky-heading"><p className="studio-kicker">AirBTC → HodlStay</p><h2>{copy.transformationHeading[0]}<br /><em>{copy.transformationHeading[1]}</em></h2></div><div className="hodl-transformation-list">{copy.transformation.map(([number, label, title, description]) => <article key={number}><div><span>{number}</span><p>{label}</p></div><h3>{title}</h3><p>{description}</p></article>)}</div></div></section>
-      <section className="hodl-system"><div className="hodl-shell"><div className="hodl-system-heading"><p className="studio-kicker">{copy.systemKicker}</p><h2>{copy.systemHeading[0]}<br /><em>{copy.systemHeading[1]}</em></h2><p>{copy.systemIntro}</p></div><div className="hodl-system-map" aria-hidden="true"><div className="hodl-system-core"><span>HODLSTAY</span><strong>{copy.core}</strong><i /></div>{copy.systems.map(([number, title]) => <div key={number} className={`hodl-system-node hodl-system-node-${number}`}><span>{number}</span><strong>{title}</strong></div>)}</div><div className="hodl-system-list">{copy.systems.map(([number, title, description]) => <article key={number}><span>{number}</span><h3>{title}</h3><p>{description}</p></article>)}</div></div></section>
-      <section className="hodl-gallery"><div className="hodl-shell"><div className="hodl-gallery-heading"><p className="studio-kicker">{copy.galleryKicker}</p><h2>{copy.galleryHeading}</h2></div><div className="hodl-gallery-list">{copy.gallery.map(([number, label, title, description, src, alt]) => <figure key={number}><div className="hodl-gallery-copy"><div><span>{number}</span><p>{label}</p></div><h3>{title}</h3><p>{description}</p></div><div className="hodl-gallery-frame"><div className="project-browser-chrome"><div><i /><i /><i /></div><span>hodlstay.com</span><b>{label}</b></div><Image src={src} alt={alt} width={1430} height={894} sizes="(max-width: 900px) 100vw, 74vw" /></div></figure>)}</div></div></section>
-      <section className="hodl-proof"><div className="hodl-shell"><div className="hodl-proof-heading"><p className="studio-kicker">{copy.proofKicker}</p><h2>{copy.proofHeading}</h2></div><div className="hodl-proof-grid">{copy.proof.map(([number, title, description]) => <article key={number}><span>{number}</span><h3>{title}</h3><p>{description}</p></article>)}</div></div></section>
-      <section className="hodl-contribution"><div className="hodl-shell hodl-contribution-layout"><div><p className="studio-kicker">{copy.contributionKicker}</p><h2>{copy.contributionHeading}</h2><p>{copy.contributionIntro}</p></div><dl>{copy.contribution.map(([term, detail]) => <div key={term}><dt>{term}</dt><dd>{detail}</dd></div>)}</dl></div></section>
-      <section className="studio-final-cta hodl-final-cta"><div className="studio-availability"><span /> {copy.availability}</div><p className="studio-kicker">{copy.ctaKicker}</p><h2>{copy.cta[0]}<br /><em>{copy.cta[1]}</em></h2><div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"><Link href={localizePath("/contact", locale)} className="studio-button studio-button-light">{copy.start} <Arrow /></Link><Link href={localizePath("/services", locale)} className="studio-button studio-button-outline-light">{copy.services}</Link></div></section>
-    </div>
-  );
+  return <CaseStudy locale={locale} copy={COPY[locale]} />;
 }

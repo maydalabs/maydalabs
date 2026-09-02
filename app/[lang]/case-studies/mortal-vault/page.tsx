@@ -1,40 +1,303 @@
-import { InProgressCaseStudy } from "@/components/InProgressCaseStudy";
+import { CaseStudy, type CaseStudyCopy } from "@/components/CaseStudy";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
 
-const COPY = {
+const META = {
   en: {
-    meta: { title: "Mortal Vault case study", socialTitle: "Mortal Vault: self-custodial continuity · MaydaLabs", description: "A work-in-progress MaydaLabs product exploring owner check-ins, delayed beneficiary claims, and explicit self-custody safety boundaries." },
-    evidenceKicker: "Current interface / Demo evidence",
-    evidenceTitle: "The private alpha has a working owner-facing surface.",
-    evidenceIntro: "Captured from the local application. Wallet connection and chain actions remain outside this public demo frame; contracts are unaudited and test networks only.",
-    evidenceCaptions: ["Owner entry screen · unaudited beta · test networks only"],
-    back: "Selected work", kicker: "Work in progress 03 / Private alpha", status: "Private alpha", statusNote: "Active development · contracts unaudited", scope: "Current scope", scopeItems: ["Solidity", "Hardhat", "Next.js", "EVM testnets"], hero: ["Continuity rules without a", "custodian."], lead: "Mortal Vault is a self-custodial continuity vault: an owner checks in, inactivity opens a delayed beneficiary claim, and owner activity can still cancel it before execution.", visitWork: "Inspect the current build", builtKicker: "Current build / Repository evidence", builtTitle: "A complete lifecycle before a public promise.", boundary: "The engineering story is already substantial, but the release story is intentionally narrower: local and testnet-first work, no meaningful funds, and no mainnet claim before independent review.", built: [["01", "Bounded contract lifecycle", "Create, fund, update, check in, withdraw, close, request a claim, cancel it through owner activity, and execute only after both time gates."], ["02", "Owner and beneficiary journeys", "The Next.js interface separates owner control from a shareable beneficiary claim path and exposes network, contract, and transaction state."], ["03", "Event-backed history", "Contract events are parsed into bounded owner and beneficiary activity views designed to survive refreshes and support deterministic reminder planning."], ["04", "Security work as a gate", "Adversarial tests, fuzzing, invariants, static analysis, a threat model, balance caps, and explicit release blockers are part of the repository." ]], ownershipKicker: "Individual ownership / Mehmet E. Mayda", ownershipTitle: "Product, contracts, interface, and release discipline in one build.", ownershipIntro: "As MaydaLabs founder and hands-on product builder, Mehmet owns the current product definition and implementation while keeping every security and release claim behind explicit evidence gates.", ownership: [["Product", "Continuity model, owner and beneficiary journeys, alpha scope"], ["Engineering", "Solidity contracts, Next.js interface, event-backed state"], ["Safety", "Threat model, adversarial tests, release blockers, honest limitations"]], boundaryKicker: "Honest boundary / What this is not", boundaryTitle: "Alpha means the risk is visible.", boundaryItems: ["Contracts are unaudited and must not hold meaningful funds.", "No administrator, custody service, legal determination, or emergency override exists.", "This is not legal inheritance, probate, identity verification, or key recovery.", "Mainnet remains blocked by independent review, external wallet exercises, monitoring, and demonstrated demand."], nextKicker: "Next gates / Before a public beta", next: "Validation outside the repository.", nextItems: ["Complete external testnet owner and beneficiary exercises.", "Resolve every critical or high issue from independent security review.", "Verify deployment inputs, chain disclosures, monitoring, and recovery instructions.", "Keep any mainnet candidate capped until evidence supports expanding it."], ctaKicker: "Building a trust-critical product?", cta: ["Make the state explicit.", "Make the risk legible."], start: "Start a project",
+    title: "Mortal Vault case study",
+    socialTitle: "Mortal Vault: self-custodial continuity · MaydaLabs",
+    description:
+      "A private, unaudited MaydaLabs lab product exploring owner check-ins, delayed beneficiary claims, and explicit self-custody safety boundaries.",
   },
   tr: {
-    meta: { title: "Mortal Vault vaka çalışması", socialTitle: "Mortal Vault: self-custody süreklilik · MaydaLabs", description: "Sahip check-in'leri, gecikmeli lehtar talepleri ve açık self-custody güvenlik sınırlarını araştıran geliştirme aşamasındaki MaydaLabs ürünü." },
-    evidenceKicker: "Mevcut arayüz / Demo kanıtı",
-    evidenceTitle: "Özel alpha, çalışan bir sahip arayüzüne sahip.",
-    evidenceIntro: "Yerel uygulamadan alınmıştır. Cüzdan bağlantısı ve zincir işlemleri bu açık demo karesinin dışındadır; sözleşmeler denetlenmemiştir ve yalnızca test ağları içindir.",
-    evidenceCaptions: ["Sahip giriş ekranı · denetlenmemiş beta · yalnızca test ağları"],
-    back: "Seçili projeler", kicker: "Geliştirme aşamasında 03 / Özel alpha", status: "Özel alpha", statusNote: "Aktif geliştirme · sözleşmeler denetlenmedi", scope: "Mevcut kapsam", scopeItems: ["Solidity", "Hardhat", "Next.js", "EVM testnetleri"], hero: ["Saklama hizmeti olmadan", "süreklilik kuralları."], lead: "Mortal Vault bir self-custody süreklilik kasasıdır: sahip düzenli olarak aktivitesini kanıtlar, hareketsizlik gecikmeli lehtar talebini açar ve sahip aktivitesi gerçekleşmeden önce talebi iptal edebilir.", visitWork: "Mevcut ürünü incele", builtKicker: "Mevcut ürün / Repository kanıtı", builtTitle: "Herkese açık vaatten önce tam yaşam döngüsü.", boundary: "Mühendislik çalışması güçlü; sürüm iddiası bilinçli olarak daha dar: yerel ve testnet öncelikli, anlamlı tutar yok ve bağımsız inceleme öncesi mainnet iddiası yok.", built: [["01", "Sınırlı sözleşme yaşam döngüsü", "Oluşturma, fonlama, güncelleme, check-in, çekme, kapatma, talep başlatma, sahip aktivitesiyle iptal ve yalnızca iki zaman kapısından sonra yürütme."], ["02", "Sahip ve lehtar yolculukları", "Next.js arayüzü sahip kontrolünü paylaşılabilir lehtar talep yolundan ayırır; ağ, sözleşme ve işlem durumunu görünür kılar."], ["03", "Event tabanlı geçmiş", "Sözleşme eventleri, yenilemelerden sonra kalan ve deterministik hatırlatma planını destekleyen sınırlı aktivite görünümlerine dönüşür."], ["04", "Sürüm kapısı olarak güvenlik", "Adversarial testler, fuzzing, invariantlar, statik analiz, tehdit modeli, bakiye limitleri ve açık sürüm engelleri repository'nin parçasıdır." ]], ownershipKicker: "Bireysel sahiplik / Mehmet E. Mayda", ownershipTitle: "Ürün, sözleşmeler, arayüz ve sürüm disiplini tek geliştirmede.", ownershipIntro: "MaydaLabs kurucusu ve uygulamalı ürün geliştiricisi olarak Mehmet, mevcut ürün tanımını ve uygulamayı sahiplenirken her güvenlik ve sürüm iddiasını açık kanıt kapılarının arkasında tutar.", ownership: [["Ürün", "Süreklilik modeli, sahip ve lehtar yolculukları, alpha kapsamı"], ["Mühendislik", "Solidity sözleşmeleri, Next.js arayüzü, event tabanlı durum"], ["Güvenlik", "Tehdit modeli, adversarial testler, sürüm engelleri, dürüst sınırlar"]], boundaryKicker: "Dürüst sınır / Ne değildir", boundaryTitle: "Alpha, riskin görünür olmasıdır.", boundaryItems: ["Sözleşmeler denetlenmemiştir ve anlamlı tutarlarla kullanılmamalıdır.", "Yönetici, saklama hizmeti, hukuki karar veya acil durum override'ı yoktur.", "Hukuki miras, veraset, kimlik doğrulama veya anahtar kurtarma ürünü değildir.", "Mainnet; bağımsız inceleme, dış cüzdan egzersizleri, izleme ve kanıtlanmış talep olmadan kapalıdır."], nextKicker: "Sonraki kapılar / Açık beta öncesi", next: "Repository dışındaki doğrulama.", nextItems: ["Dış kullanıcılarla testnet sahip ve lehtar akışlarını tamamla.", "Bağımsız güvenlik incelemesindeki tüm kritik ve yüksek bulguları çöz.", "Dağıtım girdileri, ağ bildirimleri, izleme ve kurtarma talimatlarını doğrula.", "Kanıt genişlemeyi destekleyene kadar mainnet adayını sınırlı tut."], ctaKicker: "Güven kritik bir ürün mü geliştiriyorsunuz?", cta: ["Durumu açık kılın.", "Riski anlaşılır yapın."], start: "Proje başlat",
+    title: "Mortal Vault vaka çalışması",
+    socialTitle: "Mortal Vault: self-custody süreklilik · MaydaLabs",
+    description:
+      "Sahip check-in'lerini, gecikmeli lehtar taleplerini ve açık self-custody güvenlik sınırlarını araştıran özel, denetlenmemiş bir MaydaLabs lab ürünü.",
   },
   fr: {
-    meta: { title: "Étude de cas Mortal Vault", socialTitle: "Mortal Vault : continuité en autogarde · MaydaLabs", description: "Un produit MaydaLabs en cours qui explore les check-ins, les réclamations différées et des limites de sécurité explicites." },
-    evidenceKicker: "Interface actuelle / Preuve de démo",
-    evidenceTitle: "L’alpha privée possède une interface propriétaire fonctionnelle.",
-    evidenceIntro: "Capture de l’application locale. La connexion wallet et les actions on-chain restent hors de cette démo publique ; les contrats ne sont pas audités et visent uniquement les testnets.",
-    evidenceCaptions: ["Écran d’entrée propriétaire · bêta non auditée · testnets uniquement"],
-    back: "Projets sélectionnés", kicker: "En cours 03 / Alpha privée", status: "Alpha privée", statusNote: "Construction active · contrats non audités", scope: "Périmètre actuel", scopeItems: ["Solidity", "Hardhat", "Next.js", "Testnets EVM"], hero: ["Des règles de continuité sans", "dépositaire."], lead: "Mortal Vault est un coffre de continuité en autogarde : le propriétaire confirme son activité, l’inactivité ouvre une réclamation différée et une action du propriétaire peut encore l’annuler.", visitWork: "Inspecter le produit actuel", builtKicker: "Produit actuel / Preuves du dépôt", builtTitle: "Un cycle complet avant une promesse publique.", boundary: "L’ingénierie est déjà substantielle, mais la sortie reste volontairement étroite : local et testnet d’abord, aucun fonds significatif et aucune promesse mainnet avant revue indépendante.", built: [["01", "Cycle contractuel borné", "Créer, financer, modifier, confirmer, retirer, fermer, demander une réclamation, l’annuler par activité et exécuter après les deux délais."], ["02", "Parcours propriétaire et bénéficiaire", "L’interface Next.js sépare le contrôle du propriétaire d’un parcours partageable et expose réseau, contrat et transactions."], ["03", "Historique fondé sur les événements", "Les événements deviennent des vues bornées conçues pour survivre au rafraîchissement et soutenir des rappels déterministes."], ["04", "La sécurité comme condition", "Tests adversariaux, fuzzing, invariants, analyse statique, menace, plafonds et blocages de sortie font partie du dépôt." ]], ownershipKicker: "Ownership individuel / Mehmet E. Mayda", ownershipTitle: "Produit, contrats, interface et discipline de sortie dans une seule construction.", ownershipIntro: "En tant que fondateur et builder produit impliqué, Mehmet prend en charge la définition et la réalisation actuelles tout en maintenant chaque promesse de sécurité et de sortie derrière des preuves explicites.", ownership: [["Produit", "Modèle de continuité, parcours propriétaire et bénéficiaire, périmètre alpha"], ["Ingénierie", "Contrats Solidity, interface Next.js, état fondé sur les événements"], ["Sécurité", "Modèle de menace, tests adversariaux, blocages de sortie, limites honnêtes"]], boundaryKicker: "Limite honnête / Ce que ce n’est pas", boundaryTitle: "Alpha signifie rendre le risque visible.", boundaryItems: ["Les contrats ne sont pas audités et ne doivent pas détenir de fonds significatifs.", "Aucun administrateur, dépositaire, jugement légal ou dérogation d’urgence.", "Ce n’est ni un service successoral, ni une vérification d’identité, ni une récupération de clé.", "Le mainnet reste bloqué par la revue, les essais externes, le suivi et la preuve de demande."], nextKicker: "Prochaines conditions / Avant une bêta", next: "Valider hors du dépôt.", nextItems: ["Réaliser les parcours testnet avec des utilisateurs externes.", "Résoudre tout problème critique ou élevé d’une revue indépendante.", "Vérifier déploiement, réseau, suivi et instructions de récupération.", "Garder tout candidat mainnet plafonné jusqu’à preuve suffisante."], ctaKicker: "Vous construisez un produit critique ?", cta: ["Rendez l’état explicite.", "Rendez le risque lisible."], start: "Lancer un projet",
+    title: "Étude de cas Mortal Vault",
+    socialTitle: "Mortal Vault : continuité en autogarde · MaydaLabs",
+    description:
+      "Un produit de lab MaydaLabs privé et non audité qui explore les check-ins du propriétaire, les réclamations différées et des limites de sécurité explicites.",
   },
 } as const;
 
+const COPY: Record<"en" | "tr" | "fr", CaseStudyCopy> = {
+  en: {
+    back: "Work",
+    kicker: "Lab 03 / Crypto · Self-custody · Continuity",
+    ownershipTag: "Lab product",
+    statusTag: "Private alpha · Unaudited",
+    title: ["Continuity rules", "without a custodian."],
+    lead: "Mortal Vault is a self-custodial continuity vault: an owner checks in, inactivity opens a delayed beneficiary claim, and owner activity can still cancel it before execution.",
+    railLabel: "Product summary",
+    rail: [
+      ["Engagement", "MaydaLabs lab product"],
+      ["Status", "Private alpha · Contracts unaudited"],
+      ["Scope", "Solidity · Hardhat · Next.js · EVM testnets"],
+      ["Ownership", "MaydaLabs-owned, no public release"],
+    ],
+    sections: [
+      {
+        heading: "Context",
+        paragraphs: [
+          "Bitcoin and crypto self-custody has a hard human problem: what happens to funds when the owner can no longer act? Mortal Vault explores a continuity lifecycle with no administrator, no custody service, and no emergency override — the rules live in the contract, and the risks stay visible.",
+        ],
+      },
+      {
+        heading: "Constraint",
+        paragraphs: [
+          "Make a high-consequence self-custody lifecycle understandable without hiding the irreversible risks or implying legal and security guarantees the product cannot make.",
+        ],
+      },
+      {
+        heading: "MaydaLabs' exact scope",
+        items: [
+          "The continuity model: owner check-ins, inactivity windows, delayed claims",
+          "Solidity contract lifecycle and its bounded state machine",
+          "Owner and beneficiary interfaces in Next.js, with network, contract, and transaction state exposed",
+          "Event-backed activity history and deterministic reminder planning",
+          "Security work treated as a release gate: threat model, adversarial tests, fuzzing, invariants, static analysis, balance caps",
+        ],
+      },
+      {
+        heading: "What was built",
+        items: [
+          "A bounded contract lifecycle: create, fund, update, check in, withdraw, close, request a claim, cancel it through owner activity, and execute only after both time gates",
+          "Separated owner control and a shareable beneficiary claim path",
+          "Contract events parsed into bounded activity views that survive refreshes",
+          "Adversarial, fuzz, invariant, and static-analysis gates inside the repository",
+          "Testnet-first network and release configuration with explicit release blockers",
+        ],
+      },
+      {
+        heading: "Verifiable evidence",
+        paragraphs: [
+          "The repository is private; the demo capture below shows the working owner-facing surface from the local application. Wallet connection and chain actions stay outside this public frame. Deeper evidence — the contract lifecycle, tests, and threat model — can be walked through in a conversation.",
+        ],
+      },
+      {
+        heading: "Current status",
+        paragraphs: [
+          "Private alpha in active development. Mainnet remains blocked by independent review, external wallet exercises, monitoring, and demonstrated demand.",
+        ],
+      },
+      {
+        heading: "Ownership",
+        paragraphs: [
+          "A MaydaLabs-owned lab product. Mehmet owns the product definition and implementation, with every security and release claim kept behind explicit evidence gates.",
+        ],
+      },
+    ],
+    boundaries: {
+      heading: "What this is not",
+      items: [
+        "Contracts are unaudited and must not hold meaningful funds.",
+        "No administrator, custody service, legal determination, or emergency override exists.",
+        "This is not legal inheritance, probate, identity verification, or key recovery.",
+        "No mainnet claim is made before independent review and the other release gates pass.",
+      ],
+    },
+    gallery: [
+      {
+        src: "/work/mortal-vault-demo-home.jpg",
+        alt: "Mortal Vault owner entry screen from the local demo",
+        caption: "Owner entry screen — unaudited alpha, test networks only.",
+      },
+    ],
+    ctaKicker: "Building a trust-critical product?",
+    ctaHeading: "Make the state explicit. Make the risk legible.",
+    ctaStart: "Map my next move",
+    ctaWork: "All work",
+  },
+  tr: {
+    back: "Projeler",
+    kicker: "Lab 03 / Kripto · Self-custody · Süreklilik",
+    ownershipTag: "Lab ürünü",
+    statusTag: "Özel alfa · Denetlenmedi",
+    title: ["Saklama hizmeti olmadan", "süreklilik kuralları."],
+    lead: "Mortal Vault bir self-custody süreklilik kasasıdır: sahip düzenli check-in yapar, hareketsizlik gecikmeli lehtar talebini açar ve sahip aktivitesi yürütmeden önce talebi hâlâ iptal edebilir.",
+    railLabel: "Ürün özeti",
+    rail: [
+      ["Çalışma", "MaydaLabs lab ürünü"],
+      ["Durum", "Özel alfa · Sözleşmeler denetlenmedi"],
+      ["Kapsam", "Solidity · Hardhat · Next.js · EVM testnetleri"],
+      ["Sahiplik", "MaydaLabs'e ait, açık sürüm yok"],
+    ],
+    sections: [
+      {
+        heading: "Bağlam",
+        paragraphs: [
+          "Bitcoin ve kripto self-custody'nin zor bir insani problemi var: sahip artık hareket edemediğinde fonlara ne olur? Mortal Vault; yönetici, saklama hizmeti ve acil durum override'ı olmayan bir süreklilik yaşam döngüsünü araştırıyor — kurallar sözleşmede yaşıyor, riskler görünür kalıyor.",
+        ],
+      },
+      {
+        heading: "Kısıt",
+        paragraphs: [
+          "Yüksek sonuçlu bir self-custody yaşam döngüsünü; geri döndürülemez riskleri gizlemeden ve ürünün veremeyeceği hukuki ya da güvenlik garantilerini ima etmeden anlaşılır kılmak.",
+        ],
+      },
+      {
+        heading: "MaydaLabs'in tam kapsamı",
+        items: [
+          "Süreklilik modeli: sahip check-in'leri, hareketsizlik pencereleri, gecikmeli talepler",
+          "Solidity sözleşme yaşam döngüsü ve sınırlı durum makinesi",
+          "Next.js'te sahip ve lehtar arayüzleri; ağ, sözleşme ve işlem durumu görünür",
+          "Event tabanlı aktivite geçmişi ve deterministik hatırlatma planı",
+          "Sürüm kapısı olarak güvenlik çalışması: tehdit modeli, adversarial testler, fuzzing, invariantlar, statik analiz, bakiye limitleri",
+        ],
+      },
+      {
+        heading: "Ne inşa edildi",
+        items: [
+          "Sınırlı sözleşme yaşam döngüsü: oluşturma, fonlama, güncelleme, check-in, çekme, kapatma, talep başlatma, sahip aktivitesiyle iptal ve yalnızca iki zaman kapısından sonra yürütme",
+          "Ayrılmış sahip kontrolü ve paylaşılabilir lehtar talep yolu",
+          "Yenilemelerden sonra kalan sınırlı aktivite görünümlerine dönüşen sözleşme eventleri",
+          "Repository içinde adversarial, fuzz, invariant ve statik analiz kapıları",
+          "Açık sürüm engelleriyle testnet öncelikli ağ ve sürüm yapılandırması",
+        ],
+      },
+      {
+        heading: "Doğrulanabilir kanıt",
+        paragraphs: [
+          "Repository özel; aşağıdaki demo kaydı yerel uygulamadaki çalışan sahip arayüzünü gösteriyor. Cüzdan bağlantısı ve zincir işlemleri bu açık karenin dışında kalır. Daha derin kanıt — sözleşme yaşam döngüsü, testler ve tehdit modeli — bir görüşmede birlikte incelenebilir.",
+        ],
+      },
+      {
+        heading: "Mevcut durum",
+        paragraphs: [
+          "Aktif geliştirmede özel alfa. Mainnet; bağımsız inceleme, dış cüzdan egzersizleri, izleme ve kanıtlanmış talep olmadan kapalı.",
+        ],
+      },
+      {
+        heading: "Sahiplik",
+        paragraphs: [
+          "MaydaLabs'e ait bir lab ürünü. Ürün tanımı ve uygulama Mehmet'e ait; her güvenlik ve sürüm iddiası açık kanıt kapılarının arkasında tutulur.",
+        ],
+      },
+    ],
+    boundaries: {
+      heading: "Ne değildir",
+      items: [
+        "Sözleşmeler denetlenmemiştir ve anlamlı tutarlar tutmamalıdır.",
+        "Yönetici, saklama hizmeti, hukuki karar veya acil durum override'ı yoktur.",
+        "Hukuki miras, veraset, kimlik doğrulama veya anahtar kurtarma değildir.",
+        "Bağımsız inceleme ve diğer sürüm kapıları geçilmeden mainnet iddiası yapılmaz.",
+      ],
+    },
+    gallery: [
+      {
+        src: "/work/mortal-vault-demo-home.jpg",
+        alt: "Yerel demodan Mortal Vault sahip giriş ekranı",
+        caption: "Sahip giriş ekranı — denetlenmemiş alfa, yalnızca test ağları.",
+      },
+    ],
+    ctaKicker: "Güven kritik bir ürün mü geliştiriyorsunuz?",
+    ctaHeading: "Durumu açık kılın. Riski anlaşılır yapın.",
+    ctaStart: "Sonraki hamlemi haritala",
+    ctaWork: "Tüm projeler",
+  },
+  fr: {
+    back: "Réalisations",
+    kicker: "Lab 03 / Crypto · Autogarde · Continuité",
+    ownershipTag: "Produit lab",
+    statusTag: "Alpha privée · Non auditée",
+    title: ["Des règles de continuité", "sans dépositaire."],
+    lead: "Mortal Vault est un coffre de continuité en autogarde : le propriétaire confirme son activité, l'inactivité ouvre une réclamation différée du bénéficiaire, et une action du propriétaire peut encore l'annuler avant exécution.",
+    railLabel: "Résumé du produit",
+    rail: [
+      ["Mission", "Produit lab MaydaLabs"],
+      ["Statut", "Alpha privée · Contrats non audités"],
+      ["Périmètre", "Solidity · Hardhat · Next.js · Testnets EVM"],
+      ["Propriété", "Détenu par MaydaLabs, pas de sortie publique"],
+    ],
+    sections: [
+      {
+        heading: "Contexte",
+        paragraphs: [
+          "L'autogarde en Bitcoin et crypto a un problème humain difficile : qu'arrive-t-il aux fonds quand le propriétaire ne peut plus agir ? Mortal Vault explore un cycle de continuité sans administrateur, sans dépositaire et sans dérogation d'urgence — les règles vivent dans le contrat et les risques restent visibles.",
+        ],
+      },
+      {
+        heading: "Contrainte",
+        paragraphs: [
+          "Rendre compréhensible un cycle d'autogarde à fortes conséquences sans cacher les risques irréversibles ni suggérer des garanties légales ou de sécurité que le produit ne peut pas donner.",
+        ],
+      },
+      {
+        heading: "Le périmètre exact de MaydaLabs",
+        items: [
+          "Le modèle de continuité : check-ins, fenêtres d'inactivité, réclamations différées",
+          "Cycle de contrat Solidity et sa machine à états bornée",
+          "Interfaces propriétaire et bénéficiaire en Next.js, avec réseau, contrat et transactions exposés",
+          "Historique d'activité fondé sur les événements et rappels déterministes",
+          "La sécurité comme condition de sortie : modèle de menace, tests adversariaux, fuzzing, invariants, analyse statique, plafonds",
+        ],
+      },
+      {
+        heading: "Ce qui a été construit",
+        items: [
+          "Un cycle contractuel borné : créer, financer, modifier, confirmer, retirer, fermer, demander une réclamation, l'annuler par activité du propriétaire et exécuter seulement après les deux délais",
+          "Un contrôle propriétaire séparé d'un parcours de réclamation partageable",
+          "Des événements de contrat transformés en vues d'activité bornées qui survivent au rafraîchissement",
+          "Des tests adversariaux, fuzz, invariants et analyse statique dans le dépôt",
+          "Une configuration testnet d'abord, avec des blocages de sortie explicites",
+        ],
+      },
+      {
+        heading: "Preuves vérifiables",
+        paragraphs: [
+          "Le dépôt est privé ; la capture ci-dessous montre l'interface propriétaire fonctionnelle de l'application locale. La connexion wallet et les actions on-chain restent hors de ce cadre public. Les preuves plus profondes — cycle de contrat, tests, modèle de menace — se parcourent en conversation.",
+        ],
+      },
+      {
+        heading: "Statut actuel",
+        paragraphs: [
+          "Alpha privée en construction active. Le mainnet reste bloqué par la revue indépendante, les essais externes, le suivi et la preuve de demande.",
+        ],
+      },
+      {
+        heading: "Propriété",
+        paragraphs: [
+          "Un produit lab détenu par MaydaLabs. Mehmet possède la définition et la réalisation, chaque promesse de sécurité et de sortie restant derrière des preuves explicites.",
+        ],
+      },
+    ],
+    boundaries: {
+      heading: "Ce que ce n'est pas",
+      items: [
+        "Les contrats ne sont pas audités et ne doivent pas détenir de fonds significatifs.",
+        "Aucun administrateur, dépositaire, jugement légal ou dérogation d'urgence n'existe.",
+        "Ce n'est ni un service successoral, ni une vérification d'identité, ni une récupération de clé.",
+        "Aucune promesse mainnet avant la revue indépendante et les autres conditions de sortie.",
+      ],
+    },
+    gallery: [
+      {
+        src: "/work/mortal-vault-demo-home.jpg",
+        alt: "Écran d'entrée propriétaire Mortal Vault depuis la démo locale",
+        caption: "Écran propriétaire — alpha non auditée, testnets uniquement.",
+      },
+    ],
+    ctaKicker: "Vous construisez un produit critique pour la confiance ?",
+    ctaHeading: "Rendez l'état explicite. Rendez le risque lisible.",
+    ctaStart: "Cartographier ma prochaine étape",
+    ctaWork: "Toutes les réalisations",
+  },
+};
+
 export async function generateMetadata({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
-  return createPageMetadata({ ...COPY[locale].meta, path: "/case-studies/mortal-vault", locale, socialCard: "mortal-vault" });
+  return createPageMetadata({
+    ...META[locale],
+    path: "/case-studies/mortal-vault",
+    locale,
+    socialCard: "mortal-vault",
+  });
 }
 
 export default async function MortalVaultCaseStudyPage({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
-  return <InProgressCaseStudy copy={COPY[locale]} locale={locale} name="Mortal Vault" variant="mortal" />;
+  return <CaseStudy locale={locale} copy={COPY[locale]} />;
 }

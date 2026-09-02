@@ -5,7 +5,8 @@ import type { SocialCardKind } from "@/lib/metadata";
 
 const KINDS = new Set<SocialCardKind>([
   "studio",
-  "services",
+  "start",
+  "approach",
   "work",
   "hodlstay",
   "satoshi-gazette",
@@ -14,6 +15,8 @@ const KINDS = new Set<SocialCardKind>([
   "profile",
   "about",
   "contact",
+  "portal",
+  "auth",
   "legal",
 ]);
 

@@ -4,9 +4,10 @@ import { SITE_URL } from "@/lib/site";
 
 const ROUTES = [
   "",
+  "/start",
+  "/approach",
   "/about",
   "/profile",
-  "/services",
   "/contact",
   "/case-studies",
   "/case-studies/hodlstay",
