@@ -73,7 +73,14 @@ share SG's database.
    a first-time sign-in uses the *Confirm sign up* template and a returning
    sign-in uses *Magic Link*; `/auth/confirm` accepts the token hash of
    either because it verifies with `type=email`.) Templates stay locked
-   until custom SMTP is on — do step 4 first.
+   until custom SMTP is on — do step 4 first. **Code length:** the hosted
+   project sends 8-digit codes by default (Authentication → Sign In /
+   Providers → Email → *Email OTP Length*); the local stack uses 6. Since
+   3 Sep the app accepts 6–10 digits and no copy says "six-digit", so
+   either length works — keep the dashboard template wording
+   length-neutral ("Your sign-in code:"). SMTP went live 3 Sep 2026 via
+   the Resend wizard (sender auth@maydalabs.com); first real code was
+   delivered to info@maydalabs.com at 01:18.
 4. **SMTP via Resend — the Supabase integration wizard** (Resend →
    Settings → Integrations → Supabase). Supabase's built-in sender is
    limited to a few emails per hour and is not for production. Facts
