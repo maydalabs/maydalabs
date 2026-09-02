@@ -5,7 +5,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { isValidEmail } from "@/lib/intakeValidation";
-import { PILOT_OFFERS, PILOT_STATUSES, PILOT_UPDATE_KINDS } from "@/lib/pilots";
+import { PILOT_OFFERS, PILOT_STATUSES, PILOT_UPDATE_KINDS, PROPOSAL_ORIGINS } from "@/lib/pilots";
 
 /*
  * Operator-only pilot management. Every mutation runs through the caller's
@@ -172,6 +172,114 @@ export async function deletePilotUpdateAction(
   if (typeof updateId !== "string" || !UUID.test(updateId)) return { status: "error", code: "invalid" };
 
   const { error } = await supabase.from("pilot_updates").delete().eq("id", updateId);
+  if (error) return { status: "error", code: "save_failed" };
+
+  revalidatePath("/", "layout");
+  return { status: "saved" };
+}
+
+/* ------------------------------------------------------------ proposals
+ * "Prepared for you": the work done for a prospect before the outreach
+ * note goes out. One per pilot; upsert keyed on pilot_id. Line-based
+ * textareas are parsed here into the jsonb shapes the view expects.
+ */
+
+function parseObservations(value: FormDataEntryValue | null): { text: string; source_url: string | null; source_label: string | null }[] {
+  if (typeof value !== "string") return [];
+  return value
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 12)
+    .map((line) => {
+      const [textPart = "", urlPart = "", labelPart = ""] = line.split("|").map((part) => part.trim());
+      const url = /^https?:\/\//i.test(urlPart) ? urlPart.slice(0, 500) : null;
+      return { text: textPart.slice(0, 400), source_url: url, source_label: labelPart ? labelPart.slice(0, 80) : null };
+    })
+    .filter((item) => item.text);
+}
+
+function parseScope(value: FormDataEntryValue | null): { label: string; title: string; detail: string | null }[] {
+  if (typeof value !== "string") return [];
+  return value
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 8)
+    .map((line) => {
+      const [labelPart = "", titlePart = "", detailPart = ""] = line.split("|").map((part) => part.trim());
+      // "Title only" lines still work: the label becomes the title.
+      const title = titlePart || labelPart;
+      const label = titlePart ? labelPart : "";
+      return { label: label.slice(0, 40), title: title.slice(0, 160), detail: detailPart ? detailPart.slice(0, 600) : null };
+    })
+    .filter((item) => item.title);
+}
+
+function safeHref(value: FormDataEntryValue | null): string | null {
+  const href = text(value, 500);
+  if (!href) return null;
+  return /^(https?:\/\/|mailto:)/i.test(href) ? href : null;
+}
+
+export async function upsertPilotProposalAction(
+  _prev: PilotFormState,
+  formData: FormData,
+): Promise<PilotFormState> {
+  const supabase = await operatorClient();
+  if (!supabase) return { status: "error", code: "not_authorized" };
+
+  const pilotId = formData.get("pilotId");
+  if (typeof pilotId !== "string" || !UUID.test(pilotId)) return { status: "error", code: "invalid", field: "pilotId" };
+  const headline = text(formData.get("headline"), 200);
+  const angle = text(formData.get("angle"), 2000);
+  if (!headline) return { status: "error", code: "invalid", field: "headline" };
+  if (!angle) return { status: "error", code: "invalid", field: "angle" };
+  const ctaUrlRaw = text(formData.get("ctaUrl"), 500);
+  const ctaUrl = safeHref(formData.get("ctaUrl"));
+  if (ctaUrlRaw && !ctaUrl) return { status: "error", code: "invalid", field: "ctaUrl" };
+
+  const { data, error } = await supabase
+    .from("pilot_proposals")
+    .upsert(
+      {
+        pilot_id: pilotId,
+        origin: option(formData.get("origin"), PROPOSAL_ORIGINS) ?? "outreach",
+        headline,
+        angle,
+        observations: parseObservations(formData.get("observations")),
+        sample_title: text(formData.get("sampleTitle"), 200),
+        sample_body: text(formData.get("sampleBody"), 12000),
+        sample_note: text(formData.get("sampleNote"), 600),
+        scope: parseScope(formData.get("scope")),
+        role_title: text(formData.get("roleTitle"), 200),
+        role_note: text(formData.get("roleNote"), 4000),
+        terms: text(formData.get("terms"), 2000),
+        cta_label: text(formData.get("ctaLabel"), 80),
+        cta_url: ctaUrl,
+        published: formData.get("published") === "on",
+      },
+      { onConflict: "pilot_id" },
+    )
+    .select("id");
+  if (error) return { status: "error", code: "save_failed" };
+  if (!data?.length) return { status: "error", code: "not_authorized" };
+
+  revalidatePath("/", "layout");
+  return { status: "saved" };
+}
+
+export async function deletePilotProposalAction(
+  _prev: PilotFormState,
+  formData: FormData,
+): Promise<PilotFormState> {
+  const supabase = await operatorClient();
+  if (!supabase) return { status: "error", code: "not_authorized" };
+
+  const proposalId = formData.get("proposalId");
+  if (typeof proposalId !== "string" || !UUID.test(proposalId)) return { status: "error", code: "invalid" };
+
+  const { error } = await supabase.from("pilot_proposals").delete().eq("id", proposalId);
   if (error) return { status: "error", code: "save_failed" };
 
   revalidatePath("/", "layout");

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { PILOT_COPY } from "@/components/pilotCopy";
 import { PilotSummary } from "@/components/PilotView";
+import { ProposalView, type ProposalRecord } from "@/components/ProposalView";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
@@ -31,7 +32,7 @@ export default async function PilotDetailPage({ params }: PageProps) {
 
   // RLS: clients only ever see their own pilot and its published updates.
   const supabase = await createSupabaseServerClient();
-  const [{ data: pilot }, { data: updates }] = await Promise.all([
+  const [{ data: pilot }, { data: updates }, { data: proposal }] = await Promise.all([
     supabase
       .from("pilots")
       .select("id, company, workflow, offer, status, starts_on, ends_on, summary, next_step")
@@ -44,6 +45,12 @@ export default async function PilotDetailPage({ params }: PageProps) {
       .eq("pilot_id", id)
       .eq("published", true)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("pilot_proposals")
+      .select("id, pilot_id, origin, headline, angle, observations, sample_title, sample_body, sample_note, scope, role_title, role_note, terms, cta_label, cta_url, published")
+      .eq("pilot_id", id)
+      .eq("published", true)
+      .maybeSingle(),
   ]);
   if (!pilot) notFound();
 
@@ -53,7 +60,10 @@ export default async function PilotDetailPage({ params }: PageProps) {
         <Link href={localizePath("/portal", locale)} className="mayda-text-link" style={{ alignSelf: "flex-start" }}>
           ← {copy.back}
         </Link>
-        <h1 className="mayda-heading">{copy.sectionHeading}</h1>
+        {proposal ? <ProposalView proposal={proposal as ProposalRecord} company={pilot.company} locale={locale} /> : null}
+        <h1 className="mayda-heading" style={proposal ? { fontSize: "clamp(1.6rem, 3vw, 2.2rem)", marginTop: "1rem" } : undefined}>
+          {copy.sectionHeading}
+        </h1>
         <PilotSummary pilot={pilot} updates={updates ?? []} locale={locale} />
       </div>
     </div>

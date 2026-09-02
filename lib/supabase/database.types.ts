@@ -168,6 +168,77 @@ export type Database = {
         }
         Relationships: []
       }
+      pilot_proposals: {
+        Row: {
+          angle: string
+          created_at: string
+          cta_label: string | null
+          cta_url: string | null
+          headline: string
+          id: string
+          observations: Json
+          origin: string
+          pilot_id: string
+          published: boolean
+          role_note: string | null
+          role_title: string | null
+          sample_body: string | null
+          sample_note: string | null
+          sample_title: string | null
+          scope: Json
+          terms: string | null
+          updated_at: string
+        }
+        Insert: {
+          angle: string
+          created_at?: string
+          cta_label?: string | null
+          cta_url?: string | null
+          headline: string
+          id?: string
+          observations?: Json
+          origin?: string
+          pilot_id: string
+          published?: boolean
+          role_note?: string | null
+          role_title?: string | null
+          sample_body?: string | null
+          sample_note?: string | null
+          sample_title?: string | null
+          scope?: Json
+          terms?: string | null
+          updated_at?: string
+        }
+        Update: {
+          angle?: string
+          created_at?: string
+          cta_label?: string | null
+          cta_url?: string | null
+          headline?: string
+          id?: string
+          observations?: Json
+          origin?: string
+          pilot_id?: string
+          published?: boolean
+          role_note?: string | null
+          role_title?: string | null
+          sample_body?: string | null
+          sample_note?: string | null
+          sample_title?: string | null
+          scope?: Json
+          terms?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pilot_proposals_pilot_id_fkey"
+            columns: ["pilot_id"]
+            isOneToOne: true
+            referencedRelation: "pilots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pilot_updates: {
         Row: {
           approval_latency_minutes: number | null

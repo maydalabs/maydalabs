@@ -1965,3 +1965,137 @@ fieldset.mayda-fieldset > p {
     scroll-behavior: auto !important;
   }
 }
+
+/* ------------------------------------------------------------------
+ * Prepared-for-you proposal (portal) — the work a prospect finds when
+ * they sign in after an outreach note. Reads like a letter, then a desk.
+ * ------------------------------------------------------------------ */
+@layer components {
+  .mayda-proposal {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: clamp(1.4rem, 3vw, 2.4rem);
+    border: 1px solid var(--cobalt-line);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(120% 80% at 0% 0%, var(--cobalt-soft), transparent 55%),
+      var(--surface-card);
+  }
+  .mayda-proposal.is-teaser {
+    gap: 0;
+    padding: clamp(1.2rem, 2.4vw, 1.8rem);
+  }
+  .mayda-proposal-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--border);
+  }
+  .mayda-proposal-origin {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    padding: 0.8rem 1rem;
+    border-radius: var(--radius-md);
+    background: var(--mint-soft);
+    color: var(--frost);
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+  .mayda-proposal-origin svg { flex: none; margin-top: 0.15rem; color: var(--mint); }
+  .mayda-proposal-signature {
+    color: var(--mist);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    letter-spacing: -0.01em;
+  }
+  .mayda-proposal-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .mayda-richtext { display: flex; flex-direction: column; gap: 0.8rem; color: var(--frost); line-height: 1.65; }
+  .mayda-richtext.is-letter { font-size: 1.08rem; }
+  .mayda-richtext h4 { font-family: var(--font-display); font-size: 1.15rem; letter-spacing: -0.02em; margin-top: 0.4rem; }
+  .mayda-richtext ul { display: flex; flex-direction: column; gap: 0.35rem; padding-left: 1.2rem; list-style: disc; }
+  .mayda-richtext strong { color: var(--frost); font-weight: 600; }
+
+  .mayda-observations { display: flex; flex-direction: column; gap: 0.7rem; }
+  .mayda-observations li {
+    display: grid;
+    grid-template-columns: 1.3rem 1fr;
+    gap: 0.7rem;
+    align-items: flex-start;
+    line-height: 1.5;
+  }
+  .mayda-observations svg { color: var(--cobalt); margin-top: 0.2rem; }
+  .mayda-observations li > div { display: flex; flex-wrap: wrap; gap: 0.5rem 0.7rem; align-items: baseline; }
+  .mayda-source-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1rem 0.55rem;
+    border: 1px solid var(--mint-line);
+    border-radius: 999px;
+    color: var(--mint);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .mayda-source-chip.is-unsourced { border-color: var(--border-strong); color: var(--mist); }
+
+  .mayda-sample {
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+  .mayda-sample-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-raised);
+  }
+  .mayda-sample-bar span { width: 0.55rem; height: 0.55rem; border-radius: 999px; background: var(--border-strong); }
+  .mayda-sample-bar em {
+    margin-left: 0.6rem;
+    color: var(--mist);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-style: normal;
+    letter-spacing: 0.04em;
+  }
+  .mayda-sample-body { padding: clamp(1rem, 2.4vw, 1.6rem); }
+  .mayda-sample-note { color: var(--mist); font-size: 0.74rem; letter-spacing: 0.03em; }
+
+  .mayda-scope { display: flex; flex-direction: column; gap: 0.8rem; counter-reset: scope; }
+  .mayda-scope li {
+    display: grid;
+    grid-template-columns: 5.5rem 1fr;
+    gap: 0.8rem;
+    align-items: baseline;
+  }
+  .mayda-scope li > span { color: var(--cobalt); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  .mayda-scope li strong { display: block; font-weight: 600; }
+  .mayda-scope li p { margin-top: 0.2rem; color: var(--mist); font-size: 0.92rem; line-height: 1.5; }
+  @media (max-width: 40rem) {
+    .mayda-scope li { grid-template-columns: 1fr; gap: 0.2rem; }
+  }
+
+  .mayda-details > summary {
+    cursor: pointer;
+    color: var(--mist);
+    font-size: 0.9rem;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}

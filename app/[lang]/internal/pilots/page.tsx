@@ -7,6 +7,8 @@ import {
   DeleteUpdateButton,
   UpdatePilotForm,
 } from "@/components/PilotForms";
+import { DeleteProposalButton, ProposalForm } from "@/components/ProposalForm";
+import { ProposalView, type ProposalRecord } from "@/components/ProposalView";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
@@ -31,7 +33,7 @@ export default async function InternalPilotsPage({ params }: LocalePageProps) {
   const { data: operator } = await supabase.from("operator_status").select("user_id").maybeSingle();
   if (!operator) notFound();
 
-  const [{ data: pilots }, { data: updates }] = await Promise.all([
+  const [{ data: pilots }, { data: updates }, { data: proposals }] = await Promise.all([
     supabase
       .from("pilots")
       .select("id, client_user_id, client_email, company, workflow, offer, status, starts_on, ends_on, summary, next_step, created_at")
@@ -40,7 +42,12 @@ export default async function InternalPilotsPage({ params }: LocalePageProps) {
       .from("pilot_updates")
       .select("id, pilot_id, kind, title, period_label, published, created_at")
       .order("created_at", { ascending: false }),
+    supabase
+      .from("pilot_proposals")
+      .select("id, pilot_id, origin, headline, angle, observations, sample_title, sample_body, sample_note, scope, role_title, role_note, terms, cta_label, cta_url, published"),
   ]);
+  const proposalByPilot = new Map<string, ProposalRecord>();
+  for (const proposal of (proposals ?? []) as ProposalRecord[]) proposalByPilot.set(proposal.pilot_id, proposal);
 
   const dateFormat = new Intl.DateTimeFormat("en", { dateStyle: "medium" });
 
@@ -53,7 +60,9 @@ export default async function InternalPilotsPage({ params }: LocalePageProps) {
         <p className="mayda-body">
           One record per engagement. Status, summary, and next step are visible to the client
           in their portal; updates marked “published” appear there as reports. A pilot created
-          for an email without an account attaches itself when that person signs in.
+          for an email without an account attaches itself when that person signs in. The
+          “prepared for you” proposal is what a prospect finds first: author it before the
+          outreach note goes out, keep it a draft until the note is sent, then publish.
         </p>
       </header>
 
@@ -82,6 +91,32 @@ export default async function InternalPilotsPage({ params }: LocalePageProps) {
 
                 <div style={{ marginTop: "1.2rem", borderTop: "1px solid var(--border)", paddingTop: "1.2rem" }}>
                   <UpdatePilotForm pilot={pilot} />
+                </div>
+
+                <div style={{ marginTop: "1.2rem", borderTop: "1px solid var(--border)", paddingTop: "1.2rem" }}>
+                  {(() => {
+                    const proposal = proposalByPilot.get(pilot.id) ?? null;
+                    return (
+                      <div className="mayda-stack" style={{ gap: "0.8rem" }}>
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <p className="mayda-kicker" style={{ margin: 0 }}>
+                            Prepared for you ·{" "}
+                            {proposal ? (proposal.published ? "published" : "draft, hidden from client") : "not written yet"}
+                          </p>
+                          {proposal ? <DeleteProposalButton proposalId={proposal.id} /> : null}
+                        </div>
+                        {proposal ? (
+                          <details className="mayda-details">
+                            <summary>Preview exactly as the client sees it</summary>
+                            <div style={{ marginTop: "1rem" }}>
+                              <ProposalView proposal={proposal} company={pilot.company} locale="en" />
+                            </div>
+                          </details>
+                        ) : null}
+                        <ProposalForm pilotId={pilot.id} proposal={proposal} />
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 <div style={{ marginTop: "1.2rem", borderTop: "1px solid var(--border)", paddingTop: "1.2rem" }}>

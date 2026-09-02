@@ -326,6 +326,53 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       expect(operatorView).toHaveLength(2);
     });
 
+    it("keeps a draft proposal invisible to the client and shows it once published", async () => {
+      const { error: clientWrite } = await userA
+        .from("pilot_proposals")
+        .insert({ pilot_id: pilotId, headline: "Not mine to write", angle: "x" });
+      expect(clientWrite).not.toBeNull();
+
+      const { data: created, error } = await userB
+        .from("pilot_proposals")
+        .upsert(
+          {
+            pilot_id: pilotId,
+            headline: "Prepared for Client Co",
+            angle: "Because your weekly note stopped in August.",
+            observations: [{ text: "Newsletter paused", source_url: "https://example.com/archive", source_label: "Archive" }],
+            scope: [{ label: "Week 1", title: "Scope", detail: null }],
+            published: false,
+          },
+          { onConflict: "pilot_id" },
+        )
+        .select("id, published")
+        .single();
+      expect(error).toBeNull();
+      expect(created?.published).toBe(false);
+
+      const { data: hidden } = await userA.from("pilot_proposals").select("id").eq("pilot_id", pilotId);
+      expect(hidden ?? []).toHaveLength(0);
+
+      const { error: publishError } = await userB
+        .from("pilot_proposals")
+        .update({ published: true })
+        .eq("id", created!.id);
+      expect(publishError).toBeNull();
+
+      const { data: visible } = await userA
+        .from("pilot_proposals")
+        .select("id, headline")
+        .eq("pilot_id", pilotId);
+      expect(visible).toEqual([{ id: created!.id, headline: "Prepared for Client Co" }]);
+
+      const { data: tampered } = await userA
+        .from("pilot_proposals")
+        .update({ headline: "hijacked" })
+        .eq("id", created!.id)
+        .select("id");
+      expect(tampered ?? []).toHaveLength(0);
+    });
+
     it("blocks clients from writing or deleting updates", async () => {
       const { error } = await userA
         .from("pilot_updates")

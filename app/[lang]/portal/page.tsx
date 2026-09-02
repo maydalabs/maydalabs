@@ -9,6 +9,8 @@ import {
 import { MAP_COPY } from "@/components/multiplierMapCopy";
 import { PILOT_COPY } from "@/components/pilotCopy";
 import { PilotSummary, type PilotUpdateRecord } from "@/components/PilotView";
+import { ProposalView, type ProposalRecord } from "@/components/ProposalView";
+import { PROPOSAL_COPY } from "@/components/proposalCopy";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
@@ -174,6 +176,7 @@ export default async function PortalPage({ params }: LocalePageProps) {
     { data: subscription },
     { data: pilots },
     { data: pilotUpdates },
+    { data: proposals },
   ] =
     await Promise.all([
       supabase
@@ -199,6 +202,11 @@ export default async function PortalPage({ params }: LocalePageProps) {
         .select("id, pilot_id, kind, title, body, period_label, output_count, approval_latency_minutes, source_coverage_pct, cost_usd, created_at")
         .eq("published", true)
         .order("created_at", { ascending: false }),
+      // "Prepared for you": authored before outreach, visible once published.
+      supabase
+        .from("pilot_proposals")
+        .select("id, pilot_id, origin, headline, angle, observations, sample_title, sample_body, sample_note, scope, role_title, role_note, terms, cta_label, cta_url, published")
+        .eq("published", true),
     ]);
 
   const pilotCopy = PILOT_COPY[locale];
@@ -209,6 +217,11 @@ export default async function PortalPage({ params }: LocalePageProps) {
     updatesByPilot.set(update.pilot_id, list);
   }
 
+  const proposalByPilot = new Map<string, ProposalRecord>();
+  for (const proposal of (proposals ?? []) as ProposalRecord[]) proposalByPilot.set(proposal.pilot_id, proposal);
+  const featured = (pilots ?? []).find((pilot) => proposalByPilot.has(pilot.id)) ?? null;
+  const proposalCopy = PROPOSAL_COPY[locale];
+
   const dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
 
   return (
@@ -216,7 +229,12 @@ export default async function PortalPage({ params }: LocalePageProps) {
       <header className="mayda-portal-header">
         <div>
           <p className="mayda-kicker">{copy.kicker}</p>
-          <h1 className="mayda-heading">{copy.heading}</h1>
+          <h1 className="mayda-heading">{featured ? proposalCopy.portalHeading(featured.company) : copy.heading}</h1>
+          {featured ? (
+            <p className="mayda-lead" style={{ marginTop: "0.8rem" }}>
+              {proposalCopy.portalLead}
+            </p>
+          ) : null}
           <p className="mayda-body" style={{ marginTop: "0.6rem" }}>
             {copy.signedInAs} <strong>{typeof claims.email === "string" ? claims.email : "—"}</strong>
           </p>
@@ -229,15 +247,20 @@ export default async function PortalPage({ params }: LocalePageProps) {
           {pilotCopy.sectionHeading}
         </h2>
         {pilots?.length ? (
-          pilots.map((pilot) => (
-            <PilotSummary
-              key={pilot.id}
-              pilot={pilot}
-              updates={updatesByPilot.get(pilot.id) ?? []}
-              locale={locale}
-              compact
-            />
-          ))
+          pilots.map((pilot) => {
+            const proposal = proposalByPilot.get(pilot.id);
+            return (
+              <div key={pilot.id} className="mayda-stack">
+                {proposal ? <ProposalView proposal={proposal} company={pilot.company} locale={locale} mode="teaser" /> : null}
+                <PilotSummary
+                  pilot={pilot}
+                  updates={updatesByPilot.get(pilot.id) ?? []}
+                  locale={locale}
+                  compact
+                />
+              </div>
+            );
+          })
         ) : (
           <div className="mayda-portal-empty">{pilotCopy.empty}</div>
         )}
