@@ -76,10 +76,14 @@ share SG's database.
 5. **Env vars on Vercel** — two options:
    - *Marketplace integration (fewest clicks):* Vercel → Integrations →
      Supabase → connect the `maydalabs` Supabase project to the
-     `mayda-labs` Vercel project. It injects `NEXT_PUBLIC_SUPABASE_URL`,
-     `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`.
-     **The app accepts these legacy names as fallbacks**, so nothing else
-     is needed.
+     `mayda-labs` Vercel project. It injects `SUPABASE_URL`,
+     `SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+     `SUPABASE_SERVICE_ROLE_KEY`/`SUPABASE_SECRET_KEY`, and the
+     `POSTGRES_*` connection strings. **The app accepts every one of these
+     names as fallbacks** (all Supabase access is server-side), so nothing
+     else is needed. In the connect dialog: leave the variable prefix
+     empty, leave both "Supabase Preview Branch" boxes unchecked, turn
+     "Sensitive" on.
    - *Manual:* Project → Settings → Environment Variables:
      `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
      (`sb_publishable_…`), `SUPABASE_SECRET_KEY` (`sb_secret_…`, server

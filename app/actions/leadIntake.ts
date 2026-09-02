@@ -3,7 +3,7 @@
 import { cookies, headers } from "next/headers";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getVerifiedClaims } from "@/lib/supabase/server";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { getSupabaseSecretKey, isSupabaseConfigured } from "@/lib/supabase/config";
 import {
   cleanUtm,
   looksAutomated,
@@ -68,10 +68,7 @@ export async function submitLeadIntakeAction(
     return { status: "error", code: "consent_required", field: "consentContact" };
   }
 
-  if (
-    !isSupabaseConfigured() ||
-    !(process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)
-  ) {
+  if (!isSupabaseConfigured() || !getSupabaseSecretKey()) {
     return { status: "error", code: "save_failed" };
   }
 
