@@ -92,21 +92,23 @@ share SG's database.
       creation). Add domain.
    2. **DNS** — maydalabs.com's DNS is at Namecheap
       (`dns1/dns2.registrar-servers.com`), not Vercel, so the records are
-      added by hand under Advanced DNS. Resend shows three; Namecheap wants
-      the host *without* the domain:
-      - MX, host `send`, value `feedback-smtp.eu-west-1.amazonses.com`, priority 10
-      - TXT, host `send`, value `v=spf1 include:amazonses.com ~all`
-      - TXT, host `resend._domainkey`, value `p=…` (copy from Resend)
-      None of these touch the Google Workspace MX on the root. While in
-      there, fix the root's own mail hygiene (as of 3 Sep the root has
-      **no SPF and no DMARC**, which hurts outreach sent from
-      info@maydalabs.com): TXT host `@` → `v=spf1 include:_spf.google.com ~all`;
-      TXT host `_dmarc` → `v=DMARC1; p=none; rua=mailto:info@maydalabs.com`;
-      and turn on Google DKIM (Google Admin → Apps → Gmail → Authenticate
-      email → generate record → add TXT host `google._domainkey`). Back in
-      Resend: Verify DNS records; on the domain page keep **click tracking
-      and open tracking off** (tracking rewrites auth links and breaks
-      them).
+      added by hand under Advanced DNS → Host Records (never the Mail
+      Settings/MX section, which is Google's). Done 3 Sep 2026, domain
+      **Verified** in Resend (region eu-west-1). Resend's current setup is
+      CNAME-based; Namecheap wants the host *without* the domain:
+      - TXT, host `resend._domainkey`, value `p=…` (copied from Resend)
+      - CNAME, host `rsend`, value `rsend-euw1.forge.rmta.net`
+      - CNAME, host `send`, value `send.forge.rmta.net`
+      - TXT, host `_dmarc`, value `v=DMARC1; p=none; rua=mailto:info@maydalabs.com`
+      - TXT, host `@`, value `v=spf1 include:_spf.google.com ~all`
+      The last two are mail hygiene for the root (it had no SPF and no
+      DMARC before 3 Sep, which hurts outreach sent from
+      info@maydalabs.com); still open on the Google side: DKIM (Google
+      Admin → Apps → Gmail → Authenticate email → add the TXT at
+      `google._domainkey`). In Resend, **Enable Receiving stays off** — it
+      would demand an MX on the root that conflicts with Google Workspace.
+      On the domain page keep **click tracking and open tracking off**
+      (tracking rewrites auth links and breaks them).
    3. **Add an API key** — the wizard creates it (sending access). If it
       instead asks you to create one: name `Supabase auth SMTP`, permission
       *Sending access*, domain `maydalabs.com`.
