@@ -152,6 +152,11 @@ share SG's database.
      only — never `NEXT_PUBLIC_`).
    Redeploy after saving.
 6. **Make yourself an operator** (SQL editor, once, with your auth user id
+   *Done 3 Sep 2026 — note the insert must run AFTER the first sign-in
+   code has been requested (that is when the auth user is created); an
+   earlier run silently inserts zero rows. Inserting by the user id from
+   the Table Editor with `on conflict (user_id) do nothing` is the safe
+   form.*
    after your first sign-in):
    ```sql
    insert into internal.operators (user_id, label)
