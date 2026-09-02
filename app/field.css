@@ -854,6 +854,194 @@ fieldset.mayda-fieldset > p {
   }
 }
 
+/* ------------------------------------------------------------ gate figure */
+
+.gate-figure .gate-source {
+  fill: var(--cobalt);
+  opacity: 0.8;
+}
+
+.gate-figure .gate-machine rect,
+.gate-figure .gate-machine path {
+  stroke: var(--cobalt);
+  stroke-width: 1.6;
+  fill: var(--surface);
+}
+
+.gate-figure .gate-machine rect:last-of-type {
+  fill: var(--cobalt-soft);
+}
+
+.gate-figure .gate-human circle {
+  stroke: var(--mint);
+  stroke-width: 1.8;
+  fill: var(--void);
+}
+
+.gate-figure .gate-human .gate-ring {
+  stroke: var(--mint-line);
+  stroke-width: 1;
+  fill: var(--mint-soft);
+}
+
+.gate-figure .gate-human path {
+  stroke: var(--mint);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.gate-figure .gate-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  fill: var(--mist);
+}
+
+.gate-figure .gate-label.is-mint {
+  fill: var(--mint);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gate-figure .gate-human .gate-ring {
+    animation: gate-ring-breathe 5.2s ease-in-out infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+}
+
+@keyframes gate-ring-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+/* ------------------------------------------------------ pipeline diagram */
+
+.pipeline-diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 640px) {
+  .pipeline-diagram {
+    display: none;
+  }
+}
+
+.pipeline-diagram .pipeline-lane {
+  fill: var(--surface);
+  stroke: var(--border);
+}
+
+.pipeline-diagram .pipeline-lane.is-human {
+  fill: var(--mint-soft);
+  stroke: var(--mint-line);
+}
+
+.pipeline-diagram .pipeline-lane-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  fill: var(--mist);
+}
+
+.pipeline-diagram .pipeline-lane-label.is-mint {
+  fill: var(--mint);
+}
+
+.pipeline-diagram .pipeline-connector {
+  stroke: var(--cobalt-line);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.pipeline-diagram .pipeline-node {
+  fill: var(--void);
+  stroke: var(--cobalt);
+  stroke-width: 1.6;
+}
+
+.pipeline-diagram .pipeline-node.is-human {
+  stroke: var(--mint);
+}
+
+.pipeline-diagram .pipeline-ring {
+  fill: none;
+  stroke: var(--mint-line);
+  stroke-width: 1;
+}
+
+.pipeline-diagram .pipeline-number {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  fill: var(--frost);
+}
+
+.pipeline-diagram .pipeline-stage {
+  font-family: var(--font-field-sans), sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--frost);
+}
+
+.pipeline-diagram .pipeline-stage.is-mint {
+  fill: var(--mint);
+}
+
+/* ------------------------------------------------------------------ icons */
+
+.mayda-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: none;
+}
+
+.mayda-icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--cobalt-line);
+  border-radius: 0.75rem;
+  background: var(--cobalt-soft);
+  color: #9dafff;
+}
+
+.mayda-icon-box.is-mint {
+  border-color: var(--mint-line);
+  background: var(--mint-soft);
+  color: var(--mint);
+}
+
+.mayda-rule-card {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--mint-line);
+  border-radius: var(--radius-md);
+  background: var(--mint-soft);
+  color: var(--frost);
+  font-weight: 500;
+}
+
+.mayda-rule-card .mayda-icon {
+  color: var(--mint);
+  margin-top: 0.15rem;
+}
+
 /* ------------------------------------------------------------- hero bits */
 
 .mayda-hero {

@@ -23,9 +23,9 @@ export const OPEN_GRAPH_LOCALES: Record<Locale, string> = {
 };
 
 export const SITE_DESCRIPTIONS: Record<Locale, string> = {
-  en: "MaydaLabs is a build and acceleration company for founder-led businesses. Launch an idea, accelerate what already works, or remove the systems slowing you down.",
-  tr: "MaydaLabs, kurucu liderliğindeki işletmeler için bir inşa ve hızlandırma şirketidir. Bir fikri hayata geçirin, işleyeni hızlandırın veya sizi yavaşlatan sistemleri kaldırın.",
-  fr: "MaydaLabs est une entreprise de construction et d’accélération pour les entreprises dirigées par leurs fondateurs. Lancez une idée, accélérez ce qui fonctionne ou éliminez les systèmes qui vous freinent.",
+  en: "MaydaLabs is a Bitcoin-first operations company. AI runs content, research, and payment workflows; a human approves every external action. Satoshi Gazette runs on this system.",
+  tr: "MaydaLabs, Bitcoin öncelikli bir operasyon şirketidir. İçerik, araştırma ve ödeme iş akışlarını yapay zekâ yürütür; her dış eylemi bir insan onaylar. Satoshi Gazette bu sistemle çalışır.",
+  fr: "MaydaLabs est une entreprise d’opérations Bitcoin-first. L’IA exécute les flux de contenu, de recherche et de paiement ; un humain approuve chaque action externe. Satoshi Gazette tourne sur ce système.",
 };
 
 export const SITE_CHROME_COPY = {
@@ -38,12 +38,13 @@ export const SITE_CHROME_COPY = {
     languageLabel: "Change language",
     nav: [
       ["Work", "/case-studies"],
-      ["Approach", "/approach"],
+      ["Offers", "/approach"],
       ["About", "/about"],
     ],
     mapCta: "Map my next move",
+    pilotCta: "Start a pilot",
     seeWork: "See the work",
-    footerStatement: "Build the next version of your business.",
+    footerStatement: "AI does the work. You approve every action.",
     explore: "Explore",
     founderProfile: "Founder profile",
     maydaOsLab: "MaydaOS Lab",
@@ -65,12 +66,13 @@ export const SITE_CHROME_COPY = {
     languageLabel: "Dili değiştir",
     nav: [
       ["Projeler", "/case-studies"],
-      ["Yaklaşım", "/approach"],
+      ["Teklifler", "/approach"],
       ["Hakkında", "/about"],
     ],
     mapCta: "Sonraki hamlemi haritala",
+    pilotCta: "Pilot başlat",
     seeWork: "Projeleri gör",
-    footerStatement: "İşinizin bir sonraki sürümünü inşa edin.",
+    footerStatement: "İşi yapay zekâ yapar. Her eylemi siz onaylarsınız.",
     explore: "Keşfet",
     founderProfile: "Kurucu profili",
     maydaOsLab: "MaydaOS Lab",
@@ -92,12 +94,13 @@ export const SITE_CHROME_COPY = {
     languageLabel: "Changer de langue",
     nav: [
       ["Réalisations", "/case-studies"],
-      ["Approche", "/approach"],
+      ["Offres", "/approach"],
       ["À propos", "/about"],
     ],
     mapCta: "Cartographier ma prochaine étape",
+    pilotCta: "Lancer un pilote",
     seeWork: "Voir les réalisations",
-    footerStatement: "Construisez la prochaine version de votre entreprise.",
+    footerStatement: "L’IA fait le travail. Vous approuvez chaque action.",
     explore: "Explorer",
     founderProfile: "Profil du fondateur",
     maydaOsLab: "MaydaOS Lab",

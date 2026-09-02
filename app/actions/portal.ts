@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { isValidEmail } from "@/lib/intakeValidation";
 import { isLocale, type Locale } from "@/lib/i18n";
@@ -22,6 +23,7 @@ export async function updateProfileAction(
   _prev: PortalFormState,
   formData: FormData,
 ): Promise<PortalFormState> {
+  if (!isSupabaseConfigured()) return { status: "error", code: "save_failed" };
   const claims = await getVerifiedClaims();
   if (!claims?.sub) return { status: "error", code: "not_signed_in" };
 
@@ -47,6 +49,7 @@ export async function deleteMapAction(
   _prev: PortalFormState,
   formData: FormData,
 ): Promise<PortalFormState> {
+  if (!isSupabaseConfigured()) return { status: "error", code: "save_failed" };
   const claims = await getVerifiedClaims();
   if (!claims?.sub) return { status: "error", code: "not_signed_in" };
 
@@ -72,6 +75,7 @@ export async function updateSubscriptionAction(
   _prev: PortalFormState,
   formData: FormData,
 ): Promise<PortalFormState> {
+  if (!isSupabaseConfigured()) return { status: "error", code: "save_failed" };
   const claims = await getVerifiedClaims();
   if (!claims?.sub) return { status: "error", code: "not_signed_in" };
   const email = typeof claims.email === "string" ? claims.email.toLowerCase() : null;

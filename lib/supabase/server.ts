@@ -2,14 +2,20 @@ import "server-only";
 
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 import type { Database } from "@/lib/supabase/database.types";
 
 /**
  * Request-scoped Supabase client for Server Components, Server Actions, and
  * Route Handlers. Uses the publishable key: every read and write through it
- * is subject to RLS as the signed-in user (or as anon).
+ * is subject to RLS as the signed-in user (or as anon). Throws a clear error
+ * when the project is not configured; callers that can degrade should check
+ * isSupabaseConfigured() first.
  */
 export async function createSupabaseServerClient() {
+  if (!isSupabaseConfigured()) {
+    throw new Error("Supabase is not configured for this environment");
+  }
   const cookieStore = await cookies();
 
   return createServerClient<Database>(
@@ -40,6 +46,7 @@ export async function createSupabaseServerClient() {
  * is no valid session. Never trust getSession() server-side.
  */
 export async function getVerifiedClaims() {
+  if (!isSupabaseConfigured()) return null;
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.getClaims();
   if (error || !data?.claims) return null;

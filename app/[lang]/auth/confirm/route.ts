@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { claimAnonymousMaps } from "@/lib/mapClaimServer";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { isLocale, localizePath, type Locale } from "@/lib/i18n";
 
 /**
@@ -24,7 +25,7 @@ export async function GET(
     request.nextUrl.origin,
   );
 
-  if (!tokenHash || type !== "email") {
+  if (!tokenHash || type !== "email" || !isSupabaseConfigured()) {
     return NextResponse.redirect(failureUrl);
   }
 

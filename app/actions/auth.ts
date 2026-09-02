@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { isValidEmail } from "@/lib/intakeValidation";
 import { claimAnonymousMaps } from "@/lib/mapClaimServer";
 import { checkRateLimit, clientKeyFromHeaders } from "@/lib/rateLimit";
@@ -31,6 +32,7 @@ export async function requestOtpAction(
   _prev: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+  if (!isSupabaseConfigured()) return { status: "error", code: "send_failed" };
   const email = String(formData.get("email") ?? "")
     .trim()
     .toLowerCase();
@@ -59,6 +61,7 @@ export async function verifyOtpAction(
   _prev: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+  if (!isSupabaseConfigured()) return { status: "error", code: "verify_failed" };
   const email = String(formData.get("email") ?? "")
     .trim()
     .toLowerCase();
@@ -84,7 +87,9 @@ export async function verifyOtpAction(
 }
 
 export async function signOutAction(formData: FormData) {
-  const supabase = await createSupabaseServerClient();
-  await supabase.auth.signOut();
+  if (isSupabaseConfigured()) {
+    const supabase = await createSupabaseServerClient();
+    await supabase.auth.signOut();
+  }
   redirect(localizePath("/", readLocale(formData)));
 }

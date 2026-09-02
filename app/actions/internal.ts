@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 export type ReviewFormState = {
   status: "idle" | "saved" | "error";
@@ -21,6 +22,7 @@ export async function updateLeadReviewAction(
   _prev: ReviewFormState,
   formData: FormData,
 ): Promise<ReviewFormState> {
+  if (!isSupabaseConfigured()) return { status: "error", code: "save_failed" };
   const claims = await getVerifiedClaims();
   if (!claims?.sub) return { status: "error", code: "not_authorized" };
 

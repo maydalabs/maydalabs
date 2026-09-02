@@ -39,7 +39,7 @@ export async function generateMetadata({
   return {
     metadataBase: new URL(SITE_URL),
     title: {
-      default: "MaydaLabs — Build and acceleration company",
+      default: "MaydaLabs — Bitcoin operations company",
       template: "%s · MaydaLabs",
     },
     description,
@@ -85,13 +85,13 @@ function getStructuredData(locale: Locale) {
           "https://www.linkedin.com/in/mehmet-e-mayda/",
         ],
         knowsAbout: [
-          "Product engineering",
-          "Web applications",
+          "Bitcoin",
+          "BTCPay Server",
+          "Bitcoin payments",
+          "AI-assisted operations",
           "Workflow automation",
-          "Applied AI systems",
-          "Lifecycle marketing",
-          "Conversion optimization",
-          "Security foundations",
+          "Editorial systems",
+          "Product engineering",
           "Online marketplaces",
         ],
       },

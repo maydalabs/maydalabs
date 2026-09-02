@@ -78,8 +78,8 @@ export function SiteHeader({ locale }: { locale: Locale }) {
 
         <div className="hidden items-center gap-3 md:flex">
           {languageLinks("mayda-language-switcher")}
-          <Link href={localizePath("/start", locale)} className="mayda-button mayda-button-small">
-            {copy.mapCta} <span aria-hidden>→</span>
+          <Link href={localizePath("/contact", locale)} className="mayda-button mayda-button-small">
+            {copy.pilotCta} <span aria-hidden>→</span>
           </Link>
         </div>
 
@@ -109,11 +109,11 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             </Link>
           ))}
           <Link
-            href={localizePath("/start", locale)}
+            href={localizePath("/contact", locale)}
             onClick={() => setOpen(false)}
             className="mayda-button mt-4"
           >
-            {copy.mapCta} <span aria-hidden>→</span>
+            {copy.pilotCta} <span aria-hidden>→</span>
           </Link>
           {languageLinks("mayda-language-switcher mt-4 self-start")}
         </nav>

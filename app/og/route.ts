@@ -7,6 +7,7 @@ const KINDS = new Set<SocialCardKind>([
   "studio",
   "start",
   "approach",
+  "proof",
   "work",
   "hodlstay",
   "satoshi-gazette",

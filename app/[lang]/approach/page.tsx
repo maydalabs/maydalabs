@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Icon, IconBox, type IconName } from "@/components/icons";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
@@ -6,132 +7,220 @@ import { createPageMetadata } from "@/lib/metadata";
 const COPY = {
   en: {
     meta: {
-      title: "Approach",
-      socialTitle: "From diagnosis to leverage · MaydaLabs",
+      title: "Offers",
+      socialTitle: "Two offers, both in production · MaydaLabs",
       description:
-        "How MaydaLabs moves from diagnosis to building and improvement: find the constraint, build the multiplier, connect it, compound.",
+        "Evidence-gated AI operations and Bitcoin payments engineering. Pilots from $2,500, fixed scope, your approval on everything external.",
     },
-    kicker: "Approach",
-    heading: ["Diagnosis first.", "Then build what multiplies."],
-    lead: "Most engagements fail at the framing stage: the wrong thing gets built well. MaydaLabs starts by naming the constraint precisely, then builds against it in small, verified steps.",
-    loopKicker: "The working loop",
-    loop: [
-      ["Diagnose", "Name the constraint with evidence — data where it exists, structured conversation where it doesn't. The Multiplier Map is the free, self-serve version of this step."],
-      ["Build", "Design and ship the system that addresses the constraint: a product, an automation, a growth loop, a security foundation. Small releases, real measurement, no six-month reveals."],
-      ["Connect", "Wire the new system into the rest of the business — product into analytics, analytics into lifecycle, operations into dashboards — so the value compounds instead of sitting isolated."],
-      ["Compound", "Review what the evidence says, pick the next constraint, repeat. Momentum comes from verified cycles, not from activity."],
-    ],
-    offersKicker: "How engagements are shaped",
-    offersHeading: "One offer family, honest entry points.",
-    offersIntro:
-      "No published price list and no fixed-outcome promises — scope, timing, responsibilities, and commercial terms are defined in writing per engagement, after a real conversation.",
+    kicker: "Offers",
+    heading: ["Two offers.", "Both already in production."],
+    lead: "Pilots are deliberately small: one bounded workflow, a fixed price, three to four weeks. Bitcoin-first, not Bitcoin-only — if your company isn't in Bitcoin but the problem fits, write anyway.",
     offers: [
-      ["Multiplier Map", "Free", "A five-question diagnostic with transparent rules. The self-serve starting point.", "/start"],
-      ["Multiplier Sprint", "Entry engagement", "A focused engagement to identify and address one high-leverage constraint.", "/contact"],
-      ["Build Partnership", "Delivery", "End-to-end product and system delivery: frontend, backend, infrastructure, automation, lifecycle systems, security.", "/contact"],
-      ["Acceleration Partnership", "Continuing", "Ongoing improvement for an existing company: product iteration, automation, conversion, lifecycle, reliability, security.", "/contact"],
+      {
+        title: "Evidence-gated AI operations",
+        forLabel: "For",
+        forText: "Bitcoin companies where content, research, or internal operations eat the team's week — newsletters, market notes, listings, support docs, reporting.",
+        installLabel: "What gets installed",
+        install: [
+          "One workflow rebuilt as a pipeline: intake → AI production → human approval → publish/execute",
+          "Sourcing rules: every claim linked to its source or marked unverified",
+          "An approval surface where review takes minutes, with a full record of what went out and why",
+          "Cost and output metrics from day one",
+        ],
+        endLabel: "At the end of the pilot",
+        endText: "A running system in your accounts, the operating runbook, and a plain report: output volume, approval latency, source coverage, cost per piece. Continue monthly, or keep the system and walk.",
+        price: "Pilot from $2,500 fixed · 3–4 weeks · then from $1,000/month",
+        proofLabel: "Proof",
+        proofText: "Satoshi Gazette — our own Bitcoin publication — runs on this system, publicly.",
+        proofHref: "/proof",
+        proofLink: "See how the system works",
+      },
+      {
+        title: "Bitcoin payments engineering",
+        forLabel: "For",
+        forText: "Companies and serious merchants that want to accept Bitcoin properly — or already run BTCPay Server and feel it wobble.",
+        installLabel: "Scope",
+        install: [
+          "BTCPay Server deployment or rescue, and store configuration",
+          "Integration with your product: invoice creation through settlement",
+          "Signed webhook verification and idempotent payment handling",
+          "Settlement, payout, and reconciliation records your accountant can read",
+          "Hardening, monitoring, and an operations runbook",
+        ],
+        endLabel: "At the end",
+        endText: "A payment lifecycle you can trace end to end, owned by you, documented. No custody: your node, your keys, your accounts.",
+        price: "Scoped fixed-price engagements — priced after a short technical call",
+        proofLabel: "Proof",
+        proofText: "HodlStay's production payment system — invoice lifecycle, signed webhooks, settlement, payouts — built end to end.",
+        proofHref: "/case-studies/hodlstay",
+        proofLink: "Read the HodlStay case",
+      },
     ],
-    principlesKicker: "Operating principles",
-    principles: [
-      ["Evidence over claims", "No invented metrics, no borrowed outcomes, no testimonials that don't exist. What you see on this site is inspectable."],
-      ["Small verified releases", "Work ships in increments you can use and measure, so course corrections are cheap and honest."],
-      ["You own everything", "Code, accounts, infrastructure, and data belong to you from day one. Engagements are built for handover, not dependence."],
-      ["Plain language", "Scope, trade-offs, and risks in words a non-engineer can act on. No jargon walls."],
-      ["Security by default", "Access control, least privilege, and tested authorization are part of the build, not an add-on."],
-      ["Practical onchain, when it earns it", "MaydaLabs can build onchain products where the business case genuinely requires them — as an engineering capability, not an identity."],
+    stepsKicker: "How a pilot runs",
+    steps: [
+      ["Scope", "One workflow, named precisely: what comes in, what goes out, who approves. Fixed price agreed in writing."],
+      ["Install", "The pipeline, sourcing rules, and approval gate — in your accounts, owned by you from day one."],
+      ["Operate", "AI produces daily. Your review takes minutes. Nothing external moves without your approval."],
+      ["Measure", "Output, approval latency, source coverage, cost — reported plainly. Then extend, or stop and keep everything."],
     ],
-    ctaHeading: "Start with the map, or bring the constraint directly.",
-    mapCta: "Map my next move",
-    talkCta: "Start a conversation",
+    boundariesKicker: "What we don't do",
+    boundaries: [
+      "We never take custody of funds or hold keys. Payments work runs on your node and your accounts.",
+      "We don't launch tokens, run ads for speculation, or write hype. Sourcing rules apply to your content like they apply to ours.",
+      "AI never gets send/publish/spend authority. The approval stays with a human at your company — that's the design, not a limitation.",
+    ],
+    ctaHeading: "Name the workflow. We'll scope the pilot.",
+    ctaStart: "Start a pilot",
+    ctaMail: "info@maydalabs.com",
   },
   tr: {
     meta: {
-      title: "Yaklaşım",
-      socialTitle: "Tanıdan kaldıraca · MaydaLabs",
+      title: "Teklifler",
+      socialTitle: "İki teklif, ikisi de üretimde · MaydaLabs",
       description:
-        "MaydaLabs tanıdan inşa ve iyileştirmeye nasıl ilerler: kısıtı bul, çarpanı inşa et, bağla, katla.",
+        "Kanıt kapılı yapay zekâ operasyonları ve Bitcoin ödeme mühendisliği. Pilotlar 2.500 $'dan, sabit kapsam, dışa dönük her şeyde sizin onayınız.",
     },
-    kicker: "Yaklaşım",
-    heading: ["Önce tanı.", "Sonra çarpan olanı inşa et."],
-    lead: "Çoğu çalışma çerçeveleme aşamasında başarısız olur: yanlış şey iyi inşa edilir. MaydaLabs kısıtı kanıtla ve net biçimde adlandırarak başlar; sonra ona karşı küçük, doğrulanmış adımlarla inşa eder.",
-    loopKicker: "Çalışma döngüsü",
-    loop: [
-      ["Tanıla", "Kısıtı kanıtla adlandır — veri varsa veriyle, yoksa yapılandırılmış görüşmeyle. Multiplier Map bu adımın ücretsiz, self servis halidir."],
-      ["İnşa et", "Kısıtı ele alan sistemi tasarla ve yayınla: bir ürün, bir otomasyon, bir büyüme döngüsü, bir güvenlik temeli. Küçük sürümler, gerçek ölçüm, altı aylık sürprizler yok."],
-      ["Bağla", "Yeni sistemi işin geri kalanına bağla — ürün analitiğe, analitik yaşam döngüsüne, operasyon panolara — değer izole kalmasın, katlansın."],
-      ["Katla", "Kanıtın ne dediğine bak, sıradaki kısıtı seç, tekrarla. İvme aktiviteden değil, doğrulanmış döngülerden gelir."],
-    ],
-    offersKicker: "Çalışmalar nasıl şekillenir",
-    offersHeading: "Tek teklif ailesi, dürüst giriş noktaları.",
-    offersIntro:
-      "Yayınlanmış fiyat listesi ve sabit sonuç vaadi yok — kapsam, zamanlama, sorumluluklar ve ticari koşullar gerçek bir görüşmeden sonra her çalışma için yazılı olarak tanımlanır.",
+    kicker: "Teklifler",
+    heading: ["İki teklif.", "İkisi de üretimde çalışıyor."],
+    lead: "Pilotlar bilerek küçüktür: sınırları belli tek iş akışı, sabit fiyat, üç-dört hafta. Bitcoin öncelikli; sadece Bitcoin değil — şirketiniz Bitcoin'de değilse ama problem uyuyorsa yine yazın.",
     offers: [
-      ["Multiplier Map", "Ücretsiz", "Kuralları şeffaf beş soruluk tanı. Self servis başlangıç noktası.", "/start"],
-      ["Multiplier Sprint", "Giriş çalışması", "Tek bir yüksek kaldıraçlı kısıtı bulup ele alan odaklı çalışma.", "/contact"],
-      ["Build Partnership", "Teslimat", "Uçtan uca ürün ve sistem teslimi: frontend, backend, altyapı, otomasyon, yaşam döngüsü sistemleri, güvenlik.", "/contact"],
-      ["Acceleration Partnership", "Süreklilik", "Mevcut bir şirket için süreklilik taşıyan iyileştirme: ürün iterasyonu, otomasyon, dönüşüm, yaşam döngüsü, güvenilirlik, güvenlik.", "/contact"],
+      {
+        title: "Kanıt kapılı yapay zekâ operasyonları",
+        forLabel: "Kimin için",
+        forText: "İçeriğin, araştırmanın veya iç operasyonun ekibin haftasını yediği Bitcoin şirketleri — bültenler, piyasa notları, ilanlar, destek dokümanları, raporlama.",
+        installLabel: "Ne kurulur",
+        install: [
+          "Tek iş akışı hat olarak yeniden kurulur: giriş → yapay zekâ üretimi → insan onayı → yayın/uygulama",
+          "Kaynak kuralları: her iddia kaynağına bağlı, değilse doğrulanmamış işaretli",
+          "İncelemenin dakikalar sürdüğü, neyin neden çıktığının tam kayıtlı olduğu bir onay yüzeyi",
+          "İlk günden maliyet ve üretim metrikleri",
+        ],
+        endLabel: "Pilotun sonunda",
+        endText: "Sizin hesaplarınızda çalışan bir sistem, işletim runbook'u ve yalın bir rapor: üretim hacmi, onay süresi, kaynak kapsamı, içerik başı maliyet. Aylık devam edin ya da sistemi alıp ayrılın.",
+        price: "Pilot 2.500 $'dan sabit · 3–4 hafta · sonrası aylık 1.000 $'dan",
+        proofLabel: "Kanıt",
+        proofText: "Kendi Bitcoin yayınımız Satoshi Gazette bu sistemle, herkese açık biçimde çalışıyor.",
+        proofHref: "/proof",
+        proofLink: "Sistemin nasıl çalıştığını görün",
+      },
+      {
+        title: "Bitcoin ödeme mühendisliği",
+        forLabel: "Kimin için",
+        forText: "Bitcoin'i doğru biçimde kabul etmek isteyen — veya BTCPay Server'ı zaten çalıştırıp sallandığını hisseden — şirketler ve ciddi satıcılar.",
+        installLabel: "Kapsam",
+        install: [
+          "BTCPay Server kurulumu veya kurtarma, mağaza yapılandırması",
+          "Ürününüzle entegrasyon: fatura oluşturmadan mutabakata",
+          "İmzalı webhook doğrulaması ve idempotent ödeme işleme",
+          "Muhasebecinizin okuyabileceği mutabakat ve ödeme kayıtları",
+          "Sıkılaştırma, izleme ve işletim runbook'u",
+        ],
+        endLabel: "Sonunda",
+        endText: "Uçtan uca izleyebildiğiniz, sahibi siz olduğunuz, dokümante bir ödeme yaşam döngüsü. Saklama yok: sizin node'unuz, sizin anahtarlarınız, sizin hesaplarınız.",
+        price: "Kapsamı belirli, sabit fiyatlı çalışmalar — kısa bir teknik görüşme sonrası fiyatlanır",
+        proofLabel: "Kanıt",
+        proofText: "HodlStay'in üretimdeki ödeme sistemi — fatura yaşam döngüsü, imzalı webhooklar, mutabakat, ödemeler — uçtan uca.",
+        proofHref: "/case-studies/hodlstay",
+        proofLink: "HodlStay vakasını okuyun",
+      },
     ],
-    principlesKicker: "Çalışma ilkeleri",
-    principles: [
-      ["İddiadan önce kanıt", "Uydurma metrik yok, ödünç alınmış sonuç yok, var olmayan referans yok. Bu sitede gördükleriniz denetlenebilir."],
-      ["Küçük doğrulanmış sürümler", "İş, kullanıp ölçebileceğiniz artışlarla yayınlanır; rota düzeltmeleri ucuz ve dürüst kalır."],
-      ["Her şeyin sahibi sizsiniz", "Kod, hesaplar, altyapı ve veri ilk günden size aittir. Çalışmalar bağımlılık için değil, devir için kurgulanır."],
-      ["Sade dil", "Kapsam, ödünleşimler ve riskler mühendis olmayan birinin harekete geçebileceği kelimelerle. Jargon duvarı yok."],
-      ["Varsayılan olarak güvenlik", "Erişim kontrolü, en az yetki ve test edilmiş yetkilendirme inşanın parçasıdır, eklenti değil."],
-      ["Hak ettiğinde pratik onchain", "MaydaLabs, iş gerekçesi gerçekten gerektirdiğinde onchain ürünler inşa edebilir — kimlik olarak değil, mühendislik yetkinliği olarak."],
+    stepsKicker: "Pilot nasıl ilerler",
+    steps: [
+      ["Kapsam", "Tek iş akışı, net tanım: ne girer, ne çıkar, kim onaylar. Sabit fiyat yazılı olarak."],
+      ["Kurulum", "Hat, kaynak kuralları ve onay kapısı — ilk günden sizin hesaplarınızda, sahibi sizsiniz."],
+      ["İşletim", "Yapay zekâ her gün üretir. İncelemeniz dakikalar sürer. Onayınız olmadan dışarı hiçbir şey çıkmaz."],
+      ["Ölçüm", "Üretim, onay süresi, kaynak kapsamı, maliyet — açıkça raporlanır. Sonra genişletin ya da durun; her şey sizde kalır."],
     ],
-    ctaHeading: "Haritayla başlayın veya kısıtı doğrudan getirin.",
-    mapCta: "Sonraki hamlemi haritala",
-    talkCta: "Bir görüşme başlat",
+    boundariesKicker: "Yapmadıklarımız",
+    boundaries: [
+      "Asla fon saklamayız, anahtar tutmayız. Ödeme işleri sizin node'unuzda, sizin hesaplarınızda çalışır.",
+      "Token çıkarmayız, spekülasyon reklamı yapmayız, boş heyecan yazmayız. Kaynak kuralları bizim içeriğimize uygulandığı gibi sizinkine de uygulanır.",
+      "Yapay zekâ asla gönderme/yayınlama/harcama yetkisi almaz. Onay, şirketinizdeki bir insanda kalır — bu bir kısıt değil, tasarımın kendisi.",
+    ],
+    ctaHeading: "İş akışını adlandırın. Pilotu kapsamlandıralım.",
+    ctaStart: "Pilot başlat",
+    ctaMail: "info@maydalabs.com",
   },
   fr: {
     meta: {
-      title: "Approche",
-      socialTitle: "Du diagnostic au levier · MaydaLabs",
+      title: "Offres",
+      socialTitle: "Deux offres, déjà en production · MaydaLabs",
       description:
-        "Comment MaydaLabs passe du diagnostic à la construction et à l'amélioration : trouver la contrainte, construire le multiplicateur, le connecter, composer.",
+        "Opérations IA à preuves obligatoires et ingénierie des paiements Bitcoin. Pilotes dès 2 500 $, périmètre fixe, votre approbation sur tout ce qui est externe.",
     },
-    kicker: "Approche",
-    heading: ["Le diagnostic d'abord.", "Puis construire ce qui multiplie."],
-    lead: "La plupart des missions échouent au cadrage : la mauvaise chose est bien construite. MaydaLabs commence par nommer précisément la contrainte, puis construit contre elle par petits pas vérifiés.",
-    loopKicker: "La boucle de travail",
-    loop: [
-      ["Diagnostiquer", "Nommer la contrainte avec des preuves — données quand elles existent, conversation structurée sinon. La Multiplier Map est la version gratuite et autonome de cette étape."],
-      ["Construire", "Concevoir et livrer le système qui traite la contrainte : produit, automatisation, boucle de croissance, fondation de sécurité. Petites versions, vraie mesure, pas de révélation à six mois."],
-      ["Connecter", "Relier le nouveau système au reste de l'entreprise — produit vers analytics, analytics vers lifecycle, opérations vers tableaux de bord — pour que la valeur compose au lieu de rester isolée."],
-      ["Composer", "Regarder ce que disent les preuves, choisir la contrainte suivante, répéter. L'élan vient des cycles vérifiés, pas de l'activité."],
-    ],
-    offersKicker: "Comment les missions prennent forme",
-    offersHeading: "Une famille d'offres, des points d'entrée honnêtes.",
-    offersIntro:
-      "Pas de grille tarifaire publiée ni de promesse de résultat fixe — périmètre, calendrier, responsabilités et conditions commerciales sont définis par écrit pour chaque mission, après une vraie conversation.",
+    kicker: "Offres",
+    heading: ["Deux offres.", "Déjà en production."],
+    lead: "Les pilotes sont volontairement petits : un flux borné, un prix fixe, trois à quatre semaines. Bitcoin-first, pas Bitcoin-only — si votre entreprise n'est pas dans Bitcoin mais que le problème correspond, écrivez quand même.",
     offers: [
-      ["Multiplier Map", "Gratuit", "Un diagnostic en cinq questions aux règles transparentes. Le point de départ autonome.", "/start"],
-      ["Multiplier Sprint", "Mission d'entrée", "Un engagement ciblé pour identifier et traiter une contrainte à fort levier.", "/contact"],
-      ["Build Partnership", "Livraison", "Livraison de bout en bout du produit et des systèmes : frontend, backend, infrastructure, automatisation, systèmes lifecycle, sécurité.", "/contact"],
-      ["Acceleration Partnership", "Continu", "Amélioration continue d'une entreprise existante : itération produit, automatisation, conversion, lifecycle, fiabilité, sécurité.", "/contact"],
+      {
+        title: "Opérations IA à preuves obligatoires",
+        forLabel: "Pour",
+        forText: "Les entreprises Bitcoin où contenu, recherche ou opérations internes dévorent la semaine de l'équipe — newsletters, notes de marché, listings, docs support, reporting.",
+        installLabel: "Ce qui est installé",
+        install: [
+          "Un flux reconstruit en pipeline : entrée → production IA → approbation humaine → publication/exécution",
+          "Règles de sourçage : chaque affirmation liée à sa source, sinon marquée non vérifiée",
+          "Une surface d'approbation où la revue prend des minutes, avec l'historique complet de ce qui est sorti et pourquoi",
+          "Métriques de coût et de production dès le premier jour",
+        ],
+        endLabel: "À la fin du pilote",
+        endText: "Un système qui tourne dans vos comptes, le runbook d'exploitation et un rapport simple : volume, délai d'approbation, couverture des sources, coût par pièce. Continuez au mois, ou gardez le système et partez.",
+        price: "Pilote dès 2 500 $ fixe · 3–4 semaines · puis dès 1 000 $/mois",
+        proofLabel: "Preuve",
+        proofText: "Satoshi Gazette — notre propre publication Bitcoin — tourne sur ce système, publiquement.",
+        proofHref: "/proof",
+        proofLink: "Voir comment le système fonctionne",
+      },
+      {
+        title: "Ingénierie des paiements Bitcoin",
+        forLabel: "Pour",
+        forText: "Les entreprises et marchands sérieux qui veulent accepter Bitcoin correctement — ou qui font déjà tourner BTCPay Server et le sentent vaciller.",
+        installLabel: "Périmètre",
+        install: [
+          "Déploiement ou sauvetage de BTCPay Server, configuration du store",
+          "Intégration à votre produit : de la création de facture au règlement",
+          "Vérification des webhooks signés et traitement idempotent des paiements",
+          "Registres de règlement, versement et réconciliation lisibles par votre comptable",
+          "Durcissement, supervision et runbook d'exploitation",
+        ],
+        endLabel: "À la fin",
+        endText: "Un cycle de paiement traçable de bout en bout, à vous, documenté. Pas de garde : votre nœud, vos clés, vos comptes.",
+        price: "Missions cadrées à prix fixe — chiffrées après un court appel technique",
+        proofLabel: "Preuve",
+        proofText: "Le système de paiement en production de HodlStay — cycle de facture, webhooks signés, règlement, versements — construit de bout en bout.",
+        proofHref: "/case-studies/hodlstay",
+        proofLink: "Lire le cas HodlStay",
+      },
     ],
-    principlesKicker: "Principes de travail",
-    principles: [
-      ["Les preuves avant les affirmations", "Pas de métriques inventées, pas de résultats empruntés, pas de témoignages inexistants. Ce que montre ce site est inspectable."],
-      ["Petites versions vérifiées", "Le travail est livré par incréments utilisables et mesurables ; corriger la trajectoire reste peu coûteux et honnête."],
-      ["Tout vous appartient", "Code, comptes, infrastructure et données sont à vous dès le premier jour. Les missions sont construites pour la transmission, pas la dépendance."],
-      ["Langage clair", "Périmètre, arbitrages et risques dans des mots qu'un non-ingénieur peut utiliser. Pas de mur de jargon."],
-      ["Sécurité par défaut", "Contrôle d'accès, moindre privilège et autorisation testée font partie de la construction, pas d'un supplément."],
-      ["De l'onchain pragmatique, quand il le mérite", "MaydaLabs peut construire des produits onchain quand le cas d'affaires l'exige vraiment — comme capacité d'ingénierie, pas comme identité."],
+    stepsKicker: "Comment se déroule un pilote",
+    steps: [
+      ["Cadrer", "Un flux, nommé précisément : ce qui entre, ce qui sort, qui approuve. Prix fixe convenu par écrit."],
+      ["Installer", "Le pipeline, les règles de sourçage et la porte d'approbation — dans vos comptes, à vous dès le premier jour."],
+      ["Opérer", "L'IA produit chaque jour. Votre revue prend des minutes. Rien d'externe ne bouge sans votre approbation."],
+      ["Mesurer", "Production, délai d'approbation, couverture, coût — rapportés simplement. Puis étendez, ou arrêtez et gardez tout."],
     ],
-    ctaHeading: "Commencez par la carte, ou apportez la contrainte directement.",
-    mapCta: "Cartographier ma prochaine étape",
-    talkCta: "Démarrer un échange",
+    boundariesKicker: "Ce que nous ne faisons pas",
+    boundaries: [
+      "Nous ne prenons jamais la garde de fonds ni de clés. Le travail paiements tourne sur votre nœud et vos comptes.",
+      "Pas de lancement de token, pas de pub spéculative, pas de hype. Les règles de sourçage s'appliquent à votre contenu comme au nôtre.",
+      "L'IA n'obtient jamais l'autorité d'envoyer, publier ou dépenser. L'approbation reste chez un humain de votre entreprise — c'est le design, pas une limite.",
+    ],
+    ctaHeading: "Nommez le flux. Nous cadrons le pilote.",
+    ctaStart: "Lancer un pilote",
+    ctaMail: "info@maydalabs.com",
   },
 } as const;
+
+const OFFER_ICONS: IconName[] = ["gate", "bitcoin"];
+const STEP_ICONS: IconName[] = ["scope", "install", "machine", "report"];
+const BOUNDARY_ICONS: IconName[] = ["wallet", "shield", "human"];
 
 export async function generateMetadata({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
   return createPageMetadata({ ...COPY[locale].meta, path: "/approach", locale, socialCard: "approach" });
 }
 
-export default async function ApproachPage({ params }: LocalePageProps) {
+export default async function OffersPage({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
   const copy = COPY[locale];
 
@@ -150,62 +239,89 @@ export default async function ApproachPage({ params }: LocalePageProps) {
       </section>
 
       <section className="mayda-section" style={{ paddingTop: 0 }}>
-        <p className="mayda-kicker">{copy.loopKicker}</p>
-        <div className="mayda-grid-2" style={{ marginTop: "1.4rem" }}>
-          {copy.loop.map(([title, text], index) => (
-            <article key={title} className="mayda-card">
-              <p className="mayda-card-number">0{index + 1}</p>
-              <h2 className="mayda-subheading mt-2">{title}</h2>
-              <p className="mayda-body mt-3">{text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="mayda-section" style={{ paddingTop: 0 }}>
-        <header className="mayda-stack" style={{ maxWidth: "44rem" }}>
-          <p className="mayda-kicker">{copy.offersKicker}</p>
-          <h2 className="mayda-heading">{copy.offersHeading}</h2>
-          <p className="mayda-body">{copy.offersIntro}</p>
-        </header>
-        <div className="mayda-grid-2" style={{ marginTop: "1.6rem" }}>
-          {copy.offers.map(([title, tag, text, href]) => (
-            <Link key={title} href={localizePath(href, locale)} className="mayda-card">
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="mayda-subheading">{title}</h3>
-                <span className={`mayda-tag ${href === "/start" ? "is-mint" : "is-cobalt"}`}>{tag}</span>
+        <div className="mayda-stack-lg">
+          {copy.offers.map((offer, index) => (
+            <article key={offer.title} className="mayda-card">
+              <div className="flex items-center gap-4">
+                <IconBox name={OFFER_ICONS[index]} tone={index === 0 ? "mint" : "cobalt"} />
+                <h2 className="mayda-heading" style={{ fontSize: "clamp(1.5rem,3vw,2rem)", marginBottom: "1rem" }}>
+                  {offer.title}
+                </h2>
               </div>
-              <p className="mayda-body mt-3">{text}</p>
-            </Link>
+              <div className="grid gap-8 lg:grid-cols-2" style={{ marginTop: "1.4rem" }}>
+                <div className="mayda-stack">
+                  <div>
+                    <p className="mayda-kicker">{offer.forLabel}</p>
+                    <p className="mayda-body">{offer.forText}</p>
+                  </div>
+                  <div>
+                    <p className="mayda-kicker">{offer.installLabel}</p>
+                    <ul className="mayda-case-section-body" style={{ paddingLeft: "1.1rem", margin: 0 }}>
+                      {offer.install.map((item) => (
+                        <li key={item.slice(0, 24)} style={{ marginBottom: "0.4rem" }}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                <div className="mayda-stack">
+                  <div>
+                    <p className="mayda-kicker">{offer.endLabel}</p>
+                    <p className="mayda-body">{offer.endText}</p>
+                  </div>
+                  <div>
+                    <p className="mayda-kicker">{offer.proofLabel}</p>
+                    <p className="mayda-body">{offer.proofText}</p>
+                    <Link href={localizePath(offer.proofHref, locale)} className="mayda-text-link mt-2" style={{ display: "inline-flex" }}>
+                      {offer.proofLink} <span aria-hidden>→</span>
+                    </Link>
+                  </div>
+                  <p className="mayda-mono" style={{ color: "var(--mint)" }}>{offer.price}</p>
+                </div>
+              </div>
+            </article>
           ))}
         </div>
       </section>
 
       <section className="mayda-section" style={{ paddingTop: 0 }}>
-        <p className="mayda-kicker">{copy.principlesKicker}</p>
-        <div className="mayda-grid-3" style={{ marginTop: "1.4rem" }}>
-          {copy.principles.map(([title, text]) => (
+        <p className="mayda-kicker">{copy.stepsKicker}</p>
+        <div className="mayda-grid-2" style={{ marginTop: "1.4rem" }}>
+          {copy.steps.map(([title, text], index) => (
             <article key={title} className="mayda-card">
-              <h3 className="mayda-subheading" style={{ fontSize: "1.05rem" }}>
-                {title}
-              </h3>
-              <p className="mayda-body mt-3" style={{ fontSize: "0.92rem" }}>
-                {text}
-              </p>
+              <div className="flex items-center justify-between">
+                <IconBox name={STEP_ICONS[index]} />
+                <p className="mayda-card-number">0{index + 1}</p>
+              </div>
+              <h3 className="mayda-subheading">{title}</h3>
+              <p className="mayda-body mt-3">{text}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="mayda-section" style={{ paddingTop: 0 }}>
+        <div className="mayda-card" style={{ borderColor: "var(--mint-line)" }}>
+          <p className="mayda-kicker">{copy.boundariesKicker}</p>
+          <div className="mayda-grid-3">
+            {copy.boundaries.map((item, index) => (
+              <div key={item.slice(0, 24)} className="mayda-rule-card" style={{ fontWeight: 400, fontSize: "0.92rem", lineHeight: 1.5 }}>
+                <Icon name={BOUNDARY_ICONS[index]} />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       <section className="mayda-final-cta">
         <h2 className="mayda-heading">{copy.ctaHeading}</h2>
         <div className="mayda-hero-actions" style={{ justifyContent: "center" }}>
-          <Link href={localizePath("/start", locale)} className="mayda-button">
-            {copy.mapCta} <span aria-hidden>→</span>
+          <Link href={localizePath("/contact", locale)} className="mayda-button">
+            {copy.ctaStart} <span aria-hidden>→</span>
           </Link>
-          <Link href={localizePath("/contact", locale)} className="mayda-button mayda-button-outline">
-            {copy.talkCta}
-          </Link>
+          <a href="mailto:info@maydalabs.com" className="mayda-button mayda-button-outline">
+            {copy.ctaMail}
+          </a>
         </div>
       </section>
     </div>

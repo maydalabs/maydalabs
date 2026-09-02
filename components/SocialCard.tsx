@@ -17,9 +17,10 @@ type CardCopy = { eyebrow: string; title: string };
 
 const CARD_COPY: Record<Locale, Record<SocialCardKind, CardCopy>> = {
   en: {
-    studio: { eyebrow: "Build and acceleration company", title: "Build the next version of your business." },
+    studio: { eyebrow: "Bitcoin operations company", title: "AI runs the work. You approve every action." },
+    proof: { eyebrow: "Proof · Live system", title: "The system behind Satoshi Gazette." },
     start: { eyebrow: "Multiplier Map · Free diagnostic", title: "Map my next move." },
-    approach: { eyebrow: "Approach", title: "From diagnosis to leverage." },
+    approach: { eyebrow: "Offers", title: "Two offers, both already in production." },
     work: { eyebrow: "Selected work", title: "Real products, clearly labelled." },
     hodlstay: { eyebrow: "Client build · Live", title: "HodlStay: a global stay marketplace." },
     "satoshi-gazette": { eyebrow: "Owned publication · Live", title: "Satoshi Gazette: a newsroom built as a product." },
@@ -33,9 +34,10 @@ const CARD_COPY: Record<Locale, Record<SocialCardKind, CardCopy>> = {
     legal: { eyebrow: "MaydaLabs", title: "The fine print, kept honest." },
   },
   tr: {
-    studio: { eyebrow: "İnşa ve hızlandırma şirketi", title: "İşinizin bir sonraki sürümünü inşa edin." },
+    studio: { eyebrow: "Bitcoin operasyon şirketi", title: "İşi yapay zekâ yapar. Her eylemi siz onaylarsınız." },
+    proof: { eyebrow: "Kanıt · Canlı sistem", title: "Satoshi Gazette'in arkasındaki sistem." },
     start: { eyebrow: "Multiplier Map · Ücretsiz tanı", title: "Sonraki hamlemi haritala." },
-    approach: { eyebrow: "Yaklaşım", title: "Tanıdan kaldıraca." },
+    approach: { eyebrow: "Teklifler", title: "İki teklif, ikisi de üretimde." },
     work: { eyebrow: "Seçili işler", title: "Gerçek ürünler, net etiketler." },
     hodlstay: { eyebrow: "Müşteri ürünü · Canlı", title: "HodlStay: küresel konaklama pazarı." },
     "satoshi-gazette": { eyebrow: "Sahip olunan yayın · Canlı", title: "Satoshi Gazette: ürün olarak kurulmuş bir haber odası." },
@@ -49,9 +51,10 @@ const CARD_COPY: Record<Locale, Record<SocialCardKind, CardCopy>> = {
     legal: { eyebrow: "MaydaLabs", title: "Küçük yazılar, dürüst tutulur." },
   },
   fr: {
-    studio: { eyebrow: "Construction et accélération", title: "Construisez la prochaine version de votre entreprise." },
+    studio: { eyebrow: "Opérations Bitcoin", title: "L'IA fait le travail. Vous approuvez chaque action." },
+    proof: { eyebrow: "Preuve · Système en direct", title: "Le système derrière Satoshi Gazette." },
     start: { eyebrow: "Multiplier Map · Diagnostic gratuit", title: "Cartographier ma prochaine étape." },
-    approach: { eyebrow: "Approche", title: "Du diagnostic au levier." },
+    approach: { eyebrow: "Offres", title: "Deux offres, déjà en production." },
     work: { eyebrow: "Réalisations", title: "De vrais produits, clairement étiquetés." },
     hodlstay: { eyebrow: "Produit client · En ligne", title: "HodlStay : une marketplace mondiale de séjours." },
     "satoshi-gazette": { eyebrow: "Publication détenue · En ligne", title: "Satoshi Gazette : une rédaction construite comme un produit." },

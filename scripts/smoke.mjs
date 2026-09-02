@@ -33,6 +33,7 @@ const routes = [
   "/tr",
   "/fr",
   "/start",
+  "/proof",
   "/os",
   "/tr/os",
   "/fr/os",
@@ -82,7 +83,7 @@ for (const [path, status, destination] of redirects) {
 
 await check("English metadata is canonical and localized", async () => {
   const html = await (await request("/")).text();
-  assert(html.includes("<title>MaydaLabs — Build and acceleration company</title>"), "unexpected English title");
+  assert(html.includes("<title>MaydaLabs — Bitcoin operations company</title>"), "unexpected English title");
   assert(html.includes(`rel="canonical" href="${canonicalUrl}"`), "missing canonical URL");
   assert(html.includes(`hrefLang="tr" href="${canonicalUrl}/tr"`), "missing Turkish alternate");
   assert(html.includes(`hrefLang="fr" href="${canonicalUrl}/fr"`), "missing French alternate");
@@ -93,8 +94,8 @@ await check("Turkish and French metadata is localized", async () => {
     request("/tr").then((response) => response.text()),
     request("/fr").then((response) => response.text()),
   ]);
-  assert(turkish.includes("<title>MaydaLabs — İnşa ve hızlandırma şirketi</title>"), "unexpected Turkish title");
-  assert(french.includes("<title>MaydaLabs — Entreprise de construction et d’accélération</title>"), "unexpected French title");
+  assert(turkish.includes("<title>MaydaLabs — Bitcoin operasyon şirketi</title>"), "unexpected Turkish title");
+  assert(french.includes("<title>MaydaLabs — Entreprise d&#x27;opérations Bitcoin</title>") || french.includes("<title>MaydaLabs — Entreprise d'opérations Bitcoin</title>"), "unexpected French title");
 });
 
 await check("localized routes do not set a language-preference cookie", async () => {

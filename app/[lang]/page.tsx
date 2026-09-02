@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FieldFigure } from "@/components/FieldFigure";
+import { GateFigure } from "@/components/GateFigure";
+import { Icon, IconBox, type IconName } from "@/components/icons";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
@@ -8,62 +9,68 @@ import { createPageMetadata } from "@/lib/metadata";
 const COPY = {
   en: {
     meta: {
-      title: "MaydaLabs — Build and acceleration company",
-      socialTitle: "Build the next version of your business · MaydaLabs",
+      title: "MaydaLabs — Bitcoin operations company",
+      socialTitle: "AI runs the work. You approve every action. · MaydaLabs",
       description:
-        "MaydaLabs is a build and acceleration company for founder-led businesses. Launch an idea, accelerate what already works, or remove the systems slowing you down.",
+        "MaydaLabs installs AI-run operations for Bitcoin companies: content desks, research pipelines, payment workflows. Source-linked, approval-gated, publicly proven on Satoshi Gazette.",
     },
-    availability: "Open for new work",
-    kicker: "Build and acceleration company",
-    hero: ["Build the next version", "of your business."],
-    lead: "Launch an idea, accelerate what already works, or remove the systems slowing you down. MaydaLabs combines product engineering, automation, lifecycle growth, and security to create leverage.",
-    mapCta: "Map my next move",
-    seeWork: "See the work",
-    situationsKicker: "Where founders start",
-    situationsHeading: "Three situations. One question: what multiplies?",
-    situations: [
-      ["Launch", "You have an idea that needs to become a working product.", "From a rough concept to a product real people can use — scoped around the smallest release that proves the business."],
-      ["Accelerate", "You have a company or product that needs to grow or improve.", "Find the constraint holding the numbers back, then build the product, funnel, and lifecycle systems that move them."],
-      ["Remove the drag", "Your workflows, systems, or operations are quietly expensive.", "Replace manual work, brittle tools, and disconnected systems with automation you can trust and inspect."],
+    availability: "Taking pilot clients",
+    kicker: "Bitcoin-first operations company",
+    hero: ["AI runs the operation.", "You approve every action."],
+    lead: "We install AI-run operations for Bitcoin companies — content desks, research pipelines, payment workflows. Every claim is source-linked. Nothing goes out without a human approval. Satoshi Gazette, our own publication, runs on it.",
+    pilotCta: "Start a pilot",
+    proofCta: "See the system live",
+    offersKicker: "Two offers, both already running in production",
+    offersHeading: "Pick the workflow. We install the system.",
+    offers: [
+      {
+        title: "Evidence-gated AI operations",
+        text: "One of your workflows — content, research, or internal ops — rebuilt so AI produces the work. Every claim carries its source or is marked unverified. A human approves anything that leaves the building.",
+        proof: "Proof: Satoshi Gazette runs on it, publicly.",
+        price: "Pilot from $2,500 · 3–4 weeks · then from $1,000/mo",
+        href: "/approach",
+      },
+      {
+        title: "Bitcoin payments engineering",
+        text: "BTCPay Server done properly: deployment, integration, the full invoice-to-payout lifecycle, signed webhook verification, settlement reconciliation, hardening.",
+        proof: "Proof: HodlStay's production payment system, built end to end.",
+        price: "Scoped fixed-price engagements",
+        href: "/approach",
+      },
     ],
-    situationsLink: "Start with the Multiplier Map",
-    proofKicker: "Verifiable proof",
-    proofHeading: "Real products you can open right now.",
-    proofLead: "No mockups presented as outcomes. The strongest proof is running in production with real users — and clearly labelled by who owns it.",
+    offersLink: "Full offer details",
+    flagshipKicker: "Flagship product",
+    flagshipHeading: "Satoshi Gazette is the demo.",
+    flagshipLead: "A Bitcoin-only publication operated through our system. Not a mockup, not a pitch deck — a running business you can read right now.",
+    flagshipFacts: [
+      "34 pieces published; every publication human-approved",
+      "Every claim source-linked, or it doesn't publish as fact",
+      "Every distribution action recorded with a public URL",
+      "A treasury data desk where each entry cites a regulatory filing or audited report",
+    ],
+    flagshipVisit: "Read the publication",
+    flagshipSystem: "How the system works",
+    stepsKicker: "How a pilot runs",
+    steps: [
+      ["Scope", "One workflow, named precisely: what comes in, what goes out, who approves."],
+      ["Install", "The pipeline, the sourcing rules, and the approval gate — in your accounts, owned by you."],
+      ["Operate", "AI produces daily. Your review takes minutes, not hours."],
+      ["Measure", "Output, approval latency, source coverage — reported plainly, then extended to the next workflow."],
+    ],
+    rulesKicker: "House rules",
+    rules: [
+      "No approval means no external action.",
+      "Source-linked, or marked unverified.",
+      "Your accounts, your data, your system.",
+    ],
+    proofKicker: "Live in production",
     proofItems: [
-      ["hodlstay.com", "Client build · Live", "https://hodlstay.com"],
-      ["satoshigazette.org", "Owned publication · Live", "https://satoshigazette.org"],
+      ["satoshigazette.org", "Owned publication · runs on our system", "https://satoshigazette.org"],
+      ["hodlstay.com", "Client build · Bitcoin payments live", "https://hodlstay.com"],
     ],
-    leverageKicker: "How leverage is created",
-    leverageHeading: "One input, several connected outputs.",
-    leverage: [
-      ["01", "Find the constraint", "Every business has one system holding the rest back. We name it precisely before building anything."],
-      ["02", "Build the multiplier", "Design and ship the product, automation, or growth system that addresses that constraint directly."],
-      ["03", "Connect it", "A system creates leverage when it feeds the others — product into measurement, measurement into lifecycle, lifecycle into revenue."],
-      ["04", "Compound", "Repeat with the next constraint. Each cycle builds on verified evidence, not activity."],
-    ],
-    capabilitiesKicker: "Four capabilities, one system",
-    capabilitiesHeading: "Everything needed to move a founder-led business.",
-    capabilities: [
-      ["Product Engineering", "Frontend, backend, APIs, data systems, and complete digital products — including onchain products where the business case genuinely requires them."],
-      ["Automation and AI", "Workflow automation, internal tools, operational systems, integrations, and carefully scoped AI that stays inspectable."],
-      ["Lifecycle and Growth", "Activation, conversion, retention, analytics, customer journeys, and the lifecycle systems that make growth repeatable."],
-      ["Security and Reliability", "Security foundations, performance, resilience, access control, and the operational confidence to move fast without breaking trust."],
-    ],
-    mapBandKicker: "Free diagnostic",
-    mapBandHeading: "Not sure which move multiplies?",
-    mapBandLead: "The Multiplier Map is a five-question diagnostic with transparent rules. It gives you a concrete next-step map in about two minutes — before any conversation, account, or commitment.",
     workKicker: "Selected work",
     workHeading: "Built by MaydaLabs.",
     work: [
-      {
-        href: "/case-studies/hodlstay",
-        image: "/work/hodlstay-2026-08-home.jpg",
-        alt: "HodlStay global booking marketplace homepage",
-        tags: ["Client build", "Live"],
-        title: "HodlStay",
-        text: "A Bitcoin-native travel idea rebuilt into a global stay marketplace — discovery, host operations, availability, payments, and migration as one system.",
-      },
       {
         href: "/case-studies/satoshi-gazette",
         image: "/work/satoshi-gazette-2026-08-home.jpg",
@@ -72,71 +79,86 @@ const COPY = {
         title: "Satoshi Gazette",
         text: "An independent Bitcoin publication built and operated as a product: editorial surfaces, data systems, and a guarded publishing pipeline.",
       },
-    ],
-    allWork: "All work",
-    ctaKicker: "Ready when you are",
-    ctaHeading: ["Bring the constraint.", "We’ll build what multiplies."],
-    ctaStart: "Map my next move",
-    ctaTalk: "Start a conversation",
-  },
-  tr: {
-    meta: {
-      title: "MaydaLabs — İnşa ve hızlandırma şirketi",
-      socialTitle: "İşinizin bir sonraki sürümünü inşa edin · MaydaLabs",
-      description:
-        "MaydaLabs, kurucu liderliğindeki işletmeler için bir inşa ve hızlandırma şirketidir. Bir fikri hayata geçirin, işleyeni hızlandırın veya sizi yavaşlatan sistemleri kaldırın.",
-    },
-    availability: "Yeni işlere açık",
-    kicker: "İnşa ve hızlandırma şirketi",
-    hero: ["İşinizin bir sonraki", "sürümünü inşa edin."],
-    lead: "Bir fikri hayata geçirin, işleyeni hızlandırın veya sizi yavaşlatan sistemleri ortadan kaldırın. MaydaLabs; ürün mühendisliği, otomasyon, yaşam döngüsü büyümesi ve güvenliği kaldıraç yaratmak için birleştirir.",
-    mapCta: "Sonraki hamlemi haritala",
-    seeWork: "Projeleri gör",
-    situationsKicker: "Kurucular nereden başlar",
-    situationsHeading: "Üç durum. Tek soru: neyi çarpan yapar?",
-    situations: [
-      ["Hayata geçir", "Çalışan bir ürüne dönüşmesi gereken bir fikriniz var.", "Ham bir konseptten gerçek insanların kullanabileceği ürüne — işi kanıtlayan en küçük sürüm etrafında kapsamlandırılır."],
-      ["Hızlandır", "Büyümesi veya gelişmesi gereken bir şirketiniz ya da ürününüz var.", "Rakamları tutan kısıtı bulur, ardından onları hareket ettiren ürün, huni ve yaşam döngüsü sistemlerini kurarız."],
-      ["Sürtünmeyi kaldır", "İş akışlarınız, sistemleriniz veya operasyonlarınız sessizce pahalı.", "Manuel işi, kırılgan araçları ve kopuk sistemleri güvenebileceğiniz ve denetleyebileceğiniz otomasyonla değiştirin."],
-    ],
-    situationsLink: "Multiplier Map ile başlayın",
-    proofKicker: "Doğrulanabilir kanıt",
-    proofHeading: "Şu anda açabileceğiniz gerçek ürünler.",
-    proofLead: "Sonuç gibi sunulan mockup yok. En güçlü kanıt, gerçek kullanıcılarla üretimde çalışıyor — ve sahibi açıkça etiketli.",
-    proofItems: [
-      ["hodlstay.com", "Müşteri ürünü · Canlı", "https://hodlstay.com"],
-      ["satoshigazette.org", "Sahip olunan yayın · Canlı", "https://satoshigazette.org"],
-    ],
-    leverageKicker: "Kaldıraç nasıl yaratılır",
-    leverageHeading: "Tek girdi, birbirine bağlı birden çok çıktı.",
-    leverage: [
-      ["01", "Kısıtı bul", "Her işte diğerlerini tutan tek bir sistem vardır. Bir şey inşa etmeden önce onu net biçimde adlandırırız."],
-      ["02", "Çarpanı inşa et", "O kısıtı doğrudan ele alan ürünü, otomasyonu veya büyüme sistemini tasarlayıp yayınlarız."],
-      ["03", "Bağla", "Bir sistem diğerlerini beslediğinde kaldıraç yaratır — ürün ölçüme, ölçüm yaşam döngüsüne, yaşam döngüsü gelire."],
-      ["04", "Katla", "Sıradaki kısıtla tekrarla. Her döngü aktiviteye değil, doğrulanmış kanıta dayanır."],
-    ],
-    capabilitiesKicker: "Dört yetkinlik, tek sistem",
-    capabilitiesHeading: "Kurucu liderliğindeki bir işi hareket ettirmek için gereken her şey.",
-    capabilities: [
-      ["Ürün Mühendisliği", "Frontend, backend, API'ler, veri sistemleri ve eksiksiz dijital ürünler — iş gerekçesi gerçekten gerektirdiğinde onchain ürünler dahil."],
-      ["Otomasyon ve Yapay Zekâ", "İş akışı otomasyonu, iç araçlar, operasyon sistemleri, entegrasyonlar ve denetlenebilir kalan, dikkatle kapsamlanmış yapay zekâ."],
-      ["Yaşam Döngüsü ve Büyüme", "Aktivasyon, dönüşüm, elde tutma, analitik, müşteri yolculukları ve büyümeyi tekrarlanabilir kılan yaşam döngüsü sistemleri."],
-      ["Güvenlik ve Güvenilirlik", "Güvenlik temelleri, performans, dayanıklılık, erişim kontrolü ve güveni bozmadan hızlı hareket etme rahatlığı."],
-    ],
-    mapBandKicker: "Ücretsiz tanı",
-    mapBandHeading: "Hangi hamlenin çarpan olduğundan emin değil misiniz?",
-    mapBandLead: "Multiplier Map, kuralları şeffaf beş soruluk bir tanıdır. Herhangi bir görüşme, hesap veya taahhütten önce, yaklaşık iki dakikada somut bir sonraki adım haritası verir.",
-    workKicker: "Seçili işler",
-    workHeading: "MaydaLabs imzalı.",
-    work: [
       {
         href: "/case-studies/hodlstay",
         image: "/work/hodlstay-2026-08-home.jpg",
-        alt: "HodlStay küresel rezervasyon pazarı ana sayfası",
-        tags: ["Müşteri ürünü", "Canlı"],
+        alt: "HodlStay global booking marketplace homepage",
+        tags: ["Client build", "Live"],
         title: "HodlStay",
-        text: "Bitcoin-native bir seyahat fikri küresel konaklama pazarına dönüştürüldü — keşif, ev sahibi operasyonları, uygunluk, ödemeler ve veri göçü tek sistem olarak.",
+        text: "A global stay marketplace with Bitcoin payments in production: discovery, host operations, availability, BTCPay lifecycle, migration.",
       },
+    ],
+    allWork: "All work",
+    ctaKicker: "Bitcoin-first, not Bitcoin-only",
+    ctaHeading: ["One workflow.", "Four weeks. Then decide."],
+    ctaLead: "A pilot is deliberately small: one bounded workflow, a fixed price, and your approval on everything external. If the numbers don't convince you, you keep the system anyway.",
+    ctaStart: "Start a pilot",
+    ctaTalk: "Or write directly",
+  },
+  tr: {
+    meta: {
+      title: "MaydaLabs — Bitcoin operasyon şirketi",
+      socialTitle: "İşi yapay zekâ yapar. Her eylemi siz onaylarsınız. · MaydaLabs",
+      description:
+        "MaydaLabs, Bitcoin şirketleri için yapay zekâ ile çalışan operasyonlar kurar: içerik masaları, araştırma hatları, ödeme iş akışları. Kaynağa bağlı, onay kapılı; Satoshi Gazette üzerinde herkese açık kanıtlı.",
+    },
+    availability: "Pilot müşteri alıyoruz",
+    kicker: "Bitcoin öncelikli operasyon şirketi",
+    hero: ["Operasyonu yapay zekâ yürütür.", "Her eylemi siz onaylarsınız."],
+    lead: "Bitcoin şirketleri için yapay zekâ ile çalışan operasyonlar kuruyoruz — içerik masaları, araştırma hatları, ödeme iş akışları. Her iddia kaynağa bağlı. İnsan onayı olmadan hiçbir şey dışarı çıkmaz. Kendi yayınımız Satoshi Gazette bu sistemle çalışıyor.",
+    pilotCta: "Pilot başlat",
+    proofCta: "Sistemi canlı görün",
+    offersKicker: "İki teklif, ikisi de üretimde çalışıyor",
+    offersHeading: "İş akışını seçin. Sistemi biz kuralım.",
+    offers: [
+      {
+        title: "Kanıt kapılı yapay zekâ operasyonları",
+        text: "İş akışlarınızdan biri — içerik, araştırma veya iç operasyon — işi yapay zekânın ürettiği biçimde yeniden kurulur. Her iddia kaynağını taşır veya doğrulanmamış olarak işaretlenir. Dışarı çıkan her şeyi bir insan onaylar.",
+        proof: "Kanıt: Satoshi Gazette bu sistemle, herkese açık biçimde çalışıyor.",
+        price: "Pilot 2.500 $'dan · 3–4 hafta · sonrası aylık 1.000 $'dan",
+        href: "/approach",
+      },
+      {
+        title: "Bitcoin ödeme mühendisliği",
+        text: "BTCPay Server'ın doğrusu: kurulum, entegrasyon, faturadan ödemeye tam yaşam döngüsü, imzalı webhook doğrulaması, mutabakat, sıkılaştırma.",
+        proof: "Kanıt: HodlStay'in üretimdeki ödeme sistemi, uçtan uca.",
+        price: "Kapsamı belirli, sabit fiyatlı çalışmalar",
+        href: "/approach",
+      },
+    ],
+    offersLink: "Tekliflerin tamamı",
+    flagshipKicker: "Amiral ürün",
+    flagshipHeading: "Demo, Satoshi Gazette'in kendisi.",
+    flagshipLead: "Sistemimizle işletilen, sadece Bitcoin'e odaklı bir yayın. Mockup değil, sunum değil — şu anda okuyabileceğiniz, çalışan bir iş.",
+    flagshipFacts: [
+      "34 yayınlanmış içerik; her yayın insan onaylı",
+      "Her iddia kaynağa bağlı; değilse gerçek olarak yayınlanmaz",
+      "Her dağıtım eylemi herkese açık URL ile kayıtlı",
+      "Her kaydın düzenleyici dosyaya veya denetlenmiş rapora dayandığı bir hazine veri masası",
+    ],
+    flagshipVisit: "Yayını okuyun",
+    flagshipSystem: "Sistem nasıl çalışıyor",
+    stepsKicker: "Pilot nasıl ilerler",
+    steps: [
+      ["Kapsam", "Tek iş akışı, net tanım: ne girer, ne çıkar, kim onaylar."],
+      ["Kurulum", "Hat, kaynak kuralları ve onay kapısı — sizin hesaplarınızda, sahibi sizsiniz."],
+      ["İşletim", "Yapay zekâ her gün üretir. İncelemeniz saatler değil, dakikalar sürer."],
+      ["Ölçüm", "Üretim, onay süresi, kaynak kapsamı — açıkça raporlanır; sonra sıradaki iş akışına genişletilir."],
+    ],
+    rulesKicker: "Ev kuralları",
+    rules: [
+      "Onay yoksa dış eylem yok.",
+      "Kaynağa bağlı; değilse doğrulanmamış olarak işaretli.",
+      "Sizin hesaplarınız, sizin veriniz, sizin sisteminiz.",
+    ],
+    proofKicker: "Üretimde canlı",
+    proofItems: [
+      ["satoshigazette.org", "Sahip olunan yayın · sistemimizle çalışıyor", "https://satoshigazette.org"],
+      ["hodlstay.com", "Müşteri ürünü · Bitcoin ödemeleri canlı", "https://hodlstay.com"],
+    ],
+    workKicker: "Seçili işler",
+    workHeading: "MaydaLabs imzalı.",
+    work: [
       {
         href: "/case-studies/satoshi-gazette",
         image: "/work/satoshi-gazette-2026-08-home.jpg",
@@ -145,87 +167,115 @@ const COPY = {
         title: "Satoshi Gazette",
         text: "Ürün olarak inşa edilip işletilen bağımsız bir Bitcoin yayını: editoryal yüzeyler, veri sistemleri ve korumalı bir yayınlama hattı.",
       },
+      {
+        href: "/case-studies/hodlstay",
+        image: "/work/hodlstay-2026-08-home.jpg",
+        alt: "HodlStay küresel rezervasyon pazarı ana sayfası",
+        tags: ["Müşteri ürünü", "Canlı"],
+        title: "HodlStay",
+        text: "Bitcoin ödemeleri üretimde olan küresel bir konaklama pazarı: keşif, ev sahibi operasyonları, uygunluk, BTCPay yaşam döngüsü, veri göçü.",
+      },
     ],
     allWork: "Tüm işler",
-    ctaKicker: "Siz hazır olduğunuzda",
-    ctaHeading: ["Kısıtı getirin.", "Çarpan olanı inşa edelim."],
-    ctaStart: "Sonraki hamlemi haritala",
-    ctaTalk: "Bir görüşme başlat",
+    ctaKicker: "Bitcoin öncelikli; sadece Bitcoin değil",
+    ctaHeading: ["Tek iş akışı.", "Dört hafta. Sonra karar verin."],
+    ctaLead: "Pilot bilerek küçüktür: sınırları belli tek iş akışı, sabit fiyat ve dışa dönük her şeyde sizin onayınız. Rakamlar ikna etmezse sistem yine sizde kalır.",
+    ctaStart: "Pilot başlat",
+    ctaTalk: "Veya doğrudan yazın",
   },
   fr: {
     meta: {
-      title: "MaydaLabs — Entreprise de construction et d’accélération",
-      socialTitle: "Construisez la prochaine version de votre entreprise · MaydaLabs",
+      title: "MaydaLabs — Entreprise d'opérations Bitcoin",
+      socialTitle: "L'IA fait le travail. Vous approuvez chaque action. · MaydaLabs",
       description:
-        "MaydaLabs est une entreprise de construction et d’accélération pour les entreprises dirigées par leurs fondateurs. Lancez une idée, accélérez ce qui fonctionne ou éliminez les systèmes qui vous freinent.",
+        "MaydaLabs installe des opérations pilotées par l'IA pour les entreprises Bitcoin : desks de contenu, pipelines de recherche, flux de paiement. Sources liées, approbation obligatoire, preuve publique sur Satoshi Gazette.",
     },
-    availability: "Ouvert à de nouveaux projets",
-    kicker: "Construction et accélération",
-    hero: ["Construisez la prochaine", "version de votre entreprise."],
-    lead: "Lancez une idée, accélérez ce qui fonctionne déjà ou éliminez les systèmes qui vous ralentissent. MaydaLabs combine ingénierie produit, automatisation, croissance lifecycle et sécurité pour créer du levier.",
-    mapCta: "Cartographier ma prochaine étape",
-    seeWork: "Voir les réalisations",
-    situationsKicker: "Où commencent les fondateurs",
-    situationsHeading: "Trois situations. Une question : qu’est-ce qui multiplie ?",
-    situations: [
-      ["Lancer", "Vous avez une idée qui doit devenir un produit fonctionnel.", "D’un concept brut à un produit utilisable par de vraies personnes — cadré autour de la plus petite version qui prouve le business."],
-      ["Accélérer", "Vous avez une entreprise ou un produit qui doit croître ou s’améliorer.", "Identifier la contrainte qui retient les chiffres, puis construire le produit, le funnel et les systèmes lifecycle qui les font bouger."],
-      ["Éliminer la friction", "Vos workflows, systèmes ou opérations coûtent cher en silence.", "Remplacer le travail manuel, les outils fragiles et les systèmes déconnectés par une automatisation fiable et inspectable."],
+    availability: "Pilotes ouverts",
+    kicker: "Opérations Bitcoin-first",
+    hero: ["L'IA fait tourner l'opération.", "Vous approuvez chaque action."],
+    lead: "Nous installons des opérations pilotées par l'IA pour les entreprises Bitcoin — desks de contenu, pipelines de recherche, flux de paiement. Chaque affirmation est liée à sa source. Rien ne sort sans approbation humaine. Satoshi Gazette, notre publication, tourne dessus.",
+    pilotCta: "Lancer un pilote",
+    proofCta: "Voir le système en direct",
+    offersKicker: "Deux offres, déjà en production",
+    offersHeading: "Choisissez le flux. Nous installons le système.",
+    offers: [
+      {
+        title: "Opérations IA à preuves obligatoires",
+        text: "Un de vos flux — contenu, recherche ou opérations internes — reconstruit pour que l'IA produise le travail. Chaque affirmation porte sa source ou est marquée non vérifiée. Un humain approuve tout ce qui sort.",
+        proof: "Preuve : Satoshi Gazette tourne dessus, publiquement.",
+        price: "Pilote dès 2 500 $ · 3–4 semaines · puis dès 1 000 $/mois",
+        href: "/approach",
+      },
+      {
+        title: "Ingénierie des paiements Bitcoin",
+        text: "BTCPay Server fait correctement : déploiement, intégration, cycle complet facture-versement, vérification des webhooks signés, réconciliation, durcissement.",
+        proof: "Preuve : le système de paiement en production de HodlStay, construit de bout en bout.",
+        price: "Missions cadrées à prix fixe",
+        href: "/approach",
+      },
     ],
-    situationsLink: "Commencer par la Multiplier Map",
-    proofKicker: "Preuves vérifiables",
-    proofHeading: "De vrais produits que vous pouvez ouvrir maintenant.",
-    proofLead: "Pas de mockups présentés comme des résultats. La preuve la plus forte tourne en production avec de vrais utilisateurs — et son propriétaire est clairement indiqué.",
+    offersLink: "Le détail des offres",
+    flagshipKicker: "Produit phare",
+    flagshipHeading: "Satoshi Gazette est la démo.",
+    flagshipLead: "Une publication 100 % Bitcoin opérée par notre système. Pas une maquette, pas un deck — une activité qui tourne, lisible maintenant.",
+    flagshipFacts: [
+      "34 pièces publiées ; chaque publication approuvée par un humain",
+      "Chaque affirmation liée à sa source, sinon elle n'est pas publiée comme un fait",
+      "Chaque action de distribution enregistrée avec une URL publique",
+      "Un data desk trésorerie où chaque entrée cite un dépôt réglementaire ou un rapport audité",
+    ],
+    flagshipVisit: "Lire la publication",
+    flagshipSystem: "Comment le système fonctionne",
+    stepsKicker: "Comment se déroule un pilote",
+    steps: [
+      ["Cadrer", "Un flux, nommé précisément : ce qui entre, ce qui sort, qui approuve."],
+      ["Installer", "Le pipeline, les règles de sourçage et la porte d'approbation — dans vos comptes, à vous."],
+      ["Opérer", "L'IA produit chaque jour. Votre revue prend des minutes, pas des heures."],
+      ["Mesurer", "Production, délai d'approbation, couverture des sources — rapportés simplement, puis étendus au flux suivant."],
+    ],
+    rulesKicker: "Règles de la maison",
+    rules: [
+      "Pas d'approbation, pas d'action externe.",
+      "Lié à la source, ou marqué non vérifié.",
+      "Vos comptes, vos données, votre système.",
+    ],
+    proofKicker: "En production",
     proofItems: [
-      ["hodlstay.com", "Produit client · En ligne", "https://hodlstay.com"],
-      ["satoshigazette.org", "Publication détenue · En ligne", "https://satoshigazette.org"],
+      ["satoshigazette.org", "Publication détenue · tourne sur notre système", "https://satoshigazette.org"],
+      ["hodlstay.com", "Produit client · paiements Bitcoin en direct", "https://hodlstay.com"],
     ],
-    leverageKicker: "Comment le levier se crée",
-    leverageHeading: "Une entrée, plusieurs sorties connectées.",
-    leverage: [
-      ["01", "Trouver la contrainte", "Chaque entreprise a un système qui retient les autres. Nous le nommons précisément avant de construire quoi que ce soit."],
-      ["02", "Construire le multiplicateur", "Concevoir et livrer le produit, l’automatisation ou le système de croissance qui traite cette contrainte directement."],
-      ["03", "Le connecter", "Un système crée du levier quand il alimente les autres — le produit nourrit la mesure, la mesure le lifecycle, le lifecycle le revenu."],
-      ["04", "Composer", "Répéter avec la contrainte suivante. Chaque cycle s’appuie sur des preuves vérifiées, pas sur de l’activité."],
-    ],
-    capabilitiesKicker: "Quatre capacités, un système",
-    capabilitiesHeading: "Tout ce qu’il faut pour faire bouger une entreprise de fondateur.",
-    capabilities: [
-      ["Ingénierie produit", "Frontend, backend, API, systèmes de données et produits numériques complets — y compris des produits onchain quand le cas d’affaires l’exige vraiment."],
-      ["Automatisation et IA", "Automatisation des workflows, outils internes, systèmes opérationnels, intégrations et IA soigneusement cadrée, qui reste inspectable."],
-      ["Lifecycle et croissance", "Activation, conversion, rétention, analytics, parcours clients et systèmes lifecycle qui rendent la croissance répétable."],
-      ["Sécurité et fiabilité", "Fondations de sécurité, performance, résilience, contrôle d’accès et la confiance opérationnelle pour avancer vite sans casser la confiance."],
-    ],
-    mapBandKicker: "Diagnostic gratuit",
-    mapBandHeading: "Pas sûr du mouvement qui multiplie ?",
-    mapBandLead: "La Multiplier Map est un diagnostic en cinq questions aux règles transparentes. Elle vous donne une feuille de route concrète en deux minutes — avant tout échange, compte ou engagement.",
     workKicker: "Réalisations sélectionnées",
     workHeading: "Construit par MaydaLabs.",
     work: [
       {
-        href: "/case-studies/hodlstay",
-        image: "/work/hodlstay-2026-08-home.jpg",
-        alt: "Page d’accueil de la marketplace mondiale HodlStay",
-        tags: ["Produit client", "En ligne"],
-        title: "HodlStay",
-        text: "Une idée de voyage Bitcoin-native reconstruite en marketplace mondiale de séjours — découverte, opérations hôtes, disponibilité, paiements et migration en un seul système.",
-      },
-      {
         href: "/case-studies/satoshi-gazette",
         image: "/work/satoshi-gazette-2026-08-home.jpg",
-        alt: "Page d’accueil de la publication Satoshi Gazette",
+        alt: "Page d'accueil de la publication Satoshi Gazette",
         tags: ["Publication détenue", "En ligne"],
         title: "Satoshi Gazette",
         text: "Une publication Bitcoin indépendante construite et opérée comme un produit : surfaces éditoriales, systèmes de données et pipeline de publication contrôlé.",
       },
+      {
+        href: "/case-studies/hodlstay",
+        image: "/work/hodlstay-2026-08-home.jpg",
+        alt: "Page d'accueil de la marketplace mondiale HodlStay",
+        tags: ["Produit client", "En ligne"],
+        title: "HodlStay",
+        text: "Une marketplace mondiale de séjours avec paiements Bitcoin en production : découverte, opérations hôtes, disponibilité, cycle BTCPay, migration.",
+      },
     ],
     allWork: "Toutes les réalisations",
-    ctaKicker: "Prêt quand vous l’êtes",
-    ctaHeading: ["Apportez la contrainte.", "Nous construirons ce qui multiplie."],
-    ctaStart: "Cartographier ma prochaine étape",
-    ctaTalk: "Démarrer un échange",
+    ctaKicker: "Bitcoin-first, pas Bitcoin-only",
+    ctaHeading: ["Un flux.", "Quatre semaines. Puis décidez."],
+    ctaLead: "Un pilote est volontairement petit : un flux borné, un prix fixe, et votre approbation sur tout ce qui est externe. Si les chiffres ne convainquent pas, le système vous reste quand même.",
+    ctaStart: "Lancer un pilote",
+    ctaTalk: "Ou écrire directement",
   },
 } as const;
+
+const OFFER_ICONS: IconName[] = ["gate", "bitcoin"];
+const STEP_ICONS: IconName[] = ["scope", "install", "machine", "report"];
+const RULE_ICONS: IconName[] = ["gate", "source", "key"];
 
 export async function generateMetadata({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
@@ -254,53 +304,77 @@ export default async function HomePage({ params }: LocalePageProps) {
               <p className="mayda-lead">{copy.lead}</p>
             </div>
             <div className="mayda-hero-actions">
-              <Link href={localizePath("/start", locale)} className="mayda-button">
-                {copy.mapCta} <span aria-hidden>→</span>
+              <Link href={localizePath("/contact", locale)} className="mayda-button">
+                {copy.pilotCta} <span aria-hidden>→</span>
               </Link>
-              <Link href={localizePath("/case-studies", locale)} className="mayda-button mayda-button-outline">
-                {copy.seeWork}
+              <Link href={localizePath("/proof", locale)} className="mayda-button mayda-button-outline">
+                {copy.proofCta}
               </Link>
             </div>
           </div>
-          <FieldFigure className="hidden md:block" />
+          <GateFigure className="hidden md:block" />
         </div>
       </section>
 
       <section className="mayda-section" style={{ paddingTop: 0 }}>
         <div className="mayda-shell mayda-stack-lg">
           <header>
-            <p className="mayda-kicker">{copy.situationsKicker}</p>
-            <h2 className="mayda-heading">{copy.situationsHeading}</h2>
+            <p className="mayda-kicker">{copy.offersKicker}</p>
+            <h2 className="mayda-heading">{copy.offersHeading}</h2>
           </header>
-          <div className="mayda-situations">
-            {copy.situations.map(([title, lead, detail]) => (
-              <article key={title} className="mayda-situation">
-                <h3>{title}</h3>
-                <p style={{ color: "var(--frost)" }}>{lead}</p>
-                <p>{detail}</p>
-                <Link href={localizePath("/start", locale)} className="mayda-text-link">
-                  {copy.situationsLink} <span aria-hidden>→</span>
-                </Link>
-              </article>
+          <div className="mayda-grid-2">
+            {copy.offers.map((offer, index) => (
+              <Link key={offer.title} href={localizePath(offer.href, locale)} className="mayda-card">
+                <IconBox name={OFFER_ICONS[index]} tone={index === 0 ? "mint" : "cobalt"} />
+                <h3 className="mayda-subheading">{offer.title}</h3>
+                <p className="mayda-body mt-3">{offer.text}</p>
+                <p className="mayda-body mt-3" style={{ color: "var(--frost)" }}>
+                  {offer.proof}
+                </p>
+                <p className="mayda-mono mt-4" style={{ color: "var(--mint)" }}>
+                  {offer.price}
+                </p>
+              </Link>
             ))}
           </div>
+          <Link href={localizePath("/approach", locale)} className="mayda-text-link" style={{ alignSelf: "flex-start" }}>
+            {copy.offersLink} <span aria-hidden>→</span>
+          </Link>
         </div>
       </section>
 
       <section className="mayda-section-tight">
-        <div className="mayda-shell mayda-stack">
-          <header>
-            <p className="mayda-kicker">{copy.proofKicker}</p>
-            <h2 className="mayda-heading">{copy.proofHeading}</h2>
-            <p className="mayda-body mt-4">{copy.proofLead}</p>
-          </header>
-          <div className="mayda-proof-strip" role="list">
-            {copy.proofItems.map(([host, label, url]) => (
-              <a key={host} role="listitem" href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
-                <strong>{host} ↗</strong>
-                <span>{label}</span>
-              </a>
-            ))}
+        <div className="mayda-shell">
+          <div className="mayda-card" style={{ borderColor: "var(--cobalt-line)" }}>
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center">
+              <div className="mayda-stack">
+                <p className="mayda-kicker" style={{ margin: 0 }}>{copy.flagshipKicker}</p>
+                <h2 className="mayda-heading">{copy.flagshipHeading}</h2>
+                <p className="mayda-body">{copy.flagshipLead}</p>
+                <ul className="mayda-case-section-body" style={{ paddingLeft: "1.1rem", margin: 0 }}>
+                  {copy.flagshipFacts.map((fact) => (
+                    <li key={fact.slice(0, 24)} style={{ marginBottom: "0.4rem" }}>{fact}</li>
+                  ))}
+                </ul>
+                <div className="mayda-hero-actions" style={{ marginTop: "0.5rem" }}>
+                  <a href="https://satoshigazette.org" target="_blank" rel="noopener noreferrer" className="mayda-button mayda-button-outline">
+                    {copy.flagshipVisit} <span aria-hidden>↗</span>
+                  </a>
+                  <Link href={localizePath("/proof", locale)} className="mayda-text-link">
+                    {copy.flagshipSystem} <span aria-hidden>→</span>
+                  </Link>
+                </div>
+              </div>
+              <figure style={{ margin: 0, border: "1px solid var(--border)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
+                <Image
+                  src="/work/satoshi-gazette-2026-08-home.jpg"
+                  alt={copy.work[0].alt}
+                  width={1280}
+                  height={720}
+                  sizes="(max-width: 1024px) 100vw, 54vw"
+                />
+              </figure>
+            </div>
           </div>
         </div>
       </section>
@@ -308,54 +382,44 @@ export default async function HomePage({ params }: LocalePageProps) {
       <section className="mayda-section">
         <div className="mayda-shell mayda-stack-lg">
           <header>
-            <p className="mayda-kicker">{copy.leverageKicker}</p>
-            <h2 className="mayda-heading">{copy.leverageHeading}</h2>
+            <p className="mayda-kicker">{copy.stepsKicker}</p>
           </header>
           <div className="mayda-grid-2">
-            {copy.leverage.map(([number, title, text]) => (
-              <article key={number} className="mayda-card">
-                <p className="mayda-card-number">{number}</p>
-                <h3 className="mayda-subheading mt-2">{title}</h3>
-                <p className="mayda-body mt-3">{text}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mayda-section" style={{ paddingTop: 0 }}>
-        <div className="mayda-shell mayda-stack-lg">
-          <header>
-            <p className="mayda-kicker">{copy.capabilitiesKicker}</p>
-            <h2 className="mayda-heading">{copy.capabilitiesHeading}</h2>
-          </header>
-          <div className="mayda-grid-2">
-            {copy.capabilities.map(([title, text]) => (
+            {copy.steps.map(([title, text], index) => (
               <article key={title} className="mayda-card">
+                <div className="flex items-center justify-between">
+                  <IconBox name={STEP_ICONS[index]} />
+                  <p className="mayda-card-number">0{index + 1}</p>
+                </div>
                 <h3 className="mayda-subheading">{title}</h3>
                 <p className="mayda-body mt-3">{text}</p>
               </article>
             ))}
           </div>
+          <div>
+            <p className="mayda-kicker">{copy.rulesKicker}</p>
+            <div className="mayda-grid-3">
+              {copy.rules.map((rule, index) => (
+                <div key={rule.slice(0, 16)} className="mayda-rule-card">
+                  <Icon name={RULE_ICONS[index]} />
+                  <span>{rule}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="mayda-section-tight">
-        <div className="mayda-shell">
-          <div className="mayda-card is-link" style={{ borderColor: "var(--cobalt-line)" }}>
-            <div className="mayda-hero-grid" style={{ alignItems: "center" }}>
-              <div className="mayda-stack">
-                <p className="mayda-kicker" style={{ margin: 0 }}>{copy.mapBandKicker}</p>
-                <h2 className="mayda-heading">{copy.mapBandHeading}</h2>
-                <p className="mayda-body">{copy.mapBandLead}</p>
-                <div>
-                  <Link href={localizePath("/start", locale)} className="mayda-button">
-                    {copy.mapCta} <span aria-hidden>→</span>
-                  </Link>
-                </div>
-              </div>
-              <FieldFigure className="hidden lg:block" />
-            </div>
+      <section className="mayda-section-tight" style={{ paddingTop: 0 }}>
+        <div className="mayda-shell mayda-stack">
+          <p className="mayda-kicker">{copy.proofKicker}</p>
+          <div className="mayda-proof-strip" role="list">
+            {copy.proofItems.map(([host, label, url]) => (
+              <a key={host} role="listitem" href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
+                <strong>{host} ↗</strong>
+                <span>{label}</span>
+              </a>
+            ))}
           </div>
         </div>
       </section>
@@ -404,13 +468,14 @@ export default async function HomePage({ params }: LocalePageProps) {
           <br />
           <span className="mayda-multiply">{copy.ctaHeading[1]}</span>
         </h2>
+        <p className="mayda-body" style={{ maxWidth: "36rem" }}>{copy.ctaLead}</p>
         <div className="mayda-hero-actions" style={{ justifyContent: "center" }}>
-          <Link href={localizePath("/start", locale)} className="mayda-button">
+          <Link href={localizePath("/contact", locale)} className="mayda-button">
             {copy.ctaStart} <span aria-hidden>→</span>
           </Link>
-          <Link href={localizePath("/contact", locale)} className="mayda-button mayda-button-outline">
+          <a href="mailto:info@maydalabs.com" className="mayda-button mayda-button-outline">
             {copy.ctaTalk}
-          </Link>
+          </a>
         </div>
       </section>
     </div>
