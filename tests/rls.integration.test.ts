@@ -313,10 +313,16 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         .insert({ pilot_id: pilotId, title: "Draft", published: false });
       expect(draftError).toBeNull();
 
-      const { data: clientView } = await userA.from("pilot_updates").select("id, title");
+      const { data: clientView } = await userA
+        .from("pilot_updates")
+        .select("id, title")
+        .eq("pilot_id", pilotId);
       expect(clientView).toEqual([{ id: publishedUpdateId, title: "Week 1" }]);
 
-      const { data: operatorView } = await userB.from("pilot_updates").select("id");
+      const { data: operatorView } = await userB
+        .from("pilot_updates")
+        .select("id")
+        .eq("pilot_id", pilotId);
       expect(operatorView).toHaveLength(2);
     });
 
