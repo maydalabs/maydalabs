@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient, parseCookieHeader } from "@supabase/ssr";
+import { getSupabasePublishableKey, getSupabaseUrl, isSupabaseConfigured } from "@/lib/supabase/config";
 import {
   DEFAULT_LOCALE,
   isLocale,
@@ -67,11 +68,8 @@ export async function proxy(request: NextRequest) {
     .getAll()
     .some((cookie) => cookie.name.startsWith("sb-"));
 
-  if (hasAuthCookie && process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-      {
+  if (hasAuthCookie && isSupabaseConfigured()) {
+    const supabase = createServerClient(getSupabaseUrl()!, getSupabasePublishableKey()!, {
         cookies: {
           getAll() {
             return parseCookieHeader(request.headers.get("cookie") ?? "").map(

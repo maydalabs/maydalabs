@@ -29,6 +29,9 @@
   --mint-line: rgba(66, 245, 182, 0.5);
   --error-soft: rgba(255, 107, 107, 0.14);
   --chrome-height: 4.25rem;
+  /* Defined here, not only in @theme: Tailwind emits theme variables only
+     when a utility uses them, and headings reference this one directly. */
+  --font-display: var(--font-field-display), var(--font-field-sans), sans-serif;
 }
 
 @theme inline {
@@ -43,6 +46,7 @@
   --color-mint: var(--mint);
   --color-error: var(--error);
   --font-sans: var(--font-field-sans), "Space Grotesk", sans-serif;
+  --font-display: var(--font-field-display), var(--font-field-sans), sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", "IBM Plex Mono", Menlo, monospace;
   --radius-sm: 0.375rem;
   --radius-md: 0.75rem;
@@ -161,24 +165,27 @@ select {
 
 .mayda-display {
   margin: 0;
+  font-family: var(--font-display);
   font-size: clamp(2.4rem, 6.4vw, 4.6rem);
   font-weight: 600;
   line-height: 1.02;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.03em;
   text-wrap: balance;
 }
 
 .mayda-heading {
   margin: 0;
+  font-family: var(--font-display);
   font-size: clamp(1.7rem, 3.6vw, 2.6rem);
   font-weight: 600;
   line-height: 1.08;
-  letter-spacing: -0.028em;
+  letter-spacing: -0.024em;
   text-wrap: balance;
 }
 
 .mayda-subheading {
   margin: 0;
+  font-family: var(--font-display);
   font-size: clamp(1.15rem, 2vw, 1.4rem);
   font-weight: 600;
   line-height: 1.2;
@@ -325,6 +332,7 @@ select {
   display: inline-flex;
   align-items: baseline;
   gap: 0.14rem;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.02rem;
   letter-spacing: -0.03em;
@@ -1040,6 +1048,168 @@ fieldset.mayda-fieldset > p {
 .mayda-rule-card .mayda-icon {
   color: var(--mint);
   margin-top: 0.15rem;
+}
+
+/* ---------------------------------------------------------- approval demo */
+
+.approval-demo-grid {
+  display: grid;
+  gap: 1.4rem;
+  margin-top: 1.6rem;
+}
+
+@media (min-width: 900px) {
+  .approval-demo-grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  }
+}
+
+.approval-demo-draft {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.approval-demo-draft .mayda-browser-chrome b.is-muted {
+  color: var(--mist);
+}
+
+.approval-demo-body {
+  padding: 1.1rem 1.2rem 1.3rem;
+}
+
+.approval-demo-claims {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.approval-demo-claims li {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.approval-demo-claims li .mayda-icon {
+  color: var(--cobalt);
+  margin-top: 0.15rem;
+}
+
+.approval-demo-claims li small {
+  display: block;
+  margin-top: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--mist);
+}
+
+.approval-demo-claims li.is-unverified {
+  border-color: rgba(255, 107, 107, 0.45);
+  background: var(--error-soft);
+}
+
+.approval-demo-claims li.is-unverified .mayda-icon,
+.approval-demo-claims li.is-unverified small {
+  color: var(--error);
+}
+
+.approval-demo-gate {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.approval-demo-status {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-weight: 500;
+}
+
+.approval-demo-status .mayda-icon {
+  margin-top: 0.15rem;
+  color: var(--mist);
+}
+
+.approval-demo-status.approved {
+  border-color: var(--mint-line);
+  background: var(--mint-soft);
+  color: var(--mint);
+}
+
+.approval-demo-status.approved .mayda-icon {
+  color: var(--mint);
+}
+
+.approval-demo-status.sent_back {
+  border-color: var(--cobalt-line);
+  background: var(--cobalt-soft);
+}
+
+.approval-demo-ledger {
+  padding: 0.9rem 1rem;
+  border-left: 2px solid var(--cobalt);
+  background: var(--surface);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.approval-demo-ledger .mayda-mono {
+  margin: 0.4rem 0 0;
+  color: var(--frost);
+  word-break: break-word;
+}
+
+/* --------------------------------------------------------- live headlines */
+
+.sg-latest {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.sg-latest a {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  transition: border-color 160ms ease;
+}
+
+.sg-latest a:hover {
+  border-color: var(--mint-line);
+}
+
+.sg-latest strong {
+  font-weight: 600;
+  font-size: 0.92rem;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.sg-latest small {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mist);
 }
 
 /* ------------------------------------------------------------- hero bits */

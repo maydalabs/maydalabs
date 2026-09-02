@@ -68,7 +68,10 @@ export async function submitLeadIntakeAction(
     return { status: "error", code: "consent_required", field: "consentContact" };
   }
 
-  if (!isSupabaseConfigured() || !process.env.SUPABASE_SECRET_KEY) {
+  if (
+    !isSupabaseConfigured() ||
+    !(process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)
+  ) {
     return { status: "error", code: "save_failed" };
   }
 

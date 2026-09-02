@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { GateFigure } from "@/components/GateFigure";
 import { Icon, IconBox, type IconName } from "@/components/icons";
+import { SgLatest } from "@/components/SgLatest";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
@@ -365,15 +366,18 @@ export default async function HomePage({ params }: LocalePageProps) {
                   </Link>
                 </div>
               </div>
-              <figure style={{ margin: 0, border: "1px solid var(--border)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
-                <Image
-                  src="/work/satoshi-gazette-2026-08-home.jpg"
-                  alt={copy.work[0].alt}
-                  width={1280}
-                  height={720}
-                  sizes="(max-width: 1024px) 100vw, 54vw"
-                />
-              </figure>
+              <div>
+                <figure style={{ margin: 0, border: "1px solid var(--border)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
+                  <Image
+                    src="/work/satoshi-gazette-2026-08-home.jpg"
+                    alt={copy.work[0].alt}
+                    width={1280}
+                    height={720}
+                    sizes="(max-width: 1024px) 100vw, 54vw"
+                  />
+                </figure>
+                <SgLatest locale={locale} />
+              </div>
             </div>
           </div>
         </div>

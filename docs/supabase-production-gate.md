@@ -29,18 +29,36 @@ external account, money, or a remote project is Mehmet's action._
 | `subscriptions` | Free email-updates preference; stays `pending` until a mail provider exists |
 | `internal.operators` | Who may open `/internal/leads` (not API-exposed; surfaced via the `operator_status` view) |
 
-## Going live — in order (Mehmet's actions)
+## Going live — in order
 
-1. **Create the Supabase project** (supabase.com → New project, choose a
-   region near your users; pick a strong DB password, store it in a
-   password manager). Free tier is fine for pilots.
-2. **Link and push the schema** from this repo:
+The MaydaLabs Supabase org is billed through the **Vercel Marketplace**
+(Free plan, one existing project `satoshi-gazette` in `eu-west-1`). The
+Free plan allows two active projects, so MaydaLabs gets its own — do not
+share SG's database.
+
+**Mehmet (credentials involved — Claude never enters these):**
+
+1. **Create the project**: Supabase dashboard → New project → name
+   `maydalabs`, region `eu-west-1` (same as SG), *Generate password* and
+   store it in your password manager. Wait for it to finish provisioning.
+2. **Authenticate the CLI once, in your own terminal**:
    ```bash
    npx supabase login
+   ```
+   ```bash
    npx supabase link --project-ref <project-ref>
+   ```
+   (`link` asks for the database password from step 1 and stores it in the
+   OS keychain, so later pushes don't prompt.)
+
+**Claude, after that (no credentials handled):**
+
+3. **Push the schema** — applies exactly the three migrations in
+   `supabase/migrations/` and verifies the tables, policies, and view:
+   ```bash
    npx supabase db push
    ```
-   `db push` applies exactly the three migrations in `supabase/migrations/`.
+   Then a read-only check: `npx supabase migration list`.
 3. **Auth settings in the dashboard:** Authentication → URL configuration:
    Site URL `https://maydalabs.com`, redirect URLs
    `https://maydalabs.com/**`. Authentication → Email templates → *Magic
@@ -50,11 +68,17 @@ external account, money, or a remote project is Mehmet's action._
    rate-limited to a few emails per hour and is not for production. Point
    it at your Google Workspace SMTP or a transactional provider. Until this
    is done, sign-in codes will not reliably arrive.
-5. **Env vars on Vercel** (Project → Settings → Environment Variables):
-   - `NEXT_PUBLIC_SUPABASE_URL` — project URL
-   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — the `sb_publishable_…` key
-   - `SUPABASE_SECRET_KEY` — the `sb_secret_…` key (server only; never
-     `NEXT_PUBLIC_`)
+5. **Env vars on Vercel** — two options:
+   - *Marketplace integration (fewest clicks):* Vercel → Integrations →
+     Supabase → connect the `maydalabs` Supabase project to the
+     `mayda-labs` Vercel project. It injects `NEXT_PUBLIC_SUPABASE_URL`,
+     `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`.
+     **The app accepts these legacy names as fallbacks**, so nothing else
+     is needed.
+   - *Manual:* Project → Settings → Environment Variables:
+     `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+     (`sb_publishable_…`), `SUPABASE_SECRET_KEY` (`sb_secret_…`, server
+     only — never `NEXT_PUBLIC_`).
    Redeploy after saving.
 6. **Make yourself an operator** (SQL editor, once, with your auth user id
    after your first sign-in):

@@ -14,11 +14,18 @@ import {
   type Locale,
   isLocale,
 } from "@/lib/i18n";
-import { Space_Grotesk } from "next/font/google";
+import { Bricolage_Grotesque, Space_Grotesk } from "next/font/google";
 
 const fieldSans = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-field-sans",
+});
+
+// Display face: opinionated grotesque for headings and the wordmark only.
+const fieldDisplay = Bricolage_Grotesque({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-field-display",
 });
 
 const hasVercelRuntime = process.env.VERCEL === "1";
@@ -140,7 +147,7 @@ export default async function RootLayout({
   return (
     <html
       lang={lang}
-      className={fieldSans.variable}
+      className={`${fieldSans.variable} ${fieldDisplay.variable}`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >

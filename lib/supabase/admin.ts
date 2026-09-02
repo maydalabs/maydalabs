@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createClient } from "@supabase/supabase-js";
+import { getSupabaseUrl } from "@/lib/supabase/config";
 import type { Database } from "@/lib/supabase/database.types";
 
 /**
@@ -11,12 +12,13 @@ import type { Database } from "@/lib/supabase/database.types";
  * and never derive query filters from unvalidated input.
  */
 export function createSupabaseAdminClient() {
-  const secretKey = process.env.SUPABASE_SECRET_KEY;
+  // Legacy `SUPABASE_SERVICE_ROLE_KEY` is what the Vercel integration injects.
+  const secretKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!secretKey) {
     throw new Error("SUPABASE_SECRET_KEY is not configured");
   }
 
-  return createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, secretKey, {
+  return createClient<Database>(getSupabaseUrl()!, secretKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }

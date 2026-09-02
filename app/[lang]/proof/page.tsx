@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Icon, IconBox, type IconName } from "@/components/icons";
 import { PipelineDiagram } from "@/components/PipelineDiagram";
+import { ApprovalDemo } from "@/components/ApprovalDemo";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
@@ -218,6 +219,10 @@ export default async function ProofPage({ params }: LocalePageProps) {
             </li>
           ))}
         </ol>
+      </section>
+
+      <section className="mayda-section" style={{ paddingTop: 0 }}>
+        <ApprovalDemo locale={locale} />
       </section>
 
       <section className="mayda-section" style={{ paddingTop: 0 }}>
