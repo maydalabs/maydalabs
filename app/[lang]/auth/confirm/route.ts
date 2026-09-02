@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type { EmailOtpType } from "@supabase/supabase-js";
-import { claimAnonymousMaps } from "@/lib/mapClaimServer";
+import { claimAnonymousRecords } from "@/lib/mapClaimServer";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { isLocale, localizePath, type Locale } from "@/lib/i18n";
@@ -35,7 +35,7 @@ export async function GET(
     return NextResponse.redirect(failureUrl);
   }
 
-  await claimAnonymousMaps(data.user.id);
+  await claimAnonymousRecords(data.user.id, data.user.email ?? null);
 
   return NextResponse.redirect(
     new URL(localizePath("/portal", locale), request.nextUrl.origin),

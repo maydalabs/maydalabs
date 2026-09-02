@@ -95,8 +95,8 @@ export async function verifyOtpAndSaveMapAction(
   const { data, error } = await supabase.auth.verifyOtp({ email, token, type: "email" });
   if (error || !data.user) return { status: "error", code: "verify_failed" };
 
-  const { claimAnonymousMaps } = await import("@/lib/mapClaimServer");
-  await claimAnonymousMaps(data.user.id);
+  const { claimAnonymousRecords } = await import("@/lib/mapClaimServer");
+  await claimAnonymousRecords(data.user.id, data.user.email ?? email);
 
   return saveMapAction(prev, formData);
 }

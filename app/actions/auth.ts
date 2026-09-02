@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { isValidEmail } from "@/lib/intakeValidation";
-import { claimAnonymousMaps } from "@/lib/mapClaimServer";
+import { claimAnonymousRecords } from "@/lib/mapClaimServer";
 import { checkRateLimit, clientKeyFromHeaders } from "@/lib/rateLimit";
 import { isLocale, localizePath, type Locale } from "@/lib/i18n";
 
@@ -79,7 +79,7 @@ export async function verifyOtpAction(
   const { data, error } = await supabase.auth.verifyOtp({ email, token, type: "email" });
   if (error || !data.user) return { status: "error", code: "verify_failed", email };
 
-  await claimAnonymousMaps(data.user.id);
+  await claimAnonymousRecords(data.user.id, data.user.email ?? email);
 
   const nextPath = readNextPath(formData);
   if (nextPath) redirect(localizePath(nextPath, readLocale(formData)));
