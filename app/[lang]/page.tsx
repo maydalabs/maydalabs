@@ -439,7 +439,7 @@ export default async function HomePage({ params }: LocalePageProps) {
       <FounderNote locale={locale} showPortrait={false} />
 
 
-      <section className="mayda-section-tight" style={{ paddingTop: 0 }}>
+      <section className="mayda-section-tight">
         <div className="mayda-shell mayda-stack">
           <p className="mayda-kicker">{copy.proofKicker}</p>
           <div className="mayda-proof-strip" role="list">
