@@ -4,26 +4,38 @@ _3 September 2026. Everything here is prepared for Mehmet to create or
 update the accounts himself (account creation is his action). Copy is a
 draft for his voice pass. Nothing is posted by anyone else, ever._
 
-## Accounts
+## Accounts (state seen 3 Sep 2026)
 
-| Network | Handle / URL | State (3 Sep) | Action |
+| Network | Handle / URL | State | Action |
 |---|---|---|---|
-| X | `@maydalabs` · x.com/maydalabs | Page responds (200). Confirm it is ours; if not, pick `@maydalabs_` or `@mayda_labs` and update the footer link in `components/SiteFooter.tsx`. | Set avatar, banner, bio, website, location. |
-| LinkedIn company page | linkedin.com/company/maydalabs | Does not exist (404). | Create page "MaydaLabs" from Mehmet's personal account; claim the `maydalabs` slug; set logo, cover, tagline, about, website, industry, size, HQ. Then add the URL to the footer. |
-| GitHub | github.com/maydalabs | Exists. | Set the org avatar to the mark; profile README later. |
-| Nostr / Telegram | — | Not now. | Revisit when the content lane has a month of posts. |
+| X | `@maydalabs` · x.com/maydalabs | Ours. 1,358 posts since April 2022, 7 followers, bio "MaydaLabs", old "M" avatar, no banner, a personal birthday on a company account. | Keep the handle and the history. Replace avatar, add banner, rewrite bio, set website, remove the birthday. Pin the first new post. |
+| LinkedIn company page | linkedin.com/company/maydalabs | Does not exist. Satoshi Gazette's page exists and is the style reference (dark cover, one line, nothing else). | Create it (steps below). |
+| GitHub | github.com/maydalabs | Exists. | Set the org avatar to the mark. |
 
-## Assets (in `docs/social/assets/`)
+## External actions, in order (all yours; ~40 minutes)
 
-- `maydalabs-avatar-400.png` — X profile (400×400), GitHub org avatar.
-- `maydalabs-avatar-300.png` — LinkedIn company logo (300×300).
-- `maydalabs-banner-x-1500x500.png` — X header.
-- `maydalabs-cover-linkedin-1128x191.png` — LinkedIn company cover.
+**1. LinkedIn company page (15 min)**
+1. LinkedIn → *For Business* → *Create a Company Page* → *Company*.
+2. Name `MaydaLabs` · LinkedIn public URL `maydalabs` · Website `https://maydalabs.com` · Industry `IT Services and IT Consulting` · Company size `1 employee` (LinkedIn's smallest bracket is 0–1) · Type `Self-Employed` (or `Privately Held` if you register the entity first).
+3. Logo: `maydalabs-avatar-300.png` (the mark on the void; it becomes the page avatar).
+4. Tagline (≤120): `AI runs the operation. You approve every action. Bitcoin-first operations company.`
+5. Cover: `maydalabs-cover-linkedin-a.png` (figure only) or `-b` (figure + one line). No logo on the cover; the avatar already carries it.
+6. About: paste the "LinkedIn about" block below. Location: Istanbul. Founded: 2026.
+7. Admin → *Page admins*: you are super admin by default; add nobody else yet.
+8. Publish, then open *View as member* and check the cover crop on desktop and phone.
+9. Add the page to the site footer: tell me the final URL and I change the LinkedIn link from your personal profile to the page (or keep both).
 
-All rendered from the Block gate mark on the void, brand type, one orange
-dot (Bitcoin desk rule). Re-render from the HTML templates in the session
-scratchpad if the mark or statement changes; the source is the same SVG
-as `app/icon.svg`.
+**2. X @maydalabs (10 min)**
+1. *Edit profile*: avatar `maydalabs-avatar-400.png`; header `maydalabs-banner-x-a.png` (figure only) or `-b` (figure + one line).
+2. Name `MaydaLabs`. Bio: paste the X bio below. Website `maydalabs.com`. Location `Istanbul / everywhere`. Birth date: remove (Settings → Account → Birth date → visibility "only you", or clear it).
+3. Category stays `Entrepreneur` or switch to `Business` → *Software Company*.
+4. Leave the old posts; they are history, not a liability. Pin the first new post once it is approved through Abidin.
+
+**3. GitHub org (2 min)**
+Settings → Profile → upload `maydalabs-avatar-400.png`; website `https://maydalabs.com`; description = the X bio.
+
+**4. Then back to me**
+Say "briefs" and I create the first ten content briefs in Abidin from the drafts below, draft them, and leave them in your review queue. You approve, post, paste each public URL back; nothing posts without that.
 
 ## Profile copy (drafts)
 
