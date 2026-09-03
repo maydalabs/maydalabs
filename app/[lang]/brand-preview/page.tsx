@@ -2,6 +2,7 @@ import "@/app/brand.css";
 import type { Metadata } from "next";
 import { BitcoinClock } from "@/components/BitcoinClock";
 import { Logo, LogoMark, LogoMarkBitcoin } from "@/components/Logo";
+import { LogoCandidateGallery } from "@/components/LogoCandidates";
 import { Reveal } from "@/components/Reveal";
 import { SignalField } from "@/components/SignalField";
 import { ApprovalQueue } from "@/components/illustrations/ApprovalQueue";
@@ -30,6 +31,16 @@ export default function BrandPreviewPage() {
       <p className="mayda-lead mt-4 max-w-2xl">
         Internal page. Every new brand component on the void, then the mono variants on frost.
       </p>
+
+      {/* 0. Mark candidates — pick one by its id */}
+      <section id="candidates" className="mt-12 border-t border-[color:var(--border)] pt-10">
+        <p className="mayda-kicker">Mark candidates · pick by number</p>
+        <p className="mayda-body" style={{ maxWidth: "44rem", marginTop: "0.5rem" }}>
+          Each row: the mark large in the brand gradient, the header lockup at real size, a 16 px favicon on a
+          browser tab, a 40 px app tile, and the mono version on frost. Same stroke weight throughout.
+        </p>
+        <LogoCandidateGallery />
+      </section>
 
       {/* 1. Logo family */}
       <section className="mt-16 grid gap-10 border-t border-[color:var(--border)] pt-10 md:grid-cols-2">
