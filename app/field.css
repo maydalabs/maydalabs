@@ -2442,3 +2442,13 @@ fieldset.mayda-fieldset > p {
 @layer components {
   .mayda-profile-portrait { display: block; width: 100%; height: auto; border-radius: var(--radius-lg); border: 1px solid var(--border-strong); margin-bottom: 1.1rem; filter: saturate(0.9); }
 }
+
+/* Partner logos sit on frost chips so their real colours read on the void. */
+@layer components {
+  .mayda-stack-item.is-brand { background: var(--frost); border-color: transparent; color: var(--void); }
+  .mayda-stack-item.is-brand:hover { border-color: var(--btc-line); }
+  .mayda-stack-item.is-wide { height: 2.9rem; padding: 0 0.9rem; }
+  .mayda-stack-item .mayda-stack-img.is-wide { height: 1.35rem; width: auto; max-width: 7rem; }
+  .mayda-stack-item.is-brand .mayda-stack-img { width: 1.7rem; height: 1.7rem; }
+  .mayda-stack-item.is-brand .mayda-stack-img.is-wide { width: auto; height: 1.35rem; }
+}
