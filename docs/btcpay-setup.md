@@ -18,25 +18,54 @@ site when an invoice is paid. Two consequences:
   seed phrase into BTCPay.** If it offers to create a hot wallet, decline for
   business funds.
 
-## Step 1 — Choose where it runs (15 minutes, then waiting)
+## Step 1 — Choose where it runs (20 minutes, then waiting)
 
-**Option A, hosted by someone else. Recommended to start.**
-Go to https://btcpayserver.org, open **Deployment → Third-party hosts**, and
-pick one (Voltage is the best known). You get a working instance in minutes and
-never touch a server. Roughly $10-30/month depending on the host; check the
-current price on their page. Still non-custodial: you connect your own wallet.
+"Hosted by someone else" means two very different things, and the difference
+decides whether it is safe to take real money.
 
-**Option B, your own instance via the LunaNode launcher.**
-Same page, **Deployment → LunaNode**. Create a LunaNode account, add a little
-credit, and use the one-click launcher: it builds a VPS running BTCPay plus a
-pruned Bitcoin node. Around $8-15/month. No command line needed. The node then
-has to sync the blockchain, which takes **several hours to a day**. Do steps 2-5
-after the sync finishes, or start them and expect the wallet page to be slow
-until sync completes.
+**Shared third-party host (free).** You register as a user on somebody else's
+BTCPay. BTCPay's own documentation is blunt about the risk: a malicious host can
+run a modified build that swaps your extended public key for theirs, so future
+payments land in their wallet. The docs say to use these hosts for "testing,
+learning and getting started" and *not* "with high volume payments or extremely
+valuable transactions". A $2,500 pilot invoice is not a test. Their directory at
+directory.btcpayserver.org is also serving an invalid TLS certificate as of
+3 Sep 2026, so it cannot be browsed safely today.
 
-You have the Docker skills for a bare VPS, but you would be signing up for node
-upkeep on top of everything else this month. Take A now; move to B later if you
-want to own the box. Either way, write down the instance URL, for example
+**Managed private instance (paid). Recommended.** A company runs *your own*
+BTCPay on *your own* virtual machine and keeps it patched. You are still trusting
+a provider with the box, but it is a commercial provider with a reputation, not
+an anonymous shared server, and nobody else has an account on your instance.
+
+Two providers checked on 3 Sep 2026:
+
+| Provider | Price | Notes |
+| --- | --- | --- |
+| Elestio, elest.io/open-source/btcpay | from **$16/month** | Dedicated instance, automated backups, auto SSL, **auto updates**, monitoring, custom domain, human support. Storage billed at $0.15/GB/month on top. |
+| Stellar Hosted, stellarhosted.com/btcpay-server | from **$49/month** | Dedicated private instance, 14-day trial with no card, servers in the Netherlands, Germany, San Francisco. Packages showed "coming soon", so check it is actually purchasable. |
+
+Voltage does **not** host BTCPay; they sell Lightning payment infrastructure.
+An earlier draft of this document named them by mistake.
+
+Auto updates matter more than the price difference. btcpayserver.org is
+currently carrying a red banner: "Critical security update: Update BTCPay Server
+to the latest version immediately." On a managed instance that is the provider's
+job. On your own VPS it is yours, forever.
+
+**Before you pay, confirm with the provider:**
+
+1. Does the instance run its own Bitcoin node, or connect to an external one?
+2. If its own: is it pruned, and how much disk does the plan include? A pruned
+   node needs tens of gigabytes; the $16 headline will not include that.
+3. How long until the node is synced and the instance can accept a payment?
+   Expect hours, not minutes, unless they provide a pre-synced node.
+
+**The self-hosted alternative,** if you would rather own the box: the LunaNode
+one-click launcher at btcpayserver.org → Deployment → LunaNode, roughly $8-15 a
+month, no command line, but the sync wait is yours and so is every future
+security update.
+
+Whichever you choose, write down the instance URL, for example
 `https://mayda.btcpay.example`. That value is `BTCPAY_HOST`.
 
 ## Step 2 — Create the admin account (5 minutes)
