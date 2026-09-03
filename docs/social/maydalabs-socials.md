@@ -44,25 +44,50 @@ without alpha. If it still fails, pick the file through "Change image"
 instead of drag-and-drop; the crop tool showing the image means the file
 itself is fine.
 
-## Profile copy (drafts)
+## Profile copy — options (positioning: an operations company; Bitcoin as proof and capability, not the audience)
 
-**X bio (≤160 chars):**
-> Bitcoin-first operations company. AI runs the work; a human approves every action. We run Satoshi Gazette on it. Pilots open.
+### LinkedIn tagline (≤120 chars) — pick one
+1. `AI runs the operation. You approve every action.` (49)
+2. `We install AI-run operations. Nothing leaves without your approval.` (67)
+3. `AI does the work. A human signs every action. Proven in public.` (63)
+4. `Operations company. AI-run, human-approved, source-linked.` (58)
 
-**X fields:** Website `maydalabs.com` · Location `Istanbul / everywhere`.
-
-**LinkedIn tagline (≤120 chars):**
-> AI runs the operation. You approve every action. Bitcoin-first operations company.
-
-**LinkedIn about:**
-> MaydaLabs installs AI-run operations for Bitcoin companies: content desks, research pipelines, payment workflows. AI produces the work; every claim is linked to its source; nothing goes out without a human approval.
+### LinkedIn Overview / About (≤2,000) — pick one, edit freely
+**A · plain**
+> MaydaLabs installs AI-run operations for companies whose content, research, or payment workflows eat the team's week. AI produces the work; every claim is linked to its source; nothing goes out without a human approval.
 >
-> We run our own publication, Satoshi Gazette, on the same system, in public. Pilots are small on purpose: one workflow, a fixed price, three to four weeks, in your accounts. Bitcoin-first, not Bitcoin-only.
+> We run our own publication, Satoshi Gazette, on the same system, in public, so you can inspect how it works before you buy. Pilots are small on purpose: one workflow, a fixed price, three to four weeks, in your accounts. You keep the system either way.
+>
+> Also: Bitcoin payments engineering — BTCPay Server, the full invoice-to-payout lifecycle, reconciliation your accountant can read.
 >
 > maydalabs.com · Istanbul, everywhere.
 
-**Industry:** IT Services and IT Consulting · **Size:** 1 · **Type:** Self-employed / Privately held · **Founded:** 2026 (or the entity date).
+**B · shorter**
+> We install operations that AI runs and a human approves. Content desks, research pipelines, payment workflows: every claim source-linked, every external action signed off by you. Our own publication runs on it, in public. One-workflow pilots, fixed price, in your accounts. maydalabs.com
 
+**C · founder voice**
+> I built this system to run my own publication without losing control of what goes out. AI drafts, sorts, and prepares; I approve every action. Now I install the same setup for other companies: one workflow at a time, a fixed price, your accounts, your approver. If the numbers don't convince you after four weeks, you keep the system anyway. maydalabs.com
+
+### LinkedIn details
+- Industry: keep `Software Development`, or `IT Services and IT Consulting` (closer to a services company).
+- Company type: `Self Owned` is fine; switch to `Privately held` when the entity exists.
+- Year founded: `2026`.
+- Workplace module: turn on, `Remote`.
+- Locations: Istanbul, Türkiye (HQ).
+- Specialties (up to 20): AI operations · Workflow automation · Human-in-the-loop approval · Content operations · Research pipelines · Editorial systems · Bitcoin payments · BTCPay Server · Payment reconciliation · Next.js · Supabase · Product engineering · Evidence-linked publishing · Operations consulting.
+- Custom button: `Visit website` → https://maydalabs.com ✔ (done).
+
+### X bio (≤160 chars) — pick one
+1. `Operations company. AI runs the work, a human approves every action. We run Satoshi Gazette on it, in public. Pilots open.` (124)
+2. `We install AI-run operations for companies: source-linked, human-approved, in your accounts. Proven on our own publication.` (124)
+3. `AI does the work. A human signs every action. One-workflow pilots for companies that want the output without losing control.` (126)
+4. `Operations, run by AI, approved by you. Also Bitcoin payments done properly. maydalabs.com` (90)
+
+### X fields
+- Name `MaydaLabs` · Website `maydalabs.com` · Location `Istanbul / everywhere`.
+- Birth date: open it → set visibility to "Only you" for both year and month/day, or remove it; a company account should not display one.
+- Professional profile: Category → `Business` → `Software Company` (or keep `Entrepreneur`); Profile Spotlight: none for now.
+- Header: `maydalabs-banner-x-notext.jpg` (figure only, composed around the avatar).
 ## Voice and rules for every post
 
 - One observation, one number, or one thing we shipped. No slogans.
