@@ -37,6 +37,13 @@ Settings → Profile → upload `maydalabs-avatar-400.png`; website `https://may
 **4. Then back to me**
 Say "briefs" and I create the first ten content briefs in Abidin from the drafts below, draft them, and leave them in your review queue. You approve, post, paste each public URL back; nothing posts without that.
 
+**LinkedIn upload note (3 Sep):** LinkedIn's cover uploader failed on the
+1128×191 PNGs ("Cover image update failed"). It accepts larger, flat files:
+use `maydalabs-cover-linkedin-a-2256x382.jpg` (or `-b-`), 2× size, JPEG
+without alpha. If it still fails, pick the file through "Change image"
+instead of drag-and-drop; the crop tool showing the image means the file
+itself is fine.
+
 ## Profile copy (drafts)
 
 **X bio (≤160 chars):**
