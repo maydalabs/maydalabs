@@ -2393,3 +2393,9 @@ fieldset.mayda-fieldset > p {
   .mayda-stack-item:hover span { color: var(--frost); }
   .mayda-stack-item:hover .mayda-stack-img { filter: none; opacity: 1; }
 }
+
+/* Worked-with logos keep their real colours; only the tech glyphs are monochrome. */
+@layer components {
+  .mayda-stack-group[data-group="worked"] .mayda-stack-img { filter: none; opacity: 1; width: 1.35rem; height: 1.35rem; }
+  .mayda-stack-group[data-group="worked"] .mayda-stack-item { color: var(--frost); }
+}

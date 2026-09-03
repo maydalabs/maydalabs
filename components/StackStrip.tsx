@@ -45,7 +45,7 @@ export function StackStrip({ locale, kicker }: { locale: Locale; kicker: string 
         <p className="mayda-kicker">{kicker}</p>
         <div className="mayda-stack-groups">
           {STACK_GROUPS.map((group) => (
-            <div key={group.id} className="mayda-stack-group">
+            <div key={group.id} className="mayda-stack-group" data-group={group.id}>
               <span className="mayda-stack-group-label">{group.label[locale]}</span>
               <ul className="mayda-stack-list">
                 {group.items.map((item) => {
