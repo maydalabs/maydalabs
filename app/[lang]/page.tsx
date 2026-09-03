@@ -3,6 +3,7 @@ import Link from "next/link";
 import { GateFigure } from "@/components/GateFigure";
 import { FounderNote } from "@/components/FounderNote";
 import { SignalField } from "@/components/SignalField";
+import { BitcoinDesk } from "@/components/BitcoinDesk";
 import { Reveal } from "@/components/Reveal";
 import { ApprovalQueue } from "@/components/illustrations/ApprovalQueue";
 import { PaymentsFlow } from "@/components/illustrations/PaymentsFlow";
@@ -322,6 +323,9 @@ export default async function HomePage({ params }: LocalePageProps) {
           <GateFigure className="hidden md:block" />
         </div>
       </section>
+
+      <BitcoinDesk locale={locale} />
+
 
       <section className="mayda-section" style={{ paddingTop: 0 }}>
         <div className="mayda-shell mayda-stack-lg">

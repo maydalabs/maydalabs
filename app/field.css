@@ -2185,3 +2185,113 @@ fieldset.mayda-fieldset > p {
   }
   .mayda-offer-figure svg { display: block; width: 100%; height: auto; }
 }
+
+/* Bitcoin desk — the chain, live, under the hero. */
+@keyframes desk-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.8); } }
+@layer components {
+  .mayda-desk {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background:
+      linear-gradient(90deg, var(--cobalt-soft), transparent 45%, var(--mint-soft)),
+      var(--surface);
+    padding: 1.4rem 0 1.6rem;
+  }
+  .mayda-desk-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 1.1rem;
+  }
+  .mayda-desk-dot {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-right: 0.45rem;
+    border-radius: 999px;
+    background: var(--mint);
+    box-shadow: 0 0 0 4px var(--mint-soft);
+    vertical-align: middle;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .mayda-desk-dot { animation: desk-dot 2.4s ease-in-out infinite; }
+  }
+  .mayda-desk-tagline {
+    margin-left: 0.8rem;
+    color: var(--mist);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .mayda-desk-source { color: var(--mist); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  .mayda-desk-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+  }
+  @media (min-width: 48rem) { .mayda-desk-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @media (min-width: 72rem) { .mayda-desk-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
+  .mayda-desk-tile {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.9rem 1rem 0.95rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-card);
+    transition: border-color 600ms ease;
+  }
+  .mayda-desk-tile.is-price { grid-column: span 2; }
+  .mayda-desk-tile.is-updated { border-color: var(--mint-line); }
+  .mayda-desk-tile.is-updated strong { color: var(--mint); }
+  .mayda-desk-label {
+    color: var(--mist);
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .mayda-desk-tile strong {
+    font-family: var(--font-display);
+    font-size: clamp(1.45rem, 2.4vw, 2.1rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--frost);
+    transition: color 600ms ease;
+  }
+  .mayda-desk-tile strong em {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--mist);
+    margin-left: 0.25rem;
+  }
+  .mayda-desk-tile small {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.8rem;
+    color: var(--mist);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.03em;
+  }
+  .mayda-desk-tile .is-up { color: var(--mint); }
+  .mayda-desk-tile .is-down { color: var(--error); }
+  .mayda-desk-spark {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 55%;
+    height: 2.6rem;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+}
