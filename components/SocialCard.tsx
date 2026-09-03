@@ -17,7 +17,7 @@ type CardCopy = { eyebrow: string; title: string };
 
 const CARD_COPY: Record<Locale, Record<SocialCardKind, CardCopy>> = {
   en: {
-    studio: { eyebrow: "Bitcoin operations company", title: "AI runs the work. You approve every action." },
+    studio: { eyebrow: "AI-run operations, human-approved", title: "Let AI run your operation while you stay in control!" },
     proof: { eyebrow: "Proof · Live system", title: "The system behind Satoshi Gazette." },
     start: { eyebrow: "Multiplier Map · Free diagnostic", title: "Map my next move." },
     approach: { eyebrow: "Offers", title: "Two offers, both already in production." },
@@ -34,7 +34,7 @@ const CARD_COPY: Record<Locale, Record<SocialCardKind, CardCopy>> = {
     legal: { eyebrow: "MaydaLabs", title: "The fine print, kept honest." },
   },
   tr: {
-    studio: { eyebrow: "Bitcoin operasyon şirketi", title: "İşi yapay zekâ yapar. Her eylemi siz onaylarsınız." },
+    studio: { eyebrow: "Yapay zekâ ile çalışan, insan onaylı operasyonlar", title: "Operasyonunuzu yapay zekâ yürütsün, kontrol sizde kalsın!" },
     proof: { eyebrow: "Kanıt · Canlı sistem", title: "Satoshi Gazette'in arkasındaki sistem." },
     start: { eyebrow: "Multiplier Map · Ücretsiz tanı", title: "Sonraki hamlemi haritala." },
     approach: { eyebrow: "Teklifler", title: "İki teklif, ikisi de üretimde." },
@@ -51,7 +51,7 @@ const CARD_COPY: Record<Locale, Record<SocialCardKind, CardCopy>> = {
     legal: { eyebrow: "MaydaLabs", title: "Küçük yazılar, dürüst tutulur." },
   },
   fr: {
-    studio: { eyebrow: "Opérations Bitcoin", title: "L'IA fait le travail. Vous approuvez chaque action." },
+    studio: { eyebrow: "Opérations IA, approuvées par un humain", title: "Laissez l'IA faire tourner votre opération, vous gardez le contrôle !" },
     proof: { eyebrow: "Preuve · Système en direct", title: "Le système derrière Satoshi Gazette." },
     start: { eyebrow: "Multiplier Map · Diagnostic gratuit", title: "Cartographier ma prochaine étape." },
     approach: { eyebrow: "Offres", title: "Deux offres, déjà en production." },

@@ -53,11 +53,11 @@ export function SiteFooter({ locale }: { locale: Locale }) {
                 X · @maydalabs ↗
               </a>
               <a
-                href="https://www.linkedin.com/in/mehmet-e-mayda/"
+                href="https://www.linkedin.com/company/maydalabs"
                 target="_blank"
-                rel="me noopener noreferrer"
+                rel="noopener noreferrer"
               >
-                LinkedIn ↗
+                LinkedIn · MaydaLabs ↗
               </a>
               <a
                 href="https://github.com/maydalabs"

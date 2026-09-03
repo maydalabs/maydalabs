@@ -23,9 +23,9 @@ export const OPEN_GRAPH_LOCALES: Record<Locale, string> = {
 };
 
 export const SITE_DESCRIPTIONS: Record<Locale, string> = {
-  en: "MaydaLabs is a Bitcoin-first operations company. AI runs content, research, and payment workflows; a human approves every external action. Satoshi Gazette runs on this system.",
-  tr: "MaydaLabs, Bitcoin öncelikli bir operasyon şirketidir. İçerik, araştırma ve ödeme iş akışlarını yapay zekâ yürütür; her dış eylemi bir insan onaylar. Satoshi Gazette bu sistemle çalışır.",
-  fr: "MaydaLabs est une entreprise d’opérations Bitcoin-first. L’IA exécute les flux de contenu, de recherche et de paiement ; un humain approuve chaque action externe. Satoshi Gazette tourne sur ce système.",
+  en: "MaydaLabs is an operations company. AI runs content, research, and payment workflows; a human approves every external action. Satoshi Gazette runs on this system.",
+  tr: "MaydaLabs bir operasyon şirketidir. İçerik, araştırma ve ödeme iş akışlarını yapay zekâ yürütür; her dış eylemi bir insan onaylar. Satoshi Gazette bu sistemle çalışır.",
+  fr: "MaydaLabs est une entreprise d’opérations. L’IA exécute les flux de contenu, de recherche et de paiement ; un humain approuve chaque action externe. Satoshi Gazette tourne sur ce système.",
 };
 
 export const SITE_CHROME_COPY = {

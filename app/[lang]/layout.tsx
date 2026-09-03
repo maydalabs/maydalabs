@@ -47,7 +47,7 @@ export async function generateMetadata({
   return {
     metadataBase: new URL(SITE_URL),
     title: {
-      default: "MaydaLabs — Bitcoin operations company",
+      default: "MaydaLabs — AI-run operations, you stay in control",
       template: "%s · MaydaLabs",
     },
     description,
@@ -92,7 +92,7 @@ function getStructuredData(locale: Locale) {
         sameAs: [
           "https://github.com/maydalabs",
           "https://x.com/maydalabs",
-          "https://www.linkedin.com/in/mehmet-e-mayda/",
+          "https://www.linkedin.com/company/maydalabs",
         ],
         knowsAbout: [
           "Bitcoin",

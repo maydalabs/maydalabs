@@ -38,7 +38,7 @@ const COPY = {
       ["Product engineering", "Next.js and React applications, data models, integrations, marketplaces, payments, and operator workflows."],
       ["Growth engineering", "Analytics, conversion surfaces, lifecycle email, technical SEO, localization, campaigns, and experimentation foundations."],
       ["Product ownership", "Problem framing, information architecture, release shaping, cross-functional decisions, documentation, and operational handover."],
-      ["Bitcoin + AI operations", "Bitcoin-native product work and approval-gated research, editorial, retrieval, and production workflows."],
+      ["AI operations + Bitcoin payments", "Approval-gated research, editorial, retrieval, and production workflows; Bitcoin-native product and payment work."],
     ],
     proofKicker: "Selected evidence / Individual ownership",
     proofHeading: "Four products. Clear boundaries.",
@@ -90,7 +90,7 @@ const COPY = {
       ["Ürün mühendisliği", "Next.js ve React uygulamaları, veri modelleri, entegrasyonlar, pazar yerleri, ödemeler ve operatör akışları."],
       ["Growth engineering", "Analitik, dönüşüm yüzeyleri, yaşam döngüsü e-postaları, teknik SEO, yerelleştirme, kampanyalar ve deney altyapısı."],
       ["Ürün sahipliği", "Problem çerçeveleme, bilgi mimarisi, sürüm şekillendirme, ekipler arası kararlar, dokümantasyon ve operasyonel devir."],
-      ["Bitcoin + yapay zekâ operasyonları", "Bitcoin-native ürünler ile onay kapılı araştırma, editoryal, erişim ve üretim akışları."],
+      ["Yapay zekâ operasyonları + Bitcoin ödemeleri", "Onay kapılı araştırma, editoryal, erişim ve üretim akışları; Bitcoin-native ürün ve ödeme işleri."],
     ],
     proofKicker: "Seçili kanıt / Bireysel sahiplik",
     proofHeading: "Dört ürün. Açık sınırlar.",
@@ -142,7 +142,7 @@ const COPY = {
       ["Ingénierie produit", "Applications Next.js et React, modèles de données, intégrations, marketplaces, paiements et workflows opérateurs."],
       ["Growth engineering", "Analytics, conversion, e-mails de cycle de vie, SEO technique, localisation, campagnes et fondations d'expérimentation."],
       ["Ownership produit", "Cadrage, architecture de l'information, versions, décisions transverses, documentation et transmission opérationnelle."],
-      ["Bitcoin + opérations IA", "Produits Bitcoin-native et workflows de recherche, édition, recherche et production avec validation humaine."],
+      ["Opérations IA + paiements Bitcoin", "Workflows de recherche, d'édition, de retrieval et de production avec validation humaine ; produits et paiements Bitcoin-native."],
     ],
     proofKicker: "Preuves sélectionnées / Ownership individuel",
     proofHeading: "Quatre produits. Des limites claires.",
@@ -195,14 +195,14 @@ export default async function ProfilePage({ params }: LocalePageProps) {
               <a href="https://github.com/maydalabs" target="_blank" rel="me noopener noreferrer" className="mayda-button mayda-button-outline">
                 {copy.actions.github} <span aria-hidden>↗</span>
               </a>
-              <a href="https://www.linkedin.com/in/mehmet-e-mayda/" target="_blank" rel="me noopener noreferrer" className="mayda-button mayda-button-outline">
-                {copy.actions.linkedin} <span aria-hidden>↗</span>
-              </a>
             </div>
           </header>
 
           <aside className="mayda-card" style={{ alignSelf: "start" }} aria-label={copy.factsLabel}>
             <Image src={portrait} alt="Mehmet Emin Mayda" placeholder="blur" sizes="(min-width: 1024px) 28rem, 90vw" className="mayda-profile-portrait" priority />
+            <a href="https://www.linkedin.com/in/mehmet-e-mayda/" target="_blank" rel="me noopener noreferrer" className="mayda-profile-linkedin">
+              {copy.actions.linkedin} · Mehmet E. Mayda <span aria-hidden>↗</span>
+            </a>
             <p className="mayda-kicker">{copy.factsLabel}</p>
             <dl className="mayda-dl">
               {copy.facts.map(([term, detail]) => (

@@ -9,11 +9,11 @@ const COPY = {
       title: "About",
       socialTitle: "Founder-led, evidence first · MaydaLabs",
       description:
-        "MaydaLabs is the Bitcoin-first operations company of Mehmet E. Mayda — deliberately small, founder-led, and allergic to unverifiable claims.",
+        "MaydaLabs is the operations company of Mehmet E. Mayda — deliberately small, founder-led, and allergic to unverifiable claims.",
     },
     kicker: "About",
     heading: ["Deliberately small.", "Built on inspectable work."],
-    lead: "MaydaLabs is the Bitcoin-first operations company of Mehmet E. Mayda — founder and full-stack product builder, working from Istanbul with Bitcoin companies anywhere.",
+    lead: "MaydaLabs is the operations company of Mehmet E. Mayda — founder and full-stack product builder, working from Istanbul with companies anywhere. AI runs the work; a human approves it.",
     story: [
       "There is no pretend agency floor here. Engagements are led and largely built by one accountable person, extended by carefully scoped automation and AI systems where they genuinely help. That constraint is a feature: you talk to the person who builds, and the person who builds owns the outcome.",
       "The work spans complete products — marketplaces, publications, operational systems — because founder-led businesses rarely have problems that respect a single discipline. Product, automation, growth, and security get treated as one connected system.",
@@ -44,11 +44,11 @@ const COPY = {
       title: "Hakkında",
       socialTitle: "Kurucu liderliğinde, önce kanıt · MaydaLabs",
       description:
-        "MaydaLabs, Mehmet E. Mayda'nın Bitcoin öncelikli operasyon şirketidir — bilinçli olarak küçük, kurucu liderliğinde ve doğrulanamayan iddialara alerjik.",
+        "MaydaLabs, Mehmet E. Mayda'nın operasyon şirketidir — bilinçli olarak küçük, kurucu liderliğinde ve doğrulanamayan iddialara alerjik.",
     },
     kicker: "Hakkında",
     heading: ["Bilinçli olarak küçük.", "Denetlenebilir iş üzerine kurulu."],
-    lead: "MaydaLabs, Mehmet E. Mayda'nın Bitcoin öncelikli operasyon şirketidir — kurucu ve full-stack ürün geliştirici; İstanbul'dan, dünyanın her yerindeki Bitcoin şirketleriyle çalışır.",
+    lead: "MaydaLabs, Mehmet E. Mayda'nın operasyon şirketidir — kurucu ve full-stack ürün geliştirici; İstanbul'dan, dünyanın her yerindeki şirketlerle çalışır. İşi yapay zekâ yürütür; bir insan onaylar.",
     story: [
       "Burada yapay bir ajans katı yok. Çalışmaları sorumluluğu üstlenen tek kişi yönetir ve büyük ölçüde inşa eder; gerçekten işe yaradığı yerde dikkatle kapsamlanmış otomasyon ve yapay zekâ sistemleri onu genişletir. Bu kısıt bir özelliktir: konuştuğunuz kişi inşa eden kişidir ve inşa eden kişi sonucun sahibidir.",
       "İş, eksiksiz ürünlere uzanır — pazar yerleri, yayınlar, operasyon sistemleri — çünkü kurucu liderliğindeki işletmelerin problemleri nadiren tek bir disipline saygı duyar. Ürün, otomasyon, büyüme ve güvenlik birbirine bağlı tek sistem olarak ele alınır.",
@@ -79,11 +79,11 @@ const COPY = {
       title: "À propos",
       socialTitle: "Dirigé par le fondateur, preuves d'abord · MaydaLabs",
       description:
-        "MaydaLabs est l'entreprise d'opérations Bitcoin-first de Mehmet E. Mayda — délibérément petite, dirigée par son fondateur et allergique aux affirmations invérifiables.",
+        "MaydaLabs est l'entreprise d'opérations de Mehmet E. Mayda — délibérément petite, dirigée par son fondateur et allergique aux affirmations invérifiables.",
     },
     kicker: "À propos",
     heading: ["Délibérément petite.", "Fondée sur un travail inspectable."],
-    lead: "MaydaLabs est l'entreprise d'opérations Bitcoin-first de Mehmet E. Mayda — fondateur et builder produit full-stack, travaillant depuis Istanbul avec des entreprises Bitcoin partout dans le monde.",
+    lead: "MaydaLabs est l'entreprise d'opérations de Mehmet E. Mayda — fondateur et builder produit full-stack, travaillant depuis Istanbul avec des entreprises partout dans le monde. L'IA fait le travail ; un humain l'approuve.",
     story: [
       "Pas de faux plateau d'agence ici. Les missions sont dirigées et largement construites par une personne responsable, étendue par des systèmes d'automatisation et d'IA soigneusement cadrés là où ils aident vraiment. Cette contrainte est une qualité : vous parlez à la personne qui construit, et la personne qui construit répond du résultat.",
       "Le travail couvre des produits complets — marketplaces, publications, systèmes opérationnels — parce que les problèmes des entreprises de fondateurs respectent rarement une seule discipline. Produit, automatisation, croissance et sécurité sont traités comme un seul système connecté.",

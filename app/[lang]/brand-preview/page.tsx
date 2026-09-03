@@ -95,14 +95,14 @@ export default function BrandPreviewPage() {
         <div className="relative mt-5 overflow-hidden rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--void)]">
           <SignalField />
           <div className="relative z-10 px-8 py-20 md:px-14 md:py-28">
-            <p className="mayda-kicker">Bitcoin-first operations company</p>
+            <p className="mayda-kicker">AI-run operations, human-approved</p>
             <h2 className="mayda-display mt-5 max-w-3xl">
               AI runs the operation.
               <br />
               You approve every action.
             </h2>
             <p className="mayda-lead mt-6 max-w-xl">
-              We install AI-run operations for Bitcoin companies. Every claim is source-linked.
+              We install AI-run operations for companies. Every claim is source-linked.
               Nothing goes out without a human approval.
             </p>
             <div className="mayda-hero-actions mt-8">

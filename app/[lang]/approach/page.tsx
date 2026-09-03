@@ -17,12 +17,12 @@ const COPY = {
     },
     kicker: "Offers",
     heading: ["Two offers.", "Both already in production."],
-    lead: "Pilots are deliberately small: one bounded workflow, a fixed price, three to four weeks. Bitcoin-first, not Bitcoin-only — if your company isn't in Bitcoin but the problem fits, write anyway.",
+    lead: "Pilots are deliberately small: one bounded workflow, a fixed price, three to four weeks. Any industry — if the problem fits the shape, write.",
     offers: [
       {
         title: "Evidence-gated AI operations",
         forLabel: "For",
-        forText: "Bitcoin companies where content, research, or internal operations eat the team's week — newsletters, market notes, listings, support docs, reporting.",
+        forText: "Companies where content, research, or internal operations eat the team's week — newsletters, market notes, listings, support docs, reporting.",
         installLabel: "What gets installed",
         install: [
           "One workflow rebuilt as a pipeline: intake → AI production → human approval → publish/execute",
@@ -86,12 +86,12 @@ const COPY = {
     },
     kicker: "Teklifler",
     heading: ["İki teklif.", "İkisi de üretimde çalışıyor."],
-    lead: "Pilotlar bilerek küçüktür: sınırları belli tek iş akışı, sabit fiyat, üç-dört hafta. Bitcoin öncelikli; sadece Bitcoin değil — şirketiniz Bitcoin'de değilse ama problem uyuyorsa yine yazın.",
+    lead: "Pilotlar bilerek küçüktür: sınırları belli tek iş akışı, sabit fiyat, üç-dört hafta. Sektör fark etmez — problem bu kalıba uyuyorsa yazın.",
     offers: [
       {
         title: "Kanıt kapılı yapay zekâ operasyonları",
         forLabel: "Kimin için",
-        forText: "İçeriğin, araştırmanın veya iç operasyonun ekibin haftasını yediği Bitcoin şirketleri — bültenler, piyasa notları, ilanlar, destek dokümanları, raporlama.",
+        forText: "İçeriğin, araştırmanın veya iç operasyonun ekibin haftasını yediği şirketler — bültenler, piyasa notları, ilanlar, destek dokümanları, raporlama.",
         installLabel: "Ne kurulur",
         install: [
           "Tek iş akışı hat olarak yeniden kurulur: giriş → yapay zekâ üretimi → insan onayı → yayın/uygulama",
@@ -155,12 +155,12 @@ const COPY = {
     },
     kicker: "Offres",
     heading: ["Deux offres.", "Déjà en production."],
-    lead: "Les pilotes sont volontairement petits : un flux borné, un prix fixe, trois à quatre semaines. Bitcoin-first, pas Bitcoin-only — si votre entreprise n'est pas dans Bitcoin mais que le problème correspond, écrivez quand même.",
+    lead: "Les pilotes sont volontairement petits : un flux borné, un prix fixe, trois à quatre semaines. Tout secteur — si le problème correspond, écrivez.",
     offers: [
       {
         title: "Opérations IA à preuves obligatoires",
         forLabel: "Pour",
-        forText: "Les entreprises Bitcoin où contenu, recherche ou opérations internes dévorent la semaine de l'équipe — newsletters, notes de marché, listings, docs support, reporting.",
+        forText: "Les entreprises où contenu, recherche ou opérations internes dévorent la semaine de l'équipe — newsletters, notes de marché, listings, docs support, reporting.",
         installLabel: "Ce qui est installé",
         install: [
           "Un flux reconstruit en pipeline : entrée → production IA → approbation humaine → publication/exécution",
