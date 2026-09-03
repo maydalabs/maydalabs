@@ -168,9 +168,9 @@ export function Icon({
   );
 }
 
-export function IconBox({ name, tone = "cobalt" }: { name: IconName; tone?: "cobalt" | "mint" }) {
+export function IconBox({ name, tone = "cobalt" }: { name: IconName; tone?: "cobalt" | "mint" | "btc" }) {
   return (
-    <span className={`mayda-icon-box ${tone === "mint" ? "is-mint" : ""}`}>
+    <span className={`mayda-icon-box ${tone === "mint" ? "is-mint" : tone === "btc" ? "is-btc" : ""}`}>
       <Icon name={name} />
     </span>
   );

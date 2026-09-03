@@ -340,7 +340,7 @@ export default async function HomePage({ params }: LocalePageProps) {
                   <div className="mayda-offer-figure" aria-hidden="true">
                     {index === 0 ? <ApprovalQueue /> : <PaymentsFlow />}
                   </div>
-                  <IconBox name={OFFER_ICONS[index]} tone={index === 0 ? "mint" : "cobalt"} />
+                  <IconBox name={OFFER_ICONS[index]} tone={index === 0 ? "mint" : "btc"} />
                   <h3 className="mayda-subheading">{offer.title}</h3>
                 <p className="mayda-body mt-3">{offer.text}</p>
                 <p className="mayda-body mt-3" style={{ color: "var(--frost)" }}>

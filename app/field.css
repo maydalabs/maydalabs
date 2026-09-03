@@ -14,6 +14,11 @@
   --mint: #42f5b6;
   --mist: #aab2c0;
   --error: #ff6b6b;
+  /* Bitcoin orange: used only where the thing IS Bitcoin — price, blocks,
+     paying in bitcoin. Never buttons, links, or decoration. */
+  --btc: #f7931a;
+  --btc-soft: rgba(247, 147, 26, 0.16);
+  --btc-line: rgba(247, 147, 26, 0.55);
 
   --background: var(--void);
   --foreground: var(--frost);
@@ -44,6 +49,7 @@
   --color-border-strong: var(--border-strong);
   --color-cobalt: var(--cobalt);
   --color-mint: var(--mint);
+  --color-btc: var(--btc);
   --color-error: var(--error);
   --font-sans: var(--font-field-sans), "Space Grotesk", sans-serif;
   --font-display: var(--font-field-display), var(--font-field-sans), sans-serif;
@@ -2294,4 +2300,15 @@ fieldset.mayda-fieldset > p {
     opacity: 0.55;
     pointer-events: none;
   }
+}
+
+/* Bitcoin orange — rare, unmissable, always meaning "this is Bitcoin". */
+@layer components {
+  .mayda-icon-box.is-btc { background: var(--btc-soft); border-color: var(--btc-line); color: var(--btc); }
+  .mayda-desk-dot { background: var(--btc); box-shadow: 0 0 0 4px var(--btc-soft); }
+  .mayda-desk-tile.is-price strong { color: var(--btc); }
+  .mayda-desk-tile.is-price.is-updated { border-color: var(--btc-line); }
+  .mayda-desk-tile.is-price.is-updated strong { color: var(--btc); }
+  .mayda-paynote { border-color: var(--btc-line); background: var(--btc-soft); }
+  .mayda-paynote svg { color: var(--btc); }
 }

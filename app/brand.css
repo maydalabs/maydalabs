@@ -649,3 +649,11 @@ a.mayda-card.mayda-card-lift:hover {
     border: 1px solid var(--border-strong);
   }
 }
+
+/* Bitcoin orange (see app/field.css tokens): the block clock's live dot and
+   the ₿ glyph on the BTCPay node are Bitcoin itself. */
+@layer components {
+  .btc-clock-dot { background: var(--btc); }
+  .btc-clock-dot::after { border-color: var(--btc); }
+  .payments-flow .pf-btc path { stroke: var(--btc); }
+}

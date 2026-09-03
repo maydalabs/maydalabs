@@ -93,7 +93,8 @@ export function LogoMarkBitcoin({ size = 32, className = "", mono = false, title
       <g transform="translate(16 16) scale(0.86) translate(-16 -16)">
         <MarkPaths paint={paint} strokeWidth={2.9} />
       </g>
-      <g stroke={paint} strokeWidth="2.2" strokeLinecap="round">
+      {/* The ₿-style serifs carry the one orange in the mark family. */}
+      <g stroke={mono ? "currentColor" : "#F7931A"} strokeWidth="2.2" strokeLinecap="round">
         <path d="M12 1.6v2.2M20 1.6v2.2M12 28.2v2.2M20 28.2v2.2" />
       </g>
     </svg>

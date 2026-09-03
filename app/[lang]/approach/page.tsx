@@ -249,7 +249,7 @@ export default async function OffersPage({ params }: LocalePageProps) {
           {copy.offers.map((offer, index) => (
             <article key={offer.title} className="mayda-card">
               <div className="flex items-center gap-4">
-                <IconBox name={OFFER_ICONS[index]} tone={index === 0 ? "mint" : "cobalt"} />
+                <IconBox name={OFFER_ICONS[index]} tone={index === 0 ? "mint" : "btc"} />
                 <h2 className="mayda-heading" style={{ fontSize: "clamp(1.5rem,3vw,2rem)", marginBottom: "1rem" }}>
                   {offer.title}
                 </h2>
