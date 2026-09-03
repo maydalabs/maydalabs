@@ -44,7 +44,32 @@ without alpha. If it still fails, pick the file through "Change image"
 instead of drag-and-drop; the crop tool showing the image means the file
 itself is fine.
 
-## Profile copy — options (positioning: an operations company; Bitcoin as proof and capability, not the audience)
+## Profile copy — FINAL (chosen by Mehmet, 3 Sep 2026)
+
+**Line (LinkedIn tagline, site hero candidate):**
+> Let AI run your operation while you stay in control!
+
+**X bio (105/160):**
+> Let AI run your operation while you stay in control! Every claim sourced, every action approved by you.
+
+**LinkedIn Overview (paste as is; ~900 chars):**
+> Let AI run your operation while you stay in control!
+>
+> MaydaLabs installs AI-run operations for companies whose content, research, or payment workflows eat the team's week. AI produces the work; every claim is linked to its source; nothing goes out without your approval.
+>
+> We run our own publication, Satoshi Gazette, on the same system, in public, so you can inspect how it works before you buy. Pilots are small on purpose: one workflow, a fixed price, three to four weeks, in your accounts. You keep the system either way.
+>
+> Also: Bitcoin payments engineering, from BTCPay Server to reconciliation your accountant can read.
+>
+> maydalabs.com · Istanbul, everywhere.
+
+**LinkedIn details:** Industry `Software Development` · Company type `Self Owned` (→ Privately held once the entity exists) · Size `0–1` · Year founded `2026` · Workplace module on, `Remote` · Location `Istanbul, Türkiye` · Custom button `Visit website` → https://maydalabs.com.
+
+**Specialties (paste one per entry):** AI operations · Workflow automation · Human-in-the-loop approval · Content operations · Research pipelines · Editorial systems · Payment operations · Bitcoin payments · BTCPay Server · Payment reconciliation · Product engineering · Next.js · Supabase · Operations consulting.
+
+**X fields:** Name `MaydaLabs` · Website `maydalabs.com` · Location `Istanbul / everywhere` · Birth date hidden ("Only you") or removed · Category `Business → Software Company` (or keep Entrepreneur) · Header `maydalabs-banner-x-notext.jpg`.
+
+## Profile copy — earlier options (for reference) (positioning: an operations company; Bitcoin as proof and capability, not the audience)
 
 ### LinkedIn tagline (≤120 chars) — pick one
 1. `AI runs the operation. You approve every action.` (49)
