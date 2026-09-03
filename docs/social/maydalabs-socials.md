@@ -18,7 +18,7 @@ draft for his voice pass. Nothing is posted by anyone else, ever._
 1. LinkedIn → *For Business* → *Create a Company Page* → *Company*.
 2. Name `MaydaLabs` · LinkedIn public URL `maydalabs` · Website `https://maydalabs.com` · Industry `IT Services and IT Consulting` · Company size `1 employee` (LinkedIn's smallest bracket is 0–1) · Type `Self-Employed` (or `Privately Held` if you register the entity first).
 3. Logo: `maydalabs-avatar-300.png` (the mark on the void; it becomes the page avatar).
-4. Tagline (≤120): `AI runs the operation. You approve every action. Bitcoin-first operations company.`
+4. Tagline (≤120): `Let AI run your operation while you stay in control!` (done)
 5. Cover: `maydalabs-cover-linkedin-a.png` (figure only) or `-b` (figure + one line). No logo on the cover; the avatar already carries it.
 6. About: paste the "LinkedIn about" block below. Location: Istanbul. Founded: 2026.
 7. Admin → *Page admins*: you are super admin by default; add nobody else yet.
@@ -120,6 +120,7 @@ itself is fine.
 - Nothing about a client without their written OK. Satoshi Gazette is ours and can be named freely; its coverage is never for sale.
 - No post goes out without Mehmet's approval in Abidin; he posts, then pastes the public URL back so the record is reconciled. Silence is not a signal.
 - Bitcoin orange rule applies to images: only where the thing is Bitcoin.
+- We are a Bitcoiner business: we accept Bitcoin, run a Bitcoin publication, and are glad to help Bitcoin companies grow. Bitcoin posts are welcome in proportion, never exaggerated. We do not frame MaydaLabs as "for Bitcoin companies", Bitcoin-first, or Bitcoin-only; the audience is companies in any industry (Mehmet, 3 Sep 2026).
 
 ## Cadence (first month)
 
@@ -130,7 +131,7 @@ itself is fine.
 
 ## First ten posts (drafts, EN — Mehmet rewrites in his voice)
 
-1. **Who we are.** MaydaLabs is a Bitcoin-first operations company. AI runs the work, a human approves every action. We built it for ourselves first: Satoshi Gazette runs on it, in public. Pilots are open. maydalabs.com
+1. **Who we are.** Let AI run your operation while you stay in control. MaydaLabs installs AI-run operations; a human approves every action. We built it for ourselves first: Satoshi Gazette runs on it, in public. Pilots are open. maydalabs.com
 2. **The rule.** No approval means no external action. The AI drafts, sorts, and prepares. It cannot send, publish, or spend. The click is always human. That one rule is the whole product.
 3. **Source-linked or unverified.** If a claim has no source URL, it does not publish as fact. Enforced by the pipeline, not by good intentions. maydalabs.com/proof
 4. **Time is measured in blocks.** Our homepage carries a live Bitcoin desk: price, block, fee, hashrate, next difficulty change, halving countdown. Straight from mempool.space, no key, refreshed every minute.
