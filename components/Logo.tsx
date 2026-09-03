@@ -1,13 +1,14 @@
 /*
- * MaydaLabs mark ("Check-M", chosen 3 Sep 2026): an M whose two legs are
- * the gate posts and whose inner stroke IS a check — the approval is the
- * letter itself. Three strokes, one weight, cobalt → mint on dark; `mono`
- * uses currentColor. Candidates that lost live on /brand-preview.
+ * MaydaLabs mark — "Block gate", chosen by Mehmet on 3 Sep 2026 and polished
+ * as variant B: one block of the chain; inside it two signal strands
+ * converge into the human gate bar and leave as a single approved dot.
+ * One stroke weight, cobalt → mint on dark; `mono` uses currentColor.
+ * The other candidates live on /brand-preview for the record.
  */
 
 const GRADIENT_ID = "mayda-logo-gradient";
 
-function Gradient({ id, x1 = 6, x2 = 26 }: { id: string; x1?: number; x2?: number }) {
+function Gradient({ id, x1 = 4, x2 = 28 }: { id: string; x1?: number; x2?: number }) {
   return (
     <defs>
       <linearGradient id={id} gradientUnits="userSpaceOnUse" x1={x1} y1="0" x2={x2} y2="0">
@@ -18,13 +19,25 @@ function Gradient({ id, x1 = 6, x2 = 26 }: { id: string; x1?: number; x2?: numbe
   );
 }
 
-function MarkPaths({ strokeWidth }: { strokeWidth: number }) {
+/* The interior: strands → gate → dot. Shared by the mark, the badge, and
+ * the icons (see app/icon.svg and app/apple-icon.tsx for the same geometry). */
+export function MarkInterior({ paint, strokeWidth }: { paint: string; strokeWidth: number }) {
   return (
-    <g fill="none" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M7 26V6" />
-      <path d="M25 26V6" />
-      <path d="M7 13.5 13 20.5 25 6" />
+    <g fill="none" stroke={paint} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8.5 12.5C11.5 12.5 11 16 13 16" />
+      <path d="M8.5 19.5C11.5 19.5 11 16 13 16" />
+      <path d="M17 10V22" />
+      <circle cx="22.5" cy="16" r="2.1" fill={paint} stroke="none" />
     </g>
+  );
+}
+
+function MarkPaths({ paint, strokeWidth }: { paint: string; strokeWidth: number }) {
+  return (
+    <>
+      <rect x="4" y="4" width="24" height="24" rx="6.5" fill="none" stroke={paint} strokeWidth={strokeWidth} strokeLinejoin="round" />
+      <MarkInterior paint={paint} strokeWidth={strokeWidth} />
+    </>
   );
 }
 
@@ -37,6 +50,7 @@ type MarkProps = {
 
 export function LogoMark({ size = 28, className = "", mono = false, title }: MarkProps) {
   const id = `${GRADIENT_ID}-mark`;
+  const paint = mono ? "currentColor" : `url(#${id})`;
   return (
     <svg
       className={className}
@@ -50,20 +64,19 @@ export function LogoMark({ size = 28, className = "", mono = false, title }: Mar
     >
       {title ? <title>{title}</title> : null}
       {mono ? null : <Gradient id={id} />}
-      <g stroke={mono ? "currentColor" : `url(#${id})`}>
-        <MarkPaths strokeWidth={2.7} />
-      </g>
+      <MarkPaths paint={paint} strokeWidth={2.7} />
     </svg>
   );
 }
 
 /*
- * Companion badge for payments content: the mark inside a coin ring, its
- * two legs continuing through the ring as ₿'s serifs do. Not a ₿ — the
+ * Companion badge for payments content: the same block with the two serif
+ * ticks that run past the top and bottom the way ₿'s do. Not a ₿ — the
  * inside is still the gate.
  */
 export function LogoMarkBitcoin({ size = 32, className = "", mono = false, title }: MarkProps) {
   const id = `${GRADIENT_ID}-badge`;
+  const paint = mono ? "currentColor" : `url(#${id})`;
   return (
     <svg
       className={className}
@@ -77,18 +90,11 @@ export function LogoMarkBitcoin({ size = 32, className = "", mono = false, title
     >
       {title ? <title>{title}</title> : null}
       {mono ? null : <Gradient id={id} x1={3} x2={29} />}
-      <g
-        stroke={mono ? "currentColor" : `url(#${id})`}
-        fill="none"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <circle cx="16" cy="16" r="12.5" />
-        <path d="M11.25 1.4v2M20.75 1.4v2M11.25 28.6v2M20.75 28.6v2" />
-        <g transform="translate(16 16) scale(0.56) translate(-16 -16)">
-          <MarkPaths strokeWidth={3.6} />
-        </g>
+      <g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+        <MarkPaths paint={paint} strokeWidth={2.9} />
+      </g>
+      <g stroke={paint} strokeWidth="2.2" strokeLinecap="round">
+        <path d="M12 1.6v2.2M20 1.6v2.2M12 28.2v2.2M20 28.2v2.2" />
       </g>
     </svg>
   );

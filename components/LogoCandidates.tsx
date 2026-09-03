@@ -19,59 +19,8 @@ const W = 2.8;
 
 export const LOGO_CANDIDATES: LogoCandidate[] = [
   {
-    id: "check-m",
-    name: "Check-M",
-    idea: "An M whose inner stroke is a check: the two legs are the gate posts, the approval is the letter itself.",
-    draw: (paint) => (
-      <g fill="none" stroke={paint} strokeWidth={W} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M7 26V6" />
-        <path d="M25 26V6" />
-        <path d="M7 13.5 13 20.5 25 6" />
-      </g>
-    ),
-  },
-  {
-    id: "bar-check",
-    name: "Bar & check",
-    idea: "The human gate as one vertical bar; the work leaves it approved. No letter, reads at any size.",
-    draw: (paint) => (
-      <g fill="none" stroke={paint} strokeWidth={W} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M8.5 6V26" />
-        <path d="M13.5 16.5 18.5 21.5 27.5 10.5" />
-      </g>
-    ),
-  },
-  {
-    id: "signal-gate",
-    name: "Signal gate",
-    idea: "Three strands converge, pass one gate bar, leave as a single line that ends in a dot: input → approval → output.",
-    draw: (paint) => (
-      <g fill="none" stroke={paint} strokeWidth={W} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 9C9.5 9 9.5 16 13 16" />
-        <path d="M4 16H13" />
-        <path d="M4 23C9.5 23 9.5 16 13 16" />
-        <path d="M17.5 8V24" />
-        <path d="M22 16H25.5" />
-        <circle cx="28.5" cy="16" r="2" fill={paint} stroke="none" />
-      </g>
-    ),
-  },
-  {
-    id: "gate-ring",
-    name: "Gate ring",
-    idea: "A ring (the block, the coin's silhouette without the ₿) with the gate bar through it and the signal crossing.",
-    draw: (paint) => (
-      <g fill="none" stroke={paint} strokeWidth={W} strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="16" cy="16" r="11.5" />
-        <path d="M16 9.5V22.5" />
-        <path d="M8.5 16H12.5" />
-        <path d="M19.5 16H23.5" />
-      </g>
-    ),
-  },
-  {
     id: "block-gate",
-    name: "Block gate",
+    name: "Block gate · first draft",
     idea: "One block of the chain, the gate bar inside it, the signal entering and leaving as a dot.",
     draw: (paint) => (
       <g fill="none" stroke={paint} strokeWidth={W} strokeLinecap="round" strokeLinejoin="round">
@@ -83,14 +32,43 @@ export const LOGO_CANDIDATES: LogoCandidate[] = [
     ),
   },
   {
-    id: "previous",
-    name: "Previous mark (for reference)",
-    idea: "The first draft, retired 3 Sep 2026: gate legs and a signal dipping into a check.",
+    id: "block-gate-a",
+    name: "Polish A · tuned",
+    idea: "Same drawing, better proportions: the block fills the square, the gate bar is taller, the signal has room, the dot is heavier.",
     draw: (paint) => (
       <g fill="none" stroke={paint} strokeWidth={2.7} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M7.5 27V5" />
-        <path d="M24.5 27V5" />
-        <path d="M7.5 9.5 13.5 22.5 24.5 9.5" />
+        <rect x="4" y="4" width="24" height="24" rx="6.5" />
+        <path d="M16.5 10V22" />
+        <path d="M8.5 16H12.5" />
+        <circle cx="22" cy="16" r="2.1" fill={paint} stroke="none" />
+      </g>
+    ),
+  },
+  {
+    id: "block-gate-b",
+    name: "Polish B · chosen, final",
+    idea: "Two strands converge into the gate and leave as one dot — the site's own figure, inside the block.",
+    draw: (paint) => (
+      <g fill="none" stroke={paint} strokeWidth={2.7} strokeLinecap="round" strokeLinejoin="round">
+        <rect x="4" y="4" width="24" height="24" rx="6.5" />
+        <path d="M8.5 12.5C11.5 12.5 11 16 13 16" />
+        <path d="M8.5 19.5C11.5 19.5 11 16 13 16" />
+        <path d="M17 10V22" />
+        <circle cx="22.5" cy="16" r="2.1" fill={paint} stroke="none" />
+      </g>
+    ),
+  },
+  {
+    id: "block-gate-c",
+    name: "Polish C · through and out",
+    idea: "The signal visibly crosses the gate: a line in, a line out, the dot at the exit. Direction is unmistakable.",
+    draw: (paint) => (
+      <g fill="none" stroke={paint} strokeWidth={2.7} strokeLinecap="round" strokeLinejoin="round">
+        <rect x="4" y="4" width="24" height="24" rx="6.5" />
+        <path d="M16 10V22" />
+        <path d="M8.5 16H12.5" />
+        <path d="M19.5 16H21" />
+        <circle cx="23.5" cy="16" r="1.9" fill={paint} stroke="none" />
       </g>
     ),
   },

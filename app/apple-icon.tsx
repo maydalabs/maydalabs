@@ -3,8 +3,8 @@ import { ImageResponse } from "next/og";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-// The MaydaLabs mark (see components/Logo.tsx) on the void, monochrome
-// frost — Apple touch icons are opaque PNGs, so no gradient here.
+// The block IS the tile: iOS masks it to a rounded square, so only the
+// gate interior is drawn, in frost on the void (touch icons are opaque).
 export default function AppleIcon() {
   return new ImageResponse(
     (
@@ -16,14 +16,14 @@ export default function AppleIcon() {
           alignItems: "center",
           justifyContent: "center",
           background: "#0A0B0F",
-          borderRadius: 40,
         }}
       >
-        <svg width="124" height="124" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-          <g fill="none" stroke="#F4F7FA" strokeWidth="2.7" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M7 26V6" />
-            <path d="M25 26V6" />
-            <path d="M7 13.5 13 20.5 25 6" />
+        <svg width="150" height="150" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <g fill="none" stroke="#F4F7FA" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M8.5 12.5C11.5 12.5 11 16 13 16" />
+            <path d="M8.5 19.5C11.5 19.5 11 16 13 16" />
+            <path d="M17 10V22" />
+            <circle cx="22.5" cy="16" r="2.1" fill="#F4F7FA" stroke="none" />
           </g>
         </svg>
       </div>
