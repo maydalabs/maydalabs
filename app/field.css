@@ -2463,6 +2463,6 @@ fieldset.mayda-fieldset > p {
 
 /* Personal LinkedIn lives only on the profile, under the portrait. */
 @layer components {
-  .mayda-profile-linkedin { display: inline-flex; align-items: center; gap: 0.35rem; margin: -0.35rem 0 1.1rem; font-size: 0.86rem; color: var(--mist); text-decoration: none; border-bottom: 1px solid var(--border-strong); padding-bottom: 0.15rem; }
+  .mayda-profile-linkedin { display: flex; width: fit-content; align-items: center; gap: 0.35rem; margin: -0.35rem 0 1.1rem; font-size: 0.86rem; color: var(--mist); text-decoration: none; border-bottom: 1px solid var(--border-strong); padding-bottom: 0.15rem; }
   .mayda-profile-linkedin:hover { color: var(--frost); border-color: var(--mint); }
 }
