@@ -83,7 +83,7 @@ for (const [path, status, destination] of redirects) {
 
 await check("English metadata is canonical and localized", async () => {
   const html = await (await request("/")).text();
-  assert(html.includes("<title>MaydaLabs — Bitcoin operations company</title>"), "unexpected English title");
+  assert(html.includes("<title>MaydaLabs — AI-run operations, you stay in control</title>"), "unexpected English title");
   assert(html.includes(`rel="canonical" href="${canonicalUrl}"`), "missing canonical URL");
   assert(html.includes(`hrefLang="tr" href="${canonicalUrl}/tr"`), "missing Turkish alternate");
   assert(html.includes(`hrefLang="fr" href="${canonicalUrl}/fr"`), "missing French alternate");
@@ -94,8 +94,8 @@ await check("Turkish and French metadata is localized", async () => {
     request("/tr").then((response) => response.text()),
     request("/fr").then((response) => response.text()),
   ]);
-  assert(turkish.includes("<title>MaydaLabs — Bitcoin operasyon şirketi</title>"), "unexpected Turkish title");
-  assert(french.includes("<title>MaydaLabs — Entreprise d&#x27;opérations Bitcoin</title>") || french.includes("<title>MaydaLabs — Entreprise d'opérations Bitcoin</title>"), "unexpected French title");
+  assert(turkish.includes("<title>MaydaLabs — Yapay zekâ ile çalışan operasyonlar, kontrol sizde</title>"), "unexpected Turkish title");
+  assert(french.includes("<title>MaydaLabs — Opérations pilotées par l&#x27;IA, vous gardez le contrôle</title>") || french.includes("<title>MaydaLabs — Opérations pilotées par l'IA, vous gardez le contrôle</title>"), "unexpected French title");
 });
 
 await check("localized routes do not set a language-preference cookie", async () => {
