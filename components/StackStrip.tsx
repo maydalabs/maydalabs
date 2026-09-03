@@ -56,7 +56,7 @@ function StackList({ items, tone }: { items: StackItem[]; tone: "mono" | "brand"
               href={item.href}
               target="_blank"
               rel="noopener noreferrer"
-              className={`mayda-stack-item ${tone === "brand" ? "is-brand" : ""} ${item.wide ? "is-wide" : ""}`}
+              className={`mayda-stack-item ${tone === "brand" ? "is-brand" : ""} ${item.wide ? "is-wide" : ""} ${item.chip === "dark" ? "is-dark" : ""}`}
               style={hex ? ({ "--brand": `#${hex}` } as React.CSSProperties) : undefined}
               title={item.name}
               aria-label={item.name}
@@ -75,7 +75,7 @@ export function StackStrip({ locale, kicker }: { locale: Locale; kicker: string 
     <section className="mayda-section-tight" aria-label={kicker}>
       <div className="mayda-shell">
         <p className="mayda-kicker">{kicker}</p>
-        <div className="mayda-stack-groups" data-version="logos-2">
+        <div className="mayda-stack-groups" data-version="logos-3">
           {STACK_GROUPS.map((group) => (
             <div key={group.id} className="mayda-stack-group" data-group={group.id}>
               <span className="mayda-stack-group-label">{group.label[locale]}</span>

@@ -16,6 +16,8 @@ export type StackItem = {
   icon: `si:${string}` | `img:${string}`;
   /** Wordmark-shaped logos keep their aspect ratio instead of a square. */
   wide?: boolean;
+  /** Partner chips are frost by default; light-on-dark logos ask for a dark chip. */
+  chip?: "light" | "dark";
 };
 
 const CATALOG = {
@@ -53,7 +55,7 @@ const CATALOG = {
   btcpay: { name: "BTCPay Server", href: "https://btcpayserver.org", icon: "img:/logos/btcpay.svg" },
   mempool: { name: "mempool.space", href: "https://mempool.space", icon: "img:/logos/mempool-space.png", wide: true },
   cmc: { name: "Coin Mining Central", href: "https://www.coinminingcentral.com", icon: "img:/logos/coin-mining-central.png" },
-  hodlstay: { name: "HodlStay", href: "https://hodlstay.com", icon: "img:/work/hodlstay-logo.png", wide: true },
+  hodlstay: { name: "HodlStay", href: "https://hodlstay.com", icon: "img:/work/hodlstay-logo.png", wide: true, chip: "dark" },
   dtravel: { name: "Dtravel", href: "https://www.dtravel.com", icon: "img:/logos/dtravel.svg" },
   hotelplanner: { name: "HotelPlanner", href: "https://www.hotelplanner.com", icon: "img:/logos/hotelplanner.png", wide: true },
 } as const satisfies Record<string, Omit<StackItem, "id">>;

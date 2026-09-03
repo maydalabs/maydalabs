@@ -2452,3 +2452,7 @@ fieldset.mayda-fieldset > p {
   .mayda-stack-item.is-brand .mayda-stack-img { width: 1.7rem; height: 1.7rem; }
   .mayda-stack-item.is-brand .mayda-stack-img.is-wide { width: auto; height: 1.35rem; }
 }
+
+@layer components {
+  .mayda-stack-item.is-brand.is-dark { background: var(--surface-raised); border-color: var(--border-strong); color: var(--frost); }
+}
