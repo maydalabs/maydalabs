@@ -387,4 +387,101 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       expect(deleted ?? []).toHaveLength(0);
     });
   });
+
+  describe("pilot_invoices (payment state is never client-writable)", () => {
+    const emailC = `rls-user-c-${suffix}@example.com`;
+    let userC: Db;
+    let pilotId: string;
+    let invoiceId: string;
+
+    beforeAll(async () => {
+      const createdC = await admin.auth.admin.createUser({
+        email: emailC,
+        password,
+        email_confirm: true,
+      });
+      userC = createClient<Database>(url!, publishableKey!, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
+      await userC.auth.signInWithPassword({ email: emailC, password });
+      expect(createdC.error).toBeNull();
+
+      const { data: pilot } = await admin
+        .from("pilots")
+        .insert({
+          client_user_id: idA,
+          client_email: emailA,
+          company: "Invoice Co",
+          workflow: "Weekly note",
+        })
+        .select("id")
+        .single();
+      pilotId = pilot!.id;
+
+      const { data: invoice } = await admin
+        .from("pilot_invoices")
+        .insert({
+          pilot_id: pilotId,
+          label: "Pilot fee",
+          amount_usd: 2500,
+          amount_sats: 2_500_000,
+          rate_usd: 100_000,
+          address: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+          expires_at: new Date(Date.now() + 86_400_000).toISOString(),
+        })
+        .select("id")
+        .single();
+      invoiceId = invoice!.id;
+    });
+
+    it("shows the client the invoice on their own pilot", async () => {
+      const { data } = await userA.from("pilot_invoices").select("id, amount_sats").eq("id", invoiceId);
+      expect(data).toEqual([{ id: invoiceId, amount_sats: 2_500_000 }]);
+    });
+
+    it("hides it from an unrelated signed-in user", async () => {
+      const { data } = await userC.from("pilot_invoices").select("id");
+      expect(data ?? []).toHaveLength(0);
+    });
+
+    it("blocks the client from marking their own invoice paid", async () => {
+      const { data: tampered } = await userA
+        .from("pilot_invoices")
+        .update({ status: "paid", observed_sats: 2_500_000 })
+        .eq("id", invoiceId)
+        .select("id");
+      expect(tampered ?? []).toHaveLength(0);
+
+      const { data: after } = await admin.from("pilot_invoices").select("status").eq("id", invoiceId).single();
+      expect(after!.status).toBe("open");
+    });
+
+    it("blocks the client from inventing an invoice, and from deleting one", async () => {
+      const { error } = await userA.from("pilot_invoices").insert({
+        pilot_id: pilotId,
+        label: "Free money",
+        amount_usd: 1,
+        amount_sats: 1,
+        rate_usd: 100_000,
+        address: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+        expires_at: new Date(Date.now() + 86_400_000).toISOString(),
+      });
+      expect(error).not.toBeNull();
+
+      const { data: deleted } = await userA.from("pilot_invoices").delete().eq("id", invoiceId).select("id");
+      expect(deleted ?? []).toHaveLength(0);
+    });
+
+    it("lets an operator read every invoice and record what the chain showed", async () => {
+      const { data: seen } = await userB.from("pilot_invoices").select("id").eq("id", invoiceId);
+      expect(seen).toHaveLength(1);
+
+      const { data: updated } = await userB
+        .from("pilot_invoices")
+        .update({ observed_sats: 1_000 })
+        .eq("id", invoiceId)
+        .select("observed_sats");
+      expect(updated).toEqual([{ observed_sats: 1_000 }]);
+    });
+  });
 });

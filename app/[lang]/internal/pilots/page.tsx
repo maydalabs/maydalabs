@@ -8,6 +8,10 @@ import {
   UpdatePilotForm,
 } from "@/components/PilotForms";
 import { DeleteProposalButton, ProposalForm } from "@/components/ProposalForm";
+import { InvoiceForm } from "@/components/InvoiceForm";
+import { voidInvoiceAction } from "@/app/actions/payments";
+import { formatBtc, formatSats } from "@/lib/payments";
+import { mempoolAddressUrl } from "@/lib/chain";
 import { ProposalView, type ProposalRecord } from "@/components/ProposalView";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { localizePath } from "@/lib/i18n";
@@ -33,7 +37,7 @@ export default async function InternalPilotsPage({ params }: LocalePageProps) {
   const { data: operator } = await supabase.from("operator_status").select("user_id").maybeSingle();
   if (!operator) notFound();
 
-  const [{ data: pilots }, { data: updates }, { data: proposals }] = await Promise.all([
+  const [{ data: pilots }, { data: updates }, { data: proposals }, { data: invoices }] = await Promise.all([
     supabase
       .from("pilots")
       .select("id, client_user_id, client_email, company, workflow, offer, status, starts_on, ends_on, summary, next_step, created_at")
@@ -45,6 +49,10 @@ export default async function InternalPilotsPage({ params }: LocalePageProps) {
     supabase
       .from("pilot_proposals")
       .select("id, pilot_id, origin, headline, angle, observations, sample_title, sample_body, sample_note, scope, role_title, role_note, terms, cta_label, cta_url, published"),
+    supabase
+      .from("pilot_invoices")
+      .select("id, pilot_id, label, amount_usd, amount_sats, address, status, observed_sats, expires_at, created_at")
+      .order("created_at", { ascending: false }),
   ]);
   const proposalByPilot = new Map<string, ProposalRecord>();
   for (const proposal of (proposals ?? []) as ProposalRecord[]) proposalByPilot.set(proposal.pilot_id, proposal);
@@ -114,6 +122,45 @@ export default async function InternalPilotsPage({ params }: LocalePageProps) {
                           </details>
                         ) : null}
                         <ProposalForm pilotId={pilot.id} proposal={proposal} />
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                <div style={{ marginTop: "1.2rem", borderTop: "1px solid var(--border)", paddingTop: "1.2rem" }}>
+                  {(() => {
+                    const pilotInvoices = (invoices ?? []).filter((invoice) => invoice.pilot_id === pilot.id);
+                    return (
+                      <div className="mayda-stack" style={{ gap: "0.8rem" }}>
+                        <p className="mayda-kicker" style={{ margin: 0 }}>Bitcoin invoices ({pilotInvoices.length})</p>
+                        {pilotInvoices.length ? (
+                          <div className="mayda-stack" style={{ gap: "0.5rem" }}>
+                            {pilotInvoices.map((invoice) => (
+                              <div key={invoice.id} className="mayda-row">
+                                <div>
+                                  <strong>{invoice.label}</strong>{" "}
+                                  <span className={`mayda-status${invoice.status === "paid" ? " is-active" : ""}`}>{invoice.status}</span>
+                                  <br />
+                                  <span className="mayda-invoice-sub">
+                                    ${Number(invoice.amount_usd).toFixed(2)} = {formatBtc(Number(invoice.amount_sats))} BTC
+                                    {Number(invoice.observed_sats) > 0 ? ` · seen ${formatSats(Number(invoice.observed_sats))} sats` : ""}
+                                  </span>
+                                  <br />
+                                  <a href={mempoolAddressUrl(invoice.address)} target="_blank" rel="noopener noreferrer" className="mayda-inline-link">
+                                    <code>{invoice.address}</code>
+                                  </a>
+                                </div>
+                                {invoice.status !== "paid" && invoice.status !== "void" ? (
+                                  <form action={voidInvoiceAction}>
+                                    <input type="hidden" name="invoiceId" value={invoice.id} />
+                                    <button type="submit" className="mayda-button mayda-button-outline">Cancel</button>
+                                  </form>
+                                ) : null}
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
+                        <InvoiceForm pilotId={pilot.id} />
                       </div>
                     );
                   })()}

@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { PILOT_COPY } from "@/components/pilotCopy";
 import { PilotSummary } from "@/components/PilotView";
 import { ProposalView, type ProposalRecord } from "@/components/ProposalView";
+import { InvoicePanel, type InvoiceRecord } from "@/components/InvoicePanel";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
@@ -32,7 +33,7 @@ export default async function PilotDetailPage({ params }: PageProps) {
 
   // RLS: clients only ever see their own pilot and its published updates.
   const supabase = await createSupabaseServerClient();
-  const [{ data: pilot }, { data: updates }, { data: proposal }] = await Promise.all([
+  const [{ data: pilot }, { data: updates }, { data: proposal }, { data: invoices }] = await Promise.all([
     supabase
       .from("pilots")
       .select("id, company, workflow, offer, status, starts_on, ends_on, summary, next_step")
@@ -51,6 +52,11 @@ export default async function PilotDetailPage({ params }: PageProps) {
       .eq("pilot_id", id)
       .eq("published", true)
       .maybeSingle(),
+    supabase
+      .from("pilot_invoices")
+      .select("id, label, amount_usd, amount_sats, rate_usd, address, status, observed_sats, txid, paid_at, expires_at")
+      .eq("pilot_id", id)
+      .order("created_at", { ascending: false }),
   ]);
   if (!pilot) notFound();
 
@@ -65,6 +71,7 @@ export default async function PilotDetailPage({ params }: PageProps) {
           {copy.sectionHeading}
         </h1>
         <PilotSummary pilot={pilot} updates={updates ?? []} locale={locale} />
+        <InvoicePanel invoices={(invoices ?? []) as InvoiceRecord[]} locale={locale} />
       </div>
     </div>
   );

@@ -168,6 +168,68 @@ export type Database = {
         }
         Relationships: []
       }
+      pilot_invoices: {
+        Row: {
+          address: string
+          amount_sats: number
+          amount_usd: number
+          checked_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          label: string
+          observed_sats: number
+          paid_at: string | null
+          pilot_id: string
+          rate_usd: number
+          status: string
+          txid: string | null
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          amount_sats: number
+          amount_usd: number
+          checked_at?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          label: string
+          observed_sats?: number
+          paid_at?: string | null
+          pilot_id: string
+          rate_usd: number
+          status?: string
+          txid?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          amount_sats?: number
+          amount_usd?: number
+          checked_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          label?: string
+          observed_sats?: number
+          paid_at?: string | null
+          pilot_id?: string
+          rate_usd?: number
+          status?: string
+          txid?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pilot_invoices_pilot_id_fkey"
+            columns: ["pilot_id"]
+            isOneToOne: false
+            referencedRelation: "pilots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pilot_proposals: {
         Row: {
           angle: string
