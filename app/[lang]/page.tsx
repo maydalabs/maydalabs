@@ -334,7 +334,7 @@ export default async function HomePage({ params }: LocalePageProps) {
       <BitcoinDesk locale={locale} />
 
 
-      <section className="mayda-section" style={{ paddingTop: 0 }}>
+      <section className="mayda-section">
         <div className="mayda-shell mayda-stack-lg">
           <header>
             <p className="mayda-kicker">{copy.offersKicker}</p>

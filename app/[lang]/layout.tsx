@@ -77,6 +77,8 @@ function getStructuredData(locale: Locale) {
         "@id": `${SITE_URL}/#company`,
         name: "MaydaLabs",
         url: SITE_URL,
+        logo: `${SITE_URL}/icon.svg`,
+        image: `${SITE_URL}/og?locale=${locale}&kind=home`,
         description: SITE_DESCRIPTIONS[locale],
         inLanguage: locale,
         email: "info@maydalabs.com",

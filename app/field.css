@@ -2456,3 +2456,7 @@ fieldset.mayda-fieldset > p {
 @layer components {
   .mayda-stack-item.is-brand.is-dark { background: var(--surface-raised); border-color: var(--border-strong); color: var(--frost); }
 }
+
+@layer components {
+  .mayda-stack-compact { margin-bottom: 2.2rem; }
+}

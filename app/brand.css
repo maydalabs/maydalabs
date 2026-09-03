@@ -657,3 +657,9 @@ a.mayda-card.mayda-card-lift:hover {
   .btc-clock-dot::after { border-color: var(--btc); }
   .payments-flow .pf-btc path { stroke: var(--btc); }
 }
+
+/* The signal field needs the gate figure to land on; below the hero's
+   two-column breakpoint the figure is hidden, so the field goes too. */
+@media (max-width: 959px) {
+  .signal-field { display: none; }
+}

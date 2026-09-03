@@ -88,29 +88,26 @@ export function renderSocialCard(locale: Locale, kind: SocialCardKind) {
       }}
     >
       <svg
-        width="560"
-        height="420"
-        viewBox="0 0 520 372"
-        style={{ position: "absolute", right: 24, top: 105, opacity: 0.9 }}
+        width="400"
+        height="400"
+        viewBox="0 0 32 32"
+        style={{ position: "absolute", right: 72, top: 115, opacity: 0.92 }}
       >
-        <path d="M10 186 H 150" stroke={COBALT} strokeWidth="3" fill="none" />
-        {[46, 116, 186, 256, 326].map((endY) => (
-          <path
-            key={endY}
-            d={`M150 186 C 250 186, 300 ${endY}, 466 ${endY}`}
-            stroke={COBALT}
-            strokeWidth="2"
-            strokeOpacity="0.55"
-            fill="none"
-          />
-        ))}
-        <circle cx="150" cy="186" r="7" fill={VOID} stroke={COBALT} strokeWidth="3" />
-        {[46, 116, 186, 256, 326].map((endY) => (
-          <circle key={endY} cx="466" cy={endY} r="5" fill={MINT} />
-        ))}
+        <rect x="4" y="4" width="24" height="24" rx="6.5" fill="none" stroke={COBALT} strokeWidth="1.6" />
+        <path d="M8.5 12.5C11.5 12.5 11 16 13 16" fill="none" stroke={MINT} strokeWidth="1.6" strokeLinecap="round" />
+        <path d="M8.5 19.5C11.5 19.5 11 16 13 16" fill="none" stroke={MINT} strokeWidth="1.6" strokeLinecap="round" />
+        <path d="M17 10V22" fill="none" stroke={MINT} strokeWidth="1.6" strokeLinecap="round" />
+        <circle cx="22.5" cy="16" r="1.6" fill={MINT} />
       </svg>
 
-      <div style={{ display: "flex", alignItems: "baseline" }}>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <svg width="44" height="44" viewBox="0 0 32 32" style={{ marginRight: 14 }}>
+          <rect x="4" y="4" width="24" height="24" rx="6.5" fill="none" stroke={COBALT} strokeWidth="2.7" />
+          <path d="M8.5 12.5C11.5 12.5 11 16 13 16" fill="none" stroke={MINT} strokeWidth="2.7" strokeLinecap="round" />
+          <path d="M8.5 19.5C11.5 19.5 11 16 13 16" fill="none" stroke={MINT} strokeWidth="2.7" strokeLinecap="round" />
+          <path d="M17 10V22" fill="none" stroke={MINT} strokeWidth="2.7" strokeLinecap="round" />
+          <circle cx="22.5" cy="16" r="2.1" fill={MINT} />
+        </svg>
         <span style={{ fontSize: 34, fontWeight: 700, letterSpacing: -1 }}>MaydaLabs</span>
         <span style={{ fontSize: 22, fontWeight: 700, color: COBALT, marginLeft: 4, marginBottom: 14 }}>×</span>
       </div>
