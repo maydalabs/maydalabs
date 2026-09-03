@@ -1,4 +1,5 @@
 import { CaseStudy, type CaseStudyCopy } from "@/components/CaseStudy";
+import { PROJECT_STACKS } from "@/lib/stack";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
 
@@ -98,7 +99,7 @@ const COPY: Record<"en" | "tr" | "fr", CaseStudyCopy> = {
     ],
     gallery: [
       {
-        src: "/work/hodlstay-2026-08-stays.jpg",
+        src: "/work/hodlstay-2026-09-stays.jpg",
         alt: "HodlStay stay discovery and search interface",
         caption: "Discovery — categories, dates, guests, filters, and live inventory.",
       },
@@ -108,7 +109,7 @@ const COPY: Record<"en" | "tr" | "fr", CaseStudyCopy> = {
         caption: "Stay dossier — story, media, host context, pricing, and booking entry.",
       },
       {
-        src: "/work/hodlstay-2026-08-conferences.jpg",
+        src: "/work/hodlstay-2026-09-conferences.jpg",
         alt: "HodlStay conference accommodation interface",
         caption: "Conference product — a focused journey inside the wider platform.",
       },
@@ -191,7 +192,7 @@ const COPY: Record<"en" | "tr" | "fr", CaseStudyCopy> = {
     ],
     gallery: [
       {
-        src: "/work/hodlstay-2026-08-stays.jpg",
+        src: "/work/hodlstay-2026-09-stays.jpg",
         alt: "HodlStay konaklama keşfi ve arama arayüzü",
         caption: "Keşif — kategoriler, tarihler, misafirler, filtreler ve canlı envanter.",
       },
@@ -201,7 +202,7 @@ const COPY: Record<"en" | "tr" | "fr", CaseStudyCopy> = {
         caption: "Konaklama dosyası — hikâye, medya, ev sahibi bağlamı, fiyat ve rezervasyon girişi.",
       },
       {
-        src: "/work/hodlstay-2026-08-conferences.jpg",
+        src: "/work/hodlstay-2026-09-conferences.jpg",
         alt: "HodlStay konferans konaklama arayüzü",
         caption: "Konferans ürünü — geniş platform içinde odaklanmış bir yolculuk.",
       },
@@ -284,7 +285,7 @@ const COPY: Record<"en" | "tr" | "fr", CaseStudyCopy> = {
     ],
     gallery: [
       {
-        src: "/work/hodlstay-2026-08-stays.jpg",
+        src: "/work/hodlstay-2026-09-stays.jpg",
         alt: "Interface de découverte et recherche HodlStay",
         caption: "Découverte — catégories, dates, voyageurs, filtres et inventaire en direct.",
       },
@@ -294,7 +295,7 @@ const COPY: Record<"en" | "tr" | "fr", CaseStudyCopy> = {
         caption: "Dossier de séjour — histoire, médias, contexte hôte, prix et réservation.",
       },
       {
-        src: "/work/hodlstay-2026-08-conferences.jpg",
+        src: "/work/hodlstay-2026-09-conferences.jpg",
         alt: "Interface d'hébergement conférence HodlStay",
         caption: "Produit conférence — un parcours ciblé dans la plateforme.",
       },
@@ -319,5 +320,5 @@ export async function generateMetadata({ params }: LocalePageProps) {
 
 export default async function HodlStayCaseStudyPage({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
-  return <CaseStudy locale={locale} copy={COPY[locale]} />;
+  return <CaseStudy locale={locale} copy={COPY[locale]} stack={PROJECT_STACKS["hodlstay"]} />;
 }

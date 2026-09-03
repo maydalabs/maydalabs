@@ -1,4 +1,5 @@
 import { CaseStudy, type CaseStudyCopy } from "@/components/CaseStudy";
+import { PROJECT_STACKS } from "@/lib/stack";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
 
@@ -314,5 +315,5 @@ export async function generateMetadata({ params }: LocalePageProps) {
 
 export default async function SofraCaseStudyPage({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
-  return <CaseStudy locale={locale} copy={COPY[locale]} />;
+  return <CaseStudy locale={locale} copy={COPY[locale]} stack={PROJECT_STACKS["sofra"]} />;
 }

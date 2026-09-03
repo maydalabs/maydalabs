@@ -20,7 +20,7 @@ const COPY = {
     cases: [
       {
         id: "hodlstay",
-        image: "/work/hodlstay-2026-08-home.jpg",
+        image: "/work/hodlstay-2026-09-home.jpg",
         alt: "Current HodlStay global booking marketplace homepage",
         tags: ["Client build", "Live"],
         name: "HodlStay",
@@ -28,7 +28,7 @@ const COPY = {
       },
       {
         id: "satoshi-gazette",
-        image: "/work/satoshi-gazette-2026-08-home.jpg",
+        image: "/work/satoshi-gazette-2026-09-home.jpg",
         alt: "Current Satoshi Gazette newsroom homepage",
         tags: ["Owned publication", "Live"],
         name: "Satoshi Gazette",
@@ -73,7 +73,7 @@ const COPY = {
     cases: [
       {
         id: "hodlstay",
-        image: "/work/hodlstay-2026-08-home.jpg",
+        image: "/work/hodlstay-2026-09-home.jpg",
         alt: "Güncel HodlStay küresel rezervasyon pazarı ana sayfası",
         tags: ["Müşteri ürünü", "Canlı"],
         name: "HodlStay",
@@ -81,7 +81,7 @@ const COPY = {
       },
       {
         id: "satoshi-gazette",
-        image: "/work/satoshi-gazette-2026-08-home.jpg",
+        image: "/work/satoshi-gazette-2026-09-home.jpg",
         alt: "Güncel Satoshi Gazette haber merkezi ana sayfası",
         tags: ["Sahip olunan yayın", "Canlı"],
         name: "Satoshi Gazette",
@@ -126,7 +126,7 @@ const COPY = {
     cases: [
       {
         id: "hodlstay",
-        image: "/work/hodlstay-2026-08-home.jpg",
+        image: "/work/hodlstay-2026-09-home.jpg",
         alt: "Page d'accueil actuelle de la marketplace mondiale HodlStay",
         tags: ["Produit client", "En ligne"],
         name: "HodlStay",
@@ -134,7 +134,7 @@ const COPY = {
       },
       {
         id: "satoshi-gazette",
-        image: "/work/satoshi-gazette-2026-08-home.jpg",
+        image: "/work/satoshi-gazette-2026-09-home.jpg",
         alt: "Page d'accueil actuelle de la rédaction Satoshi Gazette",
         tags: ["Publication détenue", "En ligne"],
         name: "Satoshi Gazette",

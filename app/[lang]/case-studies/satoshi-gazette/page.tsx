@@ -1,4 +1,5 @@
 import { CaseStudy, type CaseStudyCopy } from "@/components/CaseStudy";
+import { PROJECT_STACKS } from "@/lib/stack";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
 
@@ -96,17 +97,17 @@ const COPY: Record<"en" | "tr" | "fr", CaseStudyCopy> = {
     ],
     gallery: [
       {
-        src: "/work/satoshi-gazette-2026-08-home.jpg",
+        src: "/work/satoshi-gazette-2026-09-home.jpg",
         alt: "Current Satoshi Gazette homepage with populated stories and Wire",
         caption: "Front page — market context, desks, leading stories, and the Wire in one masthead.",
       },
       {
-        src: "/work/satoshi-gazette-2026-08-wire.jpg",
+        src: "/work/satoshi-gazette-2026-09-wire.jpg",
         alt: "Current populated Satoshi Gazette Wire",
         caption: "The Wire — fast reporting with structured source identity and source time.",
       },
       {
-        src: "/work/satoshi-gazette-2026-08-data.jpg",
+        src: "/work/satoshi-gazette-2026-09-data.jpg",
         alt: "Satoshi Gazette Corporate Bitcoin Treasuries Data Desk",
         caption: "Data Desk — primary evidence with dates, sources, scope limits, and methodology.",
       },
@@ -187,17 +188,17 @@ const COPY: Record<"en" | "tr" | "fr", CaseStudyCopy> = {
     ],
     gallery: [
       {
-        src: "/work/satoshi-gazette-2026-08-home.jpg",
+        src: "/work/satoshi-gazette-2026-09-home.jpg",
         alt: "Haberler ve Wire ile dolu güncel Satoshi Gazette ana sayfası",
         caption: "Ana sayfa — piyasa bağlamı, masalar, ana haberler ve Wire tek masthead'de.",
       },
       {
-        src: "/work/satoshi-gazette-2026-08-wire.jpg",
+        src: "/work/satoshi-gazette-2026-09-wire.jpg",
         alt: "Güncel dolu Satoshi Gazette Wire",
         caption: "Wire — yapılandırılmış kaynak kimliği ve zamanıyla hızlı habercilik.",
       },
       {
-        src: "/work/satoshi-gazette-2026-08-data.jpg",
+        src: "/work/satoshi-gazette-2026-09-data.jpg",
         alt: "Satoshi Gazette Corporate Bitcoin Treasuries Veri Masası",
         caption: "Veri Masası — tarih, kaynak, kapsam sınırı ve metodolojiyle birincil kanıt.",
       },
@@ -278,17 +279,17 @@ const COPY: Record<"en" | "tr" | "fr", CaseStudyCopy> = {
     ],
     gallery: [
       {
-        src: "/work/satoshi-gazette-2026-08-home.jpg",
+        src: "/work/satoshi-gazette-2026-09-home.jpg",
         alt: "Accueil Satoshi Gazette actuel avec articles et Wire",
         caption: "Page d'accueil — marché, rubriques, articles majeurs et Wire dans un même masthead.",
       },
       {
-        src: "/work/satoshi-gazette-2026-08-wire.jpg",
+        src: "/work/satoshi-gazette-2026-09-wire.jpg",
         alt: "Wire Satoshi Gazette actuel et peuplé",
         caption: "The Wire — information rapide avec source et heure structurées.",
       },
       {
-        src: "/work/satoshi-gazette-2026-08-data.jpg",
+        src: "/work/satoshi-gazette-2026-09-data.jpg",
         alt: "Data Desk Corporate Bitcoin Treasuries de Satoshi Gazette",
         caption: "Data Desk — preuves primaires avec dates, sources, limites et méthode.",
       },
@@ -313,5 +314,5 @@ export async function generateMetadata({ params }: LocalePageProps) {
 
 export default async function SatoshiGazetteCaseStudyPage({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
-  return <CaseStudy locale={locale} copy={COPY[locale]} />;
+  return <CaseStudy locale={locale} copy={COPY[locale]} stack={PROJECT_STACKS["satoshi-gazette"]} />;
 }

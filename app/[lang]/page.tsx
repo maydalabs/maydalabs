@@ -81,7 +81,7 @@ const COPY = {
     work: [
       {
         href: "/case-studies/satoshi-gazette",
-        image: "/work/satoshi-gazette-2026-08-home.jpg",
+        image: "/work/satoshi-gazette-2026-09-home.jpg",
         alt: "Satoshi Gazette publication homepage",
         tags: ["Owned publication", "Live"],
         title: "Satoshi Gazette",
@@ -89,7 +89,7 @@ const COPY = {
       },
       {
         href: "/case-studies/hodlstay",
-        image: "/work/hodlstay-2026-08-home.jpg",
+        image: "/work/hodlstay-2026-09-home.jpg",
         alt: "HodlStay global booking marketplace homepage",
         tags: ["Client build", "Live"],
         title: "HodlStay",
@@ -169,7 +169,7 @@ const COPY = {
     work: [
       {
         href: "/case-studies/satoshi-gazette",
-        image: "/work/satoshi-gazette-2026-08-home.jpg",
+        image: "/work/satoshi-gazette-2026-09-home.jpg",
         alt: "Satoshi Gazette yayın ana sayfası",
         tags: ["Sahip olunan yayın", "Canlı"],
         title: "Satoshi Gazette",
@@ -177,7 +177,7 @@ const COPY = {
       },
       {
         href: "/case-studies/hodlstay",
-        image: "/work/hodlstay-2026-08-home.jpg",
+        image: "/work/hodlstay-2026-09-home.jpg",
         alt: "HodlStay küresel rezervasyon pazarı ana sayfası",
         tags: ["Müşteri ürünü", "Canlı"],
         title: "HodlStay",
@@ -257,7 +257,7 @@ const COPY = {
     work: [
       {
         href: "/case-studies/satoshi-gazette",
-        image: "/work/satoshi-gazette-2026-08-home.jpg",
+        image: "/work/satoshi-gazette-2026-09-home.jpg",
         alt: "Page d'accueil de la publication Satoshi Gazette",
         tags: ["Publication détenue", "En ligne"],
         title: "Satoshi Gazette",
@@ -265,7 +265,7 @@ const COPY = {
       },
       {
         href: "/case-studies/hodlstay",
-        image: "/work/hodlstay-2026-08-home.jpg",
+        image: "/work/hodlstay-2026-09-home.jpg",
         alt: "Page d'accueil de la marketplace mondiale HodlStay",
         tags: ["Produit client", "En ligne"],
         title: "HodlStay",
@@ -391,7 +391,7 @@ export default async function HomePage({ params }: LocalePageProps) {
               <div>
                 <figure style={{ margin: 0, border: "1px solid var(--border)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
                   <Image
-                    src="/work/satoshi-gazette-2026-08-home.jpg"
+                    src="/work/satoshi-gazette-2026-09-home.jpg"
                     alt={copy.work[0].alt}
                     width={1280}
                     height={720}
@@ -436,7 +436,7 @@ export default async function HomePage({ params }: LocalePageProps) {
         </div>
       </section>
 
-      <FounderNote locale={locale} />
+      <FounderNote locale={locale} showPortrait={false} />
 
 
       <section className="mayda-section-tight" style={{ paddingTop: 0 }}>

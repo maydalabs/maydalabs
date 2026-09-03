@@ -55,18 +55,20 @@ const COPY: Record<Locale, { kicker: string; name: string; role: string; facts: 
   },
 };
 
-export function FounderNote({ locale }: { locale: Locale }) {
+export function FounderNote({ locale, showPortrait = true }: { locale: Locale; showPortrait?: boolean }) {
   const copy = COPY[locale];
   return (
     <section className="mayda-section-tight" style={{ paddingTop: 0 }} aria-labelledby="founder-note">
       <div className="mayda-shell">
-        <div className="mayda-founder">
+        <div className={`mayda-founder ${showPortrait ? "" : "is-text-only"}`}>
+          {showPortrait ? (
           <figure className="mayda-founder-portrait">
             <Image src={portrait} alt={copy.name} placeholder="blur" sizes="(min-width: 768px) 240px, 60vw" />
             <figcaption>
               <Icon name="human" /> {copy.tag}
             </figcaption>
           </figure>
+          ) : null}
           <div className="mayda-stack" style={{ gap: "0.9rem" }}>
             <p className="mayda-kicker" style={{ margin: 0 }}>{copy.kicker}</p>
             <h2 id="founder-note" className="mayda-subheading" style={{ fontSize: "clamp(1.5rem, 2.6vw, 2rem)" }}>

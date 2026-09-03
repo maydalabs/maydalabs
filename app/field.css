@@ -2399,3 +2399,46 @@ fieldset.mayda-fieldset > p {
   .mayda-stack-group[data-group="worked"] .mayda-stack-img { filter: none; opacity: 1; width: 1.35rem; height: 1.35rem; }
   .mayda-stack-group[data-group="worked"] .mayda-stack-item { color: var(--frost); }
 }
+
+/* Stack strip, logos only. */
+@layer components {
+  .mayda-stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .mayda-stack-item {
+    --brand: var(--frost);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.9rem;
+    height: 2.9rem;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--mist);
+    background: var(--surface-card);
+    transition: color 180ms ease, border-color 180ms ease, transform 180ms ease;
+  }
+  .mayda-stack-item.is-wide { width: auto; padding: 0 0.8rem; }
+  .mayda-stack-item svg { width: 1.45rem; height: 1.45rem; }
+  .mayda-stack-item .mayda-stack-img { width: 1.5rem; height: 1.5rem; object-fit: contain; }
+  .mayda-stack-item .mayda-stack-img.is-wide { width: auto; height: 1.15rem; }
+  .mayda-stack-item:not(.is-brand) .mayda-stack-img { filter: grayscale(1) brightness(1.5); opacity: 0.8; transition: filter 180ms ease, opacity 180ms ease; }
+  .mayda-stack-item:hover { color: var(--brand); border-color: var(--border-strong); transform: translateY(-1px); }
+  .mayda-stack-item:hover .mayda-stack-img { filter: none; opacity: 1; }
+  .mayda-stack-item.is-brand { color: var(--frost); }
+  .mayda-stack-fallback { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.06em; }
+  .mayda-stack-compact {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 1rem;
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .mayda-stack-compact .mayda-stack-group-label { padding-top: 0; }
+  .mayda-founder.is-text-only { grid-template-columns: 1fr; }
+}
+
+@layer components {
+  .mayda-profile-portrait { display: block; width: 100%; height: auto; border-radius: var(--radius-lg); border: 1px solid var(--border-strong); margin-bottom: 1.1rem; filter: saturate(0.9); }
+}

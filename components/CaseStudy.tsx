@@ -1,3 +1,5 @@
+import { ProjectStack } from "@/components/StackStrip";
+import type { StackItem } from "@/lib/stack";
 import Image from "next/image";
 import Link from "next/link";
 import { localizePath, type Locale } from "@/lib/i18n";
@@ -36,7 +38,9 @@ export type CaseStudyCopy = {
   ctaWork: string;
 };
 
-export function CaseStudy({ locale, copy }: { locale: Locale; copy: CaseStudyCopy }) {
+const STACK_LABEL: Record<Locale, string> = { en: "Stack", tr: "Yığın", fr: "Pile technique" };
+
+export function CaseStudy({ locale, copy, stack }: { locale: Locale; copy: CaseStudyCopy; stack?: StackItem[] }) {
   return (
     <div className="mayda-shell">
       <section className="mayda-case-hero mayda-stack">
@@ -81,6 +85,9 @@ export function CaseStudy({ locale, copy }: { locale: Locale; copy: CaseStudyCop
           ))}
         </div>
       </section>
+
+      {stack?.length ? <ProjectStack items={stack} label={STACK_LABEL[locale]} /> : null}
+
 
       {copy.sections.map((section) => (
         <section key={section.heading} className="mayda-case-section">
