@@ -19,6 +19,8 @@ now.
 
 **[Founder profile](https://maydalabs.com/profile)** · **[Selected work](https://maydalabs.com/case-studies)** · **[What do you need?](https://maydalabs.com/contact)**
 
+![MaydaLabs home](docs/screens/2026-09-home.png)
+
 ## What this repository is
 
 The MaydaLabs platform: the public marketing surface, an authenticated client
@@ -118,23 +120,19 @@ demo-safe and does not claim a public launch or real payments.
   </tr>
 </table>
 
-## MaydaOS, the interface lab
+## MaydaOS, the interactive lab
 
-Before the platform rebuild, this site ran as a small operating system in the
-browser. That build is preserved as a lab at
-[maydalabs.com/os](https://maydalabs.com/os) rather than as the front door,
-because a studio site should answer a buyer's question before it shows off.
+MaydaLabs is the company. [MaydaOS](https://maydalabs.com/os) is its
+interactive lab: a working interface for exploring how ideas, products,
+workflows, growth, and security connect, without making the commercial
+homepage harder to understand.
 
-It remains a fair sample of interface engineering: draggable, snappable windows
-over a persisted desktop layout, a dock, a menubar, a ⌘K command palette, a
-guided command shell, live telemetry that reads Bitcoin block height from
-mempool.space, and a three.js wallpaper engine capped so ambience never taxes
-the page, with full reduced-motion support.
+It is built into the current site rather than bolted beside it, and it is a
+fair sample of interface engineering: a windowed lab shell with its own
+navigation, live telemetry that reads Bitcoin block height from mempool.space,
+and motion that respects a reduced-motion preference.
 
-![MaydaOS interface lab](docs/awards/01-desktop-globe.png)
-
-> These captures predate the current positioning. The interface is accurate;
-> the copy inside the windows is from the earlier build.
+![MaydaOS, the interactive lab](docs/screens/2026-09-maydaos-lab.png)
 
 ## Architecture
 
