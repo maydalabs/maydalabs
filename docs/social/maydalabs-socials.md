@@ -8,8 +8,8 @@ draft for his voice pass. Nothing is posted by anyone else, ever._
 
 | Network | Handle / URL | State | Action |
 |---|---|---|---|
-| X | `@maydalabs` · x.com/maydalabs | Ours. 1,358 posts since April 2022, 7 followers, bio "MaydaLabs", old "M" avatar, no banner, a personal birthday on a company account. | Keep the handle and the history. Replace avatar, add banner, rewrite bio, set website, remove the birthday. Pin the first new post. |
-| LinkedIn company page | linkedin.com/company/maydalabs | Does not exist. Satoshi Gazette's page exists and is the style reference (dark cover, one line, nothing else). | Create it (steps below). |
+| X | `@maydalabs` · x.com/maydalabs | **Live (3 Sep 2026).** Block-gate avatar, text-free header, bio "Let AI run your operation while you stay in control! Every claim sourced, every action approved by you.", category Software Company, location "Istanbul / everywhere", website maydalabs.com, birth date hidden. 1,358 historic posts kept, 7 followers. | Pin the first new post once the content lane produces it. |
+| LinkedIn company page | linkedin.com/company/maydalabs (admin id 144834959) | **Live (3 Sep 2026).** Logo, text-free cover, tagline "Let AI run your operation while you stay in control!", the final Overview, Software Development, 0–1 employees, founded 2025 (as entered), 14 specialties, website. 0 followers. | Invite connections; add Istanbul under Locations if not yet; swap the site footer link to the page. |
 | GitHub | github.com/maydalabs | Exists. | Set the org avatar to the mark. |
 
 ## External actions, in order (all yours; ~40 minutes)
