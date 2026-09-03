@@ -22,6 +22,40 @@ site when an invoice is paid. Two consequences:
   seed phrase into BTCPay.** If it offers to create a hot wallet, decline for
   business funds.
 
+
+## Status: the zero-cost path is built and live (4 Sep 2026)
+
+Shipped in commit `acbead2`, migration applied to production:
+
+- Operators create an invoice at `/internal/pilots`: a label, a USD amount,
+  and a **fresh receiving address pasted from any wallet you control**. No
+  xpub, no processor account, no server. The rate is read from mempool.space
+  and locked; the quote holds 24 hours.
+- The client sees it in their portal: a scannable QR, the address, the amount
+  in BTC and sats, the locked rate, and the expiry.
+- "Check for payment" asks mempool.space what the address has received and
+  records it. At or above the invoiced amount the invoice turns paid and the
+  transaction id is stored.
+- Addresses are validated by real checksum before anything is saved: bech32,
+  bech32m and Base58Check, mainnet only. A single mistyped character is
+  rejected.
+- Payment state is not client-writable. The row-level security suite proves a
+  signed-in client cannot mark their own invoice paid.
+
+Verified end to end on 4 Sep 2026 against the real chain: an invoice created
+through the operator form at the live rate, rendered in the client portal, and
+flipped to paid by a chain lookup.
+
+**What you still need before invoicing anyone:** a wallet to receive into. Any
+wallet that shows a receive address works, including one you already have. If
+you want a clean separation for the business, Sparrow on the Mac or BlueWallet
+on the phone takes five minutes and costs nothing. Use a **fresh address per
+invoice** so two clients are never told to pay the same one. A hardware wallet
+is worth buying before the amounts get real, but it is not needed to start.
+
+BTCPay below stays the upgrade path, for the month a client needs Lightning,
+refunds, or a merchant back office.
+
 ## Step 1 — Decide what you are actually paying for
 
 Checked on 3 Sep 2026. BTCPay's stated minimum is **2 GB RAM and 80 GB of
