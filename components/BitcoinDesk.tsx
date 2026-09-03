@@ -57,13 +57,15 @@ async function loadDesk(): Promise<DeskData | null> {
     getJson<History>("/v1/historical-price?currency=USD", 3600),
   ]);
 
-  const sparkline = Array.isArray(history?.prices)
+  // All-time, evenly downsampled to ~160 points (linear scale, by request:
+  // the curve that only goes up and to the right).
+  const ordered = Array.isArray(history?.prices)
     ? [...history!.prices]
         .filter((point) => Number.isFinite(point?.USD) && Number.isFinite(point?.time))
         .sort((a, b) => a.time - b.time)
-        .slice(-30)
-        .map((point) => point.USD)
     : [];
+  const step = Math.max(1, Math.floor(ordered.length / 160));
+  const sparkline = ordered.filter((_, index) => index % step === 0 || index === ordered.length - 1).map((point) => point.USD);
 
   const latest = Array.isArray(blocks) ? blocks[0] : null;
 

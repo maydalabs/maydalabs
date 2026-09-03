@@ -21,6 +21,10 @@ the chain. Cobalt and mint keep meaning "the system" and "approved".
 - Payments: the icon box on "Bitcoin payments engineering" (home and
   Offers), the "pay in bitcoin" note on Offers, the ₿ glyph on the BTCPay
   node in the payments illustration, the serif ticks on `LogoMarkBitcoin`.
+- Hero flow figure: exactly one source strand, its dot, and its pulse
+  (the chain is one of the inputs).
+- Bitcoin desk kicker: the small ₿ glyph; the all-time price curve ends
+  in orange.
 
 Everything else stays cobalt/mint. Adding a new orange use means adding a
 line here and asking whether the thing is actually Bitcoin.

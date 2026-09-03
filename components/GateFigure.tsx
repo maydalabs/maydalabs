@@ -6,6 +6,8 @@
  */
 
 const SOURCE_Y = [80, 140, 200, 260];
+// One of the sources is the chain itself — the only orange in the hero.
+const BTC_SOURCE_Y = 260;
 const OUTPUT_Y = [110, 170, 230];
 const MACHINE = { x: 190, y: 170 };
 const GATE = { x: 350, y: 170 };
@@ -37,8 +39,8 @@ export function GateFigure({ className = "" }: { className?: string }) {
 
       {SOURCE_Y.map((y) => (
         <g key={y}>
-          <path className="field-line" d={sourcePath(y)} />
-          <circle className="gate-source" cx="24" cy={y} r="4" />
+          <path className={`field-line ${y === BTC_SOURCE_Y ? "is-btc" : ""}`} d={sourcePath(y)} />
+          <circle className={`gate-source ${y === BTC_SOURCE_Y ? "is-btc" : ""}`} cx="24" cy={y} r="4" />
         </g>
       ))}
 
@@ -52,7 +54,7 @@ export function GateFigure({ className = "" }: { className?: string }) {
       ))}
 
       <path className="field-pulse" d={`${sourcePath(80)} H ${GATE.x - 24}`} />
-      <path className="field-pulse is-second" d={`${sourcePath(260)} H ${GATE.x - 24}`} />
+      <path className="field-pulse is-second is-btc" d={`${sourcePath(260)} H ${GATE.x - 24}`} />
       <path className="field-pulse is-third" d={outputPath(170)} />
 
       <g className="gate-machine" transform={`translate(${MACHINE.x - 26} ${MACHINE.y - 26})`}>

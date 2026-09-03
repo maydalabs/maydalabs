@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Icon } from "@/components/icons";
 
 /*
  * Client half of the Bitcoin desk: keeps price, height, fee, and block age
@@ -32,6 +33,7 @@ const COPY: Record<
     kicker: string;
     tagline: string;
     source: string;
+    sparkLabel: string;
     price: string;
     perDollar: string;
     change: string;
@@ -54,6 +56,7 @@ const COPY: Record<
     kicker: "Bitcoin desk",
     tagline: "Time here is measured in blocks.",
     source: "Live from mempool.space",
+    sparkLabel: "All-time",
     price: "Price",
     perDollar: "sats per dollar",
     change: "24h",
@@ -75,6 +78,7 @@ const COPY: Record<
     kicker: "Bitcoin masası",
     tagline: "Burada zaman blokla ölçülür.",
     source: "Canlı, mempool.space",
+    sparkLabel: "Tüm zamanlar",
     price: "Fiyat",
     perDollar: "dolar başına satoshi",
     change: "24s",
@@ -96,6 +100,7 @@ const COPY: Record<
     kicker: "Desk Bitcoin",
     tagline: "Ici, le temps se mesure en blocs.",
     source: "En direct de mempool.space",
+    sparkLabel: "Depuis le début",
     price: "Prix",
     perDollar: "sats par dollar",
     change: "24 h",
@@ -149,10 +154,15 @@ function Sparkline({ points }: { points: number[] }) {
       <defs>
         <linearGradient id="desk-spark" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stopColor="#4B6BFF" />
-          <stop offset="1" stopColor="#42F5B6" />
+          <stop offset="1" stopColor="#F7931A" />
+        </linearGradient>
+        <linearGradient id="desk-spark-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#F7931A" stopOpacity="0.28" />
+          <stop offset="1" stopColor="#F7931A" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <path d={path} fill="none" stroke="url(#desk-spark)" strokeWidth="1.4" vectorEffect="non-scaling-stroke" />
+      <path d={`${path} L${width} ${heightPx} L0 ${heightPx} Z`} fill="url(#desk-spark-fill)" stroke="none" />
+      <path d={path} fill="none" stroke="url(#desk-spark)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
     </svg>
   );
 }
@@ -236,7 +246,7 @@ export function BitcoinDeskLive({ initial, locale, className = "" }: { initial: 
       <div className="mayda-shell">
         <header className="mayda-desk-head">
           <p className="mayda-kicker" style={{ margin: 0 }}>
-            <span className="mayda-desk-dot" aria-hidden="true" /> {copy.kicker}
+            <span className="mayda-desk-dot" aria-hidden="true" /> <Icon name="bitcoin" className="mayda-desk-btc" /> {copy.kicker}
             <span className="mayda-desk-tagline">{copy.tagline}</span>
           </p>
           <span className="mayda-mono mayda-desk-source">{copy.source}</span>
@@ -246,6 +256,7 @@ export function BitcoinDeskLive({ initial, locale, className = "" }: { initial: 
           {data.priceUsd !== null ? (
             <div className={`mayda-desk-tile is-price ${isFlashing("price") ? "is-updated" : ""}`}>
               <Sparkline points={data.sparkline} />
+              {data.sparkline.length > 1 ? <span className="mayda-desk-spark-label">{copy.sparkLabel}</span> : null}
               <span className="mayda-desk-label">{copy.price}</span>
               <strong>{currency.format(data.priceUsd)}</strong>
               <small>

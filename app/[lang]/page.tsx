@@ -4,6 +4,7 @@ import { GateFigure } from "@/components/GateFigure";
 import { FounderNote } from "@/components/FounderNote";
 import { SignalField } from "@/components/SignalField";
 import { BitcoinDesk } from "@/components/BitcoinDesk";
+import { StackStrip } from "@/components/StackStrip";
 import { Reveal } from "@/components/Reveal";
 import { ApprovalQueue } from "@/components/illustrations/ApprovalQueue";
 import { PaymentsFlow } from "@/components/illustrations/PaymentsFlow";
@@ -280,6 +281,12 @@ const COPY = {
   },
 } as const;
 
+const STACK_KICKER = {
+  en: "Stack, rails, and who we build for",
+  tr: "Yığın, raylar ve kimler için kurduğumuz",
+  fr: "La pile, les rails, et pour qui nous construisons",
+} as const;
+
 const OFFER_ICONS: IconName[] = ["gate", "bitcoin"];
 const STEP_ICONS: IconName[] = ["scope", "install", "machine", "report"];
 const RULE_ICONS: IconName[] = ["gate", "source", "key"];
@@ -479,6 +486,9 @@ export default async function HomePage({ params }: LocalePageProps) {
           </div>
         </div>
       </section>
+
+      <StackStrip locale={locale} kicker={STACK_KICKER[locale]} />
+
 
       <section className="mayda-final-cta mayda-shell">
         <div className="mayda-availability">

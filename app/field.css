@@ -2183,13 +2183,30 @@ fieldset.mayda-fieldset > p {
 @layer components {
   .mayda-offer-card { display: flex; flex-direction: column; height: 100%; }
   .mayda-offer-figure {
+    position: relative;
+    display: grid;
+    grid-template-rows: 2rem 1fr;
+    aspect-ratio: 560 / 372;
     overflow: hidden;
     margin: 0 0 1.2rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius-lg);
     background: var(--surface);
   }
-  .mayda-offer-figure svg { display: block; width: 100%; height: auto; }
+  /* Desktop-window chrome: one bar with three dots, identical on every figure. */
+  .mayda-offer-figure::before {
+    content: "";
+    grid-row: 1;
+    display: block;
+    border-bottom: 1px solid var(--border);
+    background:
+      radial-gradient(circle at 1rem 50%, var(--border-strong) 0.24rem, transparent 0.3rem),
+      radial-gradient(circle at 1.9rem 50%, var(--border-strong) 0.24rem, transparent 0.3rem),
+      radial-gradient(circle at 2.8rem 50%, var(--border-strong) 0.24rem, transparent 0.3rem),
+      var(--surface-raised);
+  }
+  .mayda-offer-figure > svg { grid-row: 2; display: block; width: 100%; height: 100%; padding: 0.4rem; }
+  .mayda-offer-figure .aq-panel { display: none; }
 }
 
 /* Bitcoin desk — the chain, live, under the hero. */
@@ -2293,13 +2310,27 @@ fieldset.mayda-fieldset > p {
   .mayda-desk-tile .is-down { color: var(--error); }
   .mayda-desk-spark {
     position: absolute;
+    left: 0;
     right: 0;
     bottom: 0;
-    width: 55%;
-    height: 2.6rem;
-    opacity: 0.55;
+    width: 100%;
+    height: 62%;
+    opacity: 0.6;
     pointer-events: none;
   }
+  .mayda-desk-spark-label {
+    position: absolute;
+    right: 0.8rem;
+    bottom: 0.55rem;
+    color: var(--mist);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.9;
+  }
+  .mayda-desk-tile.is-price > *:not(.mayda-desk-spark):not(.mayda-desk-spark-label) { position: relative; z-index: 1; }
+  .mayda-desk-btc { color: var(--btc); width: 1rem; height: 1rem; vertical-align: -0.2rem; margin-right: 0.35rem; }
 }
 
 /* Bitcoin orange — rare, unmissable, always meaning "this is Bitcoin". */
@@ -2311,4 +2342,54 @@ fieldset.mayda-fieldset > p {
   .mayda-desk-tile.is-price.is-updated strong { color: var(--btc); }
   .mayda-paynote { border-color: var(--btc-line); background: var(--btc-soft); }
   .mayda-paynote svg { color: var(--btc); }
+}
+
+/* One source in the hero flow is Bitcoin itself. */
+@layer components {
+  .gate-figure .field-line.is-btc { stroke: var(--btc); opacity: 0.85; }
+  .gate-figure .gate-source.is-btc { fill: var(--btc); }
+  .field-figure .field-pulse.is-btc { stroke: var(--btc); }
+}
+
+/* Stack and partner strip. */
+@layer components {
+  .mayda-stack-groups { display: flex; flex-direction: column; gap: 1.1rem; margin-top: 1.2rem; }
+  .mayda-stack-group {
+    display: grid;
+    grid-template-columns: 11rem 1fr;
+    gap: 0.8rem 1.2rem;
+    align-items: start;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--border);
+  }
+  @media (max-width: 48rem) { .mayda-stack-group { grid-template-columns: 1fr; } }
+  .mayda-stack-group-label {
+    color: var(--mist);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding-top: 0.55rem;
+  }
+  .mayda-stack-list { display: flex; flex-wrap: wrap; gap: 0.5rem 0.6rem; }
+  .mayda-stack-item {
+    --brand: var(--frost);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.45rem 0.8rem 0.45rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--mist);
+    font-size: 0.82rem;
+    text-decoration: none;
+    background: var(--surface-card);
+    transition: color 180ms ease, border-color 180ms ease, transform 180ms ease;
+  }
+  .mayda-stack-item svg { width: 1.15rem; height: 1.15rem; flex: none; }
+  .mayda-stack-item .mayda-stack-img { width: 1.15rem; height: 1.15rem; object-fit: contain; filter: grayscale(1) brightness(1.4); opacity: 0.85; transition: filter 180ms ease, opacity 180ms ease; }
+  .mayda-stack-item.is-text { padding-left: 0.8rem; font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.04em; }
+  .mayda-stack-item:hover { color: var(--brand); border-color: var(--border-strong); transform: translateY(-1px); }
+  .mayda-stack-item:hover span { color: var(--frost); }
+  .mayda-stack-item:hover .mayda-stack-img { filter: none; opacity: 1; }
 }
