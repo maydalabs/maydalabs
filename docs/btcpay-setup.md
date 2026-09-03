@@ -1,4 +1,8 @@
-# BTCPay Server: from nothing to a working checkout
+# Taking bitcoin payments on maydalabs.com
+
+Two paths: a zero-cost on-chain checkout built into the site, or a BTCPay
+Server instance. Step 1 compares them; steps 2-6 apply only if you choose
+BTCPay.
 
 Written 3 Sep 2026 for Mehmet, who has integrated against someone else's
 BTCPay (HodlStay) but has never run an instance. Steps 1-6 are his; step 7 is
@@ -18,55 +22,75 @@ site when an invoice is paid. Two consequences:
   seed phrase into BTCPay.** If it offers to create a hot wallet, decline for
   business funds.
 
-## Step 1 — Choose where it runs (20 minutes, then waiting)
+## Step 1 — Decide what you are actually paying for
 
-"Hosted by someone else" means two very different things, and the difference
-decides whether it is safe to take real money.
+Checked on 3 Sep 2026. BTCPay's stated minimum is **2 GB RAM and 80 GB of
+storage with pruning enabled**, plus Docker, and the node has to stay online
+permanently or it falls behind the chain.
 
-**Shared third-party host (free).** You register as a user on somebody else's
-BTCPay. BTCPay's own documentation is blunt about the risk: a malicious host can
-run a modified build that swaps your extended public key for theirs, so future
-payments land in their wallet. The docs say to use these hosts for "testing,
-learning and getting started" and *not* "with high volume payments or extremely
-valuable transactions". A $2,500 pilot invoice is not a test. Their directory at
-directory.btcpayserver.org is also serving an invalid TLS certificate as of
-3 Sep 2026, so it cannot be browsed safely today.
+| Path | Real monthly cost | What you get | What you own |
+| --- | --- | --- | --- |
+| **No server (see below)** | **$0** | On-chain checkout on maydalabs.com | Nothing to patch |
+| LunaNode `s.2`, 1-click | **$14** (2 GB RAM, 35 GB SSD; needs aggressive pruning) | Your own BTCPay, no command line | Updates, sync |
+| LunaNode `c.1`, 1-click | **$20** (5 GB RAM, 100 GB SSD) | Same, comfortably within spec | Updates, sync |
+| Own VPS (Hetzner, Contabo) + official Docker script | roughly €5-8, not verified today | Cheapest real BTCPay | Everything |
+| Elestio managed | **from $16** plus $0.15/GB/month storage | Auto updates, auto SSL, backups | Nothing |
 
-**Managed private instance (paid). Recommended.** A company runs *your own*
-BTCPay on *your own* virtual machine and keeps it patched. You are still trusting
-a provider with the box, but it is a commercial provider with a reputation, not
-an anonymous shared server, and nobody else has an account on your instance.
+BTCPay's own docs quote "~$10/month" for LunaNode. LunaNode's price list does not
+have a plan at that price with enough disk; the honest figure is $14, and $20 if
+you want the documented 80 GB.
 
-Two providers checked on 3 Sep 2026:
+## The zero-cost path, and why it is not a compromise
 
-| Provider | Price | Notes |
-| --- | --- | --- |
-| Elestio, elest.io/open-source/btcpay | from **$16/month** | Dedicated instance, automated backups, auto SSL, **auto updates**, monitoring, custom domain, human support. Storage billed at $0.15/GB/month on top. |
-| Stellar Hosted, stellarhosted.com/btcpay-server | from **$49/month** | Dedicated private instance, 14-day trial with no card, servers in the Netherlands, Germany, San Francisco. Packages showed "coming soon", so check it is actually purchasable. |
+You do not need BTCPay to take an on-chain payment. A pilot invoice needs four
+things: a fresh address, a QR code, a price locked at a rate, and something that
+notices when the money arrives.
 
-Voltage does **not** host BTCPay; they sell Lightning payment infrastructure.
-An earlier draft of this document named them by mistake.
+All four can live in the site itself:
 
-Auto updates matter more than the price difference. btcpayserver.org is
-currently carrying a red banner: "Critical security update: Update BTCPay Server
-to the latest version immediately." On a managed instance that is the provider's
-job. On your own VPS it is yours, forever.
+- Derive a fresh receive address per invoice from a **watch-only extended public
+  key** of a wallet you control, held in `BTCPAY_`-style Vercel variables.
+- Show the BIP21 QR and the amount, priced in USD at the rate on the day.
+- Watch for payment with the **public mempool.space API**, the same source
+  already feeding the homepage Bitcoin desk. No key, no account, no node.
+- Mark the pilot paid at one confirmation, and record the transaction id.
 
-**Before you pay, confirm with the provider:**
+Cost: nothing, forever. Custody: yours, exactly as with BTCPay, because the
+private key never leaves your wallet. The address derivation gets verified
+against your own wallet before it goes live: if the first five addresses the
+site derives match the first five your wallet shows, the derivation is right.
 
-1. Does the instance run its own Bitcoin node, or connect to an external one?
-2. If its own: is it pruned, and how much disk does the plan include? A pruned
-   node needs tens of gigabytes; the $16 headline will not include that.
-3. How long until the node is synced and the instance can accept a payment?
-   Expect hours, not minutes, unless they provide a pre-synced node.
+What you give up compared to BTCPay: Lightning, refunds and payouts from a UI,
+accounting exports, a hosted checkout page with its own timer, and
+underpayment/overpayment handling beyond what we write ourselves.
 
-**The self-hosted alternative,** if you would rather own the box: the LunaNode
-one-click launcher at btcpayserver.org → Deployment → LunaNode, roughly $8-15 a
-month, no command line, but the sync wait is yours and so is every future
-security update.
+**Recommendation.** Build the zero-cost on-chain checkout now, since there is no
+client to invoice yet and it costs nothing to run. Add BTCPay on LunaNode `s.2`
+at $14 the month a client needs Lightning, refunds, or a full merchant back
+office, or the month you want to say "we run our own BTCPay" as proof for the
+payments offer. HodlStay's production BTCPay lifecycle already proves that offer
+today.
 
-Whichever you choose, write down the instance URL, for example
-`https://mayda.btcpay.example`. That value is `BTCPAY_HOST`.
+## About Lightning
+
+Lightning is the wrong rail for a $2,500 pilot invoice, and it is worth being
+precise about why:
+
+- Large single payments route unreliably. Every hop needs enough outbound
+  liquidity on that channel; payments in the thousands of dollars fail or split
+  badly, and many nodes cap what they will forward.
+- You would need that much **inbound** liquidity before the first invoice, which
+  is bought, not free: a channel purchase or an LSP fee.
+- A Lightning node is more operational work than a Bitcoin node, not less:
+  channel management, always-on uptime, and static channel backups whose loss
+  costs money.
+
+Lightning is right for small, frequent payments: a paid newsletter, hourly
+consulting, tips on Satoshi Gazette. If that day comes, the cheap route is
+`phoenixd` on the same box, which handles liquidity automatically and charges
+per payment, connected to BTCPay as an external node. Not now.
+
+Whichever path you take, an instance URL, if you have one, is `BTCPAY_HOST`.
 
 ## Step 2 — Create the admin account (5 minutes)
 
