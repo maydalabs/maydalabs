@@ -3,7 +3,8 @@ import { ImageResponse } from "next/og";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-// Typographic M placeholder — matches app/icon.tsx.
+// The MaydaLabs mark (see components/Logo.tsx) on the void, monochrome
+// frost — Apple touch icons are opaque PNGs, so no gradient here.
 export default function AppleIcon() {
   return new ImageResponse(
     (
@@ -15,13 +16,16 @@ export default function AppleIcon() {
           alignItems: "center",
           justifyContent: "center",
           background: "#0A0B0F",
-          color: "#F4F7FA",
-          fontSize: 112,
-          fontWeight: 700,
-          fontFamily: "sans-serif",
+          borderRadius: 40,
         }}
       >
-        M
+        <svg width="124" height="124" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <g fill="none" stroke="#F4F7FA" strokeWidth="2.7" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M7.5 27V5" />
+            <path d="M24.5 27V5" />
+            <path d="M7.5 9.5 13.5 22.5 24.5 9.5" />
+          </g>
+        </svg>
       </div>
     ),
     size,

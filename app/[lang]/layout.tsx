@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../field.css";
+import "../brand.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { GoogleTagManager } from "@/components/GoogleTagManager";
@@ -152,6 +153,9 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-screen overflow-x-hidden bg-background text-foreground antialiased">
+        <noscript>
+          <style>{`.reveal{opacity:1 !important;translate:none !important}`}</style>
+        </noscript>
         <GoogleTagManager />
         <script
           type="application/ld+json"

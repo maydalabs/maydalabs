@@ -1,6 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { GateFigure } from "@/components/GateFigure";
+import { FounderNote } from "@/components/FounderNote";
+import { SignalField } from "@/components/SignalField";
+import { Reveal } from "@/components/Reveal";
+import { ApprovalQueue } from "@/components/illustrations/ApprovalQueue";
+import { PaymentsFlow } from "@/components/illustrations/PaymentsFlow";
 import { Icon, IconBox, type IconName } from "@/components/icons";
 import { SgLatest } from "@/components/SgLatest";
 import { localizePath } from "@/lib/i18n";
@@ -289,8 +294,9 @@ export default async function HomePage({ params }: LocalePageProps) {
 
   return (
     <div>
-      <section className="mayda-hero">
-        <div className="mayda-shell mayda-hero-grid">
+      <section className="mayda-hero relative overflow-hidden">
+        <SignalField />
+        <div className="mayda-shell mayda-hero-grid relative z-10">
           <div className="mayda-stack-lg">
             <div className="mayda-stack" style={{ gap: "1.2rem" }}>
               <div className="mayda-availability">
@@ -325,17 +331,22 @@ export default async function HomePage({ params }: LocalePageProps) {
           </header>
           <div className="mayda-grid-2">
             {copy.offers.map((offer, index) => (
-              <Link key={offer.title} href={localizePath(offer.href, locale)} className="mayda-card">
-                <IconBox name={OFFER_ICONS[index]} tone={index === 0 ? "mint" : "cobalt"} />
-                <h3 className="mayda-subheading">{offer.title}</h3>
+              <Reveal key={offer.title} delay={index * 120}>
+                <Link href={localizePath(offer.href, locale)} className="mayda-card mayda-card-lift mayda-offer-card">
+                  <div className="mayda-offer-figure" aria-hidden="true">
+                    {index === 0 ? <ApprovalQueue /> : <PaymentsFlow />}
+                  </div>
+                  <IconBox name={OFFER_ICONS[index]} tone={index === 0 ? "mint" : "cobalt"} />
+                  <h3 className="mayda-subheading">{offer.title}</h3>
                 <p className="mayda-body mt-3">{offer.text}</p>
                 <p className="mayda-body mt-3" style={{ color: "var(--frost)" }}>
                   {offer.proof}
                 </p>
-                <p className="mayda-mono mt-4" style={{ color: "var(--mint)" }}>
-                  {offer.price}
-                </p>
-              </Link>
+                  <p className="mayda-mono mt-4" style={{ color: "var(--mint)" }}>
+                    {offer.price}
+                  </p>
+                </Link>
+              </Reveal>
             ))}
           </div>
           <Link href={localizePath("/approach", locale)} className="mayda-text-link" style={{ alignSelf: "flex-start" }}>
@@ -413,6 +424,9 @@ export default async function HomePage({ params }: LocalePageProps) {
           </div>
         </div>
       </section>
+
+      <FounderNote locale={locale} />
+
 
       <section className="mayda-section-tight" style={{ paddingTop: 0 }}>
         <div className="mayda-shell mayda-stack">

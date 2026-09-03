@@ -2099,3 +2099,89 @@ fieldset.mayda-fieldset > p {
     text-underline-offset: 0.2em;
   }
 }
+
+/* Founder block — the human at the gate. */
+@layer components {
+  .mayda-founder {
+    display: grid;
+    grid-template-columns: minmax(0, 15rem) 1fr;
+    gap: clamp(1.4rem, 4vw, 3rem);
+    align-items: center;
+    padding: clamp(1.4rem, 3vw, 2.4rem);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(90% 90% at 100% 0%, var(--mint-soft), transparent 60%),
+      var(--surface-card);
+  }
+  @media (max-width: 40rem) {
+    .mayda-founder { grid-template-columns: 1fr; }
+    .mayda-founder-portrait { max-width: 14rem; }
+  }
+  .mayda-founder-portrait { position: relative; margin: 0; }
+  .mayda-founder-portrait img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-strong);
+    filter: saturate(0.85);
+  }
+  .mayda-founder-portrait figcaption {
+    position: absolute;
+    left: 0.7rem;
+    bottom: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid var(--mint-line);
+    background: rgba(10, 11, 15, 0.82);
+    color: var(--mint);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .mayda-founder-portrait figcaption svg { width: 0.9rem; height: 0.9rem; }
+  .mayda-founder-quote {
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+    color: var(--frost);
+  }
+  .mayda-founder-facts { display: flex; flex-direction: column; gap: 0.5rem; color: var(--mist); font-size: 0.95rem; line-height: 1.5; }
+  .mayda-founder-facts li { display: grid; grid-template-columns: 1.2rem 1fr; gap: 0.6rem; align-items: start; }
+  .mayda-founder-facts svg { color: var(--cobalt); margin-top: 0.15rem; width: 1.05rem; height: 1.05rem; }
+}
+
+/* Pay-in-bitcoin note under the offers. */
+@layer components {
+  .mayda-paynote {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    padding: 0.9rem 1.1rem;
+    border: 1px dashed var(--mint-line);
+    border-radius: var(--radius-md);
+    color: var(--frost);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .mayda-paynote svg { flex: none; color: var(--mint); margin-top: 0.15rem; }
+}
+
+/* Illustration figures inside offer cards (home) and offer articles (Offers). */
+@layer components {
+  .mayda-offer-card { display: flex; flex-direction: column; height: 100%; }
+  .mayda-offer-figure {
+    overflow: hidden;
+    margin: 0 0 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+  .mayda-offer-figure svg { display: block; width: 100%; height: auto; }
+}

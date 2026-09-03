@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/Wordmark";
+import { BitcoinClock } from "@/components/BitcoinClock";
 import { SITE_CHROME_COPY, type Locale, localizePath } from "@/lib/i18n";
 
 export function SiteFooter({ locale }: { locale: Locale }) {
@@ -16,6 +17,9 @@ export function SiteFooter({ locale }: { locale: Locale }) {
             <p className="mt-5 max-w-md text-[clamp(1.4rem,2.6vw,2.4rem)] font-semibold leading-[1.08] tracking-[-0.03em]">
               {copy.footerStatement}
             </p>
+            <div className="mt-6">
+              <BitcoinClock locale={locale} variant="badge" />
+            </div>
           </div>
 
           <div>

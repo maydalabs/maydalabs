@@ -1,0 +1,596 @@
+/*
+ * MaydaLabs brand layer — logo lockup, Bitcoin block clock, hero signal
+ * field, reveal-on-scroll, the two illustration figures, and a card lift.
+ * Everything sits in the `components` cascade layer so Tailwind utilities
+ * keep winning in markup; keyframes are top-level. Tokens come from
+ * app/field.css. Motion is slow, quiet, and off under reduced motion.
+ */
+
+@layer theme, base, components, utilities;
+
+@layer components {
+
+/* ------------------------------------------------------------------ logo */
+
+.mayda-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 1.02rem;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.mayda-logo .mayda-wordmark {
+  font-size: 1em;
+}
+
+.mayda-logo-mark {
+  display: block;
+  flex: none;
+  width: 1.6em;
+  height: 1.6em;
+  transition: filter 240ms ease;
+}
+
+a:hover .mayda-logo-mark,
+a:focus-visible .mayda-logo-mark {
+  filter: drop-shadow(0 0 5px rgba(66, 245, 182, 0.35));
+}
+
+.mayda-logo.is-mono {
+  color: inherit;
+}
+
+.mayda-logo.is-mono .mayda-wordmark {
+  color: inherit;
+}
+
+.mayda-logo.is-mono .mayda-wordmark i {
+  color: inherit;
+  opacity: 0.6;
+}
+
+/* ------------------------------------------------------------ block clock */
+
+.btc-clock {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--mist);
+  white-space: nowrap;
+}
+
+.btc-clock b {
+  font-weight: 500;
+  color: var(--frost);
+}
+
+.btc-clock.is-badge {
+  padding: 0.42rem 0.75rem 0.42rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-card);
+}
+
+.btc-clock-dot {
+  position: relative;
+  flex: none;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: var(--mint);
+}
+
+.btc-clock-dot::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border: 1px solid var(--mint);
+  border-radius: inherit;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btc-clock-dot {
+    animation: btc-breathe 6s ease-in-out infinite;
+  }
+
+  .btc-clock-dot.is-tick::after {
+    animation: btc-ping 1.6s ease-out 1;
+  }
+}
+
+/* ----------------------------------------------------------- signal field */
+
+.signal-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.signal-field .sf-rail {
+  stroke: url(#sf-rail);
+  stroke-width: 1;
+  fill: none;
+  opacity: 0.42;
+}
+
+.signal-field .sf-pulse {
+  stroke: var(--mint);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  fill: none;
+  opacity: 0.35;
+  stroke-dasharray: 70 1500;
+  stroke-dashoffset: 70;
+}
+
+.signal-field .sf-gate {
+  stroke: url(#sf-gate);
+  stroke-width: 1;
+  opacity: 0.55;
+}
+
+.signal-field .sf-ring {
+  stroke: var(--mint-line);
+  stroke-width: 1;
+  fill: var(--mint-soft);
+  opacity: 0.35;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.signal-field .sf-node {
+  fill: var(--mint);
+  opacity: 0.55;
+}
+
+.signal-field .sf-out {
+  stroke: url(#sf-out);
+  stroke-width: 1.4;
+  fill: none;
+  opacity: 0.45;
+}
+
+.signal-field .sf-dot {
+  fill: var(--cobalt);
+  opacity: 0.22;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .signal-field .sf-pulse {
+    animation: sf-flow 11s linear infinite;
+  }
+
+  .signal-field .sf-pulse.is-second {
+    animation-delay: -3.8s;
+  }
+
+  .signal-field .sf-pulse.is-third {
+    animation-delay: -7.4s;
+  }
+
+  .signal-field .sf-pulse.is-out {
+    animation: sf-flow-out 11s linear infinite;
+    animation-delay: -1.2s;
+    stroke-dasharray: 60 900;
+  }
+
+  .signal-field .sf-ring {
+    animation: gate-ring-breathe 8s ease-in-out infinite;
+  }
+
+  .signal-field .sf-dot {
+    animation: sf-drift 12s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signal-field .sf-pulse {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------- reveal */
+
+/* The rise uses the `translate` longhand rather than `transform` so it never
+   collides with hover transforms (e.g. .mayda-card-lift) on the same node. */
+.reveal {
+  --reveal-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0;
+  translate: 0 12px;
+  transition:
+    opacity 600ms var(--reveal-ease) var(--reveal-delay, 0ms),
+    translate 600ms var(--reveal-ease) var(--reveal-delay, 0ms);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  translate: none;
+}
+
+/* Both on one element: keep the reveal timing and the lift timing. */
+.reveal.mayda-card-lift {
+  transition:
+    opacity 600ms var(--reveal-ease) var(--reveal-delay, 0ms),
+    translate 600ms var(--reveal-ease) var(--reveal-delay, 0ms),
+    transform 200ms ease,
+    border-color 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.mayda-card-lift {
+    opacity: 1;
+    translate: none;
+    transition: none;
+  }
+}
+
+/* -------------------------------------------------------------- card lift */
+
+.mayda-card-lift {
+  transition:
+    transform 200ms ease,
+    border-color 200ms ease;
+}
+
+.mayda-card-lift:hover,
+.mayda-card-lift:focus-within,
+.mayda-card.mayda-card-lift:hover,
+a.mayda-card.mayda-card-lift:hover {
+  transform: translateY(-2px);
+  border-color: var(--cobalt-line);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mayda-card-lift:hover,
+  .mayda-card-lift:focus-within {
+    transform: none;
+  }
+}
+
+/* --------------------------------------------------------- brand figures */
+
+.brand-figure {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.brand-figure text {
+  font-family: var(--font-mono);
+}
+
+/* approval queue */
+
+.approval-queue .aq-panel {
+  fill: var(--surface);
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.approval-queue .aq-divider {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.approval-queue .aq-divider.is-soft {
+  opacity: 0.55;
+}
+
+.approval-queue .aq-bar {
+  fill: var(--frost);
+  opacity: 0.5;
+}
+
+.approval-queue .aq-bar.is-dim {
+  opacity: 0.35;
+}
+
+.approval-queue .aq-bar.is-faint {
+  opacity: 0.16;
+}
+
+.approval-queue .aq-dot {
+  fill: var(--cobalt);
+  opacity: 0.85;
+}
+
+.approval-queue .aq-dot.is-mint {
+  fill: var(--mint);
+  opacity: 1;
+}
+
+.approval-queue .aq-chip {
+  fill: var(--cobalt-soft);
+  stroke: var(--cobalt-line);
+  stroke-width: 1;
+}
+
+.approval-queue .aq-chip-dot {
+  fill: #9dafff;
+}
+
+.approval-queue .aq-track {
+  fill: var(--border);
+}
+
+.approval-queue .aq-fill {
+  fill: var(--mint);
+  opacity: 0.85;
+}
+
+.approval-queue .aq-fill.is-partial {
+  fill: var(--cobalt);
+}
+
+.approval-queue .aq-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  fill: var(--mist);
+}
+
+.approval-queue .aq-label.is-mint {
+  fill: var(--mint);
+  letter-spacing: 0.04em;
+}
+
+.approval-queue .aq-label.is-faint {
+  opacity: 0.55;
+  letter-spacing: 0.06em;
+}
+
+.approval-queue .aq-focus-bg {
+  fill: var(--surface);
+}
+
+.approval-queue .aq-focus-ring {
+  fill: var(--mint-soft);
+  stroke: var(--mint-line);
+  stroke-width: 1;
+}
+
+.approval-queue .aq-btn-ghost {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 1;
+}
+
+.approval-queue .aq-btn-approve {
+  fill: var(--mint);
+}
+
+.approval-queue .aq-btn-text {
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  fill: var(--frost);
+}
+
+.approval-queue .aq-btn-text.is-dark {
+  fill: var(--void);
+  font-weight: 600;
+}
+
+.approval-queue .aq-focus {
+  opacity: 0;
+}
+
+.approval-queue .aq-focus.is-static {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .approval-queue .aq-focus,
+  .approval-queue .aq-focus.is-static {
+    opacity: 0;
+    animation: aq-focus 24s linear infinite;
+  }
+}
+
+/* payments flow */
+
+.payments-flow .pf-rail {
+  stroke: url(#pf-rail);
+  stroke-width: 1.5;
+  opacity: 0.7;
+}
+
+.payments-flow .pf-pulse {
+  stroke: var(--mint);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 40 1200;
+  stroke-dashoffset: 40;
+  display: none;
+}
+
+.payments-flow .pf-void {
+  fill: var(--void);
+}
+
+.payments-flow .pf-bolt {
+  fill: var(--mint);
+}
+
+.payments-flow .pf-node {
+  fill: var(--surface);
+  stroke: var(--cobalt);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.payments-flow .pf-node.is-primary {
+  fill: var(--cobalt-soft);
+}
+
+.payments-flow .pf-node.is-mint {
+  fill: var(--void);
+  stroke: var(--mint);
+  stroke-width: 1.8;
+}
+
+.payments-flow .pf-ring {
+  stroke: var(--cobalt-line);
+  stroke-width: 1;
+  fill: none;
+  opacity: 0.8;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.payments-flow .pf-btc path {
+  stroke: #9dafff;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.payments-flow .pf-line-dim {
+  stroke: var(--mist);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.5;
+}
+
+.payments-flow .pf-line-mint {
+  stroke: var(--mint);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.payments-flow .pf-check {
+  stroke: var(--mint);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.payments-flow .pf-check.is-small {
+  stroke-width: 1.6;
+}
+
+.payments-flow .pf-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  fill: var(--mist);
+}
+
+.payments-flow .pf-label.is-mint {
+  fill: var(--mint);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .payments-flow .pf-pulse {
+    display: block;
+    animation: pf-flow 8s linear infinite;
+  }
+
+  .payments-flow .pf-ring {
+    animation: gate-ring-breathe 8s ease-in-out infinite;
+  }
+}
+
+}
+
+/* --------------------------------------------------------------- keyframes */
+
+@keyframes btc-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes btc-ping {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+
+@keyframes sf-flow {
+  from {
+    stroke-dashoffset: 70;
+  }
+
+  to {
+    stroke-dashoffset: -1500;
+  }
+}
+
+@keyframes sf-flow-out {
+  from {
+    stroke-dashoffset: 60;
+  }
+
+  to {
+    stroke-dashoffset: -900;
+  }
+}
+
+@keyframes sf-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.1;
+  }
+
+  50% {
+    transform: translate(48px, 4px);
+    opacity: 0.3;
+  }
+}
+
+@keyframes aq-focus {
+  0% {
+    opacity: 0;
+  }
+
+  2% {
+    opacity: 1;
+  }
+
+  23% {
+    opacity: 1;
+  }
+
+  25% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes pf-flow {
+  from {
+    stroke-dashoffset: 40;
+  }
+
+  to {
+    stroke-dashoffset: -1200;
+  }
+}

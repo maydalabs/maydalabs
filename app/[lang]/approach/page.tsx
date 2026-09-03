@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { Icon, IconBox, type IconName } from "@/components/icons";
+import { LogoMarkBitcoin } from "@/components/Logo";
+import { ApprovalQueue } from "@/components/illustrations/ApprovalQueue";
+import { PaymentsFlow } from "@/components/illustrations/PaymentsFlow";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
@@ -70,6 +73,7 @@ const COPY = {
       "AI never gets send/publish/spend authority. The approval stays with a human at your company — that's the design, not a limitation.",
     ],
     ctaHeading: "Name the workflow. We'll scope the pilot.",
+    payNote: "Pay in bitcoin. BTCPay Server checkout is being wired in; until then, an invoice you can settle on-chain or by transfer.",
     ctaStart: "Start a pilot",
     ctaMail: "info@maydalabs.com",
   },
@@ -138,6 +142,7 @@ const COPY = {
       "Yapay zekâ asla gönderme/yayınlama/harcama yetkisi almaz. Onay, şirketinizdeki bir insanda kalır — bu bir kısıt değil, tasarımın kendisi.",
     ],
     ctaHeading: "İş akışını adlandırın. Pilotu kapsamlandıralım.",
+    payNote: "Bitcoin ile ödeyin. BTCPay Server ödeme sayfası kuruluyor; o zamana kadar zincir üstü veya havale ile ödenebilen bir fatura.",
     ctaStart: "Pilot başlat",
     ctaMail: "info@maydalabs.com",
   },
@@ -206,6 +211,7 @@ const COPY = {
       "L'IA n'obtient jamais l'autorité d'envoyer, publier ou dépenser. L'approbation reste chez un humain de votre entreprise — c'est le design, pas une limite.",
     ],
     ctaHeading: "Nommez le flux. Nous cadrons le pilote.",
+    payNote: "Payez en bitcoin. Le paiement BTCPay Server est en cours d'installation ; d'ici là, une facture réglable on-chain ou par virement.",
     ctaStart: "Lancer un pilote",
     ctaMail: "info@maydalabs.com",
   },
@@ -264,6 +270,9 @@ export default async function OffersPage({ params }: LocalePageProps) {
                   </div>
                 </div>
                 <div className="mayda-stack">
+                  <div className="mayda-offer-figure" aria-hidden="true">
+                    {index === 0 ? <ApprovalQueue /> : <PaymentsFlow />}
+                  </div>
                   <div>
                     <p className="mayda-kicker">{offer.endLabel}</p>
                     <p className="mayda-body">{offer.endText}</p>
@@ -280,6 +289,9 @@ export default async function OffersPage({ params }: LocalePageProps) {
               </div>
             </article>
           ))}
+          <p className="mayda-paynote">
+            <LogoMarkBitcoin size={22} /> <span>{copy.payNote}</span>
+          </p>
         </div>
       </section>
 

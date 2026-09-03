@@ -1,13 +1,10 @@
 /*
- * v3 identity: a typographic wordmark. The superscript multiplier is the
- * only ornament — MaydaLabs raised to ×. There is deliberately no drawn
- * logo; the favicon "M" is a placeholder, not a finalized mark.
+ * v3 identity: the gate mark plus the typographic wordmark, MaydaLabs
+ * raised to ×. Kept as a thin alias so existing imports keep working;
+ * the lockup itself lives in components/Logo.tsx.
  */
+import { Logo } from "@/components/Logo";
+
 export function Wordmark({ className = "" }: { className?: string }) {
-  return (
-    <span className={`mayda-wordmark ${className}`}>
-      MaydaLabs
-      <i aria-hidden="true">×</i>
-    </span>
-  );
+  return <Logo className={className} />;
 }
