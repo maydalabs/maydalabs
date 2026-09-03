@@ -1,9 +1,8 @@
 /*
- * MaydaLabs mark: an M whose two legs are the gate bars and whose inner
- * stroke is a signal line dipping into a check — AI work passing through a
- * human approval gate. The legs run past the top of the inner stroke, the
- * way ₿'s two serifs run past the top of its B: the one Bitcoin cue in the
- * family. Three strokes, cobalt → mint on dark; `mono` uses currentColor.
+ * MaydaLabs mark ("Check-M", chosen 3 Sep 2026): an M whose two legs are
+ * the gate posts and whose inner stroke IS a check — the approval is the
+ * letter itself. Three strokes, one weight, cobalt → mint on dark; `mono`
+ * uses currentColor. Candidates that lost live on /brand-preview.
  */
 
 const GRADIENT_ID = "mayda-logo-gradient";
@@ -22,9 +21,9 @@ function Gradient({ id, x1 = 6, x2 = 26 }: { id: string; x1?: number; x2?: numbe
 function MarkPaths({ strokeWidth }: { strokeWidth: number }) {
   return (
     <g fill="none" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M7.5 27V5" />
-      <path d="M24.5 27V5" />
-      <path d="M7.5 9.5 13.5 22.5 24.5 9.5" />
+      <path d="M7 26V6" />
+      <path d="M25 26V6" />
+      <path d="M7 13.5 13 20.5 25 6" />
     </g>
   );
 }

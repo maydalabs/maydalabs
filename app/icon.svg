@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
   <defs>
     <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="6" y1="0" x2="26" y2="0">
       <stop offset="0" stop-color="#4B6BFF"/>
@@ -6,9 +6,9 @@
     </linearGradient>
   </defs>
   <rect width="32" height="32" rx="7" fill="#0A0B0F"/>
-  <g fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M8 26.5V5.5"/>
-    <path d="M24 26.5V5.5"/>
-    <path d="M8 10 13.5 22.5 24 10"/>
+  <g fill="none" stroke="url(#g)" stroke-width="2.9" stroke-linecap="round" stroke-linejoin="round" transform="translate(16 16) scale(0.78) translate(-16 -16)">
+    <path d="M7 26V6"/>
+    <path d="M25 26V6"/>
+    <path d="M7 13.5 13 20.5 25 6"/>
   </g>
 </svg>

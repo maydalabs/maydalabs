@@ -83,9 +83,9 @@ export const LOGO_CANDIDATES: LogoCandidate[] = [
     ),
   },
   {
-    id: "current",
-    name: "Current mark (for reference)",
-    idea: "The one on the site now: gate legs and a signal dipping into a check.",
+    id: "previous",
+    name: "Previous mark (for reference)",
+    idea: "The first draft, retired 3 Sep 2026: gate legs and a signal dipping into a check.",
     draw: (paint) => (
       <g fill="none" stroke={paint} strokeWidth={2.7} strokeLinecap="round" strokeLinejoin="round">
         <path d="M7.5 27V5" />
