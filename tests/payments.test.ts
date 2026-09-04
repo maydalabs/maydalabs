@@ -71,3 +71,30 @@ describe("invoiceState", () => {
     expect(invoiceState({ status: "open", amountSats: 100, observedSats: 0, expiresAt: future })).toBe("open");
   });
 });
+
+/* Reused addresses. An exchange or custodial wallet gives out one deposit
+ * address for life, so the chain's lifetime total for that address says
+ * nothing about a particular invoice. What counts is the increase since the
+ * invoice was written. */
+describe("payment measured against a baseline", () => {
+  const received = (confirmedSats: number, baselineSats: number) => Math.max(0, confirmedSats - baselineSats);
+
+  it("ignores money that arrived before the invoice existed", () => {
+    // Address already held 5 000 000 sats; invoice asks for 1 229.
+    expect(received(5_000_000, 5_000_000)).toBe(0);
+    expect(received(5_000_000, 5_000_000) >= 1_229).toBe(false);
+  });
+
+  it("counts only the new payment on a reused address", () => {
+    expect(received(5_001_229, 5_000_000)).toBe(1_229);
+    expect(received(5_001_229, 5_000_000) >= 1_229).toBe(true);
+  });
+
+  it("never reports a negative amount if the total somehow drops", () => {
+    expect(received(4_000_000, 5_000_000)).toBe(0);
+  });
+
+  it("behaves the same on a fresh address, where the baseline is zero", () => {
+    expect(received(1_229, 0)).toBe(1_229);
+  });
+});

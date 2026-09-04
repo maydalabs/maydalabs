@@ -173,6 +173,7 @@ export type Database = {
           address: string
           amount_sats: number
           amount_usd: number
+          baseline_sats: number
           checked_at: string | null
           created_at: string
           expires_at: string
@@ -190,6 +191,7 @@ export type Database = {
           address: string
           amount_sats: number
           amount_usd: number
+          baseline_sats?: number
           checked_at?: string | null
           created_at?: string
           expires_at: string
@@ -207,6 +209,7 @@ export type Database = {
           address?: string
           amount_sats?: number
           amount_usd?: number
+          baseline_sats?: number
           checked_at?: string | null
           created_at?: string
           expires_at?: string

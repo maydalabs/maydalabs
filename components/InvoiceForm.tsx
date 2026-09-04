@@ -21,11 +21,15 @@ function Status({ state }: { state: InvoiceFormState }) {
       ? "Not authorized."
       : state.code === "rate_unavailable"
         ? "Could not read the BTC/USD rate from mempool.space. Try again."
-        : state.code === "invalid"
-          ? state.field === "address"
-            ? "That is not a valid mainnet bitcoin address (checksum failed)."
-            : `Invalid input${state.field ? ` (${state.field})` : ""}.`
-          : "Save failed.";
+        : state.code === "chain_unavailable"
+          ? "Could not read that address from mempool.space. Try again."
+          : state.code === "address_in_use"
+            ? "That address already has an invoice awaiting payment. Use a fresh receive address."
+            : state.code === "invalid"
+              ? state.field === "address"
+                ? "That is not a valid mainnet bitcoin address (checksum failed)."
+                : `Invalid input${state.field ? ` (${state.field})` : ""}.`
+              : "Save failed.";
   return <span className="mayda-field-error" role="alert">{message}</span>;
 }
 
@@ -50,7 +54,9 @@ export function InvoiceForm({ pilotId }: { pilotId: string }) {
         <input name="address" required maxLength={90} spellCheck={false} autoComplete="off" placeholder="bc1..." />
       </label>
       <p className="mayda-note" style={{ margin: 0 }}>
-        The rate is read from mempool.space and locked when you create the invoice. The quote holds for 24 hours.
+        The rate is read from mempool.space and locked when you create the invoice; the quote holds for 24 hours.
+        Any wallet works, including an exchange deposit address. Only money arriving after this moment counts
+        toward the invoice, and an address can carry one unpaid invoice at a time.
       </p>
       <div className="mayda-hero-actions" style={{ gap: "0.6rem" }}>
         <button type="submit" className="mayda-button" disabled={pending}>

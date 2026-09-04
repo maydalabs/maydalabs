@@ -472,6 +472,21 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       expect(deleted ?? []).toHaveLength(0);
     });
 
+    it("allows only one invoice awaiting payment per address", async () => {
+      const { error } = await admin.from("pilot_invoices").insert({
+        pilot_id: pilotId,
+        label: "Second open invoice, same address",
+        amount_usd: 10,
+        amount_sats: 10_000,
+        rate_usd: 100_000,
+        address: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+        expires_at: new Date(Date.now() + 86_400_000).toISOString(),
+      });
+      // A reused deposit address must never carry two invoices at once: one
+      // arriving payment would otherwise settle both.
+      expect(error).not.toBeNull();
+    });
+
     it("lets an operator read every invoice and record what the chain showed", async () => {
       const { data: seen } = await userB.from("pilot_invoices").select("id").eq("id", invoiceId);
       expect(seen).toHaveLength(1);

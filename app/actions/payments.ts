@@ -21,7 +21,7 @@ import { INVOICE_TTL_HOURS, satsFromUsd } from "@/lib/payments";
 
 export type InvoiceFormState = {
   status: "idle" | "saved" | "checked" | "error";
-  code?: "not_authorized" | "invalid" | "save_failed" | "chain_unavailable" | "rate_unavailable";
+  code?: "not_authorized" | "invalid" | "save_failed" | "chain_unavailable" | "rate_unavailable" | "address_in_use";
   field?: string;
 };
 
@@ -62,6 +62,12 @@ export async function createInvoiceAction(
   const rate = await fetchBtcUsdRate();
   if (!rate) return { status: "error", code: "rate_unavailable" };
 
+  // What the address already holds. An exchange or custodial wallet hands
+  // out one address for life, so payment has to be measured as the increase
+  // over this figure, never as the address total.
+  const existing = await fetchAddressFunding(address);
+  if (!existing) return { status: "error", code: "chain_unavailable" };
+
   const amountSats = satsFromUsd(amountUsd, rate);
   if (amountSats <= 0) return { status: "error", code: "invalid", field: "amountUsd" };
 
@@ -73,8 +79,11 @@ export async function createInvoiceAction(
     amount_sats: amountSats,
     rate_usd: rate,
     address,
+    baseline_sats: existing.confirmedSats,
     expires_at: expiresAt,
   });
+  // A unique partial index allows one invoice awaiting payment per address.
+  if (error?.code === "23505") return { status: "error", code: "address_in_use", field: "address" };
   if (error) return { status: "error", code: "save_failed" };
 
   revalidatePath("/internal/pilots");
@@ -108,7 +117,7 @@ export async function checkInvoiceAction(formData: FormData): Promise<void> {
   const supabase = await createSupabaseServerClient();
   const { data: invoice } = await supabase
     .from("pilot_invoices")
-    .select("id, pilot_id, address, amount_sats, status, expires_at")
+    .select("id, pilot_id, address, amount_sats, baseline_sats, status, expires_at")
     .eq("id", invoiceId)
     .maybeSingle();
   if (!invoice || invoice.status === "void") return;
@@ -118,7 +127,10 @@ export async function checkInvoiceAction(formData: FormData): Promise<void> {
   // API is not evidence that nothing was paid.
   if (!funding) return;
 
-  const paid = funding.confirmedSats >= invoice.amount_sats;
+  // Only money that arrived after the invoice was written counts. On a
+  // reused address the earlier balance belongs to something else.
+  const received = Math.max(0, funding.confirmedSats - invoice.baseline_sats);
+  const paid = received >= invoice.amount_sats;
   const expired = !paid && Date.parse(invoice.expires_at) <= Date.now();
 
   const admin = createSupabaseAdminClient();
@@ -126,7 +138,7 @@ export async function checkInvoiceAction(formData: FormData): Promise<void> {
   await admin
     .from("pilot_invoices")
     .update({
-      observed_sats: funding.confirmedSats,
+      observed_sats: received,
       txid: funding.txid,
       checked_at: new Date().toISOString(),
       status: paid ? "paid" : expired && invoice.status === "open" ? "expired" : invoice.status,
