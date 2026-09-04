@@ -21,6 +21,8 @@ now.
 
 ![MaydaLabs home](docs/screens/2026-09-home.png)
 
+<img src="docs/screens/2026-09-home-mobile.png" alt="MaydaLabs on a narrow viewport" width="320" />
+
 ## What this repository is
 
 The MaydaLabs platform: the public marketing surface, an authenticated client
@@ -42,6 +44,9 @@ these:
 | `lib/bitcoinAddress.ts` | Address checksum validation, run by the server action before anything is written. |
 | `lib/supabase/` | Server and browser clients, typed against a generated database schema. |
 | `lib/rateLimit.ts` | Rate limiting on the public intake path. |
+| `lib/osSources.ts` | Fetching pages on behalf of a signed-in stranger is a server-side request forgery hole unless it is guarded. Every hostname is resolved before the request and anything private, loopback, or link-local is refused, redirects are not followed, and responses are capped and stripped to text. |
+| `lib/osDraft.ts` | One model call, structured output, every claim returned beside the source it came from or explicitly beside nothing. A citation to a URL the model was never given is replaced with null before anything is stored, because a model naming a source it never read is not evidence. |
+| `app/actions/os.ts` | A MaydaOS run end to end: gather the sources, draft, record the tokens and the dollar cost, and wait for a person to decide. |
 | `app/[lang]/` | Localized routing and metadata composition across English, Turkish, and French. |
 | `lib/i18n.ts`, `lib/metadata.ts` | Localization and metadata kept out of presentation. |
 | `scripts/smoke.mjs` | Dependency-free production verification: routes, redirects, localized metadata, robots, sitemap, social images, and the public telemetry response. |
@@ -120,26 +125,37 @@ demo-safe and does not claim a public launch or real payments.
   </tr>
 </table>
 
-## MaydaOS, the interactive lab
+## MaydaOS
 
-MaydaLabs is the company. [MaydaOS](https://maydalabs.com/os) is its
-interactive lab: a working interface for exploring how ideas, products,
-workflows, growth, and security connect, without making the commercial
-homepage harder to understand.
+![MaydaOS: the system bar, the dock, and one app in the window](docs/screens/2026-09-maydaos.png)
 
-It is built into the current site rather than bolted beside it, and it is a
-fair sample of interface engineering: a windowed lab shell with its own
-navigation, live telemetry that reads Bitcoin block height from mempool.space,
-and motion that respects a reduced-motion preference.
+MaydaOS came back as an operating system rather than a wallpaper. The frame is a
+system bar, a dock, a window, and a status bar. What changed is underneath: the
+dock is made of links, so every app is its own address that can be deep-linked,
+bookmarked, and server-rendered, instead of tabs inside one client component.
 
-![MaydaOS, the interactive lab](docs/screens/2026-09-maydaos-lab.png)
+[The lab](https://maydalabs.com/os) is open to anyone and shows how the pieces
+connect. Behind sign-in, the same shell runs five apps — Desk, Record, Pilot,
+Account, Terminal — and the Desk is the product rather than a picture of it: a
+person hands it links, the model produces the piece with every claim attached to
+the source it came from, and nothing leaves until they approve it. The Record
+keeps what happened, including the runs they rejected.
+
+The beta gives ten credits for life. One credit is one model call; adding
+sources, previewing exactly what will be sent, editing, approving, rejecting and
+re-reading the record cost nothing, and a run that fails is recorded but not
+charged. [`docs/maydaos-beta.md`](docs/maydaos-beta.md) has the reasoning, the
+cost per run, and the daily ceiling.
+
+It is still being built. The operator view of beta usage, one-click top-ups, and
+revising a draft are all deliberately unfinished.
 
 ## Architecture
 
 ```text
 app/[lang]/       Localized pages, metadata, and route composition
 app/[lang]/portal Authenticated client portal
-app/[lang]/os     The MaydaOS interface lab
+app/[lang]/os     MaydaOS: the public lab and the five signed-in apps
 app/api/          Public telemetry endpoint
 components/       Interface, forms, diagrams, and case-study components
 lib/              Payments, Bitcoin address validation, Supabase clients,
