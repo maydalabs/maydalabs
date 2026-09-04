@@ -5,7 +5,7 @@ import { OS_DESK_COPY } from "@/components/osCopy";
 import { OS_EXAMPLE_LABEL, OS_EXAMPLE_NOTE, osExampleRun } from "@/components/osExample";
 import { OsShell } from "@/components/os/OsShell";
 import { isOsConfigured } from "@/lib/osDraft";
-import { isOsAllowed, isOsInviteOnly } from "@/lib/osAccess";
+import { isOsAllowed } from "@/lib/osAccess";
 import { requireOsSession } from "@/lib/osSession";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 
