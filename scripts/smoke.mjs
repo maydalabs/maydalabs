@@ -114,7 +114,7 @@ await check("MaydaOS is a localized, indexable product page", async () => {
   // It used to be a noindex lab. It describes a real product now.
   assert(english.includes('name="robots" content="index, follow"'), "MaydaOS should be indexable");
   assert(english.includes("for the work you repeat."), "MaydaOS heading is missing");
-  assert(english.includes("/os/desk-preview"), "the desk screenshot is missing");
+  assert(english.includes("The MaydaOS desk:"), "the desk screenshot is missing");
   assert(turkish.includes("bir işletim sistemi."), "Turkish MaydaOS copy is missing");
   assert(french.includes("pour le travail qui revient."), "French MaydaOS copy is missing");
 });
@@ -130,9 +130,12 @@ await check("robots and sitemap expose the public routes", async () => {
   }
 });
 
-await check("sitemap excludes the noindex MaydaOS Lab", async () => {
+await check("sitemap carries the MaydaOS page and none of its private apps", async () => {
   const sitemap = await (await request("/sitemap.xml")).text();
-  assert(!sitemap.includes(canonicalUrl + "/os"), "noindex MaydaOS route leaked into sitemap");
+  assert(sitemap.includes(`${canonicalUrl}/os<`), "the MaydaOS page is missing from the sitemap");
+  for (const app of ["desk", "record", "pilot", "account", "terminal"]) {
+    assert(!sitemap.includes(`${canonicalUrl}/os/${app}`), `private OS app ${app} leaked into the sitemap`);
+  }
 });
 
 await check("social image endpoint returns PNG", async () => {
