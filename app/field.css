@@ -2528,3 +2528,13 @@ fieldset.mayda-fieldset > p {
   .mayda-os-record-row { text-decoration: none; color: inherit; transition: border-color 0.15s ease, transform 0.15s ease; }
   .mayda-os-record-row:hover { border-color: var(--mint); transform: translateY(-1px); }
 }
+
+/* Brand marks sit on the text baseline and take its colour, so a social
+   link reads as one thing rather than an icon next to a word. */
+@layer components {
+  .mayda-brand-glyph { display: inline-block; vertical-align: -0.16em; flex: 0 0 auto; }
+  .mayda-social { display: inline-flex; align-items: center; gap: 0.5rem; }
+  .mayda-social:hover .mayda-brand-glyph { color: var(--mint); }
+  .mayda-profile-linkedin .mayda-brand-glyph { color: inherit; }
+  .mayda-button .mayda-brand-glyph { margin-right: 0.15rem; }
+}

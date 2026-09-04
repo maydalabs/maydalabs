@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandGlyph } from "@/components/BrandGlyph";
 import { Wordmark } from "@/components/Wordmark";
 import { BitcoinClock } from "@/components/BitcoinClock";
 import { SITE_CHROME_COPY, type Locale, localizePath } from "@/lib/i18n";
@@ -49,22 +50,24 @@ export function SiteFooter({ locale }: { locale: Locale }) {
             <div className="mt-4 flex flex-col gap-2 text-sm text-[color:var(--mist)]">
               <Link href={localizePath("/auth/sign-in", locale)}>{copy.signIn}</Link>
               <Link href={localizePath("/os/desk", locale)}>{copy.portal}</Link>
-              <a href="https://x.com/maydalabs" target="_blank" rel="noopener noreferrer">
-                X · @maydalabs ↗
+              <a className="mayda-social" href="https://x.com/maydalabs" target="_blank" rel="noopener noreferrer">
+                <BrandGlyph name="x" /> @maydalabs
               </a>
               <a
+                className="mayda-social"
                 href="https://www.linkedin.com/company/maydalabs"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                LinkedIn · MaydaLabs ↗
+                <BrandGlyph name="linkedin" /> MaydaLabs
               </a>
               <a
+                className="mayda-social"
                 href="https://github.com/maydalabs"
                 target="_blank"
                 rel="me noopener noreferrer"
               >
-                GitHub · @maydalabs ↗
+                <BrandGlyph name="github" /> @maydalabs
               </a>
             </div>
           </div>

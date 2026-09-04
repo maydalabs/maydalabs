@@ -1,6 +1,7 @@
 import Image from "next/image";
 import portrait from "@/public/profile/mehmet-e-mayda-portrait.jpg";
 import Link from "next/link";
+import { BrandGlyph } from "@/components/BrandGlyph";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
@@ -193,7 +194,7 @@ export default async function ProfilePage({ params }: LocalePageProps) {
                 {copy.actions.work} <span aria-hidden>↓</span>
               </a>
               <a href="https://github.com/maydalabs" target="_blank" rel="me noopener noreferrer" className="mayda-button mayda-button-outline">
-                {copy.actions.github} <span aria-hidden>↗</span>
+                <BrandGlyph name="github" /> {copy.actions.github}
               </a>
             </div>
           </header>
@@ -201,7 +202,7 @@ export default async function ProfilePage({ params }: LocalePageProps) {
           <aside className="mayda-card" style={{ alignSelf: "start" }} aria-label={copy.factsLabel}>
             <Image src={portrait} alt="Mehmet Emin Mayda" placeholder="blur" sizes="(min-width: 1024px) 28rem, 90vw" className="mayda-profile-portrait" priority />
             <a href="https://www.linkedin.com/in/mehmet-e-mayda/" target="_blank" rel="me noopener noreferrer" className="mayda-profile-linkedin">
-              {copy.actions.linkedin} · Mehmet E. Mayda <span aria-hidden>↗</span>
+              <BrandGlyph name="linkedin" /> {copy.actions.linkedin} · Mehmet E. Mayda
             </a>
             <p className="mayda-kicker">{copy.factsLabel}</p>
             <dl className="mayda-dl">
