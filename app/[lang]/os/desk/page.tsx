@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { OsRunCard, type OsRunRecord } from "@/components/OsRunCard";
 import { OsRunForm } from "@/components/OsRunForm";
 import { OS_DESK_COPY, fillCredits } from "@/components/osCopy";
+import { OS_EXAMPLE_LABEL, OS_EXAMPLE_NOTE, osExampleRun } from "@/components/osExample";
 import { OS_STARTING_CREDITS, creditsLeft } from "@/lib/os";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { isOsConfigured } from "@/lib/osDraft";
@@ -60,6 +61,13 @@ export default async function OsDeskPage({ params }: LocalePageProps) {
           <h1 className="mayda-display" style={{ fontSize: "clamp(1.7rem,3.6vw,2.6rem)" }}>{copy.heading}</h1>
           <p className="mayda-os-credits">
             <strong>{fillCredits(copy.creditsLeft, left, granted)}</strong>
+            {drafted.length > 0 ? (
+              <span>
+                {" · "}
+                {drafted.length} {copy.recordRuns} · {approved.length} {copy.recordApproved} · {citedSources.size}{" "}
+                {copy.recordSources}
+              </span>
+            ) : null}
           </p>
         </header>
 
@@ -92,7 +100,11 @@ export default async function OsDeskPage({ params }: LocalePageProps) {
         <section className="mayda-stack" style={{ gap: "1rem" }}>
           <h2 className="mayda-h3">{copy.runsHeading}</h2>
           {rows.length === 0 ? (
-            <p className="mayda-body">{copy.empty}</p>
+            <>
+              <p className="mayda-body">{copy.empty}</p>
+              <p className="mayda-note" style={{ margin: 0 }}>{OS_EXAMPLE_NOTE[locale]}</p>
+              <OsRunCard run={osExampleRun(locale)} copy={copy} exampleLabel={OS_EXAMPLE_LABEL[locale]} />
+            </>
           ) : (
             rows.map((run) => <OsRunCard key={run.id} run={run} copy={copy} />)
           )}

@@ -169,3 +169,26 @@ export async function decideOsRunAction(formData: FormData): Promise<void> {
 
   revalidatePath("/os/desk");
 }
+
+/* Operator-only: more rope for one person, decided case by case while
+ * pricing stays switched off. */
+export async function grantOsCreditsAction(formData: FormData): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  const claims = await getVerifiedClaims();
+  if (!claims?.sub) return;
+
+  const supabase = await createSupabaseServerClient();
+  const { data: operator } = await supabase.from("operator_status").select("user_id").maybeSingle();
+  if (!operator) return;
+
+  const userId = String(formData.get("userId") ?? "");
+  if (!/^[0-9a-f-]{36}$/.test(userId)) return;
+  const granted = Number(formData.get("granted"));
+  if (!Number.isInteger(granted) || granted < 0 || granted > 1000) return;
+
+  // Row-level security already limits this to operators; the check above only
+  // avoids doing the work for anyone else.
+  await supabase.from("os_credits").update({ granted }).eq("user_id", userId);
+
+  revalidatePath("/internal/os");
+}

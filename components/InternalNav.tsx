@@ -4,6 +4,7 @@ import { localizePath, type Locale } from "@/lib/i18n";
 const ITEMS = [
   ["Leads", "/internal/leads"],
   ["Pilots", "/internal/pilots"],
+  ["MaydaOS", "/internal/os"],
 ] as const;
 
 export function InternalNav({ locale, current }: { locale: Locale; current: string }) {

@@ -1,4 +1,5 @@
 import { decideOsRunAction } from "@/app/actions/os";
+import { OsCopyButton } from "@/components/OsCopyButton";
 import type { OsDeskCopy } from "@/components/osCopy";
 import type { OsDecision, OsShape } from "@/lib/os";
 
@@ -47,7 +48,16 @@ function hostOf(url: string): string {
   }
 }
 
-export function OsRunCard({ run, copy }: { run: OsRunRecord; copy: OsDeskCopy }) {
+export function OsRunCard({
+  run,
+  copy,
+  exampleLabel,
+}: {
+  run: OsRunRecord;
+  copy: OsDeskCopy;
+  /* Set for the built-in example: it is read-only and says so. */
+  exampleLabel?: string;
+}) {
   const claims = asClaims(run.claims);
   const sources = asSources(run.sources);
 
@@ -59,7 +69,7 @@ export function OsRunCard({ run, copy }: { run: OsRunRecord; copy: OsDeskCopy })
           <strong>{run.topic}</strong>
         </div>
         <span className={`mayda-status${run.decision === "approved" ? " is-active" : ""}`}>
-          {copy.decisions[run.decision]}
+          {exampleLabel ?? copy.decisions[run.decision]}
         </span>
       </div>
 
@@ -96,7 +106,11 @@ export function OsRunCard({ run, copy }: { run: OsRunRecord; copy: OsDeskCopy })
             </div>
           ) : null}
 
-          {run.decision === "pending" ? (
+          {exampleLabel ? (
+            <div className="mayda-os-decide">
+              <OsCopyButton text={run.draft ?? ""} label={copy.copy} done={copy.copied} />
+            </div>
+          ) : run.decision === "pending" ? (
             <form action={decideOsRunAction} className="mayda-os-decide">
               <input type="hidden" name="runId" value={run.id} />
               <label className="mayda-field" style={{ flex: "1 1 16rem" }}>
@@ -108,9 +122,12 @@ export function OsRunCard({ run, copy }: { run: OsRunRecord; copy: OsDeskCopy })
                 <button type="submit" name="decision" value="rejected" className="mayda-button mayda-button-outline">{copy.reject}</button>
               </div>
             </form>
-          ) : run.decision_note ? (
-            <p className="mayda-note">{run.decision_note}</p>
-          ) : null}
+          ) : (
+            <div className="mayda-os-decide">
+              <OsCopyButton text={run.draft ?? ""} label={copy.copy} done={copy.copied} />
+              {run.decision_note ? <p className="mayda-note" style={{ margin: 0 }}>{run.decision_note}</p> : null}
+            </div>
+          )}
         </>
       )}
 
