@@ -623,6 +623,30 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       expect(outsiderKeys).toContain("short_note");
       expect(outsiderKeys).not.toContain(`client_only_${suffix}`);
 
+      // An operator can install one. Without this the negative cases below
+      // would pass for the wrong reason: at one point nobody could write at
+      // all, because the table grant was missing while the policy allowed it.
+      const { data: byOperator, error: operatorError } = await userB
+        .from("os_workflows")
+        .insert({
+          key: `operator_made_${suffix}`,
+          name: "Operator made",
+          purpose: "Installed by an operator.",
+          brief: "a note",
+          standing_sources: [{ url: "https://example.com/feed.xml", kind: "feed" }],
+        })
+        .select("id, standing_sources")
+        .single();
+      expect(operatorError).toBeNull();
+      expect(byOperator!.standing_sources).toEqual([{ url: "https://example.com/feed.xml", kind: "feed" }]);
+
+      const { data: edited } = await userB
+        .from("os_workflows")
+        .update({ brief: "a longer note" })
+        .eq("id", byOperator!.id)
+        .select("brief");
+      expect(edited).toEqual([{ brief: "a longer note" }]);
+
       // Installing a workflow is MaydaLabs' job, not the client's.
       const { error } = await userA.from("os_workflows").insert({
         key: `self_serve_${suffix}`,
