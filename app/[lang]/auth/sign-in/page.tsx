@@ -106,17 +106,18 @@ export default async function SignInPage({
 }: LocalePageProps & { searchParams: Promise<{ error?: string; next?: string }> }) {
   const locale = await getPageLocale(params);
   const copy = COPY[locale];
-  const params = await searchParams;
-  const showLinkError = params.error === "confirm";
+  const query = await searchParams;
+  const showLinkError = query.error === "confirm";
   // Same-site relative paths only, never protocol-relative ones: this value
   // decides where somebody lands after proving their email.
   const nextPath =
-    typeof params.next === "string" && params.next.startsWith("/") && !params.next.startsWith("//")
-      ? params.next
+    typeof query.next === "string" && query.next.startsWith("/") && !query.next.startsWith("//")
+      ? query.next
       : "/portal";
 
   const claims = await getVerifiedClaims();
-  if (claims) redirect(localizePath("/portal", locale));
+  // Already signed in: honour the deep link rather than dropping them on the portal.
+  if (claims) redirect(localizePath(nextPath, locale));
 
   return (
     <div className="mayda-shell mayda-section" style={{ maxWidth: "34rem" }}>
