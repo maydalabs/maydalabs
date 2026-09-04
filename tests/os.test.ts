@@ -1,0 +1,118 @@
+import { describe, expect, it } from "vitest";
+import { creditsLeft, normalizeSourceUrl, parseSourceUrls, runCostUsd, OS_MAX_SOURCES } from "@/lib/os";
+import { fetchSource, isFailure } from "@/lib/osSources";
+import { draftFromSources, type DraftClient } from "@/lib/osDraft";
+
+describe("source URLs", () => {
+  it("accepts ordinary http and https links", () => {
+    expect(normalizeSourceUrl("https://example.com/a")).toBe("https://example.com/a");
+    expect(normalizeSourceUrl("  http://example.org/b?x=1  ")).toBe("http://example.org/b?x=1");
+  });
+
+  it("refuses anything that is not a public web page", () => {
+    for (const value of [
+      "file:///etc/passwd",
+      "ftp://example.com/x",
+      "javascript:alert(1)",
+      "https://user:pass@example.com/",
+      "https://localhost/admin",
+      "not a url",
+      "",
+    ]) {
+      expect(normalizeSourceUrl(value)).toBeNull();
+    }
+  });
+
+  it("drops the fragment, de-duplicates, and caps the list", () => {
+    expect(normalizeSourceUrl("https://example.com/a#section")).toBe("https://example.com/a");
+    const many = Array.from({ length: 9 }, (_, i) => `https://example.com/${i}`).join("\n");
+    expect(parseSourceUrls(many).urls).toHaveLength(OS_MAX_SOURCES);
+    const duplicated = parseSourceUrls("https://example.com/a\nhttps://example.com/a");
+    expect(duplicated.urls).toEqual(["https://example.com/a"]);
+  });
+
+  it("reports what it rejected so the person can fix it", () => {
+    const { urls, rejected } = parseSourceUrls("https://example.com/a\nnonsense");
+    expect(urls).toEqual(["https://example.com/a"]);
+    expect(rejected).toEqual(["nonsense"]);
+  });
+});
+
+/* Fetching URLs on behalf of a signed-in stranger is a server-side request
+ * forgery hole unless private hosts are refused. */
+describe("fetchSource refuses to look inside our own network", () => {
+  it.each([
+    "http://127.0.0.1/",
+    "http://localhost/",
+    "http://10.0.0.1/",
+    "http://192.168.1.1/",
+    "http://169.254.169.254/latest/meta-data/",
+    "http://[::1]/",
+  ])("refuses %s", async (url) => {
+    const result = await fetchSource(url);
+    expect(isFailure(result)).toBe(true);
+    if (isFailure(result)) expect(result.reason).toBe("host is not publicly routable");
+  });
+});
+
+describe("credits and cost", () => {
+  it("never reports a negative balance", () => {
+    expect(creditsLeft(10, 3)).toBe(7);
+    expect(creditsLeft(10, 12)).toBe(0);
+  });
+
+  it("prices a run at the model's published rates", () => {
+    // 6 000 in, 1 000 out on Opus 5: $0.03 + $0.025.
+    expect(runCostUsd(6_000, 1_000)).toBeCloseTo(0.055, 6);
+    expect(runCostUsd(0, 0)).toBe(0);
+  });
+});
+
+function stubClient(parsed: unknown, stopReason: string | null = "end_turn"): DraftClient {
+  return {
+    messages: {
+      parse: async () => ({
+        parsed_output: parsed as never,
+        stop_reason: stopReason,
+        usage: { input_tokens: 6_000, output_tokens: 1_000 },
+      }),
+    },
+  };
+}
+
+const SOURCES = [{ url: "https://example.com/a", title: "A", text: "x".repeat(400), chars: 400 }];
+
+describe("draftFromSources", () => {
+  it("keeps a claim whose source was actually supplied", async () => {
+    const result = await draftFromSources(
+      "Topic",
+      "note",
+      SOURCES,
+      stubClient({ draft: "A draft.", claims: [{ text: "A claim.", source_url: "https://example.com/a" }] }),
+    );
+    expect("error" in result).toBe(false);
+    if (!("error" in result)) {
+      expect(result.claims[0].source_url).toBe("https://example.com/a");
+      expect(result.inputTokens).toBe(6_000);
+    }
+  });
+
+  it("strips a citation to a URL the model was never given", async () => {
+    // A model naming a source it did not read is not evidence, whatever it says.
+    const result = await draftFromSources(
+      "Topic",
+      "note",
+      SOURCES,
+      stubClient({ draft: "A draft.", claims: [{ text: "Invented.", source_url: "https://elsewhere.example/z" }] }),
+    );
+    if (!("error" in result)) expect(result.claims[0].source_url).toBeNull();
+  });
+
+  it("reports a refusal and an empty draft as errors rather than pretending", async () => {
+    const refused = await draftFromSources("Topic", "note", SOURCES, stubClient(null, "refusal"));
+    expect("error" in refused).toBe(true);
+
+    const empty = await draftFromSources("Topic", "note", SOURCES, stubClient({ draft: "   ", claims: [] }));
+    expect("error" in empty).toBe(true);
+  });
+});

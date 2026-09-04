@@ -168,6 +168,99 @@ export type Database = {
         }
         Relationships: []
       }
+      os_credits: {
+        Row: {
+          created_at: string
+          granted: number
+          updated_at: string
+          used: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted?: number
+          updated_at?: string
+          used?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted?: number
+          updated_at?: string
+          used?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      os_runs: {
+        Row: {
+          claims: Json
+          cost_usd: number
+          created_at: string
+          decided_at: string | null
+          decision: string
+          decision_note: string | null
+          draft: string | null
+          effort: string | null
+          error: string | null
+          id: string
+          input_tokens: number
+          model: string | null
+          output_tokens: number
+          shape: string
+          sources: Json
+          status: string
+          template: string
+          topic: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          claims?: Json
+          cost_usd?: number
+          created_at?: string
+          decided_at?: string | null
+          decision?: string
+          decision_note?: string | null
+          draft?: string | null
+          effort?: string | null
+          error?: string | null
+          id?: string
+          input_tokens?: number
+          model?: string | null
+          output_tokens?: number
+          shape?: string
+          sources?: Json
+          status?: string
+          template?: string
+          topic: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          claims?: Json
+          cost_usd?: number
+          created_at?: string
+          decided_at?: string | null
+          decision?: string
+          decision_note?: string | null
+          draft?: string | null
+          effort?: string | null
+          error?: string | null
+          id?: string
+          input_tokens?: number
+          model?: string | null
+          output_tokens?: number
+          shape?: string
+          sources?: Json
+          status?: string
+          template?: string
+          topic?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pilot_invoices: {
         Row: {
           address: string
@@ -499,7 +592,7 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      os_spend_credit: { Args: { p_user_id: string }; Returns: number }
     }
     Enums: {
       [_ in never]: never

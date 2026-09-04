@@ -389,6 +389,9 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
   });
 
   describe("pilot_invoices (payment state is never client-writable)", () => {
+    // One open invoice per address is enforced by a unique index, so the
+    // fixture needs an address of its own on every run.
+    const address = `bc1q${suffix}`.padEnd(42, "q");
     const emailC = `rls-user-c-${suffix}@example.com`;
     let userC: Db;
     let pilotId: string;
@@ -426,7 +429,7 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
           amount_usd: 2500,
           amount_sats: 2_500_000,
           rate_usd: 100_000,
-          address: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+          address,
           expires_at: new Date(Date.now() + 86_400_000).toISOString(),
         })
         .select("id")
@@ -463,7 +466,7 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         amount_usd: 1,
         amount_sats: 1,
         rate_usd: 100_000,
-        address: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+        address,
         expires_at: new Date(Date.now() + 86_400_000).toISOString(),
       });
       expect(error).not.toBeNull();
@@ -479,7 +482,7 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         amount_usd: 10,
         amount_sats: 10_000,
         rate_usd: 100_000,
-        address: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+        address,
         expires_at: new Date(Date.now() + 86_400_000).toISOString(),
       });
       // A reused deposit address must never carry two invoices at once: one
@@ -497,6 +500,96 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         .eq("id", invoiceId)
         .select("observed_sats");
       expect(updated).toEqual([{ observed_sats: 1_000 }]);
+    });
+  });
+
+  describe("MaydaOS beta (credits and runs are not self-serve)", () => {
+    const emailOutsider = `rls-user-os-${suffix}@example.com`;
+    let outsider: Db;
+    let runId: string;
+
+    beforeAll(async () => {
+      await admin.auth.admin.createUser({ email: emailOutsider, password, email_confirm: true });
+      outsider = createClient<Database>(url!, publishableKey!, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
+      await outsider.auth.signInWithPassword({ email: emailOutsider, password });
+
+      await admin.from("os_credits").upsert({ user_id: idA, granted: 10, used: 3 });
+      const { data: run } = await admin
+        .from("os_runs")
+        .insert({
+          user_id: idA,
+          topic: "A topic",
+          shape: "note",
+          sources: [{ url: "https://example.com/a", title: "A", chars: 400 }],
+          draft: "The original draft.",
+          claims: [{ text: "A claim.", source_url: "https://example.com/a" }],
+          input_tokens: 6000,
+          output_tokens: 1000,
+          cost_usd: 0.055,
+        })
+        .select("id")
+        .single();
+      runId = run!.id;
+    });
+
+    it("shows a person their own balance and hides everyone else's", async () => {
+      const { data: own } = await userA.from("os_credits").select("granted, used");
+      expect(own).toEqual([{ granted: 10, used: 3 }]);
+
+      const { data: foreign } = await userB.from("os_credits").select("user_id").eq("user_id", idA);
+      // userB is an operator in this suite, so they legitimately see it; a
+      // plain signed-in stranger is covered by the run test below.
+      expect(foreign).toHaveLength(1);
+    });
+
+    it("blocks a person from granting themselves credits", async () => {
+      const { data: tampered } = await userA
+        .from("os_credits")
+        .update({ granted: 1000, used: 0 })
+        .eq("user_id", idA)
+        .select("granted");
+      expect(tampered ?? []).toHaveLength(0);
+
+      const { data: after } = await admin.from("os_credits").select("granted, used").eq("user_id", idA).single();
+      expect(after).toEqual({ granted: 10, used: 3 });
+    });
+
+    it("lets a person record their own decision", async () => {
+      const { data: decided } = await userA
+        .from("os_runs")
+        .update({ decision: "approved", decision_note: "Good enough." })
+        .eq("id", runId)
+        .select("decision");
+      expect(decided).toEqual([{ decision: "approved" }]);
+    });
+
+    it("blocks a person from rewriting the draft or the cost of their own run", async () => {
+      // Row-level security cannot restrict columns; the column grant does.
+      const { error: draftError } = await userA
+        .from("os_runs")
+        .update({ draft: "Something I wrote myself." })
+        .eq("id", runId);
+      expect(draftError).not.toBeNull();
+
+      const { error: costError } = await userA.from("os_runs").update({ cost_usd: 0 }).eq("id", runId);
+      expect(costError).not.toBeNull();
+
+      const { data: after } = await admin.from("os_runs").select("draft, cost_usd").eq("id", runId).single();
+      expect(after!.draft).toBe("The original draft.");
+      expect(Number(after!.cost_usd)).toBeCloseTo(0.055, 6);
+    });
+
+    it("blocks a person from inserting a run, and hides other people's runs", async () => {
+      const { error } = await userA.from("os_runs").insert({ user_id: idA, topic: "Mine", draft: "Free work" });
+      expect(error).not.toBeNull();
+
+      const { data: theirs } = await outsider.from("os_runs").select("id");
+      expect(theirs ?? []).toHaveLength(0);
+
+      const { data: theirCredits } = await outsider.from("os_credits").select("user_id");
+      expect(theirCredits ?? []).toHaveLength(0);
     });
   });
 });

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { FieldFigure } from "@/components/FieldFigure";
 import { MaydaOSLab } from "@/components/MaydaOSLab";
 import { MAYDA_OS_COPY } from "@/components/maydaOsLabCopy";
+import { isOsConfigured } from "@/lib/osDraft";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
@@ -20,6 +21,12 @@ const COPY = {
       "MaydaLabs is the company. MaydaOS is its interactive lab: a working interface for exploring how ideas, products, workflows, growth, and security connect—without making the commercial homepage harder to understand.",
     badges: ["Built into v3", "No wallet required", "Interactive proof"],
     fieldLabel: "One input · connected systems · several useful outputs",
+    beta: {
+      kicker: "Beta / Free while it lasts",
+      heading: "Try the desk itself.",
+      body: "Sign in and you get ten runs. Hand it a few links, it produces the piece with every claim next to its source, and you decide whether it leaves. Nothing is published by us, and nothing is charged to you.",
+      cta: "Open the desk",
+    },
     closingKicker: "The hierarchy is now clear",
     closingHeading: "The commercial site stays simple. The lab earns the complexity.",
     closingBody:
@@ -40,6 +47,12 @@ const COPY = {
       "Şirket MaydaLabs. MaydaOS ise onun etkileşimli laboratuvarı: ticari ana sayfayı anlaşılmaz hâle getirmeden fikirlerin, ürünlerin, iş akışlarının, büyümenin ve güvenliğin nasıl bağlandığını keşfeden çalışan bir arayüz.",
     badges: ["v3 içine işlendi", "Cüzdan gerekmez", "Etkileşimli kanıt"],
     fieldLabel: "Tek girdi · bağlı sistemler · birden fazla yararlı çıktı",
+    beta: {
+      kicker: "Beta / Sürdüğü sürece ücretsiz",
+      heading: "Masayı kendiniz deneyin.",
+      body: "Giriş yapın, on çalıştırma hakkınız olsun. Birkaç bağlantı verin; metni, her iddia kaynağının yanında olacak şekilde üretsin ve dışarı çıkıp çıkmayacağına siz karar verin. Biz hiçbir şey yayınlamayız, sizden de bir ücret alınmaz.",
+      cta: "Masayı aç",
+    },
     closingKicker: "Hiyerarşi artık net",
     closingHeading: "Ticari site sade kalır. Karmaşıklığı laboratuvar hak eder.",
     closingBody:
@@ -60,6 +73,12 @@ const COPY = {
       "MaydaLabs est l’entreprise. MaydaOS est son laboratoire interactif : une interface fonctionnelle pour explorer comment idées, produits, flux de travail, croissance et sécurité se connectent—sans rendre la page commerciale plus difficile à comprendre.",
     badges: ["Intégré à v3", "Aucun portefeuille requis", "Preuve interactive"],
     fieldLabel: "Une entrée · systèmes connectés · plusieurs sorties utiles",
+    beta: {
+      kicker: "Beta / Gratuit pour l'instant",
+      heading: "Essayez le bureau lui-meme.",
+      body: "Connectez-vous et vous obtenez dix executions. Donnez-lui quelques liens, il produit le texte avec chaque affirmation a cote de sa source, et vous decidez si cela sort. Nous ne publions rien, et rien ne vous est facture.",
+      cta: "Ouvrir le bureau",
+    },
     closingKicker: "La hiérarchie est désormais claire",
     closingHeading: "Le site commercial reste simple. Le laboratoire mérite la complexité.",
     closingBody:
@@ -125,6 +144,23 @@ export default async function MaydaOsPage({ params }: LocalePageProps) {
       <section className="mayda-shell-wide pb-[clamp(4rem,9vw,7rem)]">
         <MaydaOSLab locale={locale} copy={MAYDA_OS_COPY[locale]} />
       </section>
+
+      {isOsConfigured() ? (
+      <section className="mayda-section border-t border-[color:var(--border)]">
+        <div className="mayda-shell grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+          <div className="mayda-stack">
+            <p className="mayda-kicker">{copy.beta.kicker}</p>
+            <h2 className="mayda-heading">{copy.beta.heading}</h2>
+            <p className="mayda-body">{copy.beta.body}</p>
+          </div>
+          <div className="mayda-hero-actions">
+            <Link href={localizePath("/os/desk", locale)} className="mayda-button">
+              {copy.beta.cta} <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+      ) : null}
 
       <section className="mayda-section border-t border-[color:var(--border)]">
         <div className="mayda-shell grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
