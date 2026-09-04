@@ -291,7 +291,9 @@ export type Database = {
           owner_user_id: string | null
           purpose: string
           shape: string
+          standing_sources: Json
           updated_at: string
+          window_days: number
         }
         Insert: {
           active?: boolean
@@ -305,7 +307,9 @@ export type Database = {
           owner_user_id?: string | null
           purpose: string
           shape?: string
+          standing_sources?: Json
           updated_at?: string
+          window_days?: number
         }
         Update: {
           active?: boolean
@@ -319,7 +323,9 @@ export type Database = {
           owner_user_id?: string | null
           purpose?: string
           shape?: string
+          standing_sources?: Json
           updated_at?: string
+          window_days?: number
         }
         Relationships: []
       }

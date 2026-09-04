@@ -6,8 +6,10 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { draftFromSources } from "@/lib/osDraft";
 import { isOsAllowed } from "@/lib/osAccess";
-import { fetchSource, isFailure, type FetchedSource } from "@/lib/osSources";
+import { gatherSources } from "@/lib/osGather";
 import {
+  asStandingSources,
+  parseStandingSources,
   OS_MODEL,
   OS_EFFORT,
   OS_STARTING_CREDITS,
@@ -64,14 +66,15 @@ export async function runOsDraftAction(_prev: OsRunState, formData: FormData): P
   const scoped = await createSupabaseServerClient();
   const { data: workflow } = await scoped
     .from("os_workflows")
-    .select("id, key, name, brief, shape, max_sources, active")
+    .select("id, key, name, brief, shape, max_sources, active, standing_sources, window_days")
     .eq("id", workflowId)
     .maybeSingle();
   if (!workflow || !workflow.active) return { status: "error", code: "no_workflow" };
 
+  const standing = asStandingSources(workflow.standing_sources);
   const { urls, rejected } = parseSourceUrls(String(formData.get("sources") ?? ""));
-  const allowed = urls.slice(0, workflow.max_sources);
-  if (allowed.length === 0) {
+  // A workflow that carries its own sources runs with nothing pasted at all.
+  if (standing.length === 0 && urls.length === 0) {
     return {
       status: "error",
       code: "no_sources",
@@ -111,11 +114,17 @@ export async function runOsDraftAction(_prev: OsRunState, formData: FormData): P
   const spentToday = (today ?? []).reduce((total, row) => total + Number(row.cost_usd ?? 0), 0);
   if (spentToday >= DAILY_USD_CAP) return { status: "error", code: "daily_cap" };
 
-  const fetched = await Promise.all(allowed.map((url) => fetchSource(url)));
-  const sources = fetched.filter((item): item is FetchedSource => !isFailure(item));
+  const { sources, failures } = await gatherSources(standing, urls, {
+    maxSources: workflow.max_sources,
+    windowDays: workflow.window_days ?? 7,
+  });
   if (sources.length === 0) {
-    const first = fetched.find(isFailure);
-    return { status: "error", code: "no_sources", message: first ? `${first.url}: ${first.reason}` : "None of those links could be read." };
+    const first = failures[0];
+    return {
+      status: "error",
+      code: "no_sources",
+      message: first ? `${first.url}: ${first.reason}` : "Nothing could be read this time.",
+    };
   }
 
   const drafted = await draftFromSources(topic, workflow.brief, sources);
@@ -278,6 +287,8 @@ export async function saveOsWorkflowAction(
   const shape = ["note", "post", "summary"].includes(shapeRaw) ? shapeRaw : "note";
   const destination = String(formData.get("destination") ?? "").trim().slice(0, 200) || null;
   const maxSources = Math.min(5, Math.max(1, Number(formData.get("maxSources")) || 5));
+  const windowDays = Math.min(90, Math.max(1, Number(formData.get("windowDays")) || 7));
+  const standingSources = parseStandingSources(String(formData.get("standingSources") ?? ""));
   const active = formData.get("active") === "on";
 
   // Installed for one client, or a template for everyone.
@@ -302,6 +313,8 @@ export async function saveOsWorkflowAction(
       shape,
       destination,
       max_sources: maxSources,
+      window_days: windowDays,
+      standing_sources: standingSources,
       active,
     },
     { onConflict: "key" },

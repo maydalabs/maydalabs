@@ -54,6 +54,8 @@ export type OsWorkflow = {
   destination: string | null;
   max_sources: number;
   owner_user_id: string | null;
+  standing_sources?: unknown;
+  window_days?: number;
 };
 
 /* http(s) only, and no credentials or fragments smuggled in. Shape only;
@@ -84,4 +86,37 @@ export function parseSourceUrls(raw: string): { urls: string[]; rejected: string
     else if (!urls.includes(normalized)) urls.push(normalized);
   }
   return { urls: urls.slice(0, OS_MAX_SOURCES), rejected };
+}
+
+/* A source the workflow reads on every run, before anything a person adds. */
+export type StandingSource = { url: string; kind: "page" | "feed" };
+
+export function parseStandingSources(raw: string): StandingSource[] {
+  const out: StandingSource[] = [];
+  for (const line of raw.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    // "feed https://..." or just a URL; the fetcher confirms which it is.
+    const explicitFeed = /^feed\s+/i.test(trimmed);
+    const url = normalizeSourceUrl(trimmed.replace(/^feed\s+/i, ""));
+    if (!url) continue;
+    if (out.some((entry) => entry.url === url)) continue;
+    out.push({ url, kind: explicitFeed ? "feed" : "page" });
+    if (out.length >= 10) break;
+  }
+  return out;
+}
+
+export function asStandingSources(value: unknown): StandingSource[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const entry = item as Record<string, unknown>;
+    if (typeof entry.url !== "string") return [];
+    return [{ url: entry.url, kind: entry.kind === "feed" ? "feed" : "page" }] as StandingSource[];
+  });
+}
+
+export function standingSourcesToText(sources: StandingSource[]): string {
+  return sources.map((source) => (source.kind === "feed" ? `feed ${source.url}` : source.url)).join("\n");
 }

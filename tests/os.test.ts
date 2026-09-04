@@ -145,3 +145,158 @@ describe("invite-only gate", () => {
     expect(isOsAllowed(123)).toBe(false);
   });
 });
+
+/* Feeds are how a workflow starts reading on its own. */
+describe("feed parsing", () => {
+  const RSS = `<?xml version="1.0"?><rss version="2.0"><channel>
+    <title>Example</title>
+    <item><title>Newest</title><link>https://example.com/new</link><pubDate>Wed, 03 Sep 2026 10:00:00 GMT</pubDate></item>
+    <item><title><![CDATA[Older & wiser]]></title><link>https://example.com/old</link><pubDate>Wed, 01 Jan 2020 10:00:00 GMT</pubDate></item>
+  </channel></rss>`;
+
+  const ATOM = `<?xml version="1.0"?><feed xmlns="http://www.w3.org/2005/Atom">
+    <entry><title>Atom one</title><link rel="alternate" href="https://example.org/a"/><updated>2026-09-02T10:00:00Z</updated></entry>
+    <entry><title>No date</title><link href="https://example.org/b"/></entry>
+  </feed>`;
+
+  it("recognises a feed and ignores a web page", async () => {
+    const { looksLikeFeed } = await import("@/lib/osFeeds");
+    expect(looksLikeFeed(RSS)).toBe(true);
+    expect(looksLikeFeed(ATOM)).toBe(true);
+    expect(looksLikeFeed("<!doctype html><html><body>hello</body></html>")).toBe(false);
+  });
+
+  it("reads RSS items, decoding entities and CDATA", async () => {
+    const { parseFeed } = await import("@/lib/osFeeds");
+    const items = parseFeed(RSS);
+    expect(items).toHaveLength(2);
+    expect(items[0]).toMatchObject({ url: "https://example.com/new", title: "Newest" });
+    expect(items[1].title).toBe("Older & wiser");
+  });
+
+  it("reads Atom entries, preferring the alternate link", async () => {
+    const { parseFeed } = await import("@/lib/osFeeds");
+    const items = parseFeed(ATOM);
+    expect(items.map((item) => item.url)).toEqual(["https://example.org/a", "https://example.org/b"]);
+    expect(items[1].published).toBeNull();
+  });
+
+  it("keeps only what is inside the window, newest first", async () => {
+    const { parseFeed, recentItems } = await import("@/lib/osFeeds");
+    const now = Date.parse("2026-09-04T00:00:00Z");
+    const recent = recentItems(parseFeed(RSS), 7, now);
+    expect(recent.map((item) => item.url)).toEqual(["https://example.com/new"]);
+  });
+
+  it("keeps undated items rather than silently producing nothing", async () => {
+    const { parseFeed, recentItems } = await import("@/lib/osFeeds");
+    const now = Date.parse("2026-09-04T00:00:00Z");
+    const recent = recentItems(parseFeed(ATOM), 1, now);
+    expect(recent.map((item) => item.url)).toContain("https://example.org/b");
+  });
+});
+
+/* Gathering is what lets a workflow run without anyone pasting anything. */
+describe("gatherSources", () => {
+  const page = (url: string, title = "T") => ({ url, title, text: "x".repeat(400), chars: 400 });
+  const FEED = `<rss><channel>
+    <item><title>One</title><link>https://site.example/1</link><pubDate>Wed, 03 Sep 2026 10:00:00 GMT</pubDate></item>
+    <item><title>Two</title><link>https://site.example/2</link><pubDate>Tue, 02 Sep 2026 10:00:00 GMT</pubDate></item>
+    <item><title>Ancient</title><link>https://site.example/old</link><pubDate>Wed, 01 Jan 2020 10:00:00 GMT</pubDate></item>
+  </channel></rss>`;
+  const now = Date.parse("2026-09-04T00:00:00Z");
+
+  function fetcherFor(map: Record<string, unknown>) {
+    return async (url: string) => {
+      const value = map[url];
+      if (!value) return { url, reason: "could not be read" };
+      return value as never;
+    };
+  }
+
+  it("expands a standing feed into its recent items and skips the feed itself", async () => {
+    const { gatherSources } = await import("@/lib/osGather");
+    const { sources } = await gatherSources(
+      [{ url: "https://site.example/feed.xml", kind: "feed" }],
+      [],
+      {
+        maxSources: 5,
+        windowDays: 7,
+        now,
+        fetcher: fetcherFor({
+          "https://site.example/feed.xml": { url: "https://site.example/feed.xml", title: "site", text: "", chars: 0, feedBody: FEED },
+          "https://site.example/1": page("https://site.example/1", "One"),
+          "https://site.example/2": page("https://site.example/2", "Two"),
+        }),
+      },
+    );
+    expect(sources.map((s) => s.url)).toEqual(["https://site.example/1", "https://site.example/2"]);
+  });
+
+  it("reads standing sources before pasted ones and stops at the limit", async () => {
+    const { gatherSources } = await import("@/lib/osGather");
+    const { sources } = await gatherSources(
+      [{ url: "https://a.example/x", kind: "page" }],
+      ["https://b.example/y", "https://c.example/z"],
+      {
+        maxSources: 2,
+        windowDays: 7,
+        now,
+        fetcher: fetcherFor({
+          "https://a.example/x": page("https://a.example/x"),
+          "https://b.example/y": page("https://b.example/y"),
+          "https://c.example/z": page("https://c.example/z"),
+        }),
+      },
+    );
+    expect(sources.map((s) => s.url)).toEqual(["https://a.example/x", "https://b.example/y"]);
+  });
+
+  it("reports what it could not read instead of failing the whole run", async () => {
+    const { gatherSources } = await import("@/lib/osGather");
+    const { sources, failures } = await gatherSources([], ["https://good.example/a", "https://gone.example/b"], {
+      maxSources: 5,
+      windowDays: 7,
+      now,
+      fetcher: fetcherFor({ "https://good.example/a": page("https://good.example/a") }),
+    });
+    expect(sources).toHaveLength(1);
+    expect(failures.map((f) => f.url)).toEqual(["https://gone.example/b"]);
+  });
+
+  it("never reads the same page twice", async () => {
+    const { gatherSources } = await import("@/lib/osGather");
+    const { sources } = await gatherSources([{ url: "https://a.example/x", kind: "page" }], ["https://a.example/x"], {
+      maxSources: 5,
+      windowDays: 7,
+      now,
+      fetcher: fetcherFor({ "https://a.example/x": page("https://a.example/x") }),
+    });
+    expect(sources).toHaveLength(1);
+  });
+});
+
+/* A publication whose feed points at anchors on one page must not be read
+ * as several identical sources. Satoshi Gazette's wire does exactly this. */
+describe("feeds that point at anchors on one page", () => {
+  it("reads that page once", async () => {
+    const { gatherSources } = await import("@/lib/osGather");
+    const anchors = `<rss><channel>
+      <item><title>One</title><link>https://sg.example/wire#a</link><pubDate>Wed, 03 Sep 2026 10:00:00 GMT</pubDate></item>
+      <item><title>Two</title><link>https://sg.example/wire#b</link><pubDate>Wed, 03 Sep 2026 09:00:00 GMT</pubDate></item>
+      <item><title>Three</title><link>https://sg.example/stories/x</link><pubDate>Wed, 03 Sep 2026 08:00:00 GMT</pubDate></item>
+    </channel></rss>`;
+    const { sources } = await gatherSources([{ url: "https://sg.example/feed.xml", kind: "feed" }], [], {
+      maxSources: 5,
+      windowDays: 7,
+      now: Date.parse("2026-09-04T00:00:00Z"),
+      fetcher: async (url: string) => {
+        if (url === "https://sg.example/feed.xml") {
+          return { url, title: "sg", text: "", chars: 0, feedBody: anchors } as never;
+        }
+        return { url, title: url, text: "x".repeat(400), chars: 400 } as never;
+      },
+    });
+    expect(sources.map((s) => s.url)).toEqual(["https://sg.example/wire", "https://sg.example/stories/x"]);
+  });
+});

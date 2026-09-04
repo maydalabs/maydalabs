@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { saveOsWorkflowAction, type OsWorkflowFormState } from "@/app/actions/os";
-import type { OsWorkflow } from "@/lib/os";
+import { asStandingSources, standingSourcesToText, type OsWorkflow } from "@/lib/os";
 
 /* Installing a workflow, which is the operator's core move: a pilot is a
  * workflow installed by hand, and the product is the same thing self-serve
@@ -57,7 +57,22 @@ export function OsWorkflowForm({
         </label>
       </div>
 
+      <label className="mayda-field">
+        <span>Sources it always reads — one per line, prefix a feed with &quot;feed&quot;</span>
+        <textarea
+          name="standingSources"
+          rows={3}
+          spellCheck={false}
+          defaultValue={standingSourcesToText(asStandingSources(workflow?.standing_sources))}
+          placeholder={"feed https://example.com/rss.xml\nhttps://example.org/page"}
+        />
+      </label>
+
       <div className="mayda-grid-2" style={{ gap: "0.7rem" }}>
+        <label className="mayda-field">
+          <span>Feed window (days)</span>
+          <input name="windowDays" type="number" min="1" max="90" defaultValue={workflow?.window_days ?? 7} />
+        </label>
         <label className="mayda-field">
           <span>Destination (where it is meant to go)</span>
           <input name="destination" maxLength={200} defaultValue={workflow?.destination ?? ""} placeholder="LinkedIn, or the founder's inbox" />

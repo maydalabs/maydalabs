@@ -1,8 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { runOsDraftAction, type OsRunState } from "@/app/actions/os";
-import { OS_TOPIC_LIMIT, type OsWorkflow } from "@/lib/os";
+import { OS_TOPIC_LIMIT, asStandingSources, type OsWorkflow } from "@/lib/os";
 import type { OsDeskCopy } from "@/components/osCopy";
 
 const IDLE: OsRunState = { status: "idle" };
@@ -34,6 +34,9 @@ export function OsRunForm({
   workflows: OsWorkflow[];
 }) {
   const [state, dispatch, pending] = useActionState(runOsDraftAction, IDLE);
+  const [selectedId, setSelectedId] = useState(workflows[0]?.id ?? "");
+  const selected = workflows.find((workflow) => workflow.id === selectedId) ?? workflows[0];
+  const standing = asStandingSources(selected?.standing_sources);
 
   return (
     <form action={dispatch} className="mayda-stack" style={{ gap: "0.8rem" }}>
@@ -44,7 +47,12 @@ export function OsRunForm({
 
       <label className="mayda-field">
         <span>{copy.workflowLabel}</span>
-        <select name="workflowId" defaultValue={workflows[0]?.id} disabled={disabled}>
+        <select
+          name="workflowId"
+          value={selectedId}
+          onChange={(event) => setSelectedId(event.target.value)}
+          disabled={disabled}
+        >
           {workflows.map((workflow) => (
             <option key={workflow.id} value={workflow.id}>
               {workflow.name}{workflow.owner_user_id ? " · installed for you" : ""}
@@ -54,10 +62,14 @@ export function OsRunForm({
       </label>
 
       <label className="mayda-field">
-        <span>{copy.sourcesLabel}</span>
+        <span>
+          {standing.length > 0
+            ? `${copy.sourcesLabel} — optional, this workflow already reads ${standing.length}`
+            : copy.sourcesLabel}
+        </span>
         <textarea
           name="sources"
-          required
+          required={standing.length === 0}
           rows={4}
           spellCheck={false}
           disabled={disabled}
@@ -72,7 +84,7 @@ export function OsRunForm({
         <Message state={state} copy={copy} />
       </div>
       <p className="mayda-note" style={{ margin: 0 }}>
-        {copy.creditsNote} {workflows[0]?.purpose ?? ""}
+        {selected?.purpose} {copy.creditsNote}
       </p>
     </form>
   );

@@ -10,6 +10,7 @@
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { OS_SOURCE_CHAR_LIMIT } from "@/lib/os";
+import { looksLikeFeed } from "@/lib/osFeeds";
 
 const FETCH_TIMEOUT_MS = 10_000;
 const MAX_BYTES = 512 * 1024;
@@ -19,6 +20,9 @@ export type FetchedSource = {
   title: string;
   text: string;
   chars: number;
+  /* Set when the URL turned out to be RSS or Atom, so a workflow can expand
+   * it into the items published inside its window. */
+  feedBody?: string;
 };
 
 export type SourceFailure = { url: string; reason: string };
@@ -100,12 +104,19 @@ export async function fetchSource(url: string): Promise<FetchedSource | SourceFa
     if (!response.ok) return { url, reason: `the page returned ${response.status}` };
 
     const type = response.headers.get("content-type") ?? "";
-    if (!type.includes("text/html") && !type.includes("text/plain")) {
+    const isXml = /xml|rss|atom/i.test(type);
+    if (!type.includes("text/html") && !type.includes("text/plain") && !isXml) {
       return { url, reason: "not a text page" };
     }
 
     const buffer = await response.arrayBuffer();
     const raw = new TextDecoder().decode(buffer.slice(0, MAX_BYTES));
+
+    if (looksLikeFeed(raw)) {
+      // A feed is not something to summarise; it is a list of things to read.
+      return { url, title: parsed.hostname, text: "", chars: 0, feedBody: raw };
+    }
+
     const { title, text } = type.includes("text/html")
       ? stripHtml(raw)
       : { title: "", text: raw.replace(/\s+/g, " ").trim() };
