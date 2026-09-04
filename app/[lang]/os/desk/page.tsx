@@ -5,6 +5,7 @@ import { OS_DESK_COPY } from "@/components/osCopy";
 import { OS_EXAMPLE_LABEL, OS_EXAMPLE_NOTE, osExampleRun } from "@/components/osExample";
 import { OsShell } from "@/components/os/OsShell";
 import { isOsConfigured } from "@/lib/osDraft";
+import { isOsAllowed, isOsInviteOnly } from "@/lib/osAccess";
 import { requireOsSession } from "@/lib/osSession";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 
@@ -16,7 +17,8 @@ export const metadata: Metadata = {
 export default async function OsDeskPage({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
   const copy = OS_DESK_COPY[locale];
-  const { supabase, credits } = await requireOsSession(locale, "desk");
+  const { claims, supabase, credits } = await requireOsSession(locale, "desk");
+  const allowed = isOsAllowed(claims.email);
 
   const { data: runs } = await supabase
     .from("os_runs")
@@ -33,14 +35,18 @@ export default async function OsDeskPage({ params }: LocalePageProps) {
       <div className="mayda-stack-lg">
         <section className="mayda-stack" style={{ gap: "0.8rem" }}>
           <h2 className="mayda-subheading" style={{ margin: 0 }}>{copy.heading}</h2>
-          {isOsConfigured() ? (
+          {!isOsConfigured() ? (
+            <p className="mayda-body">The beta is not open yet. Nothing here will run.</p>
+          ) : !allowed ? (
+            <p className="mayda-body">
+              The beta is invite-only while it finds its feet. Ask for a seat and you can run it here.
+            </p>
+          ) : (
             credits.left > 0 ? (
               <OsRunForm copy={copy} disabled={false} />
             ) : (
               <p className="mayda-body">{copy.outOfHeading} {copy.outOfBody}</p>
             )
-          ) : (
-            <p className="mayda-body">The beta is not open yet. Nothing here will run.</p>
           )}
         </section>
 

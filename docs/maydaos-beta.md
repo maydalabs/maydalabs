@@ -55,6 +55,17 @@ switching `OS_MODEL` to `claude-sonnet-5` in `lib/os.ts` halves the cost.
   restrict columns. The suite proves they cannot rewrite a draft, zero a cost, or
   grant themselves credits.
 
+## Invite-only while the balance is small
+
+The beta spends a MaydaLabs API balance, so being signed in is not the same as
+being allowed to spend it. Set `MAYDAOS_ALLOWLIST` to a comma-separated list of
+emails and only those people can run anything; everyone else sees an
+invite-only note. Leave it unset and the beta is open to anyone signed in.
+
+Keep it set while the balance is shared with Abidin. One stranger who signs in
+and uses ten credits costs about $0.55, so a $4 balance is seven strangers away
+from stopping Abidin's drafting.
+
 ## To switch it on
 
 1. Console, new workspace (keep it away from Abidin's), create a key named
@@ -62,7 +73,9 @@ switching `OS_MODEL` to `claude-sonnet-5` in `lib/os.ts` halves the cost.
 2. Top up to $20 and leave auto-reload off.
 3. Vercel, project `maydalabs`, environment variables, all environments:
    - `MAYDAOS_ANTHROPIC_API_KEY` = the new key
-   - `MAYDAOS_DAILY_USD_CAP` = `2` (optional; this is the default)
+   - `MAYDAOS_DAILY_USD_CAP` = `2` (optional; this is the default — set it to
+     `1` while the balance is small)
+   - `MAYDAOS_ALLOWLIST` = your email, while the beta should stay closed
 4. Redeploy. The beta door appears on `/os` and the desk starts working.
 5. Diary the key's expiry. Abidin's died silently on a Thursday.
 

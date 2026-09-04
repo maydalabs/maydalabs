@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { creditsLeft, normalizeSourceUrl, parseSourceUrls, runCostUsd, OS_MAX_SOURCES } from "@/lib/os";
 import { fetchSource, isFailure } from "@/lib/osSources";
 import { draftFromSources, type DraftClient } from "@/lib/osDraft";
@@ -114,5 +114,34 @@ describe("draftFromSources", () => {
 
     const empty = await draftFromSources("Topic", "note", SOURCES, stubClient({ draft: "   ", claims: [] }));
     expect("error" in empty).toBe(true);
+  });
+});
+
+/* The beta spends a MaydaLabs balance, so being signed in is not the same as
+ * being allowed to spend it. */
+describe("invite-only gate", () => {
+  const original = process.env.MAYDAOS_ALLOWLIST;
+  afterEach(() => {
+    if (original === undefined) delete process.env.MAYDAOS_ALLOWLIST;
+    else process.env.MAYDAOS_ALLOWLIST = original;
+  });
+
+  it("is open to anyone signed in when no list is set", async () => {
+    delete process.env.MAYDAOS_ALLOWLIST;
+    const { isOsAllowed, isOsInviteOnly } = await import("@/lib/osAccess");
+    expect(isOsInviteOnly()).toBe(false);
+    expect(isOsAllowed("anyone@example.com")).toBe(true);
+  });
+
+  it("admits only the listed emails, ignoring case and spacing", async () => {
+    process.env.MAYDAOS_ALLOWLIST = " Info@maydalabs.com , friend@example.com ";
+    const { isOsAllowed, isOsInviteOnly } = await import("@/lib/osAccess");
+    expect(isOsInviteOnly()).toBe(true);
+    expect(isOsAllowed("info@maydalabs.com")).toBe(true);
+    expect(isOsAllowed("INFO@MAYDALABS.COM")).toBe(true);
+    expect(isOsAllowed("friend@example.com")).toBe(true);
+    expect(isOsAllowed("stranger@example.com")).toBe(false);
+    expect(isOsAllowed(undefined)).toBe(false);
+    expect(isOsAllowed(123)).toBe(false);
   });
 });

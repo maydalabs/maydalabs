@@ -5,6 +5,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { draftFromSources } from "@/lib/osDraft";
+import { isOsAllowed } from "@/lib/osAccess";
 import { fetchSource, isFailure, type FetchedSource } from "@/lib/osSources";
 import {
   OS_MAX_SOURCES,
@@ -31,6 +32,7 @@ export type OsRunState = {
   status: "idle" | "drafted" | "error";
   code?:
     | "not_signed_in"
+    | "invite_only"
     | "no_credits"
     | "daily_cap"
     | "invalid"
@@ -49,6 +51,9 @@ export async function runOsDraftAction(_prev: OsRunState, formData: FormData): P
   const claims = await getVerifiedClaims();
   if (!claims?.sub) return { status: "error", code: "not_signed_in" };
   const userId = claims.sub;
+  // The balance is ours, so being signed in is not the same as being allowed
+  // to spend it.
+  if (!isOsAllowed(claims.email)) return { status: "error", code: "invite_only" };
 
   const topic = String(formData.get("topic") ?? "").trim().slice(0, OS_TOPIC_LIMIT);
   if (!topic) return { status: "error", code: "invalid", message: "Give it a topic." };

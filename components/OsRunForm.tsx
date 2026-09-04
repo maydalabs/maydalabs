@@ -10,8 +10,10 @@ const IDLE: OsRunState = { status: "idle" };
 function Message({ state, copy }: { state: OsRunState; copy: OsDeskCopy }) {
   if (state.status !== "error") return null;
   const fallback =
-    state.code === "no_credits"
-      ? copy.outOfHeading
+    state.code === "invite_only"
+      ? "The beta is invite-only for now."
+      : state.code === "no_credits"
+        ? copy.outOfHeading
       : state.code === "daily_cap"
         ? "The beta has hit its budget for today. Try again tomorrow."
         : state.code === "not_signed_in"
