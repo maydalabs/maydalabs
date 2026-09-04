@@ -46,6 +46,28 @@ Verified end to end on 4 Sep 2026 against the real chain: an invoice created
 through the operator form at the live rate, rendered in the client portal, and
 flipped to paid by a chain lookup.
 
+### Which wallets work
+
+Any wallet that shows you a **mainnet on-chain address** works, including an
+exchange deposit address (Binance and the like) or a custodial wallet's
+on-chain receive address. The site only watches the chain; it does not care
+what software holds the key. Lightning-only addresses and Lightning invoices
+do not work, and neither does a testnet address.
+
+Reused addresses are handled correctly (fixed 4 Sep 2026 after the first
+version got it wrong). Exchanges give you one deposit address for life, so
+every invoice records what the address had already received when it was
+written, and payment is measured as the increase since. An address can also
+carry only one invoice awaiting payment at a time, so one arriving payment
+can never settle two invoices.
+
+Two cautions about exchange addresses that are not the site's problem to fix:
+
+- Exchanges enforce a **minimum deposit**. A small test payment under that
+  minimum can be lost, not returned.
+- Business income landing straight on an exchange is worse for custody and
+  for the accounting story you sell. A wallet you control is the better home.
+
 **What you still need before invoicing anyone:** a wallet to receive into. Any
 wallet that shows a receive address works, including one you already have. If
 you want a clean separation for the business, Sparrow on the Mac or BlueWallet
