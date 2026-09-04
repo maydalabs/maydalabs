@@ -2522,3 +2522,9 @@ fieldset.mayda-fieldset > p {
   .mayda-os-live > div { flex: 1 1 auto; }
   .mayda-os-live .mayda-os-window-grows { min-height: 0; }
 }
+
+/* A record row is a door into the run, so it should behave like one. */
+@layer components {
+  .mayda-os-record-row { text-decoration: none; color: inherit; transition: border-color 0.15s ease, transform 0.15s ease; }
+  .mayda-os-record-row:hover { border-color: var(--mint); transform: translateY(-1px); }
+}

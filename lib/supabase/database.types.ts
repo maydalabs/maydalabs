@@ -207,6 +207,8 @@ export type Database = {
           input_tokens: number
           model: string | null
           output_tokens: number
+          published_at: string | null
+          published_url: string | null
           shape: string
           sources: Json
           status: string
@@ -229,6 +231,8 @@ export type Database = {
           input_tokens?: number
           model?: string | null
           output_tokens?: number
+          published_at?: string | null
+          published_url?: string | null
           shape?: string
           sources?: Json
           status?: string
@@ -251,6 +255,8 @@ export type Database = {
           input_tokens?: number
           model?: string | null
           output_tokens?: number
+          published_at?: string | null
+          published_url?: string | null
           shape?: string
           sources?: Json
           status?: string

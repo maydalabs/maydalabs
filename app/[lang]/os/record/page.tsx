@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { OsShell } from "@/components/os/OsShell";
+import { localizePath } from "@/lib/i18n";
 import { OS_DESK_COPY } from "@/components/osCopy";
 import { requireOsSession } from "@/lib/osSession";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
@@ -41,7 +43,7 @@ export default async function OsRecordPage({ params }: LocalePageProps) {
 
   const { data: runs } = await supabase
     .from("os_runs")
-    .select("id, topic, shape, status, decision, decision_note, sources, decided_at, created_at")
+    .select("id, topic, shape, status, decision, decision_note, published_url, sources, decided_at, created_at")
     .order("created_at", { ascending: false })
     .limit(200);
 
@@ -71,7 +73,7 @@ export default async function OsRecordPage({ params }: LocalePageProps) {
         ) : (
           <div className="mayda-stack" style={{ gap: "0.5rem" }}>
             {rows.map((run) => (
-              <div key={run.id} className="mayda-row">
+              <Link key={run.id} href={localizePath(`/os/record/${run.id}`, locale)} className="mayda-row mayda-os-record-row">
                 <div>
                   <strong>{run.topic}</strong>
                   <br />
@@ -79,12 +81,13 @@ export default async function OsRecordPage({ params }: LocalePageProps) {
                     {format.format(new Date(run.created_at))} · {deskCopy.shapes[run.shape as "note" | "post" | "summary"]}
                     {run.status === "failed" ? " · failed" : ""}
                     {run.decision_note ? ` · "${run.decision_note}"` : ""}
+                    {run.published_url ? " · published" : ""}
                   </span>
                 </div>
                 <span className={`mayda-status${run.decision === "approved" ? " is-active" : ""}`}>
                   {run.status === "failed" ? "—" : deskCopy.decisions[run.decision as "pending" | "approved" | "rejected"]}
                 </span>
-              </div>
+              </Link>
             ))}
           </div>
         )}

@@ -581,6 +581,25 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       expect(Number(after!.cost_usd)).toBeCloseTo(0.055, 6);
     });
 
+    it("lets a person record where their approved work landed, and only that", async () => {
+      await admin.from("os_runs").update({ decision: "approved" }).eq("id", runId);
+
+      const { data: recorded } = await userA
+        .from("os_runs")
+        .update({ published_url: "https://example.com/post", published_at: new Date().toISOString() })
+        .eq("id", runId)
+        .select("published_url");
+      expect(recorded).toEqual([{ published_url: "https://example.com/post" }]);
+
+      // The database refuses anything that is not a public https link, so a
+      // recorded outcome always points somewhere a reader can check.
+      const { error } = await admin
+        .from("os_runs")
+        .update({ published_url: "javascript:alert(1)" })
+        .eq("id", runId);
+      expect(error).not.toBeNull();
+    });
+
     it("blocks a person from inserting a run, and hides other people's runs", async () => {
       const { error } = await userA.from("os_runs").insert({ user_id: idA, topic: "Mine", draft: "Free work" });
       expect(error).not.toBeNull();

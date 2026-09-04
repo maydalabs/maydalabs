@@ -1,4 +1,4 @@
-import { decideOsRunAction } from "@/app/actions/os";
+import { decideOsRunAction, recordOsOutcomeAction } from "@/app/actions/os";
 import { OsCopyButton } from "@/components/OsCopyButton";
 import type { OsDeskCopy } from "@/components/osCopy";
 import type { OsDecision, OsShape } from "@/lib/os";
@@ -13,6 +13,7 @@ export type OsRunRecord = {
   claims: unknown;
   decision: OsDecision;
   decision_note: string | null;
+  published_url?: string | null;
   error: string | null;
   created_at: string;
 };
@@ -123,9 +124,34 @@ export function OsRunCard({
               </div>
             </form>
           ) : (
-            <div className="mayda-os-decide">
-              <OsCopyButton text={run.draft ?? ""} label={copy.copy} done={copy.copied} />
-              {run.decision_note ? <p className="mayda-note" style={{ margin: 0 }}>{run.decision_note}</p> : null}
+            <div className="mayda-stack" style={{ gap: "0.7rem" }}>
+              <div className="mayda-os-decide">
+                <OsCopyButton text={run.draft ?? ""} label={copy.copy} done={copy.copied} />
+                {run.decision_note ? <p className="mayda-note" style={{ margin: 0 }}>{run.decision_note}</p> : null}
+              </div>
+
+              {run.decision === "approved" ? (
+                run.published_url ? (
+                  <p className="mayda-note" style={{ margin: 0 }}>
+                    {copy.outcomeLabel}{" "}
+                    <a href={run.published_url} target="_blank" rel="noopener noreferrer" className="mayda-inline-link">
+                      {hostOf(run.published_url)} <span aria-hidden>↗</span>
+                    </a>
+                  </p>
+                ) : (
+                  <form action={recordOsOutcomeAction} className="mayda-os-decide">
+                    <input type="hidden" name="runId" value={run.id} />
+                    <label className="mayda-field" style={{ flex: "1 1 18rem" }}>
+                      <span>{copy.outcomeLabel}</span>
+                      <input name="publishedUrl" type="url" placeholder="https://" maxLength={500} />
+                    </label>
+                    <button type="submit" className="mayda-button mayda-button-outline">{copy.outcomeSave}</button>
+                  </form>
+                )
+              ) : null}
+              {run.decision === "approved" && !run.published_url ? (
+                <p className="mayda-note" style={{ margin: 0 }}>{copy.outcomeNote}</p>
+              ) : null}
             </div>
           )}
         </>

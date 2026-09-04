@@ -197,3 +197,37 @@ export async function grantOsCreditsAction(formData: FormData): Promise<void> {
 
   revalidatePath("/internal/os");
 }
+
+/* Where an approved draft ended up. MaydaOS never posts anything, so this is
+ * a record of what a person did with the work, not proof the system acted. */
+export async function recordOsOutcomeAction(formData: FormData): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  const claims = await getVerifiedClaims();
+  if (!claims?.sub) return;
+
+  const runId = String(formData.get("runId") ?? "");
+  if (!/^[0-9a-f-]{36}$/.test(runId)) return;
+
+  const raw = String(formData.get("publishedUrl") ?? "").trim();
+  let url: string | null = null;
+  if (raw) {
+    try {
+      const parsed = new URL(raw);
+      if (parsed.protocol !== "https:") return;
+      url = parsed.toString().slice(0, 500);
+    } catch {
+      return;
+    }
+  }
+
+  // Their own run, and only these columns: the grant sees to that.
+  const supabase = await createSupabaseServerClient();
+  await supabase
+    .from("os_runs")
+    .update({ published_url: url, published_at: url ? new Date().toISOString() : null })
+    .eq("id", runId)
+    .eq("decision", "approved");
+
+  revalidatePath("/os/desk");
+  revalidatePath("/os/record");
+}

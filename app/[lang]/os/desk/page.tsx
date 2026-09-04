@@ -22,7 +22,7 @@ export default async function OsDeskPage({ params }: LocalePageProps) {
 
   const { data: runs } = await supabase
     .from("os_runs")
-    .select("id, shape, topic, sources, status, draft, claims, decision, decision_note, error, created_at")
+    .select("id, shape, topic, sources, status, draft, claims, decision, decision_note, published_url, error, created_at")
     .order("created_at", { ascending: false })
     .limit(20);
 
