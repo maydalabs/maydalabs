@@ -6,7 +6,7 @@ import { OS_EXAMPLE_LABEL, OS_EXAMPLE_NOTE, osExampleRun } from "@/components/os
 import { OsShell } from "@/components/os/OsShell";
 import { isOsConfigured } from "@/lib/osDraft";
 import { isOsAllowed } from "@/lib/osAccess";
-import type { OsWorkflow } from "@/lib/os";
+import { toOsWorkflows } from "@/lib/os";
 import { requireOsSession } from "@/lib/osSession";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 
@@ -25,11 +25,11 @@ export default async function OsDeskPage({ params }: LocalePageProps) {
   // decides which is which.
   const { data: workflowRows } = await supabase
     .from("os_workflows")
-    .select("id, key, name, purpose, brief, shape, destination, max_sources, owner_user_id")
+    .select("id, key, name, purpose, brief, shape, destination, max_sources, owner_user_id, standing_sources, window_days")
     .eq("active", true)
     .order("owner_user_id", { ascending: false, nullsFirst: false })
     .order("name");
-  const workflows = (workflowRows ?? []) as OsWorkflow[];
+  const workflows = toOsWorkflows(workflowRows ?? []);
 
   const { data: runs } = await supabase
     .from("os_runs")

@@ -36,7 +36,7 @@ export default async function InternalOsPage({ params }: LocalePageProps) {
     supabase.from("os_runs").select("id, user_id, topic, status, decision, cost_usd, created_at").order("created_at", { ascending: false }),
     supabase
       .from("os_workflows")
-      .select("id, key, name, purpose, brief, shape, destination, max_sources, owner_user_id, active")
+      .select("id, key, name, purpose, brief, shape, destination, max_sources, owner_user_id, active, standing_sources, window_days")
       .order("owner_user_id", { ascending: false, nullsFirst: false })
       .order("name"),
   ]);

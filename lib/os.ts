@@ -54,8 +54,10 @@ export type OsWorkflow = {
   destination: string | null;
   max_sources: number;
   owner_user_id: string | null;
-  standing_sources?: unknown;
-  window_days?: number;
+  /* Required on purpose: a page that forgets to select these silently made
+   * the desk demand links from a workflow that already had its own. */
+  standing_sources: unknown;
+  window_days: number;
 };
 
 /* http(s) only, and no credentials or fragments smuggled in. Shape only;
@@ -119,4 +121,18 @@ export function asStandingSources(value: unknown): StandingSource[] {
 
 export function standingSourcesToText(sources: StandingSource[]): string {
   return sources.map((source) => (source.kind === "feed" ? `feed ${source.url}` : source.url)).join("\n");
+}
+
+/* Narrowing database rows into workflows.
+ *
+ * The constraint is the point: a query that forgets a column will not
+ * satisfy it and the build fails, rather than the desk quietly behaving as
+ * though the workflow had no sources of its own. The shape is narrowed here
+ * because the database column is a plain string.
+ */
+export function toOsWorkflows<T extends Omit<OsWorkflow, "shape"> & { shape: string }>(rows: T[]): OsWorkflow[] {
+  return rows.map((row) => ({
+    ...row,
+    shape: (OS_SHAPES as readonly string[]).includes(row.shape) ? (row.shape as OsShape) : "note",
+  }));
 }
