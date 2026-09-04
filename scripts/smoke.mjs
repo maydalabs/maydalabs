@@ -104,17 +104,19 @@ await check("localized routes do not set a language-preference cookie", async ()
   assert(!cookie.includes("maydalabs_locale"), "legacy language-preference cookie is still present");
 });
 
-await check("MaydaOS is a localized noindex Lab route", async () => {
+await check("MaydaOS is a localized, indexable product page", async () => {
   const [english, turkish, french] = await Promise.all([
     request("/os").then((response) => response.text()),
     request("/tr/os").then((response) => response.text()),
     request("/fr/os").then((response) => response.text()),
   ]);
-  assert(english.includes("<title>MaydaOS Lab · MaydaLabs</title>"), "unexpected MaydaOS title");
-  assert(english.includes('name="robots" content="noindex, follow"'), "MaydaOS is missing noindex");
-  assert(english.includes('data-mayda-os="v3"'), "MaydaOS v3 Lab shell is missing");
-  assert(turkish.includes("MaydaOS geri döndü."), "Turkish MaydaOS copy is missing");
-  assert(french.includes("MaydaOS est de retour."), "French MaydaOS copy is missing");
+  assert(english.includes("<title>MaydaOS · MaydaLabs</title>"), "unexpected MaydaOS title");
+  // It used to be a noindex lab. It describes a real product now.
+  assert(english.includes('name="robots" content="index, follow"'), "MaydaOS should be indexable");
+  assert(english.includes("for the work you repeat."), "MaydaOS heading is missing");
+  assert(english.includes("/os/desk-preview"), "the desk screenshot is missing");
+  assert(turkish.includes("bir işletim sistemi."), "Turkish MaydaOS copy is missing");
+  assert(french.includes("pour le travail qui revient."), "French MaydaOS copy is missing");
 });
 
 await check("robots and sitemap expose the public routes", async () => {
