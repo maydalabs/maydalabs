@@ -103,10 +103,17 @@ export async function generateMetadata({ params }: LocalePageProps) {
 export default async function SignInPage({
   params,
   searchParams,
-}: LocalePageProps & { searchParams: Promise<{ error?: string }> }) {
+}: LocalePageProps & { searchParams: Promise<{ error?: string; next?: string }> }) {
   const locale = await getPageLocale(params);
   const copy = COPY[locale];
-  const showLinkError = (await searchParams).error === "confirm";
+  const params = await searchParams;
+  const showLinkError = params.error === "confirm";
+  // Same-site relative paths only, never protocol-relative ones: this value
+  // decides where somebody lands after proving their email.
+  const nextPath =
+    typeof params.next === "string" && params.next.startsWith("/") && !params.next.startsWith("//")
+      ? params.next
+      : "/portal";
 
   const claims = await getVerifiedClaims();
   if (claims) redirect(localizePath("/portal", locale));
@@ -124,7 +131,7 @@ export default async function SignInPage({
             {copy.linkError}
           </p>
         ) : null}
-        <SignInForm locale={locale} nextPath="/portal" copy={copy.form} />
+        <SignInForm locale={locale} nextPath={nextPath} copy={copy.form} />
       </div>
     </div>
   );
