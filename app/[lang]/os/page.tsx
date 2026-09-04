@@ -3,6 +3,8 @@ import { FieldFigure } from "@/components/FieldFigure";
 import { MaydaOSLab } from "@/components/MaydaOSLab";
 import { MAYDA_OS_COPY } from "@/components/maydaOsLabCopy";
 import { isOsConfigured } from "@/lib/osDraft";
+import { redirect } from "next/navigation";
+import { getVerifiedClaims } from "@/lib/supabase/server";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
@@ -109,6 +111,11 @@ export async function generateMetadata({ params }: LocalePageProps) {
 export default async function MaydaOsPage({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
   const copy = COPY[locale];
+
+  // Signed in, /os is not a page about an operating system: it is the
+  // operating system. The tour below is for people who have not booted it.
+  const claims = await getVerifiedClaims();
+  if (claims) redirect(localizePath("/os/desk", locale));
 
   return (
     <>

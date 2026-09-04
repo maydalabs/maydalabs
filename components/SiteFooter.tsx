@@ -48,7 +48,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
             <p className="mayda-footer-label">{copy.account}</p>
             <div className="mt-4 flex flex-col gap-2 text-sm text-[color:var(--mist)]">
               <Link href={localizePath("/auth/sign-in", locale)}>{copy.signIn}</Link>
-              <Link href={localizePath("/portal", locale)}>{copy.portal}</Link>
+              <Link href={localizePath("/os/desk", locale)}>{copy.portal}</Link>
               <a href="https://x.com/maydalabs" target="_blank" rel="noopener noreferrer">
                 X · @maydalabs ↗
               </a>

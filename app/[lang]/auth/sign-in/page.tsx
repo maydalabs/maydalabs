@@ -113,7 +113,7 @@ export default async function SignInPage({
   const nextPath =
     typeof query.next === "string" && query.next.startsWith("/") && !query.next.startsWith("//")
       ? query.next
-      : "/portal";
+      : "/os/desk";
 
   const claims = await getVerifiedClaims();
   // Already signed in: honour the deep link rather than dropping them on the portal.

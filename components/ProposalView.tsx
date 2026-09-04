@@ -85,7 +85,7 @@ export function ProposalView({
         </p>
         <h3 className="mayda-subheading" style={{ marginTop: "0.5rem" }}>{proposal.headline}</h3>
         <p className="mayda-body" style={{ marginTop: "0.6rem" }}>{proposal.angle.split(/\n{2,}/)[0]}</p>
-        <Link href={localizePath(`/portal/pilots/${proposal.pilot_id}`, locale)} className="mayda-button mayda-button-small" style={{ alignSelf: "flex-start", marginTop: "0.9rem" }}>
+        <Link href={localizePath("/os/pilot", locale)} className="mayda-button mayda-button-small" style={{ alignSelf: "flex-start", marginTop: "0.9rem" }}>
           {copy.openFull} <span aria-hidden>→</span>
         </Link>
       </article>

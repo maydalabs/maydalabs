@@ -87,7 +87,7 @@ export async function createInvoiceAction(
   if (error) return { status: "error", code: "save_failed" };
 
   revalidatePath("/internal/pilots");
-  revalidatePath(`/portal/pilots/${pilotId}`);
+  revalidatePath("/os/pilot");
   return { status: "saved" };
 }
 
@@ -147,6 +147,6 @@ export async function checkInvoiceAction(formData: FormData): Promise<void> {
     .eq("id", invoice.id)
     .neq("status", "paid");
 
-  revalidatePath(`/portal/pilots/${invoice.pilot_id}`);
+  revalidatePath("/os/pilot");
   revalidatePath("/internal/pilots");
 }

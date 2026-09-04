@@ -2500,3 +2500,25 @@ fieldset.mayda-fieldset > p {
   .mayda-os-sources { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; font-size: 0.78rem; color: var(--mist); }
   .mayda-os-sources a { color: inherit; }
 }
+
+/* The credit meter lives in the MaydaOS system bar, where a number like this
+   belongs: visible without being shouted. */
+@layer components {
+  .mayda-os-meter { display: inline-flex; align-items: baseline; gap: 0.1rem; padding: 0.12rem 0.5rem; border: 1px solid var(--border-strong); border-radius: 999px; font-variant-numeric: tabular-nums; line-height: 1.4; }
+  .mayda-os-meter strong { color: var(--mint); font-size: 0.82rem; }
+  .mayda-os-meter small { color: var(--mist); font-size: 0.72rem; }
+}
+
+/* Visually hidden, still read aloud. */
+@layer components {
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+}
+
+/* Running for real, the OS is the whole screen rather than a figure inside a
+   marketing page: no rounded card floating in a layout, no dead space under
+   the status bar. The lab at /os keeps the framed look. */
+@layer components {
+  .mayda-os-live { display: flex; flex-direction: column; min-height: 100svh; border: 0; border-radius: 0; box-shadow: none; }
+  .mayda-os-live > div { flex: 1 1 auto; }
+  .mayda-os-live .mayda-os-window-grows { min-height: 0; }
+}

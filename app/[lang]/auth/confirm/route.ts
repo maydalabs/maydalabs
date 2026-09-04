@@ -38,6 +38,6 @@ export async function GET(
   await claimAnonymousRecords(data.user.id, data.user.email ?? null);
 
   return NextResponse.redirect(
-    new URL(localizePath("/portal", locale), request.nextUrl.origin),
+    new URL(localizePath("/os/desk", locale), request.nextUrl.origin),
   );
 }
