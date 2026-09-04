@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { localizePath, type Locale } from "@/lib/i18n";
 import { OS_APPS, type OsApp } from "@/components/os/OsShell";
-import styles from "@/components/MaydaOSLab.module.css";
+import styles from "@/components/os/OsShell.module.css";
 
 /* A terminal that actually does things: it moves you between apps and
  * answers questions about your own account. Nothing here can spend a credit

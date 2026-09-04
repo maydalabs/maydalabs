@@ -2538,3 +2538,8 @@ fieldset.mayda-fieldset > p {
   .mayda-profile-linkedin .mayda-brand-glyph { color: inherit; }
   .mayda-button .mayda-brand-glyph { margin-right: 0.15rem; }
 }
+
+/* A screenshot of the real desk, framed like the window it shows. */
+@layer components {
+  .mayda-os-preview { display: block; width: 100%; height: auto; border: 1px solid var(--border-strong); border-radius: var(--radius-lg); }
+}

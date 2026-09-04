@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/Wordmark";
 import { localizePath, type Locale } from "@/lib/i18n";
-import styles from "@/components/MaydaOSLab.module.css";
+import styles from "@/components/os/OsShell.module.css";
 
 /* The MaydaOS chrome, running for real.
  *

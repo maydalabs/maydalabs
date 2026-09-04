@@ -1,111 +1,101 @@
 import Link from "next/link";
-import { FieldFigure } from "@/components/FieldFigure";
-import { MaydaOSLab } from "@/components/MaydaOSLab";
-import { MAYDA_OS_COPY } from "@/components/maydaOsLabCopy";
+import Image from "next/image";
+import { OsRunCard } from "@/components/OsRunCard";
+import { OS_DESK_COPY } from "@/components/osCopy";
+import { OS_EXAMPLE_LABEL, osExampleRun } from "@/components/osExample";
+import { OS_APP_META, OS_APPS } from "@/components/os/OsShell";
 import { isOsConfigured } from "@/lib/osDraft";
-import { redirect } from "next/navigation";
 import { getVerifiedClaims } from "@/lib/supabase/server";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
+import { redirect } from "next/navigation";
+import deskPreview from "@/public/os/desk-preview.jpg";
+
+/*
+ * MaydaOS, for people who have not signed in.
+ *
+ * It used to be an interactive lab full of copy about what the company
+ * might do. The operating system is real now, so this page shows it: what
+ * the apps are, what a run actually produces, and the way in. Signed in,
+ * /os boots the machine instead of describing it.
+ */
 
 const COPY = {
   en: {
     meta: {
-      title: "MaydaOS Lab",
-      socialTitle: "MaydaOS Lab · MaydaLabs",
+      title: "MaydaOS",
+      socialTitle: "MaydaOS · MaydaLabs",
       description:
-        "The interactive proof layer inside MaydaLabs v3. Explore how product engineering, automation, lifecycle growth, and security connect.",
+        "The operating system behind MaydaLabs: give a workflow its sources, it produces the work, and nothing leaves without your approval. Free while in beta.",
     },
-    kicker: "MaydaOS / Lab",
-    heading: ["MaydaOS is back.", "This time, it knows its job."],
+    kicker: "MaydaOS",
+    heading: ["An operating system", "for the work you repeat."],
     intro:
-      "MaydaLabs is the company. MaydaOS is its interactive lab: a working interface for exploring how ideas, products, workflows, growth, and security connect—without making the commercial homepage harder to understand.",
-    badges: ["Built into v3", "No wallet required", "Interactive proof"],
-    fieldLabel: "One input · connected systems · several useful outputs",
-    beta: {
-      kicker: "Beta / Free while it lasts",
-      heading: "Try the desk itself.",
-      body: "Sign in and you get ten runs. Hand it a few links, it produces the piece with every claim next to its source, and you decide whether it leaves. Nothing is published by us, and nothing is charged to you.",
-      cta: "Open the desk",
-    },
-    closingKicker: "The hierarchy is now clear",
-    closingHeading: "The commercial site stays simple. The lab earns the complexity.",
-    closingBody:
-      "Use MaydaOS to explore the system. Use the Multiplier Map when you want to turn your own situation into a concrete next move.",
-    primaryAction: "Map my next move",
-    secondaryAction: "Return to MaydaLabs",
+      "A workflow reads its sources, produces the piece with every claim beside the source it came from, and stops. You read the claims, then approve or send it back. Nothing leaves without you, and nothing is published by us.",
+    badges: ["Free while in beta", "Ten runs", "No card"],
+    appsKicker: "Five apps",
+    exampleKicker: "A real run, not a mock-up",
+    exampleIntro:
+      "This is what comes back. Read the claims list first: it is what you are approving, and a claim with no source says so.",
+    ctaHeading: "Ten runs, free while it is in beta.",
+    ctaBody:
+      "Sign in with your email and the desk is there. A credit is one run; reading sources, editing, approving and sending back cost nothing.",
+    cta: "Open the desk",
+    closed: "The beta is not open yet.",
+    previewAlt: "The MaydaOS desk: the dock, a workflow ready to run, and a draft waiting for approval.",
   },
   tr: {
     meta: {
-      title: "MaydaOS Lab",
-      socialTitle: "MaydaOS Lab · MaydaLabs",
+      title: "MaydaOS",
+      socialTitle: "MaydaOS · MaydaLabs",
       description:
-        "MaydaLabs v3 içindeki etkileşimli kanıt katmanı. Ürün mühendisliği, otomasyon, yaşam döngüsü büyümesi ve güvenliğin nasıl bağlandığını keşfedin.",
+        "MaydaLabs'in arkasındaki işletim sistemi: iş akışına kaynaklarını verin, işi o üretsin, sizin onayınız olmadan hiçbir şey çıkmasın. Beta boyunca ücretsiz.",
     },
-    kicker: "MaydaOS / Lab",
-    heading: ["MaydaOS geri döndü.", "Bu kez görevini biliyor."],
+    kicker: "MaydaOS",
+    heading: ["Tekrarlanan işler için", "bir işletim sistemi."],
     intro:
-      "Şirket MaydaLabs. MaydaOS ise onun etkileşimli laboratuvarı: ticari ana sayfayı anlaşılmaz hâle getirmeden fikirlerin, ürünlerin, iş akışlarının, büyümenin ve güvenliğin nasıl bağlandığını keşfeden çalışan bir arayüz.",
-    badges: ["v3 içine işlendi", "Cüzdan gerekmez", "Etkileşimli kanıt"],
-    fieldLabel: "Tek girdi · bağlı sistemler · birden fazla yararlı çıktı",
-    beta: {
-      kicker: "Beta / Sürdüğü sürece ücretsiz",
-      heading: "Masayı kendiniz deneyin.",
-      body: "Giriş yapın, on çalıştırma hakkınız olsun. Birkaç bağlantı verin; metni, her iddia kaynağının yanında olacak şekilde üretsin ve dışarı çıkıp çıkmayacağına siz karar verin. Biz hiçbir şey yayınlamayız, sizden de bir ücret alınmaz.",
-      cta: "Masayı aç",
-    },
-    closingKicker: "Hiyerarşi artık net",
-    closingHeading: "Ticari site sade kalır. Karmaşıklığı laboratuvar hak eder.",
-    closingBody:
-      "Sistemi keşfetmek için MaydaOS'i kullanın. Kendi durumunuzu somut bir sonraki hamleye çevirmek istediğinizde Multiplier Map'i kullanın.",
-    primaryAction: "Sonraki hamlemi haritala",
-    secondaryAction: "MaydaLabs'e dön",
+      "Bir iş akışı kaynaklarını okur, metni her iddia kaynağının yanında olacak şekilde üretir ve durur. Siz iddiaları okur, onaylar ya da geri gönderirsiniz. Sizsiz hiçbir şey çıkmaz; biz de hiçbir şey yayınlamayız.",
+    badges: ["Beta boyunca ücretsiz", "On çalıştırma", "Kart yok"],
+    appsKicker: "Beş uygulama",
+    exampleKicker: "Gerçek bir çalıştırma, maket değil",
+    exampleIntro:
+      "Geri gelen şey budur. Önce iddialar listesini okuyun: onayladığınız şey odur ve kaynağı olmayan iddia bunu söyler.",
+    ctaHeading: "On çalıştırma, beta boyunca ücretsiz.",
+    ctaBody:
+      "E-postanızla giriş yapın, masa orada. Bir kredi bir çalıştırmadır; kaynakları okumak, düzenlemek, onaylamak ve geri göndermek ücretsizdir.",
+    cta: "Masayı aç",
+    closed: "Beta henüz açık değil.",
+    previewAlt: "MaydaOS masası: uygulama çubuğu, çalıştırılmaya hazır bir iş akışı ve onay bekleyen bir taslak.",
   },
   fr: {
     meta: {
-      title: "MaydaOS Lab",
-      socialTitle: "MaydaOS Lab · MaydaLabs",
+      title: "MaydaOS",
+      socialTitle: "MaydaOS · MaydaLabs",
       description:
-        "La couche de preuve interactive de MaydaLabs v3. Explorez comment ingénierie produit, automatisation, cycle de vie et sécurité se connectent.",
+        "Le systeme d'exploitation derriere MaydaLabs : donnez ses sources a un flux, il produit le travail, et rien ne sort sans votre approbation. Gratuit pendant la beta.",
     },
-    kicker: "MaydaOS / Lab",
-    heading: ["MaydaOS est de retour.", "Cette fois, son rôle est clair."],
+    kicker: "MaydaOS",
+    heading: ["Un systeme d'exploitation", "pour le travail qui revient."],
     intro:
-      "MaydaLabs est l’entreprise. MaydaOS est son laboratoire interactif : une interface fonctionnelle pour explorer comment idées, produits, flux de travail, croissance et sécurité se connectent—sans rendre la page commerciale plus difficile à comprendre.",
-    badges: ["Intégré à v3", "Aucun portefeuille requis", "Preuve interactive"],
-    fieldLabel: "Une entrée · systèmes connectés · plusieurs sorties utiles",
-    beta: {
-      kicker: "Beta / Gratuit pour l'instant",
-      heading: "Essayez le bureau lui-meme.",
-      body: "Connectez-vous et vous obtenez dix executions. Donnez-lui quelques liens, il produit le texte avec chaque affirmation a cote de sa source, et vous decidez si cela sort. Nous ne publions rien, et rien ne vous est facture.",
-      cta: "Ouvrir le bureau",
-    },
-    closingKicker: "La hiérarchie est désormais claire",
-    closingHeading: "Le site commercial reste simple. Le laboratoire mérite la complexité.",
-    closingBody:
-      "Utilisez MaydaOS pour explorer le système. Utilisez la Multiplier Map lorsque vous souhaitez transformer votre propre situation en prochain mouvement concret.",
-    primaryAction: "Cartographier ma prochaine étape",
-    secondaryAction: "Retourner à MaydaLabs",
+      "Un flux lit ses sources, produit le texte avec chaque affirmation a cote de sa source, puis s'arrete. Vous lisez les affirmations, puis vous approuvez ou vous renvoyez. Rien ne sort sans vous, et nous ne publions rien.",
+    badges: ["Gratuit pendant la beta", "Dix executions", "Sans carte"],
+    appsKicker: "Cinq applications",
+    exampleKicker: "Une vraie execution, pas une maquette",
+    exampleIntro:
+      "Voici ce qui revient. Lisez d'abord la liste des affirmations : c'est ce que vous approuvez, et une affirmation sans source le dit.",
+    ctaHeading: "Dix executions, gratuites pendant la beta.",
+    ctaBody:
+      "Connectez-vous avec votre email et le bureau est la. Un credit vaut une execution ; lire, editer, approuver et renvoyer ne coutent rien.",
+    cta: "Ouvrir le bureau",
+    closed: "La beta n'est pas encore ouverte.",
+    previewAlt: "Le bureau MaydaOS : le dock, un flux pret a tourner et un brouillon en attente d'approbation.",
   },
 } as const;
 
 export async function generateMetadata({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
-  const metadata = createPageMetadata({
-    ...COPY[locale].meta,
-    path: "/os",
-    locale,
-    socialCard: "studio",
-  });
-
-  return {
-    ...metadata,
-    robots: {
-      index: false,
-      follow: true,
-    },
-  };
+  return createPageMetadata({ ...COPY[locale].meta, path: "/os", locale, socialCard: "studio" });
 }
 
 export default async function MaydaOsPage({ params }: LocalePageProps) {
@@ -113,80 +103,85 @@ export default async function MaydaOsPage({ params }: LocalePageProps) {
   const copy = COPY[locale];
 
   // Signed in, /os is not a page about an operating system: it is the
-  // operating system. The tour below is for people who have not booted it.
+  // operating system.
   const claims = await getVerifiedClaims();
   if (claims) redirect(localizePath("/os/desk", locale));
+
+  const apps = OS_APP_META[locale];
 
   return (
     <>
       <section className="mayda-hero">
-        <div className="mayda-shell mayda-hero-grid">
+        <div className="mayda-shell mayda-stack" style={{ maxWidth: "48rem" }}>
+          <p className="mayda-kicker">{copy.kicker}</p>
+          <h1 className="mayda-display">
+            {copy.heading[0]}
+            <br />
+            <span className="mayda-multiply">{copy.heading[1]}</span>
+          </h1>
+          <p className="mayda-lead">{copy.intro}</p>
+          <div className="flex flex-wrap gap-2">
+            {copy.badges.map((badge, index) => (
+              <span key={badge} className={"mayda-tag " + (index === 0 ? "is-mint" : "is-cobalt")}>
+                {badge}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mayda-section">
+        <div className="mayda-shell">
+          <Image
+            src={deskPreview}
+            alt={copy.previewAlt}
+            placeholder="blur"
+            sizes="(min-width: 1024px) 60rem, 96vw"
+            className="mayda-os-preview"
+            priority
+          />
+        </div>
+      </section>
+
+      <section className="mayda-section">
+        <div className="mayda-shell mayda-stack">
+          <p className="mayda-kicker">{copy.appsKicker}</p>
+          <dl className="mayda-dl">
+            {OS_APPS.map((app) => (
+              <div key={app}>
+                <dt>{apps[app].label}</dt>
+                <dd>{apps[app].hint}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      <section className="mayda-section">
+        <div className="mayda-shell mayda-stack" style={{ maxWidth: "48rem" }}>
+          <p className="mayda-kicker">{copy.exampleKicker}</p>
+          <p className="mayda-body">{copy.exampleIntro}</p>
+          <OsRunCard
+            run={osExampleRun(locale)}
+            copy={OS_DESK_COPY[locale]}
+            exampleLabel={OS_EXAMPLE_LABEL[locale]}
+          />
+        </div>
+      </section>
+
+      <section className="mayda-section border-t border-[color:var(--border)]">
+        <div className="mayda-shell grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div className="mayda-stack">
-            <p className="mayda-kicker">{copy.kicker}</p>
-            <h1 className="mayda-display">
-              {copy.heading[0]}
-              <br />
-              <span className="mayda-multiply">{copy.heading[1]}</span>
-            </h1>
-            <p className="mayda-lead">{copy.intro}</p>
-            <div className="flex flex-wrap gap-2">
-              {copy.badges.map((badge, index) => (
-                <span
-                  key={badge}
-                  className={"mayda-tag " + (index === 1 ? "is-mint" : "is-cobalt")}
-                >
-                  {badge}
-                </span>
-              ))}
+            <h2 className="mayda-heading">{isOsConfigured() ? copy.ctaHeading : copy.closed}</h2>
+            {isOsConfigured() ? <p className="mayda-body">{copy.ctaBody}</p> : null}
+          </div>
+          {isOsConfigured() ? (
+            <div className="mayda-hero-actions">
+              <Link href={localizePath("/os/desk", locale)} className="mayda-button">
+                {copy.cta} <span aria-hidden="true">→</span>
+              </Link>
             </div>
-          </div>
-
-          <div className="mayda-card" aria-label={copy.fieldLabel}>
-            <FieldFigure />
-            <p className="mayda-mono mt-3 text-[color:var(--mist)]">{copy.fieldLabel}</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="mayda-shell-wide pb-[clamp(4rem,9vw,7rem)]">
-        <MaydaOSLab locale={locale} copy={MAYDA_OS_COPY[locale]} />
-      </section>
-
-      {isOsConfigured() ? (
-      <section className="mayda-section border-t border-[color:var(--border)]">
-        <div className="mayda-shell grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-          <div className="mayda-stack">
-            <p className="mayda-kicker">{copy.beta.kicker}</p>
-            <h2 className="mayda-heading">{copy.beta.heading}</h2>
-            <p className="mayda-body">{copy.beta.body}</p>
-          </div>
-          <div className="mayda-hero-actions">
-            <Link href={localizePath("/os/desk", locale)} className="mayda-button">
-              {copy.beta.cta} <span aria-hidden="true">→</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-      ) : null}
-
-      <section className="mayda-section border-t border-[color:var(--border)]">
-        <div className="mayda-shell grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-          <div className="mayda-stack">
-            <p className="mayda-kicker">{copy.closingKicker}</p>
-            <h2 className="mayda-heading">{copy.closingHeading}</h2>
-            <p className="mayda-body">{copy.closingBody}</p>
-          </div>
-          <div className="mayda-hero-actions">
-            <Link href={localizePath("/start", locale)} className="mayda-button">
-              {copy.primaryAction} <span aria-hidden="true">→</span>
-            </Link>
-            <Link
-              href={localizePath("/", locale)}
-              className="mayda-button mayda-button-outline"
-            >
-              {copy.secondaryAction}
-            </Link>
-          </div>
+          ) : null}
         </div>
       </section>
     </>

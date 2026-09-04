@@ -3,7 +3,8 @@
  * as variant B: one block of the chain; inside it two signal strands
  * converge into the human gate bar and leave as a single approved dot.
  * One stroke weight, cobalt → mint on dark; `mono` uses currentColor.
- * The other candidates live on /brand-preview for the record.
+ * Chosen from five candidates in September 2026; the rest are in the
+ * repository history.
  */
 
 const GRADIENT_ID = "mayda-logo-gradient";
