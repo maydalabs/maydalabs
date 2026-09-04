@@ -53,11 +53,18 @@ export function OsRunForm({
           onChange={(event) => setSelectedId(event.target.value)}
           disabled={disabled}
         >
-          {workflows.map((workflow) => (
-            <option key={workflow.id} value={workflow.id}>
-              {workflow.name}{workflow.owner_user_id ? " · installed for you" : ""}
-            </option>
-          ))}
+          {workflows.map((workflow) => {
+            // Say it in the option itself: which workflow already reads its
+            // own sources is otherwise invisible until you have picked it.
+            const own = asStandingSources(workflow.standing_sources).length;
+            return (
+              <option key={workflow.id} value={workflow.id}>
+                {workflow.name}
+                {own > 0 ? ` · reads ${own} of its own` : " · needs links"}
+                {workflow.owner_user_id ? " · installed for you" : ""}
+              </option>
+            );
+          })}
         </select>
       </label>
 
