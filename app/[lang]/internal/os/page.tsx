@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { InternalNav } from "@/components/InternalNav";
 import { GrantCreditsForm } from "@/components/GrantCreditsForm";
+import { OsWorkflowForm } from "@/components/OsWorkflowForm";
+import type { OsWorkflow } from "@/lib/os";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { localizePath } from "@/lib/i18n";
@@ -29,9 +31,14 @@ export default async function InternalOsPage({ params }: LocalePageProps) {
   const { data: operator } = await supabase.from("operator_status").select("user_id").maybeSingle();
   if (!operator) notFound();
 
-  const [{ data: credits }, { data: runs }] = await Promise.all([
+  const [{ data: credits }, { data: runs }, { data: workflowRows }] = await Promise.all([
     supabase.from("os_credits").select("user_id, granted, used, updated_at"),
     supabase.from("os_runs").select("id, user_id, topic, status, decision, cost_usd, created_at").order("created_at", { ascending: false }),
+    supabase
+      .from("os_workflows")
+      .select("id, key, name, purpose, brief, shape, destination, max_sources, owner_user_id, active")
+      .order("owner_user_id", { ascending: false, nullsFirst: false })
+      .order("name"),
   ]);
 
   // Emails live in auth, which RLS does not reach.
@@ -110,6 +117,42 @@ export default async function InternalOsPage({ params }: LocalePageProps) {
             ))}
           </div>
         )}
+
+        <section className="mayda-stack" style={{ gap: "0.8rem", borderTop: "1px solid var(--border)", paddingTop: "1.4rem" }}>
+          <div>
+            <h2 className="mayda-subheading" style={{ margin: 0 }}>Workflows</h2>
+            <p className="mayda-body">
+              A pilot is a workflow installed by hand. Leave the client email blank and it is a template everyone can
+              run; fill it in and only they see it.
+            </p>
+          </div>
+
+          {(workflowRows ?? []).map((row) => {
+            const workflow = row as OsWorkflow & { active: boolean };
+            return (
+              <details key={workflow.id} className="mayda-details">
+                <summary>
+                  {workflow.name} · {workflow.key}
+                  {workflow.owner_user_id ? ` · ${emails.get(workflow.owner_user_id) ?? "a client"}` : " · template"}
+                  {workflow.active ? "" : " · inactive"}
+                </summary>
+                <div style={{ marginTop: "1rem" }}>
+                  <OsWorkflowForm
+                    workflow={workflow}
+                    ownerEmail={workflow.owner_user_id ? emails.get(workflow.owner_user_id) : undefined}
+                  />
+                </div>
+              </details>
+            );
+          })}
+
+          <details className="mayda-details">
+            <summary>Install a new workflow</summary>
+            <div style={{ marginTop: "1rem" }}>
+              <OsWorkflowForm />
+            </div>
+          </details>
+        </section>
       </div>
     </div>
   );

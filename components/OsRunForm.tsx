@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { runOsDraftAction, type OsRunState } from "@/app/actions/os";
-import { OS_MAX_SOURCES, OS_SHAPES, OS_TOPIC_LIMIT } from "@/lib/os";
+import { OS_TOPIC_LIMIT, type OsWorkflow } from "@/lib/os";
 import type { OsDeskCopy } from "@/components/osCopy";
 
 const IDLE: OsRunState = { status: "idle" };
@@ -12,6 +12,8 @@ function Message({ state, copy }: { state: OsRunState; copy: OsDeskCopy }) {
   const fallback =
     state.code === "invite_only"
       ? "The beta is invite-only for now."
+      : state.code === "no_workflow"
+        ? "Pick a workflow."
       : state.code === "no_credits"
         ? copy.outOfHeading
       : state.code === "daily_cap"
@@ -22,7 +24,15 @@ function Message({ state, copy }: { state: OsRunState; copy: OsDeskCopy }) {
   return <span className="mayda-field-error" role="alert">{state.message ?? fallback}</span>;
 }
 
-export function OsRunForm({ copy, disabled }: { copy: OsDeskCopy; disabled: boolean }) {
+export function OsRunForm({
+  copy,
+  disabled,
+  workflows,
+}: {
+  copy: OsDeskCopy;
+  disabled: boolean;
+  workflows: OsWorkflow[];
+}) {
   const [state, dispatch, pending] = useActionState(runOsDraftAction, IDLE);
 
   return (
@@ -33,10 +43,12 @@ export function OsRunForm({ copy, disabled }: { copy: OsDeskCopy; disabled: bool
       </label>
 
       <label className="mayda-field">
-        <span>{copy.shapeLabel}</span>
-        <select name="shape" defaultValue="note" disabled={disabled}>
-          {OS_SHAPES.map((shape) => (
-            <option key={shape} value={shape}>{copy.shapes[shape]}</option>
+        <span>{copy.workflowLabel}</span>
+        <select name="workflowId" defaultValue={workflows[0]?.id} disabled={disabled}>
+          {workflows.map((workflow) => (
+            <option key={workflow.id} value={workflow.id}>
+              {workflow.name}{workflow.owner_user_id ? " · installed for you" : ""}
+            </option>
           ))}
         </select>
       </label>
@@ -60,7 +72,7 @@ export function OsRunForm({ copy, disabled }: { copy: OsDeskCopy; disabled: bool
         <Message state={state} copy={copy} />
       </div>
       <p className="mayda-note" style={{ margin: 0 }}>
-        {copy.creditsNote} Up to {OS_MAX_SOURCES} links.
+        {copy.creditsNote} {workflows[0]?.purpose ?? ""}
       </p>
     </form>
   );

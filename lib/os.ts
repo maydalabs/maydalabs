@@ -42,10 +42,18 @@ export function creditsLeft(granted: number, used: number): number {
   return Math.max(0, granted - used);
 }
 
-export const OS_SHAPE_BRIEF: Record<OsShape, string> = {
-  note: "a short internal note, 120 to 180 words, plain sentences, no headings",
-  post: "a LinkedIn post, 150 to 250 words, a first line that stands alone, short paragraphs",
-  summary: "a summary of what the sources say, 100 to 150 words, no opinion of your own",
+/* A workflow's instruction lives in the os_workflows row, not here: a
+ * different workflow per client is the whole point. */
+export type OsWorkflow = {
+  id: string;
+  key: string;
+  name: string;
+  purpose: string;
+  brief: string;
+  shape: OsShape;
+  destination: string | null;
+  max_sources: number;
+  owner_user_id: string | null;
 };
 
 /* http(s) only, and no credentials or fragments smuggled in. Shape only;

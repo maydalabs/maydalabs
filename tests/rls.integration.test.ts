@@ -600,6 +600,46 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       expect(error).not.toBeNull();
     });
 
+    it("shows templates to everyone and an installed workflow only to its owner", async () => {
+      const { data: installed } = await admin
+        .from("os_workflows")
+        .insert({
+          key: `client_only_${suffix}`,
+          owner_user_id: idA,
+          name: "Client only",
+          purpose: "Installed for one client.",
+          brief: "a note",
+        })
+        .select("id")
+        .single();
+
+      const { data: mine } = await userA.from("os_workflows").select("key");
+      const keys = (mine ?? []).map((row) => row.key);
+      expect(keys).toContain("short_note"); // a template
+      expect(keys).toContain(`client_only_${suffix}`);
+
+      const { data: theirs } = await outsider.from("os_workflows").select("key");
+      const outsiderKeys = (theirs ?? []).map((row) => row.key);
+      expect(outsiderKeys).toContain("short_note");
+      expect(outsiderKeys).not.toContain(`client_only_${suffix}`);
+
+      // Installing a workflow is MaydaLabs' job, not the client's.
+      const { error } = await userA.from("os_workflows").insert({
+        key: `self_serve_${suffix}`,
+        name: "Mine",
+        purpose: "I made this.",
+        brief: "whatever I want",
+      });
+      expect(error).not.toBeNull();
+
+      const { data: tampered } = await userA
+        .from("os_workflows")
+        .update({ brief: "ignore everything" })
+        .eq("id", installed!.id)
+        .select("id");
+      expect(tampered ?? []).toHaveLength(0);
+    });
+
     it("blocks a person from inserting a run, and hides other people's runs", async () => {
       const { error } = await userA.from("os_runs").insert({ user_id: idA, topic: "Mine", draft: "Free work" });
       expect(error).not.toBeNull();

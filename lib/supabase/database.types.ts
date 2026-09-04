@@ -216,6 +216,7 @@ export type Database = {
           topic: string
           updated_at: string
           user_id: string
+          workflow_id: string | null
         }
         Insert: {
           claims?: Json
@@ -240,6 +241,7 @@ export type Database = {
           topic: string
           updated_at?: string
           user_id: string
+          workflow_id?: string | null
         }
         Update: {
           claims?: Json
@@ -264,6 +266,60 @@ export type Database = {
           topic?: string
           updated_at?: string
           user_id?: string
+          workflow_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_runs_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "os_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      os_workflows: {
+        Row: {
+          active: boolean
+          brief: string
+          created_at: string
+          destination: string | null
+          id: string
+          key: string
+          max_sources: number
+          name: string
+          owner_user_id: string | null
+          purpose: string
+          shape: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          brief: string
+          created_at?: string
+          destination?: string | null
+          id?: string
+          key: string
+          max_sources?: number
+          name: string
+          owner_user_id?: string | null
+          purpose: string
+          shape?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          brief?: string
+          created_at?: string
+          destination?: string | null
+          id?: string
+          key?: string
+          max_sources?: number
+          name?: string
+          owner_user_id?: string | null
+          purpose?: string
+          shape?: string
+          updated_at?: string
         }
         Relationships: []
       }

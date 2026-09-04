@@ -8,15 +8,12 @@ import { draftFromSources } from "@/lib/osDraft";
 import { isOsAllowed } from "@/lib/osAccess";
 import { fetchSource, isFailure, type FetchedSource } from "@/lib/osSources";
 import {
-  OS_MAX_SOURCES,
   OS_MODEL,
   OS_EFFORT,
-  OS_SHAPES,
   OS_STARTING_CREDITS,
   OS_TOPIC_LIMIT,
   parseSourceUrls,
   runCostUsd,
-  type OsShape,
 } from "@/lib/os";
 
 /*
@@ -36,6 +33,7 @@ export type OsRunState = {
     | "no_credits"
     | "daily_cap"
     | "invalid"
+    | "no_workflow"
     | "no_sources"
     | "model_failed"
     | "save_failed";
@@ -58,15 +56,26 @@ export async function runOsDraftAction(_prev: OsRunState, formData: FormData): P
   const topic = String(formData.get("topic") ?? "").trim().slice(0, OS_TOPIC_LIMIT);
   if (!topic) return { status: "error", code: "invalid", message: "Give it a topic." };
 
-  const shapeRaw = String(formData.get("shape") ?? "note");
-  const shape: OsShape = (OS_SHAPES as readonly string[]).includes(shapeRaw) ? (shapeRaw as OsShape) : "note";
+  const workflowId = String(formData.get("workflowId") ?? "");
+  if (!/^[0-9a-f-]{36}$/.test(workflowId)) return { status: "error", code: "no_workflow" };
+
+  // Read the workflow through the caller's own client: row-level security
+  // decides whether it is a template or one installed for them.
+  const scoped = await createSupabaseServerClient();
+  const { data: workflow } = await scoped
+    .from("os_workflows")
+    .select("id, key, name, brief, shape, max_sources, active")
+    .eq("id", workflowId)
+    .maybeSingle();
+  if (!workflow || !workflow.active) return { status: "error", code: "no_workflow" };
 
   const { urls, rejected } = parseSourceUrls(String(formData.get("sources") ?? ""));
-  if (urls.length === 0) {
+  const allowed = urls.slice(0, workflow.max_sources);
+  if (allowed.length === 0) {
     return {
       status: "error",
       code: "no_sources",
-      message: rejected.length ? `Not a usable link: ${rejected[0]}` : `Add one to ${OS_MAX_SOURCES} links.`,
+      message: rejected.length ? `Not a usable link: ${rejected[0]}` : `Add one to ${workflow.max_sources} links.`,
     };
   }
 
@@ -102,19 +111,20 @@ export async function runOsDraftAction(_prev: OsRunState, formData: FormData): P
   const spentToday = (today ?? []).reduce((total, row) => total + Number(row.cost_usd ?? 0), 0);
   if (spentToday >= DAILY_USD_CAP) return { status: "error", code: "daily_cap" };
 
-  const fetched = await Promise.all(urls.map((url) => fetchSource(url)));
+  const fetched = await Promise.all(allowed.map((url) => fetchSource(url)));
   const sources = fetched.filter((item): item is FetchedSource => !isFailure(item));
   if (sources.length === 0) {
     const first = fetched.find(isFailure);
     return { status: "error", code: "no_sources", message: first ? `${first.url}: ${first.reason}` : "None of those links could be read." };
   }
 
-  const drafted = await draftFromSources(topic, shape, sources);
+  const drafted = await draftFromSources(topic, workflow.brief, sources);
   if ("error" in drafted) {
     // Nothing was produced, so nothing is charged.
     await admin.from("os_runs").insert({
       user_id: userId,
-      shape,
+      workflow_id: workflow.id,
+      shape: workflow.shape,
       topic,
       sources: sources.map((source) => ({ url: source.url, title: source.title, chars: source.chars })),
       status: "failed",
@@ -129,7 +139,8 @@ export async function runOsDraftAction(_prev: OsRunState, formData: FormData): P
   const cost = runCostUsd(drafted.inputTokens, drafted.outputTokens);
   const { error: insertError } = await admin.from("os_runs").insert({
     user_id: userId,
-    shape,
+    workflow_id: workflow.id,
+    shape: workflow.shape,
     topic,
     sources: sources.map((source) => ({ url: source.url, title: source.title, chars: source.chars })),
     status: "drafted",
@@ -230,4 +241,74 @@ export async function recordOsOutcomeAction(formData: FormData): Promise<void> {
 
   revalidatePath("/os/desk");
   revalidatePath("/os/record");
+}
+
+export type OsWorkflowFormState = {
+  status: "idle" | "saved" | "error";
+  code?: "not_authorized" | "invalid" | "save_failed" | "unknown_client";
+  field?: string;
+};
+
+/* Installing a workflow. This is the operator's core move: a named piece of
+ * work, its instruction, and who it belongs to. Leave the client email blank
+ * and it is a template everyone can run. */
+export async function saveOsWorkflowAction(
+  _prev: OsWorkflowFormState,
+  formData: FormData,
+): Promise<OsWorkflowFormState> {
+  if (!isSupabaseConfigured()) return { status: "error", code: "not_authorized" };
+  const claims = await getVerifiedClaims();
+  if (!claims?.sub) return { status: "error", code: "not_authorized" };
+
+  const supabase = await createSupabaseServerClient();
+  const { data: operator } = await supabase.from("operator_status").select("user_id").maybeSingle();
+  if (!operator) return { status: "error", code: "not_authorized" };
+
+  const key = String(formData.get("key") ?? "").trim().toLowerCase();
+  if (!/^[a-z0-9_]{3,60}$/.test(key)) return { status: "error", code: "invalid", field: "key" };
+
+  const name = String(formData.get("name") ?? "").trim().slice(0, 120);
+  const purpose = String(formData.get("purpose") ?? "").trim().slice(0, 300);
+  const brief = String(formData.get("brief") ?? "").trim().slice(0, 4000);
+  if (!name) return { status: "error", code: "invalid", field: "name" };
+  if (!purpose) return { status: "error", code: "invalid", field: "purpose" };
+  if (!brief) return { status: "error", code: "invalid", field: "brief" };
+
+  const shapeRaw = String(formData.get("shape") ?? "note");
+  const shape = ["note", "post", "summary"].includes(shapeRaw) ? shapeRaw : "note";
+  const destination = String(formData.get("destination") ?? "").trim().slice(0, 200) || null;
+  const maxSources = Math.min(5, Math.max(1, Number(formData.get("maxSources")) || 5));
+  const active = formData.get("active") === "on";
+
+  // Installed for one client, or a template for everyone.
+  const clientEmail = String(formData.get("clientEmail") ?? "").trim().toLowerCase();
+  let ownerUserId: string | null = null;
+  if (clientEmail) {
+    const admin = createSupabaseAdminClient();
+    if (!admin) return { status: "error", code: "save_failed" };
+    const { data: users } = await admin.auth.admin.listUsers({ page: 1, perPage: 200 });
+    const match = (users?.users ?? []).find((user) => user.email?.toLowerCase() === clientEmail);
+    if (!match) return { status: "error", code: "unknown_client", field: "clientEmail" };
+    ownerUserId = match.id;
+  }
+
+  const { error } = await supabase.from("os_workflows").upsert(
+    {
+      key,
+      owner_user_id: ownerUserId,
+      name,
+      purpose,
+      brief,
+      shape,
+      destination,
+      max_sources: maxSources,
+      active,
+    },
+    { onConflict: "key" },
+  );
+  if (error) return { status: "error", code: "save_failed" };
+
+  revalidatePath("/internal/os");
+  revalidatePath("/os/desk");
+  return { status: "saved" };
 }

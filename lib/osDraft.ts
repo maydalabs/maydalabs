@@ -9,7 +9,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
-import { OS_EFFORT, OS_MODEL, OS_SHAPE_BRIEF, type OsShape } from "@/lib/os";
+import { OS_EFFORT, OS_MODEL } from "@/lib/os";
 import type { FetchedSource } from "@/lib/osSources";
 
 const DraftSchema = z.object({
@@ -41,13 +41,13 @@ Binding rules:
 
 The claims array is what the reader checks before approving, so it must cover the substantive statements in the draft, in the order they appear.`;
 
-function buildUserMessage(topic: string, shape: OsShape, sources: FetchedSource[]): string {
+function buildUserMessage(topic: string, brief: string, sources: FetchedSource[]): string {
   const rendered = sources
     .map((source, index) => `<source index="${index + 1}" url="${source.url}" title="${source.title}">\n${source.text}\n</source>`)
     .join("\n\n");
   return `Topic: ${topic}
 
-Write ${OS_SHAPE_BRIEF[shape]}.
+Write ${brief}
 
 Sources:
 
@@ -71,7 +71,9 @@ export type DraftClient = {
 
 export async function draftFromSources(
   topic: string,
-  shape: OsShape,
+  /* The workflow's own instruction. This is what makes one workflow
+   * different from another, and it lives in a row rather than in here. */
+  brief: string,
   sources: FetchedSource[],
   injected?: DraftClient,
 ): Promise<OsDraft | { error: string }> {
@@ -85,7 +87,7 @@ export async function draftFromSources(
       max_tokens: 4000,
       system: SYSTEM,
       output_config: { effort: OS_EFFORT, format: zodOutputFormat(DraftSchema) },
-      messages: [{ role: "user", content: buildUserMessage(topic, shape, sources) }],
+      messages: [{ role: "user", content: buildUserMessage(topic, brief, sources) }],
     });
 
     // A refusal or a schema miss leaves parsed_output null; never pretend.

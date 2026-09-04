@@ -6,6 +6,7 @@ import { OS_EXAMPLE_LABEL, OS_EXAMPLE_NOTE, osExampleRun } from "@/components/os
 import { OsShell } from "@/components/os/OsShell";
 import { isOsConfigured } from "@/lib/osDraft";
 import { isOsAllowed } from "@/lib/osAccess";
+import type { OsWorkflow } from "@/lib/os";
 import { requireOsSession } from "@/lib/osSession";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 
@@ -19,6 +20,16 @@ export default async function OsDeskPage({ params }: LocalePageProps) {
   const copy = OS_DESK_COPY[locale];
   const { claims, supabase, credits } = await requireOsSession(locale, "desk");
   const allowed = isOsAllowed(claims.email);
+
+  // Templates plus anything installed for this person: row-level security
+  // decides which is which.
+  const { data: workflowRows } = await supabase
+    .from("os_workflows")
+    .select("id, key, name, purpose, brief, shape, destination, max_sources, owner_user_id")
+    .eq("active", true)
+    .order("owner_user_id", { ascending: false, nullsFirst: false })
+    .order("name");
+  const workflows = (workflowRows ?? []) as OsWorkflow[];
 
   const { data: runs } = await supabase
     .from("os_runs")
@@ -42,8 +53,10 @@ export default async function OsDeskPage({ params }: LocalePageProps) {
               The beta is invite-only while it finds its feet. Ask for a seat and you can run it here.
             </p>
           ) : (
-            credits.left > 0 ? (
-              <OsRunForm copy={copy} disabled={false} />
+            workflows.length === 0 ? (
+              <p className="mayda-body">No workflow is installed yet.</p>
+            ) : credits.left > 0 ? (
+              <OsRunForm copy={copy} disabled={false} workflows={workflows} />
             ) : (
               <p className="mayda-body">{copy.outOfHeading} {copy.outOfBody}</p>
             )
