@@ -19,6 +19,7 @@
 
 # production
 /build
+/.brand-build/
 
 # misc
 .DS_Store

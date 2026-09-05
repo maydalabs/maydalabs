@@ -1,0 +1,12 @@
+{
+  "name": "MaydaLabs Solid Gate", "version": "1.0.0", "approvedOn": "2026-09-05",
+  "sourceDirection": "C — Solid gate; exact approved exploration geometry",
+  "viewBox": "0 0 32 32",
+  "frame": "M9 2H23A7 7 0 0 1 30 9V23A7 7 0 0 1 23 30H9A7 7 0 0 1 2 23V9A7 7 0 0 1 9 2Z",
+  "inputs": "M7.5 11.5C10.5 11.5 10.5 16 13.5 16M7.5 20.5C10.5 20.5 10.5 16 13.5 16",
+  "gate": "M18 10V22", "dot": [24, 16, 1.75], "stroke": 2.5,
+  "gradient": { "x1": 3, "x2": 29 },
+  "colors": { "cobalt": "#4B6BFF", "mint": "#42F5B6", "void": "#0A0B0F", "frost": "#F4F7FA", "black": "#000000", "white": "#FFFFFF" },
+  "wordmark": { "text": "MaydaLabs", "font": "Bricolage Grotesque", "weight": 700, "opticalSize": 16.32, "width": 100, "trackingEm": -0.03, "multiplier": "×" },
+  "clearSpaceUnits": 4, "minimumMarkCssPixels": 16
+}
