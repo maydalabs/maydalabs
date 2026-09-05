@@ -1,7 +1,10 @@
 # MaydaLabs design direction review — 2026-09-05
 
-Status: planning and visual comparison. Neither concept is a selected final
-design or authorized production implementation. No deployment approval.
+Status: Mehmet selected **A — Connected flow** with "go with A" on September 5.
+The next isolated art/motion prototype is prepared for review; B is retained
+below as the historical alternative. Selection is not final copy/art approval,
+production implementation approval or deployment approval. See
+docs/connected-flow-prototype-2026-09-05.md for the refinement and checks.
 
 ## 1. What changed in the brief
 
@@ -55,7 +58,7 @@ do not revive old offers, Bitcoin-first positioning, pilot prices or public OS.
 
 ## 4. Two composition studies
 
-### A — Connected flow (recommended for review)
+### A — Connected flow (selected by Mehmet)
 
 Dark continuous hero with quiet input lines extending behind the left copy.
 Preparation becomes legible beside the copy, followed by one strong human
