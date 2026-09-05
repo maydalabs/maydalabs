@@ -4,6 +4,12 @@ Mehmet chose A with "go with A" after comparing A — Connected flow and
 B — Project chapters. This advances gate 2 of the design-direction brief:
 refine one direction in an isolated review surface, without changing the app.
 
+Later September 5 acceptance: after asking where to replay the illustration,
+Mehmet said "seems all good to me I like this direction". The refined A
+prototype is now the accepted visual reference for the next local integration.
+Do not ask him to choose A/B again or keep presenting this direction as rejected.
+This does not certify exact EN/TR/FR wording, production behavior or release.
+
 ## What is now implemented in the prototype
 
 - One measured-coordinate hero illustration: subtle inputs extend behind the
@@ -67,6 +73,7 @@ independent. No Abidin/private data is exposed. No commercial record, pricing,
 database, auth, environment, SG, deployment, push, account, message, spend or
 Monster-sync action is part of this work.
 
-Next: review the chosen direction's art/motion and exact copy, then integrate
-the accepted design into the existing app with its real navigation and EN/TR/FR.
-Do not interpret composition selection as approval to release it.
+Next: carry the accepted visual reference into the existing app, completing
+the exact-copy/EN/TR/FR pass, real navigation and responsive/accessibility
+checks. No app code changed in the acceptance-recording turn. Release approval
+is still separate; no push or deployment is authorized by liking the direction.

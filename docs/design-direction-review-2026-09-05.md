@@ -1,9 +1,11 @@
 # MaydaLabs design direction review — 2026-09-05
 
 Status: Mehmet selected **A — Connected flow** with "go with A" on September 5.
-The next isolated art/motion prototype is prepared for review; B is retained
-below as the historical alternative. Selection is not final copy/art approval,
-production implementation approval or deployment approval. See
+After the refined prototype and replay explanation, he said "seems all good
+to me I like this direction". A is the accepted visual reference; do not reopen
+the A/B choice. B is retained below as the historical alternative. Exact
+localized copy and production implementation still need their normal checks;
+this is not deployment approval. See
 docs/connected-flow-prototype-2026-09-05.md for the refinement and checks.
 
 ## 1. What changed in the brief
