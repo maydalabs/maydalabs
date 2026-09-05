@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { GateFigure } from "@/components/GateFigure";
 import { SignalField } from "@/components/SignalField";
 import { BitcoinDesk } from "@/components/BitcoinDesk";
 import { localizePath, SITE_DESCRIPTIONS } from "@/lib/i18n";
@@ -75,15 +76,18 @@ export default async function Home(props: LocalePageProps) {
     <div className="mayda-home">
       <section className="mayda-hero relative overflow-hidden">
         <SignalField />
-        <div className="mayda-shell relative z-10">
-          <p className="mayda-kicker">{copy.kicker}</p>
-          <h1 className="mayda-display" style={{ maxWidth: "19ch" }}>{copy.hero[0]}<br /><span className="mayda-multiply">{copy.hero[1]}</span></h1>
-          <p className="mayda-body mt-6" style={{ maxWidth: "43rem", fontSize: "clamp(1.1rem,2vw,1.35rem)" }}>{SITE_DESCRIPTIONS[locale]}</p>
-          <div className="mayda-hero-actions">
-            <Link href={localizePath("/contact", locale)} className="mayda-button">{services.cta} <span aria-hidden>→</span></Link>
-            <Link href={localizePath("/case-studies", locale)} className="mayda-button mayda-button-outline">{services.work}</Link>
+        <div className="mayda-shell mayda-hero-grid relative z-10">
+          <div>
+            <p className="mayda-kicker">{copy.kicker}</p>
+            <h1 className="mayda-display" style={{ maxWidth: "19ch" }}>{copy.hero[0]}<br /><span className="mayda-multiply">{copy.hero[1]}</span></h1>
+            <p className="mayda-body mt-6" style={{ maxWidth: "43rem", fontSize: "clamp(1.1rem,2vw,1.35rem)" }}>{SITE_DESCRIPTIONS[locale]}</p>
+            <div className="mayda-hero-actions">
+              <Link href={localizePath("/contact", locale)} className="mayda-button">{services.cta} <span aria-hidden>→</span></Link>
+              <Link href={localizePath("/case-studies", locale)} className="mayda-button mayda-button-outline">{services.work}</Link>
+            </div>
+            <p className="mayda-body mt-6">{copy.note}</p>
           </div>
-          <p className="mayda-body mt-6">{copy.note}</p>
+          <GateFigure />
         </div>
       </section>
 

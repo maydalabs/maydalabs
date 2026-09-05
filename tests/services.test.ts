@@ -31,6 +31,21 @@ describe("approved public services", () => {
     expect(home).not.toContain("<StackStrip");
   });
 
+  it("preserves the original animated hero beside the simpler service copy", () => {
+    const home = readFileSync("app/[lang]/page.tsx", "utf8");
+    const hero = home.slice(home.indexOf('<section className="mayda-hero'), home.indexOf("</section>"));
+    expect(hero).toContain("mayda-hero-grid");
+    expect(hero).toContain("<SignalField />");
+    expect(hero).toContain("<GateFigure />");
+    expect(hero.indexOf("<GateFigure />")).toBeGreaterThan(hero.indexOf("mayda-hero-actions"));
+    const figure = readFileSync("components/GateFigure.tsx", "utf8");
+    expect(figure).toContain('aria-hidden="true"');
+    expect(figure).toContain('className="field-pulse"');
+    const css = readFileSync("app/field.css", "utf8");
+    expect(css).toContain("animation: field-pulse-flow 5.2s linear infinite");
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.field-figure \.field-pulse\s*\{\s*display: none/);
+  });
+
   it("keeps old map keys readable without selling retired packages", () => {
     for (const locale of LOCALES) {
       expect(Object.keys(MAP_COPY[locale].offers)).toEqual(["multiplier_sprint", "build_partnership", "acceleration_partnership"]);

@@ -192,6 +192,31 @@ for (const [prefix, label] of [["", "Websites &amp; online stores"], ["/tr", "We
   });
 }
 
+for (const path of ["/", "/tr", "/fr"]) {
+  await check(`${path} retains the original hero animation`, async () => {
+    const html = await (await request(path)).text();
+    const hero = html.slice(html.indexOf('<section class="mayda-hero'), html.indexOf("</section>"));
+    assert(hero.includes("mayda-hero-grid"), "hero layout is missing");
+    assert(hero.includes("gate-figure") && hero.includes("field-pulse"), "original hero figure is missing");
+    assert(hero.includes("signal-field"), "background animation is missing");
+  });
+}
+
+await check("homepage stylesheet contains current services and animation rules", async () => {
+  const html = await (await request("/")).text();
+  const hrefs = [...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*>/g)]
+    .map(([tag]) => tag.match(/href="([^"]+)"/)?.[1]).filter(Boolean);
+  assert(hrefs.length > 0, "no stylesheet linked");
+  const styles = (await Promise.all(hrefs.map(async href => {
+    const response = await request(href.replaceAll("&amp;", "&"));
+    assert(response.status === 200, `stylesheet returned ${response.status}`);
+    return response.text();
+  }))).join("\n");
+  for (const rule of [".mayda-service-row", ".mayda-hero-grid", "field-pulse-flow", "prefers-reduced-motion"]) {
+    assert(styles.includes(rule), `missing current CSS rule: ${rule}`);
+  }
+});
+
 if (failures.length > 0) {
   console.error(`\n${failures.length} smoke check${failures.length === 1 ? "" : "s"} failed:`);
   for (const failure of failures) console.error(`- ${failure}`);
