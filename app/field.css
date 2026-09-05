@@ -1222,29 +1222,90 @@ fieldset.mayda-fieldset > p {
 
 .mayda-hero {
   position: relative;
-  padding-block: clamp(2.5rem, 5vw, 4.5rem) clamp(2.5rem, 5vw, 4rem);
+  isolation: isolate;
+  padding-block: clamp(3.5rem, 7vw, 6.5rem) clamp(3.75rem, 8vw, 7rem);
   overflow: hidden;
 }
 
-.mayda-hero-grid {
-  display: grid;
-  gap: 3rem;
-  align-items: center;
-  min-width: 0;
+.mayda-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.mayda-hero-copy {
+  max-width: 47rem;
+}
+
+.mayda-hero-copy .mayda-kicker {
+  margin-bottom: 1.5rem;
+  max-width: 100%;
+  line-height: 1.7;
 }
 
 .mayda-hero .mayda-display {
-  font-size: clamp(2.35rem, 4.3vw, 4.4rem);
+  font-size: clamp(2rem, 1.2rem + 3.7vw, 4.4rem);
+  line-height: 1.1;
+  overflow-wrap: break-word;
   text-wrap: balance;
 }
 
-.mayda-hero .mayda-lead { max-width: 36rem; }
-.mayda-hero .signal-field { opacity: 0.12; }
-.mayda-hero .gate-figure { min-width: 0; max-width: 100%; }
+.mayda-hero-intro {
+  max-width: 35rem;
+  margin: clamp(1.5rem, 3vw, 2rem) 0 0;
+  color: var(--mist);
+  font-size: clamp(1.05rem, 0.85rem + 0.5vw, 1.25rem);
+  line-height: 1.7;
+  text-wrap: pretty;
+}
 
-@media (min-width: 960px) {
-  .mayda-hero-grid {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+/* One continuous, decorative field. It never becomes a second content row. */
+.mayda-hero-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 76% 48%, rgb(75 107 255 / 0.09), transparent 56%),
+    radial-gradient(ellipse at 96% 66%, rgb(66 245 182 / 0.06), transparent 48%);
+  mask-image: linear-gradient(transparent, #000 16%, #000 78%, transparent);
+}
+
+.mayda-hero-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--background) 3%, transparent 88%);
+}
+
+.mayda-hero .signal-field {
+  display: block;
+  opacity: 0.7;
+}
+
+.mayda-hero .gate-figure {
+  position: absolute;
+  width: clamp(46rem, 70vw, 78rem);
+  max-width: none;
+  height: auto;
+  right: -5%;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.3;
+  mask-image: linear-gradient(90deg, transparent, #000 35%, #000 82%, transparent);
+}
+
+.mayda-hero .gate-label { display: none; }
+
+@media (max-width: 760px) {
+  .mayda-hero .gate-figure {
+    right: -20rem;
+    top: 58%;
+    opacity: 0.18;
+  }
+
+  .mayda-hero-art::after {
+    background: linear-gradient(90deg, var(--background), rgb(10 11 15 / 0.3));
   }
 }
 
@@ -1253,6 +1314,13 @@ fieldset.mayda-fieldset > p {
   flex-wrap: wrap;
   gap: 0.85rem;
   align-items: center;
+}
+
+.mayda-hero .mayda-hero-actions { margin-top: 2rem; }
+
+@media (max-width: 420px) {
+  .mayda-hero .mayda-hero-actions { align-items: stretch; flex-direction: column; }
+  .mayda-hero .mayda-hero-actions .mayda-button { width: 100%; }
 }
 
 .mayda-situations {

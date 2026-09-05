@@ -12,9 +12,9 @@ import { SERVICES, SERVICES_COPY } from "@/lib/services";
 const COPY = {
   en: {
     title: "Websites, software & automation",
-    kicker: "For founders and businesses ready for their next step",
-    hero: ["Build what’s next.", "Make business work better."],
-    note: "From a first idea to a better way of running an established business.",
+    kicker: "Websites, software & automation",
+    hero: ["Build what’s next.", "Make work simpler."],
+    intro: "We build websites and software, automate the busywork, and connect your tools—so your business can move forward.",
     workKicker: "Selected work", workHeading: "Real projects. Clear ownership.",
     work: [
       { title: "HodlStay", tag: "Client build · Live", text: "A booking platform with guest and host journeys, payment integrations and a full-stack rebuild.", image: "/work/hodlstay-2026-09-home.jpg", alt: "HodlStay booking platform homepage", slug: "hodlstay" },
@@ -29,9 +29,9 @@ const COPY = {
   },
   tr: {
     title: "Web siteleri, yazılım ve otomasyon",
-    kicker: "Bir sonraki adıma hazır girişimciler ve şirketler için",
-    hero: ["Sıradaki fikri hayata geçirin.", "İşinizi daha iyi çalıştırın."],
-    note: "İlk fikirden köklü bir şirketin daha verimli çalışmasına kadar.",
+    kicker: "Web siteleri, yazılım ve otomasyon",
+    hero: ["Fikrinizi hayata geçirin.", "İşinizi kolaylaştırın."],
+    intro: "Web siteleri ve yazılım geliştiriyor, tekrarlayan işleri otomatikleştiriyor, kullandığınız araçları birbirine bağlıyoruz. Siz işinizi büyütmeye odaklanın.",
     workKicker: "Seçili projeler", workHeading: "Gerçek projeler. Açık sahiplik.",
     work: [
       { title: "HodlStay", tag: "Müşteri projesi · Yayında", text: "Misafir ve ev sahibi akışları, ödeme entegrasyonları ve uçtan uca yeniden geliştirmeyle bir rezervasyon platformu.", image: "/work/hodlstay-2026-09-home.jpg", alt: "HodlStay rezervasyon platformu ana sayfası", slug: "hodlstay" },
@@ -46,9 +46,9 @@ const COPY = {
   },
   fr: {
     title: "Sites web, logiciels & automatisation",
-    kicker: "Pour les fondateurs et entreprises prêts à avancer",
-    hero: ["Construisez la suite.", "Faites mieux fonctionner votre entreprise."],
-    note: "D’une première idée à une meilleure façon de gérer une entreprise établie.",
+    kicker: "Sites web, logiciels & automatisation",
+    hero: ["Donnez vie à vos idées.", "Simplifiez votre activité."],
+    intro: "Nous créons vos sites et logiciels, automatisons les tâches répétitives et connectons vos outils. Pour faire avancer votre entreprise.",
     workKicker: "Projets sélectionnés", workHeading: "Des projets réels. Des rôles clairs.",
     work: [
       { title: "HodlStay", tag: "Projet client · En ligne", text: "Une plateforme de réservation avec parcours voyageurs et hôtes, intégrations de paiement et refonte complète.", image: "/work/hodlstay-2026-09-home.jpg", alt: "Page d’accueil de la plateforme HodlStay", slug: "hodlstay" },
@@ -74,20 +74,21 @@ export default async function Home(props: LocalePageProps) {
   const services = SERVICES_COPY[locale];
   return (
     <div className="mayda-home">
-      <section className="mayda-hero relative overflow-hidden">
-        <SignalField />
-        <div className="mayda-shell mayda-hero-grid relative z-10">
-          <div>
+      <section className="mayda-hero">
+        <div className="mayda-hero-art" aria-hidden="true">
+          <SignalField />
+          <GateFigure />
+        </div>
+        <div className="mayda-shell mayda-hero-content">
+          <div className="mayda-hero-copy">
             <p className="mayda-kicker">{copy.kicker}</p>
-            <h1 className="mayda-display" style={{ maxWidth: "19ch" }}>{copy.hero[0]}<br /><span className="mayda-multiply">{copy.hero[1]}</span></h1>
-            <p className="mayda-body mt-6" style={{ maxWidth: "43rem", fontSize: "clamp(1.1rem,2vw,1.35rem)" }}>{SITE_DESCRIPTIONS[locale]}</p>
+            <h1 className="mayda-display">{copy.hero[0]}<br /><span className="mayda-multiply">{copy.hero[1]}</span></h1>
+            <p className="mayda-hero-intro">{copy.intro}</p>
             <div className="mayda-hero-actions">
               <Link href={localizePath("/contact", locale)} className="mayda-button">{services.cta} <span aria-hidden>→</span></Link>
               <Link href={localizePath("/case-studies", locale)} className="mayda-button mayda-button-outline">{services.work}</Link>
             </div>
-            <p className="mayda-body mt-6">{copy.note}</p>
           </div>
-          <GateFigure />
         </div>
       </section>
 

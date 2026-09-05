@@ -31,19 +31,25 @@ describe("approved public services", () => {
     expect(home).not.toContain("<StackStrip");
   });
 
-  it("preserves the original animated hero beside the simpler service copy", () => {
+  it("weaves the animation into the hero background instead of a second content row", () => {
     const home = readFileSync("app/[lang]/page.tsx", "utf8");
     const hero = home.slice(home.indexOf('<section className="mayda-hero'), home.indexOf("</section>"));
-    expect(hero).toContain("mayda-hero-grid");
+    expect(hero).toContain('className="mayda-hero-art" aria-hidden="true"');
+    expect(hero).toContain("mayda-hero-copy");
+    expect(hero).not.toContain("mayda-hero-grid");
     expect(hero).toContain("<SignalField />");
     expect(hero).toContain("<GateFigure />");
-    expect(hero.indexOf("<GateFigure />")).toBeGreaterThan(hero.indexOf("mayda-hero-actions"));
+    expect(hero.indexOf("<GateFigure />")).toBeLessThan(hero.indexOf("mayda-hero-content"));
     const figure = readFileSync("components/GateFigure.tsx", "utf8");
     expect(figure).toContain('aria-hidden="true"');
     expect(figure).toContain('className="field-pulse"');
     const css = readFileSync("app/field.css", "utf8");
     expect(css).toContain("animation: field-pulse-flow 5.2s linear infinite");
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.field-figure \.field-pulse\s*\{\s*display: none/);
+    expect(css).toMatch(/\.mayda-hero-art\s*\{\s*position: absolute/);
+    expect(css).toMatch(/\.mayda-hero \.mayda-hero-actions\s*\{\s*margin-top: 2rem/);
+    expect(css).toContain("mask-image: linear-gradient");
+    expect(readFileSync("app/brand.css", "utf8")).not.toMatch(/\.signal-field\s*\{\s*display: none/);
   });
 
   it("keeps old map keys readable without selling retired packages", () => {

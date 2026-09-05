@@ -193,10 +193,11 @@ for (const [prefix, label] of [["", "Websites &amp; online stores"], ["/tr", "We
 }
 
 for (const path of ["/", "/tr", "/fr"]) {
-  await check(`${path} retains the original hero animation`, async () => {
+  await check(`${path} retains the animation as an atmospheric hero background`, async () => {
     const html = await (await request(path)).text();
     const hero = html.slice(html.indexOf('<section class="mayda-hero'), html.indexOf("</section>"));
-    assert(hero.includes("mayda-hero-grid"), "hero layout is missing");
+    assert(hero.includes("mayda-hero-art") && hero.includes("mayda-hero-copy"), "ambient hero layout is missing");
+    assert(!hero.includes("mayda-hero-grid"), "old two-column diagram layout returned");
     assert(hero.includes("gate-figure") && hero.includes("field-pulse"), "original hero figure is missing");
     assert(hero.includes("signal-field"), "background animation is missing");
   });
@@ -212,7 +213,7 @@ await check("homepage stylesheet contains current services and animation rules",
     assert(response.status === 200, `stylesheet returned ${response.status}`);
     return response.text();
   }))).join("\n");
-  for (const rule of [".mayda-service-row", ".mayda-hero-grid", "field-pulse-flow", "prefers-reduced-motion"]) {
+  for (const rule of [".mayda-service-row", ".mayda-hero-art", ".mayda-hero-intro", "field-pulse-flow", "prefers-reduced-motion"]) {
     assert(styles.includes(rule), `missing current CSS rule: ${rule}`);
   }
 });

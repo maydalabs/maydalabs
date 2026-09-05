@@ -659,8 +659,4 @@ a.mayda-card.mayda-card-lift:hover {
   .payments-flow .pf-btc path { stroke: var(--btc); }
 }
 
-/* The signal field needs the gate figure to land on; below the hero's
-   two-column breakpoint the figure is hidden, so the field goes too. */
-@media (max-width: 959px) {
-  .signal-field { display: none; }
-}
+/* Responsive hero field composition lives with the hero in field.css. */
