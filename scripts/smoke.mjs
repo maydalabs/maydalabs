@@ -3,6 +3,7 @@ const canonicalUrl = (process.env.SMOKE_CANONICAL_URL || "https://maydalabs.com"
 const baseHostname = new URL(baseUrl).hostname;
 const isLocalBase = baseHostname === "localhost" || baseHostname === "127.0.0.1";
 const failures = [];
+const serviceSlugs = ["websites-and-ecommerce", "custom-software", "ai-and-automation", "email-and-customer-journeys", "fixes-and-support"];
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -136,7 +137,7 @@ await check("robots and sitemap expose the public routes", async () => {
   assert(sitemapResponse.status === 200, `sitemap returned ${sitemapResponse.status}`);
   const [robots, sitemap] = await Promise.all([robotsResponse.text(), sitemapResponse.text()]);
   assert(robots.includes(`${canonicalUrl}/sitemap.xml`), "robots does not reference the sitemap");
-  for (const path of ["/tr", "/fr", "/case-studies/hodlstay", "/case-studies/sofra"]) {
+  for (const path of ["/tr", "/fr", "/case-studies/hodlstay", "/case-studies/sofra", ...["", "/tr", "/fr"].flatMap(prefix => serviceSlugs.map(slug => `${prefix}/services/${slug}`))]) {
     assert(sitemap.includes(`${canonicalUrl}${path}`), `sitemap is missing ${path}`);
   }
 });
@@ -193,18 +194,50 @@ for (const [prefix, label] of [["", "Websites &amp; online stores"], ["/tr", "We
 }
 
 for (const path of ["/", "/tr", "/fr"]) {
-  await check(`${path} serves the Connected flow and native service examples`, async () => {
+  await check(`${path} preserves the hero without replay chrome and exposes all services`, async () => {
     const html = await (await request(path)).text();
     const hero = html.slice(html.indexOf('<section class="mc-hero'), html.indexOf("</section>"));
     assert(hero.includes("mc-flow") && hero.includes("mc-copy"), "Connected flow layout is missing");
     assert(hero.includes('data-stage="settled"'), "complete static diagram is not server-rendered");
-    for (const part of ["mc-prepared", "mc-approval", "mc-output-base", "mc-replay"]) {
+    for (const part of ["mc-prepared", "mc-approval", "mc-output-base"]) {
       assert(hero.includes(part), `missing hero part: ${part}`);
     }
-    for (const id of ["build", "connect", "improve"]) {
-      assert(html.includes(`id="service-${id}"`) && html.includes(`id="example-${id}"`), `missing native example ${id}`);
+    assert(!hero.includes("mc-replay") && !hero.includes("mc-motion-footer"), "unwanted replay/caption chrome remains");
+    for (const slug of serviceSlugs) {
+      assert(html.includes(`href="${path === "/" ? "" : path}/services/${slug}"`), `missing direct service link ${slug}`);
     }
-    assert(html.includes('type="radio"'), "service selection requires JavaScript");
+    assert((html.match(/class="svc-card svc-card-/g) || []).length === 5, "all five service cards must be server-rendered");
+  });
+}
+
+for (const prefix of ["", "/tr", "/fr"]) {
+  const titles = new Set();
+  for (const slug of serviceSlugs) {
+    const path = `${prefix}/services/${slug}`;
+    await check(`${path} has unique metadata, scope, proof and enquiry path`, async () => {
+      const response = await request(path);
+      assert(response.status === 200, `expected 200, received ${response.status}`);
+      const html = await response.text();
+      const title = html.match(/<title>(.*?)<\/title>/)?.[1];
+      assert(title && !titles.has(title), "missing or duplicate service title");
+      titles.add(title);
+      assert((html.match(/<h1[ >]/g) || []).length === 1, "expected one service headline");
+      assert(html.includes(`rel="canonical" href="${canonicalUrl}${path}"`), "wrong canonical service URL");
+      for (const locale of ["tr", "fr"]) assert(html.includes(`hrefLang="${locale}" href="${canonicalUrl}/${locale}/services/${slug}"`), "missing translated service alternate");
+      assert((html.match(/class="svc-scope-item"/g) || []).length === 3, "missing scoped deliverables");
+      assert((html.match(/<details>/g) || []).length === 4, "missing native FAQ answers");
+      assert(html.includes(`href="${prefix}/contact"`), "missing direct enquiry path");
+      assert(html.includes(`href="${prefix}/services"`), "missing overview return path");
+      assert(html.includes('class="svc-related-links"'), "missing related service discovery");
+      assert(!/href="\/(?:tr\/|fr\/)?os(?:\/|")/.test(html), "public beta invitation exposed");
+      if (slug === "email-and-customer-journeys") {
+        const proof = html.slice(html.indexOf('class="svc-proof"'), html.indexOf('class="svc-faq"'));
+        assert(!proof.includes("HodlStay") && !proof.includes("Satoshi Gazette"), "email service borrowed unrelated client proof");
+      }
+    });
+  }
+  await check(`${prefix}/services/unknown-service returns 404`, async () => {
+    assert((await request(`${prefix}/services/unknown-service`)).status === 404, "unknown service is not a 404");
   });
 }
 
@@ -218,7 +251,7 @@ await check("homepage stylesheet contains current services and animation rules",
     assert(response.status === 200, `stylesheet returned ${response.status}`);
     return response.text();
   }))).join("\n");
-  for (const rule of [".mc-choice", ".mc-approval", ".mc-lead", "mc-incoming", "prefers-reduced-motion", ":has("]) {
+  for (const rule of [".svc-card", ".svc-card-link:focus-visible", ".mc-approval", ".mc-lead", "mc-incoming", "prefers-reduced-motion"]) {
     assert(styles.includes(rule), `missing current CSS rule: ${rule}`);
   }
 });

@@ -10,9 +10,8 @@ export function ConnectedFlow({ copy }: { copy: FlowCopy }) {
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
-    const replay = root.querySelector<HTMLButtonElement>("button");
     const scene = root.querySelector(".mc-scene");
-    if (!replay || !scene) return;
+    if (!scene) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     let timers: ReturnType<typeof setTimeout>[] = [];
     let played = false;
@@ -25,7 +24,7 @@ export function ConnectedFlow({ copy }: { copy: FlowCopy }) {
     function play() {
       settle();
       if (reduced.matches || document.hidden) return;
-      // Restart finite CSS keyframes without remounting content or moving focus.
+      // Start one finite sequence without remounting the hero content.
       void root!.offsetWidth;
       root!.dataset.running = "true";
       root!.dataset.stage = "gather";
@@ -40,15 +39,12 @@ export function ConnectedFlow({ copy }: { copy: FlowCopy }) {
     }, { threshold: [0, .45] });
     const onVisibility = () => { if (document.hidden) settle(); };
     observer.observe(scene);
-    replay.addEventListener("click", play);
     reduced.addEventListener("change", settle);
     document.addEventListener("visibilitychange", onVisibility);
-    root.dataset.enhanced = "true";
     return () => {
-      settle(); observer.disconnect(); replay.removeEventListener("click", play);
+      settle(); observer.disconnect();
       reduced.removeEventListener("change", settle);
       document.removeEventListener("visibilitychange", onVisibility);
-      delete root.dataset.enhanced;
     };
   }, []);
 
@@ -84,6 +80,5 @@ export function ConnectedFlow({ copy }: { copy: FlowCopy }) {
         <div className="mc-out mc-out-three"><div className="mc-mini-journey"><i/><i/><i/></div><div className="mc-out-name">{copy.outputs[2]}</div></div>
       </div>
     </div>
-    <div className="mc-motion-footer"><span>{copy.label}</span><button type="button" className="mc-replay"><span aria-hidden="true">↻ </span>{copy.replay}</button></div>
   </div>;
 }

@@ -50,18 +50,18 @@ describe("Connected flow production contract", () => {
     const css = readFileSync("app/connected-flow.css", "utf8");
     expect(css).not.toMatch(/infinite/);
     expect(css).toContain("prefers-reduced-motion:reduce");
-    expect(css).toContain('.mc-replay { display:none;');
+    expect(component).not.toContain("mc-replay");
+    expect(component).not.toContain("mc-motion-footer");
+    expect(component).not.toContain("copy.caption");
     expect(css).toContain("mc-rails-mobile");
   });
 
-  it("keeps service selection native and server rendered", () => {
-    const component = readFileSync("components/ServiceStories.tsx", "utf8");
+  it("makes every service a direct server-rendered link", () => {
+    const component = readFileSync("components/ServiceGallery.tsx", "utf8");
     expect(component).not.toContain('"use client"');
-    expect(component).toContain("<fieldset");
-    expect(component).toContain('type="radio"');
-    expect(component).toContain("defaultChecked={index === 0}");
-    expect(component).toContain("aria-controls=");
-    expect(component).toContain('localizePath(`/services#${id}`, locale)');
-    expect(readFileSync("app/connected-flow.css", "utf8")).toContain(":focus-visible + .mc-choice");
+    expect(component).not.toContain('type="radio"');
+    expect(component).toContain("SERVICES[locale].map");
+    expect(component).toContain("servicePath(service.id)");
+    expect(readFileSync("app/services.css", "utf8")).toContain(".svc-card-link:focus-visible");
   });
 });

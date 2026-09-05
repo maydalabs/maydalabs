@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ConnectedFlow } from "@/components/ConnectedFlow";
-import { ServiceStories } from "@/components/ServiceStories";
+import { ServiceGallery } from "@/components/ServiceGallery";
 import { CONNECTED_COPY } from "@/lib/connectedFlow";
 import "../connected-flow.css";
 import { BitcoinDesk } from "@/components/BitcoinDesk";
@@ -84,7 +84,7 @@ export default async function Home(props: LocalePageProps) {
         </div>
       </section>
 
-      <ServiceStories locale={locale} />
+      <ServiceGallery locale={locale} />
 
       <section id="selected-work" className="mayda-section">
         <div className="mayda-shell mayda-stack-lg">

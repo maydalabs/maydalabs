@@ -25,9 +25,9 @@ describe("approved public services", () => {
     const dashboard = home.indexOf('id="bitcoin-dashboard"');
     expect(dashboard).toBeGreaterThan(home.indexOf('id="how-we-work"'));
     expect(home.indexOf('id="how-we-work"')).toBeGreaterThan(home.indexOf('id="selected-work"'));
-    const serviceStories = home.indexOf("<ServiceStories");
-    expect(serviceStories).toBeGreaterThan(0);
-    expect(home.indexOf('id="selected-work"')).toBeGreaterThan(serviceStories);
+    const serviceGallery = home.indexOf("<ServiceGallery");
+    expect(serviceGallery).toBeGreaterThan(0);
+    expect(home.indexOf('id="selected-work"')).toBeGreaterThan(serviceGallery);
     expect(home).toContain("<BitcoinDesk locale={locale}");
     expect(home).not.toContain("<PaymentsFlow");
     expect(home).not.toContain("<StackStrip");

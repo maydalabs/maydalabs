@@ -1,12 +1,15 @@
 import type { MetadataRoute } from "next";
 import { LOCALES, getLocalizedUrls, localizePath } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
+import { SERVICE_IDS } from "@/lib/services";
+import { servicePath } from "@/lib/servicePages";
 
 const ROUTES = [
   "",
   "/proof",
   "/start",
   "/services",
+  ...SERVICE_IDS.map(servicePath),
   "/about",
   "/profile",
   "/contact",
