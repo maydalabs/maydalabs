@@ -34,9 +34,6 @@ const routes = [
   "/fr",
   "/start",
   "/proof",
-  "/os",
-  "/tr/os",
-  "/fr/os",
   "/approach",
   "/about",
   "/profile",
@@ -104,19 +101,21 @@ await check("localized routes do not set a language-preference cookie", async ()
   assert(!cookie.includes("maydalabs_locale"), "legacy language-preference cookie is still present");
 });
 
-await check("MaydaOS is a localized, indexable product page", async () => {
-  const [english, turkish, french] = await Promise.all([
-    request("/os").then((response) => response.text()),
-    request("/tr/os").then((response) => response.text()),
-    request("/fr/os").then((response) => response.text()),
-  ]);
-  assert(english.includes("<title>MaydaOS · MaydaLabs</title>"), "unexpected MaydaOS title");
-  // It used to be a noindex lab. It describes a real product now.
-  assert(english.includes('name="robots" content="index, follow"'), "MaydaOS should be indexable");
-  assert(english.includes("for the work you repeat."), "MaydaOS heading is missing");
-  assert(english.includes("The MaydaOS desk:"), "the desk screenshot is missing");
-  assert(turkish.includes("bir işletim sistemi."), "Turkish MaydaOS copy is missing");
-  assert(french.includes("pour le travail qui revient."), "French MaydaOS copy is missing");
+for (const prefix of ["", "/en", "/tr", "/fr"]) {
+  for (const route of ["", "/desk", "/record", "/record/00000000-0000-4000-8000-000000000000", "/pilot", "/account", "/terminal"]) {
+    await check(`${prefix}/os${route} does not expose beta content`, async () => {
+      const response = await request(`${prefix}/os${route}`);
+      const html = await response.text();
+      assert([200, 404].includes(response.status), `unexpected status ${response.status}`);
+      assert(html.includes('name="robots" content="noindex'), "missing noindex");
+      assert(!html.includes('data-mayda-os="live"'), "workspace exposed");
+      assert(!html.includes("Open the desk"), "public beta invitation exposed");
+    });
+  }
+}
+await check("public home does not link into MaydaOS", async () => {
+  const html = await (await request("/")).text();
+  assert(!/href="\/(?:en\/|tr\/|fr\/)?os(?:\/|")/.test(html), "public OS link remains");
 });
 
 await check("robots and sitemap expose the public routes", async () => {
@@ -130,9 +129,11 @@ await check("robots and sitemap expose the public routes", async () => {
   }
 });
 
-await check("sitemap carries the MaydaOS page and none of its private apps", async () => {
+await check("sitemap excludes the entire MaydaOS beta", async () => {
   const sitemap = await (await request("/sitemap.xml")).text();
-  assert(sitemap.includes(`${canonicalUrl}/os<`), "the MaydaOS page is missing from the sitemap");
+  for (const prefix of ["", "/en", "/tr", "/fr"]) {
+    assert(!sitemap.includes(`${canonicalUrl}${prefix}/os<`), "MaydaOS leaked into the sitemap");
+  }
   for (const app of ["desk", "record", "pilot", "account", "terminal"]) {
     assert(!sitemap.includes(`${canonicalUrl}/os/${app}`), `private OS app ${app} leaked into the sitemap`);
   }

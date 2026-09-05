@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { GateFigure } from "@/components/GateFigure";
@@ -331,7 +332,6 @@ export default async function HomePage({ params }: LocalePageProps) {
         </div>
       </section>
 
-      <BitcoinDesk locale={locale} />
 
 
       <section className="mayda-section">
@@ -398,7 +398,7 @@ export default async function HomePage({ params }: LocalePageProps) {
                     sizes="(max-width: 1024px) 100vw, 54vw"
                   />
                 </figure>
-                <SgLatest locale={locale} />
+                <Suspense fallback={null}><SgLatest locale={locale} /></Suspense>
               </div>
             </div>
           </div>
@@ -486,6 +486,8 @@ export default async function HomePage({ params }: LocalePageProps) {
           </div>
         </div>
       </section>
+
+      <Suspense fallback={null}><BitcoinDesk locale={locale} /></Suspense>
 
       <StackStrip locale={locale} kicker={STACK_KICKER[locale]} />
 

@@ -506,10 +506,13 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
   describe("MaydaOS beta (credits and runs are not self-serve)", () => {
     const emailOutsider = `rls-user-os-${suffix}@example.com`;
     let outsider: Db;
+    let outsiderId: string;
     let runId: string;
 
     beforeAll(async () => {
-      await admin.auth.admin.createUser({ email: emailOutsider, password, email_confirm: true });
+      const created = await admin.auth.admin.createUser({ email: emailOutsider, password, email_confirm: true });
+      outsiderId = created.data.user!.id;
+      runSql(`insert into internal.os_beta_members (user_id) values ('${idA}');`);
       outsider = createClient<Database>(url!, publishableKey!, {
         auth: { persistSession: false, autoRefreshToken: false },
       });
@@ -532,6 +535,55 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         .select("id")
         .single();
       runId = run!.id;
+    });
+
+    afterAll(async () => {
+      if (outsiderId) await admin.auth.admin.deleteUser(outsiderId);
+      await admin.from("os_workflows").delete().eq("key", `operator_made_${suffix}`);
+    });
+
+    it("shows live membership only to members and operators", async () => {
+      expect((await userA.from("os_beta_status").select("*")).data).toEqual([{ user_id: idA }]);
+      expect((await userB.from("os_beta_status").select("*")).data).toEqual([{ user_id: idB }]);
+      expect((await outsider.from("os_beta_status").select("*")).data).toEqual([]);
+      const anon = anonClient();
+      expect((await anon.from("os_beta_status").select("*")).error).not.toBeNull();
+    });
+
+    it("denies a nonmember even their own historical beta data", async () => {
+      await admin.from("os_credits").insert({ user_id: outsiderId });
+      const { data: historical } = await admin.from("os_runs").insert({ user_id: outsiderId, topic: "Historical" }).select("id").single();
+      for (const table of ["os_credits", "os_runs", "os_workflows"] as const) {
+        const result = await outsider.from(table).select("*");
+        expect(result.error).toBeNull();
+        expect(result.data).toEqual([]);
+      }
+      const result = await outsider.from("os_runs").update({ decision: "approved" }).eq("id", historical!.id).select("id");
+      expect(result.data).toEqual([]);
+      expect((await admin.from("os_runs").select("decision").eq("id", historical!.id).single()).data?.decision).toBe("pending");
+    });
+
+    it("does not let account metadata or a writable view grant membership", async () => {
+      await outsider.auth.updateUser({ data: { os_beta: true, role: "operator" } });
+      expect((await outsider.from("os_beta_status").select("*")).data).toEqual([]);
+      // The generated type correctly forbids writes to the UNION view; probe
+      // a malicious direct API caller past that compile-time boundary too.
+      // @ts-expect-error deliberately attempt a prohibited write
+      expect((await outsider.from("os_beta_status").insert({ user_id: outsiderId })).error).not.toBeNull();
+    });
+
+    it("revokes access immediately without replacing the signed-in session", async () => {
+      runSql(`delete from internal.os_beta_members where user_id = '${idA}';`);
+      try {
+        expect((await userA.from("os_beta_status").select("*")).data).toEqual([]);
+        expect((await userA.from("os_runs").select("*")).data).toEqual([]);
+        expect((await userA.from("os_credits").select("*")).data).toEqual([]);
+        expect((await userA.from("os_workflows").select("*")).data).toEqual([]);
+        const result = await userA.from("os_runs").update({ decision: "rejected" }).eq("id", runId).select("id");
+        expect(result.data).toEqual([]);
+      } finally {
+        runSql(`insert into internal.os_beta_members (user_id) values ('${idA}');`);
+      }
     });
 
     it("shows a person their own balance and hides everyone else's", async () => {
@@ -600,7 +652,7 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       expect(error).not.toBeNull();
     });
 
-    it("shows templates to everyone and an installed workflow only to its owner", async () => {
+    it("shows templates only to beta members and an installed workflow only to its owner", async () => {
       const { data: installed } = await admin
         .from("os_workflows")
         .insert({
@@ -620,7 +672,7 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
 
       const { data: theirs } = await outsider.from("os_workflows").select("key");
       const outsiderKeys = (theirs ?? []).map((row) => row.key);
-      expect(outsiderKeys).toContain("short_note");
+      expect(outsiderKeys).toEqual([]);
       expect(outsiderKeys).not.toContain(`client_only_${suffix}`);
 
       // An operator can install one. Without this the negative cases below

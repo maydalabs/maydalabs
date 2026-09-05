@@ -5,7 +5,6 @@ import { OS_DESK_COPY } from "@/components/osCopy";
 import { OS_EXAMPLE_LABEL, OS_EXAMPLE_NOTE, osExampleRun } from "@/components/osExample";
 import { OsShell } from "@/components/os/OsShell";
 import { isOsConfigured } from "@/lib/osDraft";
-import { isOsAllowed } from "@/lib/osAccess";
 import { toOsWorkflows } from "@/lib/os";
 import { requireOsSession } from "@/lib/osSession";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
@@ -18,8 +17,7 @@ export const metadata: Metadata = {
 export default async function OsDeskPage({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
   const copy = OS_DESK_COPY[locale];
-  const { claims, supabase, credits } = await requireOsSession(locale, "desk");
-  const allowed = isOsAllowed(claims.email);
+  const { claims, supabase, credits } = await requireOsSession();
 
   // Templates plus anything installed for this person: row-level security
   // decides which is which.
@@ -34,6 +32,7 @@ export default async function OsDeskPage({ params }: LocalePageProps) {
   const { data: runs } = await supabase
     .from("os_runs")
     .select("id, shape, topic, sources, status, draft, claims, decision, decision_note, published_url, error, created_at")
+    .eq("user_id", claims.sub)
     .order("created_at", { ascending: false })
     .limit(20);
 
@@ -48,10 +47,6 @@ export default async function OsDeskPage({ params }: LocalePageProps) {
           <h2 className="mayda-subheading" style={{ margin: 0 }}>{copy.heading}</h2>
           {!isOsConfigured() ? (
             <p className="mayda-body">The beta is not open yet. Nothing here will run.</p>
-          ) : !allowed ? (
-            <p className="mayda-body">
-              The beta is invite-only while it finds its feet. Ask for a seat and you can run it here.
-            </p>
           ) : (
             workflows.length === 0 ? (
               <p className="mayda-body">No workflow is installed yet.</p>

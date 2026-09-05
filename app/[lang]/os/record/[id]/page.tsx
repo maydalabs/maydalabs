@@ -21,7 +21,7 @@ export default async function OsRunPage({ params }: PageProps) {
   const locale = await getPageLocale(params);
   const { id } = await params;
   const copy = OS_DESK_COPY[locale];
-  const { supabase, credits } = await requireOsSession(locale, "record");
+  const { supabase, credits } = await requireOsSession();
 
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
 

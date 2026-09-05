@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../field.css";
 import "../brand.css";
 import { SiteChromeFooter, SiteChromeHeader } from "@/components/SiteChrome";
+import { SiteFooter } from "@/components/SiteFooter";
 import { GoogleTagManager } from "@/components/GoogleTagManager";
 import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { SITE_URL } from "@/lib/site";
@@ -164,7 +165,7 @@ export default async function RootLayout({
         />
         <SiteChromeHeader locale={lang} />
         <main className="min-h-screen">{children}</main>
-        <SiteChromeFooter locale={lang} />
+        <SiteChromeFooter><SiteFooter locale={lang} /></SiteChromeFooter>
         {hasVercelRuntime ? (
           <>
             <Analytics />

@@ -39,7 +39,7 @@ export default async function OsRecordPage({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
   const copy = COPY[locale];
   const deskCopy = OS_DESK_COPY[locale];
-  const { supabase, credits } = await requireOsSession(locale, "record");
+  const { supabase, credits } = await requireOsSession();
 
   const { data: runs } = await supabase
     .from("os_runs")

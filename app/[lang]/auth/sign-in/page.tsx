@@ -97,7 +97,7 @@ const COPY = {
 
 export async function generateMetadata({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
-  return createPageMetadata({ ...COPY[locale].meta, path: "/auth/sign-in", locale, socialCard: "auth" });
+  return { ...createPageMetadata({ ...COPY[locale].meta, path: "/auth/sign-in", locale, socialCard: "auth" }), robots: { index: false, follow: false } };
 }
 
 export default async function SignInPage({
@@ -113,7 +113,7 @@ export default async function SignInPage({
   const nextPath =
     typeof query.next === "string" && query.next.startsWith("/") && !query.next.startsWith("//")
       ? query.next
-      : "/os/desk";
+      : "/portal";
 
   const claims = await getVerifiedClaims();
   // Already signed in: honour the deep link rather than dropping them on the portal.

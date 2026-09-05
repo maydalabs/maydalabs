@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function OsTerminalPage({ params }: LocalePageProps) {
   const locale = await getPageLocale(params);
-  const { claims, supabase, credits } = await requireOsSession(locale, "terminal");
+  const { claims, supabase, credits } = await requireOsSession();
 
   const { count } = await supabase.from("os_runs").select("id", { count: "exact", head: true });
 

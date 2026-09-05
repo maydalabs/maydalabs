@@ -4,6 +4,7 @@
  * Renders nothing if mempool.space is unreachable — a missing clock is
  * better than a wrong one.
  */
+import "server-only";
 import { BitcoinClockLive, type BitcoinClockLocale, type BitcoinClockVariant } from "./BitcoinClockLive";
 
 const TIP_HEIGHT_URL = "https://mempool.space/api/blocks/tip/height";
@@ -20,7 +21,7 @@ export async function BitcoinClock({
   let height: number | null = null;
 
   try {
-    const response = await fetch(TIP_HEIGHT_URL, { next: { revalidate: 120 } });
+    const response = await fetch(TIP_HEIGHT_URL, { next: { revalidate: 120 }, signal: AbortSignal.timeout(4000) });
     if (response.ok) {
       const parsed = Number.parseInt((await response.text()).trim(), 10);
       if (Number.isFinite(parsed) && parsed > 0) height = parsed;

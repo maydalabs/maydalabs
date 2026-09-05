@@ -1,20 +1,5 @@
-"use client";
-
-/*
- * Reveal-on-scroll wrapper: renders with class `reveal` and adds
- * `is-visible` once the element enters the viewport (IntersectionObserver,
- * fired once). The fade/rise lives in brand.css; under reduced motion the
- * CSS shows everything immediately with no transform.
- */
-import {
-  useEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type HTMLAttributes,
-  type ReactNode,
-  type Ref,
-} from "react";
+/* Static, server-rendered wrapper. Content never waits for a scroll observer. */
+import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 
 type RevealTag =
   | "div"
@@ -43,32 +28,6 @@ export function Reveal({
   className?: string;
   children?: ReactNode;
 } & HTMLAttributes<HTMLElement>) {
-  const ref = useRef<HTMLElement | null>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    if (typeof IntersectionObserver === "undefined") {
-      // No observer support: show immediately without a render cycle.
-      node.classList.add("is-visible");
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -6% 0px" },
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
-
   const mergedStyle: CSSProperties | undefined =
     delay > 0 ? { ...style, ["--reveal-delay" as string]: `${delay}ms` } : style;
 
@@ -78,8 +37,7 @@ export function Reveal({
   return (
     <Tag
       {...rest}
-      ref={ref as Ref<HTMLDivElement>}
-      className={`reveal ${visible ? "is-visible" : ""} ${className}`.replace(/\s+/g, " ").trim()}
+      className={`reveal is-visible ${className}`.trim()}
       style={mergedStyle}
     >
       {children}

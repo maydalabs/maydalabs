@@ -45,7 +45,9 @@ type Hashrate = { currentHashrate: number };
 type History = { prices: { time: number; USD: number }[] };
 
 async function loadDesk(): Promise<DeskData | null> {
-  const dayAgo = Math.floor(Date.now() / 1000) - 86_400;
+  // Bucket to 15 minutes to reuse the 15-minute data cache. A timestamp that
+  // changes every second creates a different cache key on every page request.
+  const dayAgo = Math.floor(Date.now() / 900_000) * 900 - 86_400;
   const [prices, height, blocks, fees, difficulty, hashrate, dayAgoPrice, history] = await Promise.all([
     getJson<Prices>("/v1/prices", 60),
     getNumber("/blocks/tip/height", 60),

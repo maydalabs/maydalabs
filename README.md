@@ -134,8 +134,13 @@ system bar, a dock, a window, and a status bar. What changed is underneath: the
 dock is made of links, so every app is its own address that can be deep-linked,
 bookmarked, and server-rendered, instead of tabs inside one client component.
 
-[The lab](https://maydalabs.com/os) is open to anyone and shows how the pieces
-connect. Behind sign-in, the same shell runs five apps — Desk, Record, Pilot,
+MaydaOS is a **private beta**, not a public signup destination. Existing
+operators and explicitly granted database members can use it after signing in;
+ordinary visitors and ordinary accounts cannot enter. The local September 5
+closure requires its migration and application release before production is
+closed too. See [access and rollout](docs/private-beta-2026-09-05.md).
+
+The same shell still runs five apps — Desk, Record, Pilot,
 Account, Terminal — and the Desk is the product rather than a picture of it: a
 person hands it links, the model produces the piece with every claim attached to
 the source it came from, and nothing leaves until they approve it. The Record
@@ -155,7 +160,7 @@ revising a draft are all deliberately unfinished.
 ```text
 app/[lang]/       Localized pages, metadata, and route composition
 app/[lang]/portal Authenticated client portal
-app/[lang]/os     MaydaOS: the public lab and the five signed-in apps
+app/[lang]/os     Private MaydaOS beta; verified membership on every page/action
 app/api/          Public telemetry endpoint
 components/       Interface, forms, diagrams, and case-study components
 lib/              Payments, Bitcoin address validation, Supabase clients,

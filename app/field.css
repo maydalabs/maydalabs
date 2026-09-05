@@ -1222,7 +1222,7 @@ fieldset.mayda-fieldset > p {
 
 .mayda-hero {
   position: relative;
-  padding-block: clamp(4.5rem, 11vw, 8.5rem) clamp(3.5rem, 8vw, 6rem);
+  padding-block: clamp(2.5rem, 5vw, 4.5rem) clamp(2.5rem, 5vw, 4rem);
   overflow: hidden;
 }
 
@@ -1230,7 +1230,17 @@ fieldset.mayda-fieldset > p {
   display: grid;
   gap: 3rem;
   align-items: center;
+  min-width: 0;
 }
+
+.mayda-hero .mayda-display {
+  font-size: clamp(2.35rem, 4.3vw, 4.4rem);
+  text-wrap: balance;
+}
+
+.mayda-hero .mayda-lead { max-width: 36rem; }
+.mayda-hero .signal-field { opacity: 0.12; }
+.mayda-hero .gate-figure { min-width: 0; max-width: 100%; }
 
 @media (min-width: 960px) {
   .mayda-hero-grid {

@@ -174,7 +174,7 @@ export function PilotSummary({
           </p>
         )}
         {compact ? (
-          <Link href={localizePath("/os/pilot", locale)} className="mayda-text-link" style={{ alignSelf: "flex-start" }}>
+          <Link href={localizePath(`/portal/pilots/${pilot.id}`, locale)} className="mayda-text-link" style={{ alignSelf: "flex-start" }}>
             {copy.viewAll} <span aria-hidden>→</span>
           </Link>
         ) : null}

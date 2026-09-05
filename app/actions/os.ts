@@ -5,7 +5,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { draftFromSources } from "@/lib/osDraft";
-import { isOsAllowed } from "@/lib/osAccess";
+import { getOsBetaAccess } from "@/lib/osBetaAccess";
 import { gatherSources } from "@/lib/osGather";
 import {
   asStandingSources,
@@ -48,12 +48,10 @@ const DAILY_USD_CAP = Number(process.env.MAYDAOS_DAILY_USD_CAP ?? "2");
 
 export async function runOsDraftAction(_prev: OsRunState, formData: FormData): Promise<OsRunState> {
   if (!isSupabaseConfigured()) return { status: "error", code: "not_signed_in" };
-  const claims = await getVerifiedClaims();
-  if (!claims?.sub) return { status: "error", code: "not_signed_in" };
+  const access = await getOsBetaAccess();
+  if (!access.allowed) return { status: "error", code: access.code };
+  const { claims, supabase: scoped } = access;
   const userId = claims.sub;
-  // The balance is ours, so being signed in is not the same as being allowed
-  // to spend it.
-  if (!isOsAllowed(claims.email)) return { status: "error", code: "invite_only" };
 
   const topic = String(formData.get("topic") ?? "").trim().slice(0, OS_TOPIC_LIMIT);
   if (!topic) return { status: "error", code: "invalid", message: "Give it a topic." };
@@ -63,7 +61,6 @@ export async function runOsDraftAction(_prev: OsRunState, formData: FormData): P
 
   // Read the workflow through the caller's own client: row-level security
   // decides whether it is a template or one installed for them.
-  const scoped = await createSupabaseServerClient();
   const { data: workflow } = await scoped
     .from("os_workflows")
     .select("id, key, name, brief, shape, max_sources, active, standing_sources, window_days")
@@ -175,8 +172,8 @@ export type OsDecisionState = { status: "idle" | "saved" | "error" };
 
 export async function decideOsRunAction(formData: FormData): Promise<void> {
   if (!isSupabaseConfigured()) return;
-  const claims = await getVerifiedClaims();
-  if (!claims?.sub) return;
+  const access = await getOsBetaAccess();
+  if (!access.allowed) return;
 
   const runId = String(formData.get("runId") ?? "");
   if (!/^[0-9a-f-]{36}$/.test(runId)) return;
@@ -186,7 +183,7 @@ export async function decideOsRunAction(formData: FormData): Promise<void> {
 
   // The caller's own client: the column grant allows the decision and
   // nothing else, and row-level security allows only their own run.
-  const supabase = await createSupabaseServerClient();
+  const { supabase } = access;
   await supabase
     .from("os_runs")
     .update({ decision, decision_note: note, decided_at: new Date().toISOString() })
@@ -222,8 +219,8 @@ export async function grantOsCreditsAction(formData: FormData): Promise<void> {
  * a record of what a person did with the work, not proof the system acted. */
 export async function recordOsOutcomeAction(formData: FormData): Promise<void> {
   if (!isSupabaseConfigured()) return;
-  const claims = await getVerifiedClaims();
-  if (!claims?.sub) return;
+  const access = await getOsBetaAccess();
+  if (!access.allowed) return;
 
   const runId = String(formData.get("runId") ?? "");
   if (!/^[0-9a-f-]{36}$/.test(runId)) return;
@@ -241,7 +238,7 @@ export async function recordOsOutcomeAction(formData: FormData): Promise<void> {
   }
 
   // Their own run, and only these columns: the grant sees to that.
-  const supabase = await createSupabaseServerClient();
+  const { supabase } = access;
   await supabase
     .from("os_runs")
     .update({ published_url: url, published_at: url ? new Date().toISOString() : null })

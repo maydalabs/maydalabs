@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 import type { Locale } from "@/lib/i18n";
 
 /* MaydaOS runs full-bleed. A marketing header above an operating system
@@ -18,8 +17,8 @@ export function SiteChromeHeader({ locale }: { locale: Locale }) {
   return <SiteHeader locale={locale} />;
 }
 
-export function SiteChromeFooter({ locale }: { locale: Locale }) {
+export function SiteChromeFooter({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "";
   if (isInsideOs(pathname)) return null;
-  return <SiteFooter locale={locale} />;
+  return children;
 }

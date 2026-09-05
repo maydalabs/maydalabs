@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { BrandGlyph } from "@/components/BrandGlyph";
 import { Wordmark } from "@/components/Wordmark";
@@ -19,7 +20,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
               {copy.footerStatement}
             </p>
             <div className="mt-6">
-              <BitcoinClock locale={locale} variant="badge" />
+              <Suspense fallback={null}><BitcoinClock locale={locale} variant="badge" /></Suspense>
             </div>
           </div>
 
@@ -32,7 +33,6 @@ export function SiteFooter({ locale }: { locale: Locale }) {
                 </Link>
               ))}
               <Link href={localizePath("/profile", locale)}>{copy.founderProfile}</Link>
-              <Link href={localizePath("/os", locale)}>{copy.maydaOsLab}</Link>
             </div>
           </div>
 
@@ -49,7 +49,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
             <p className="mayda-footer-label">{copy.account}</p>
             <div className="mt-4 flex flex-col gap-2 text-sm text-[color:var(--mist)]">
               <Link href={localizePath("/auth/sign-in", locale)}>{copy.signIn}</Link>
-              <Link href={localizePath("/os/desk", locale)}>{copy.portal}</Link>
+              <Link href={localizePath("/portal", locale)}>{copy.portal}</Link>
               <a className="mayda-social" href="https://x.com/maydalabs" target="_blank" rel="noopener noreferrer">
                 <BrandGlyph name="x" /> @maydalabs
               </a>

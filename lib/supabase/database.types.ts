@@ -658,6 +658,12 @@ export type Database = {
         }
         Relationships: []
       }
+      os_beta_status: {
+        Row: {
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       os_spend_credit: { Args: { p_user_id: string }; Returns: number }
@@ -796,4 +802,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

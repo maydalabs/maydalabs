@@ -41,9 +41,9 @@ export const OS_APP_META: Record<Locale, Record<OsApp, AppMeta>> = {
 };
 
 const STATUS: Record<Locale, { connected: string; mode: string; footer: string }> = {
-  en: { connected: "Signed in", mode: "Beta", footer: "AI produces. You approve. Nothing leaves without you." },
-  tr: { connected: "Giriş yapıldı", mode: "Beta", footer: "Üretimi yapay zekâ yapar. Onayı siz verirsiniz. Sizsiz hiçbir şey çıkmaz." },
-  fr: { connected: "Connecte", mode: "Beta", footer: "L'IA produit. Vous approuvez. Rien ne sort sans vous." },
+  en: { connected: "Signed in", mode: "Private beta", footer: "AI produces. You approve. Nothing leaves without you." },
+  tr: { connected: "Giriş yapıldı", mode: "Özel beta", footer: "Üretimi yapay zekâ yapar. Onayı siz verirsiniz. Sizsiz hiçbir şey çıkmaz." },
+  fr: { connected: "Connecte", mode: "Bêta privée", footer: "L'IA produit. Vous approuvez. Rien ne sort sans vous." },
 };
 
 export function OsShell({
