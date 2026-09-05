@@ -3,6 +3,7 @@ import type { StackItem } from "@/lib/stack";
 import Image from "next/image";
 import Link from "next/link";
 import { localizePath, type Locale } from "@/lib/i18n";
+import { SERVICES_COPY } from "@/lib/services";
 
 /*
  * The v3 case standard: every case answers the same questions in the same
@@ -151,8 +152,8 @@ export function CaseStudy({ locale, copy, stack }: { locale: Locale; copy: CaseS
         </p>
         <h2 className="mayda-heading">{copy.ctaHeading}</h2>
         <div className="mayda-hero-actions" style={{ justifyContent: "center" }}>
-          <Link href={localizePath("/start", locale)} className="mayda-button">
-            {copy.ctaStart} <span aria-hidden>→</span>
+          <Link href={localizePath("/contact", locale)} className="mayda-button">
+            {SERVICES_COPY[locale].cta} <span aria-hidden>→</span>
           </Link>
           <Link href={localizePath("/case-studies", locale)} className="mayda-button mayda-button-outline">
             {copy.ctaWork}

@@ -281,7 +281,7 @@ export default async function ProfilePage({ params }: LocalePageProps) {
           </div>
           <p className="mayda-body mt-6" style={{ fontSize: "0.9rem" }}>
             {copy.studioPrompt}{" "}
-            <Link href={localizePath("/approach", locale)} className="mayda-text-link">
+            <Link href={localizePath("/services", locale)} className="mayda-text-link">
               {copy.studioLink} →
             </Link>
           </p>

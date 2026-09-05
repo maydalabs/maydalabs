@@ -4,11 +4,10 @@ const nextConfig: NextConfig = {
   async redirects() {
     const legacyRedirects = [
       { source: "/pricing", destination: "/contact", permanent: true },
-      { source: "/programs", destination: "/approach", permanent: true },
+      { source: "/programs", destination: "/services", permanent: true },
       { source: "/playbooks", destination: "/case-studies", permanent: true },
       { source: "/newsletter", destination: "/", permanent: true },
       { source: "/roi-quickcheck", destination: "/start", permanent: true },
-      { source: "/services", destination: "/approach", permanent: true },
     ];
 
     return [

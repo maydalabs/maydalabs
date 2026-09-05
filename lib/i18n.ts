@@ -23,9 +23,9 @@ export const OPEN_GRAPH_LOCALES: Record<Locale, string> = {
 };
 
 export const SITE_DESCRIPTIONS: Record<Locale, string> = {
-  en: "MaydaLabs is an operations company. AI runs content, research, and payment workflows; a human approves every external action. Satoshi Gazette runs on this system.",
-  tr: "MaydaLabs bir operasyon şirketidir. İçerik, araştırma ve ödeme iş akışlarını yapay zekâ yürütür; her dış eylemi bir insan onaylar. Satoshi Gazette bu sistemle çalışır.",
-  fr: "MaydaLabs est une entreprise d’opérations. L’IA exécute les flux de contenu, de recherche et de paiement ; un humain approuve chaque action externe. Satoshi Gazette tourne sur ce système.",
+  en: "We build websites and software, automate repetitive work, and connect the systems businesses use to win and serve customers.",
+  tr: "Web siteleri ve yazılım geliştiriyor, tekrar eden işleri otomatikleştiriyor, şirketlerin müşteri kazanmak ve müşterilerine hizmet vermek için kullandığı sistemleri birbirine bağlıyoruz.",
+  fr: "Nous créons des sites et des logiciels, automatisons les tâches répétitives et connectons les systèmes qui aident les entreprises à acquérir et servir leurs clients.",
 };
 
 export const SITE_CHROME_COPY = {
@@ -38,13 +38,13 @@ export const SITE_CHROME_COPY = {
     languageLabel: "Change language",
     nav: [
       ["Work", "/case-studies"],
-      ["Offers", "/approach"],
+      ["Services", "/services"],
       ["About", "/about"],
     ],
     mapCta: "Map my next move",
-    pilotCta: "Start a pilot",
+    pilotCta: "Tell us what you need",
     seeWork: "See the work",
-    footerStatement: "Let AI run your operation while you stay in control!",
+    footerStatement: "Build what’s next. Make business work better.",
     explore: "Explore",
     founderProfile: "Founder profile",
     maydaOsLab: "MaydaOS Lab",
@@ -66,13 +66,13 @@ export const SITE_CHROME_COPY = {
     languageLabel: "Dili değiştir",
     nav: [
       ["Projeler", "/case-studies"],
-      ["Teklifler", "/approach"],
+      ["Hizmetler", "/services"],
       ["Hakkında", "/about"],
     ],
     mapCta: "Sonraki hamlemi haritala",
-    pilotCta: "Pilot başlat",
+    pilotCta: "İhtiyacınızı anlatın",
     seeWork: "Projeleri gör",
-    footerStatement: "Operasyonunuzu yapay zekâ yürütsün, kontrol sizde kalsın!",
+    footerStatement: "Sıradaki fikri hayata geçirin. İşinizi daha iyi çalıştırın.",
     explore: "Keşfet",
     founderProfile: "Kurucu profili",
     maydaOsLab: "MaydaOS Lab",
@@ -94,13 +94,13 @@ export const SITE_CHROME_COPY = {
     languageLabel: "Changer de langue",
     nav: [
       ["Réalisations", "/case-studies"],
-      ["Offres", "/approach"],
+      ["Services", "/services"],
       ["À propos", "/about"],
     ],
     mapCta: "Cartographier ma prochaine étape",
-    pilotCta: "Lancer un pilote",
+    pilotCta: "Parlons de votre besoin",
     seeWork: "Voir les réalisations",
-    footerStatement: "Laissez l’IA faire tourner votre opération, vous gardez le contrôle !",
+    footerStatement: "Construisez la suite. Faites mieux fonctionner votre entreprise.",
     explore: "Explorer",
     founderProfile: "Profil du fondateur",
     maydaOsLab: "MaydaOS Lab",

@@ -2553,3 +2553,17 @@ fieldset.mayda-fieldset > p {
 @layer components {
   .mayda-os-preview { display: block; width: 100%; height: auto; border: 1px solid var(--border-strong); border-radius: var(--radius-lg); }
 }
+/* Plain service index: five choices, no product-dashboard metaphor. */
+.mayda-service-list { border-top: 1px solid var(--border); }
+.mayda-service-row { display: grid; grid-template-columns: 2rem minmax(0, 1fr) minmax(0, 1.2fr) 1.5rem; gap: 1.5rem; align-items: center; padding: 2rem 0; border-bottom: 1px solid var(--border); }
+.mayda-service-row:hover .mayda-subheading, .mayda-service-row:focus-visible .mayda-subheading { color: var(--mint); }
+.mayda-service-arrow { font-size: 1.5rem; color: var(--mint); }
+.mayda-service-detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; padding: 3rem 0; border-top: 1px solid var(--border); scroll-margin-top: 7rem; }
+.mayda-service-deliverables { list-style: disc; padding-left: 1.25rem; color: var(--frost); line-height: 1.7; }
+.mayda-service-deliverables li + li { margin-top: .75rem; }
+@media (max-width: 720px) {
+  .mayda-service-row { grid-template-columns: 1.5rem minmax(0, 1fr) 1.5rem; gap: .75rem; padding: 1.5rem 0; }
+  .mayda-service-row .mayda-body { grid-column: 2; grid-row: 2; }
+  .mayda-service-arrow { grid-column: 3; grid-row: 1; }
+  .mayda-service-detail { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+}

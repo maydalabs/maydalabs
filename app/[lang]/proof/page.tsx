@@ -15,8 +15,8 @@ const COPY = {
         "How an AI-operated, human-approved Bitcoin publication actually runs: the pipeline, the sourcing rules, the approval gates, and the numbers — dated and verifiable.",
     },
     kicker: "Proof / The system behind Satoshi Gazette",
-    heading: ["This is what we sell.", "Running, in public."],
-    lead: "Satoshi Gazette is a Bitcoin-only publication that MaydaLabs owns and operates through the same system we install for clients. This page describes how it actually works. Every number is dated; everything external is inspectable.",
+    heading: ["One working example.","Inside Satoshi Gazette."],
+    lead: "Satoshi Gazette is a MaydaLabs-owned Bitcoin publication with independent editorial standards. This is a look at its software and editorial workflows, not a client result or a requirement for your business to work the same way.",
     asOf: "Figures as of 2 September 2026.",
     factsKicker: "The numbers",
     facts: [
@@ -43,14 +43,14 @@ const COPY = {
       ["Source-linked or unverified", "If a claim has no source URL, it is marked unverified and does not publish as fact. This is enforced by the pipeline, not by good intentions."],
       ["No approval, no external action", "The AI can draft, sort, and prepare. It cannot send, publish, or spend. Ever. The approval surface makes review take minutes — but the click is always human."],
     ],
-    meaningKicker: "What this means if you hire us",
-    meaningText: "The pilot installs this same architecture on one of your workflows — your sources, your rules, your approver. We are not proposing a system we believe would work. We are offering the one that already runs our own business, with the receipts public.",
+    meaningKicker: "What can carry over to your project",
+    meaningText: "Source tracking, connected tools and human review can also be useful outside publishing. We start with your actual process, then scope the software or automation it needs. This example demonstrates implementation, not a promise of the same results.",
     meaningNote: "Satoshi Gazette is a MaydaLabs-owned publication with independent editorial standards; its coverage is never for sale, including to our clients.",
     visitSg: "Read Satoshi Gazette",
     readCase: "Read the full case study",
     ctaHeading: "Want this on one of your workflows?",
-    ctaStart: "Start a pilot",
-    ctaOffers: "See the offers",
+    ctaStart: "Tell us what you need",
+    ctaOffers: "Explore services",
   },
   tr: {
     meta: {
@@ -60,8 +60,8 @@ const COPY = {
         "Yapay zekâ ile işletilen, insan onaylı bir Bitcoin yayını gerçekte nasıl çalışır: hat, kaynak kuralları, onay kapıları ve rakamlar — tarihli ve doğrulanabilir.",
     },
     kicker: "Kanıt / Satoshi Gazette'in arkasındaki sistem",
-    heading: ["Sattığımız şey bu.", "Çalışıyor, herkese açık."],
-    lead: "Satoshi Gazette, MaydaLabs'in sahibi olduğu ve müşterilere kurduğumuz sistemin aynısıyla işlettiği, sadece Bitcoin'e odaklı bir yayındır. Bu sayfa gerçekte nasıl çalıştığını anlatır. Her rakam tarihlidir; dışa dönük her şey denetlenebilir.",
+    heading: ["Çalışan bir örnek.","Satoshi Gazette'in içinde."],
+    lead: "Satoshi Gazette, bağımsız editoryal standartlara sahip, MaydaLabs'e ait bir Bitcoin yayınıdır. Bu sayfa yazılımını ve editoryal iş akışlarını gösterir; müşteri sonucu değildir ve sizin işinizin de aynı şekilde çalışması gerektiği anlamına gelmez.",
     asOf: "Rakamlar 2 Eylül 2026 itibarıyladır.",
     factsKicker: "Rakamlar",
     facts: [
@@ -88,14 +88,14 @@ const COPY = {
       ["Kaynağa bağlı ya da doğrulanmamış", "Bir iddianın kaynak URL'i yoksa doğrulanmamış işaretlenir ve gerçek olarak yayınlanmaz. Bunu iyi niyet değil, hat zorlar."],
       ["Onay yoksa dış eylem yok", "Yapay zekâ taslaklar, sıralar, hazırlar. Gönderemez, yayınlayamaz, harcayamaz. Asla. Onay yüzeyi incelemeyi dakikalara indirir — ama tık her zaman insandadır."],
     ],
-    meaningKicker: "Bizi tutarsanız bunun anlamı",
-    meaningText: "Pilot, aynı mimariyi sizin iş akışlarınızdan birine kurar — sizin kaynaklarınız, sizin kurallarınız, sizin onaylayıcınız. İşe yarayacağına inandığımız bir sistem önermiyoruz. Kendi işimizi zaten yürüten, makbuzları herkese açık olanı sunuyoruz.",
+    meaningKicker: "Projenize neler aktarılabilir?",
+    meaningText: "Kaynak takibi, bağlantılı araçlar ve insan incelemesi yayıncılık dışında da faydalı olabilir. Mevcut sürecinizden başlayıp gereken yazılım veya otomasyonun kapsamını belirleriz. Bu örnek geliştirme becerisini gösterir; aynı sonuçları vaat etmez.",
     meaningNote: "Satoshi Gazette, bağımsız editoryal standartlara sahip, MaydaLabs'e ait bir yayındır; yayın içeriği satılık değildir — müşterilerimize bile.",
     visitSg: "Satoshi Gazette'i okuyun",
     readCase: "Tam vaka çalışmasını okuyun",
     ctaHeading: "Bunu kendi iş akışınızda ister misiniz?",
-    ctaStart: "Pilot başlat",
-    ctaOffers: "Teklifleri görün",
+    ctaStart: "İhtiyacınızı anlatın",
+    ctaOffers: "Hizmetleri inceleyin",
   },
   fr: {
     meta: {
@@ -105,8 +105,8 @@ const COPY = {
         "Comment tourne réellement une publication Bitcoin opérée par l'IA et approuvée par des humains : pipeline, règles de sourçage, portes d'approbation et chiffres — datés et vérifiables.",
     },
     kicker: "Preuve / Le système derrière Satoshi Gazette",
-    heading: ["Voilà ce que nous vendons.", "En marche, en public."],
-    lead: "Satoshi Gazette est une publication 100 % Bitcoin que MaydaLabs détient et opère avec le même système que nous installons chez nos clients. Cette page décrit son fonctionnement réel. Chaque chiffre est daté ; tout ce qui est externe est inspectable.",
+    heading: ["Un exemple en fonctionnement.","Au sein de Satoshi Gazette."],
+    lead: "Satoshi Gazette est une publication Bitcoin détenue par MaydaLabs, aux standards éditoriaux indépendants. Cette page présente son logiciel et ses processus : ce n’est ni un résultat client, ni un modèle imposé à votre entreprise.",
     asOf: "Chiffres au 2 septembre 2026.",
     factsKicker: "Les chiffres",
     facts: [
@@ -133,14 +133,14 @@ const COPY = {
       ["Lié à la source, ou non vérifié", "Une affirmation sans URL source est marquée non vérifiée et ne se publie pas comme un fait. C'est le pipeline qui l'impose, pas les bonnes intentions."],
       ["Pas d'approbation, pas d'action externe", "L'IA peut rédiger, trier, préparer. Elle ne peut ni envoyer, ni publier, ni dépenser. Jamais. La surface d'approbation réduit la revue à quelques minutes — mais le clic reste humain."],
     ],
-    meaningKicker: "Ce que cela signifie si vous nous engagez",
-    meaningText: "Le pilote installe cette même architecture sur un de vos flux — vos sources, vos règles, votre approbateur. Nous ne proposons pas un système dont nous croyons qu'il marcherait. Nous offrons celui qui fait déjà tourner notre propre activité, reçus publics à l'appui.",
+    meaningKicker: "Ce qui peut servir à votre projet",
+    meaningText: "Le suivi des sources, les outils connectés et la validation humaine peuvent servir au-delà de l’édition. Nous partons de votre processus pour définir le logiciel ou l’automatisation utile. Cet exemple montre une réalisation, pas une promesse de résultats identiques.",
     meaningNote: "Satoshi Gazette est une publication détenue par MaydaLabs avec des standards éditoriaux indépendants ; sa couverture n'est jamais à vendre, y compris à nos clients.",
     visitSg: "Lire Satoshi Gazette",
     readCase: "Lire l'étude de cas complète",
     ctaHeading: "Vous voulez ça sur un de vos flux ?",
-    ctaStart: "Lancer un pilote",
-    ctaOffers: "Voir les offres",
+    ctaStart: "Parlez-nous de votre besoin",
+    ctaOffers: "Explorer les services",
   },
 } as const;
 
@@ -252,7 +252,7 @@ export default async function ProofPage({ params }: LocalePageProps) {
           <Link href={localizePath("/contact", locale)} className="mayda-button">
             {copy.ctaStart} <span aria-hidden>→</span>
           </Link>
-          <Link href={localizePath("/approach", locale)} className="mayda-button mayda-button-outline">
+          <Link href={localizePath("/services", locale)} className="mayda-button mayda-button-outline">
             {copy.ctaOffers}
           </Link>
         </div>

@@ -160,16 +160,16 @@ export const MAP_COPY: Record<Locale, MapCopy> = {
     offerLabel: "Suggested entry point",
     offers: {
       multiplier_sprint: {
-        title: "Multiplier Sprint",
-        text: "A focused engagement to identify and address one high-leverage constraint — the smallest honest way to start.",
+        title: "A scoped first project",
+        text: "Start with one clearly defined improvement. Agree the work, price and responsibilities before committing.",
       },
       build_partnership: {
-        title: "Build Partnership",
-        text: "End-to-end delivery of the product and the systems around it — scoped around the smallest release that proves the business.",
+        title: "A software project",
+        text: "Define a useful first release, then build its frontend, backend and integrations.",
       },
       acceleration_partnership: {
-        title: "Acceleration Partnership",
-        text: "Continuing improvement across product, conversion, lifecycle, and reliability — compounding cycle by cycle.",
+        title: "Improve an existing system",
+        text: "Choose a concrete improvement to your product, customer communication or everyday workflows. Ongoing support is optional.",
       },
     },
     focusLabel: "Capability focus",
@@ -200,7 +200,7 @@ export const MAP_COPY: Record<Locale, MapCopy> = {
       automate_verify: "Automate it with checks you can inspect — then verify the hours actually came back.",
     },
     notes: {
-      sprint_first: "You're still exploring — a bounded sprint beats a long commitment until direction is proven.",
+      sprint_first: "You're still exploring — a small project is a useful start while you clarify the direction.",
       resource_light: "With limited hands, the map favors moves that reduce ongoing workload instead of adding it.",
       human_judgment: "This map is rule-based guidance. The real scope comes from a conversation, not a form.",
     },
@@ -327,16 +327,16 @@ export const MAP_COPY: Record<Locale, MapCopy> = {
     offerLabel: "Önerilen giriş noktası",
     offers: {
       multiplier_sprint: {
-        title: "Multiplier Sprint",
-        text: "Tek bir yüksek kaldıraçlı kısıtı bulup ele alan odaklı bir çalışma — başlamanın en küçük ve dürüst yolu.",
+        title: "Kapsamı net bir ilk proje",
+        text: "Tek bir somut iyileştirmeyle başlayın. Taahhütten önce işi, ücreti ve sorumlulukları belirleyin.",
       },
       build_partnership: {
-        title: "Build Partnership",
-        text: "Ürünün ve çevresindeki sistemlerin uçtan uca teslimi — işi kanıtlayan en küçük sürüm etrafında kapsamlandırılır.",
+        title: "Bir yazılım projesi",
+        text: "Faydalı bir ilk sürüm belirleyin; arayüzünü, sunucu tarafını ve entegrasyonlarını geliştirin.",
       },
       acceleration_partnership: {
-        title: "Acceleration Partnership",
-        text: "Ürün, dönüşüm, yaşam döngüsü ve güvenilirlikte süreklilik taşıyan iyileştirme — döngü döngü katlanır.",
+        title: "Mevcut sistemi iyileştirin",
+        text: "Ürününüze, müşteri iletişiminize veya günlük iş akışınıza somut bir iyileştirme seçin. Sürekli destek isteğe bağlıdır.",
       },
     },
     focusLabel: "Yetkinlik odağı",
@@ -367,7 +367,7 @@ export const MAP_COPY: Record<Locale, MapCopy> = {
       automate_verify: "Denetleyebileceğiniz kontrollerle otomatikleştirin — sonra saatlerin gerçekten geri geldiğini doğrulayın.",
     },
     notes: {
-      sprint_first: "Hâlâ araştırma aşamasındasınız — yön kanıtlanana kadar sınırlı bir sprint uzun taahhütten iyidir.",
+      sprint_first: "Hâlâ araştırma aşamasındasınız — yönü netleştirirken küçük bir projeyle başlayabilirsiniz.",
       resource_light: "Eller sınırlıyken harita, iş yükünü artıran değil azaltan hamleleri öne alır.",
       human_judgment: "Bu harita kural tabanlı bir rehberdir. Gerçek kapsam formdan değil, görüşmeden çıkar.",
     },
@@ -494,16 +494,16 @@ export const MAP_COPY: Record<Locale, MapCopy> = {
     offerLabel: "Point d’entrée suggéré",
     offers: {
       multiplier_sprint: {
-        title: "Multiplier Sprint",
-        text: "Un engagement ciblé pour identifier et traiter une contrainte à fort levier — la façon la plus petite et honnête de commencer.",
+        title: "Un premier projet cadré",
+        text: "Commencez par une amélioration précise. Convenez du travail, du prix et des responsabilités avant de vous engager.",
       },
       build_partnership: {
-        title: "Build Partnership",
-        text: "Livraison de bout en bout du produit et des systèmes autour — cadrée sur la plus petite version qui prouve le business.",
+        title: "Un projet logiciel",
+        text: "Définissez une première version utile, puis développez son interface, son backend et ses intégrations.",
       },
       acceleration_partnership: {
-        title: "Acceleration Partnership",
-        text: "Amélioration continue du produit, de la conversion, du lifecycle et de la fiabilité — qui compose cycle après cycle.",
+        title: "Améliorer un système existant",
+        text: "Choisissez une amélioration concrète du produit, de la communication client ou du travail quotidien. La maintenance reste optionnelle.",
       },
     },
     focusLabel: "Capacités mobilisées",
@@ -534,7 +534,7 @@ export const MAP_COPY: Record<Locale, MapCopy> = {
       automate_verify: "L’automatiser avec des contrôles inspectables — puis vérifier que les heures reviennent vraiment.",
     },
     notes: {
-      sprint_first: "Vous explorez encore — un sprint borné vaut mieux qu’un long engagement tant que la direction n’est pas prouvée.",
+      sprint_first: "Vous explorez encore — un petit projet permet de préciser la direction avant un engagement plus long.",
       resource_light: "Avec des mains limitées, la carte privilégie les mouvements qui réduisent la charge au lieu de l’augmenter.",
       human_judgment: "Cette carte est un guide fondé sur des règles. Le vrai périmètre sort d’une conversation, pas d’un formulaire.",
     },

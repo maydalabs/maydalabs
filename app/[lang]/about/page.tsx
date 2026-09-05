@@ -9,11 +9,11 @@ const COPY = {
       title: "About",
       socialTitle: "Founder-led, evidence first · MaydaLabs",
       description:
-        "MaydaLabs is the operations company of Mehmet E. Mayda — deliberately small, founder-led, and allergic to unverifiable claims.",
+        "MaydaLabs builds websites, software and connected workflows. Founder-led by Mehmet E. Mayda, based in Istanbul and working worldwide.",
     },
     kicker: "About",
-    heading: ["Deliberately small.", "Built on inspectable work."],
-    lead: "MaydaLabs is the operations company of Mehmet E. Mayda — founder and full-stack product builder, working from Istanbul with companies anywhere. AI runs the work; a human approves it.",
+    heading: ["Work directly with the builder.","Start with what your business needs."],
+    lead: "MaydaLabs helps founders and businesses build new things and improve how they work. Led by Mehmet E. Mayda, a full-stack builder based in Istanbul, the work connects websites, software, automation and customer communication.",
     story: [
       "There is no pretend agency floor here. Engagements are led and largely built by one accountable person, extended by carefully scoped automation and AI systems where they genuinely help. That constraint is a feature: you talk to the person who builds, and the person who builds owns the outcome.",
       "The work spans complete products — marketplaces, publications, operational systems — because founder-led businesses rarely have problems that respect a single discipline. Product, automation, growth, and security get treated as one connected system.",
@@ -24,7 +24,7 @@ const COPY = {
       ["Founded and led by", "Mehmet E. Mayda"],
       ["Based in", "Istanbul, working worldwide"],
       ["Languages", "English, Turkish, French site"],
-      ["Model", "Founder-led, run on our own AI operations system"],
+      ["Model", "Founder-led, project-based delivery"],
     ],
     principlesKicker: "How the company behaves",
     principles: [
@@ -36,19 +36,19 @@ const COPY = {
     profileNote: "Looking for the deeper founder background — track record, stack, hiring context?",
     profileCta: "Read the founder profile",
     ctaHeading: "See how the work happens, or start yours.",
-    approachCta: "Read the approach",
-    mapCta: "Map my next move",
+    approachCta: "Explore services",
+    mapCta: "Tell us what you need",
   },
   tr: {
     meta: {
       title: "Hakkında",
       socialTitle: "Kurucu liderliğinde, önce kanıt · MaydaLabs",
       description:
-        "MaydaLabs, Mehmet E. Mayda'nın operasyon şirketidir — bilinçli olarak küçük, kurucu liderliğinde ve doğrulanamayan iddialara alerjik.",
+        "MaydaLabs web siteleri, yazılım ve bağlantılı iş akışları geliştirir. Mehmet E. Mayda liderliğinde, İstanbul'dan dünya çapında çalışır.",
     },
     kicker: "Hakkında",
-    heading: ["Bilinçli olarak küçük.", "Denetlenebilir iş üzerine kurulu."],
-    lead: "MaydaLabs, Mehmet E. Mayda'nın operasyon şirketidir — kurucu ve full-stack ürün geliştirici; İstanbul'dan, dünyanın her yerindeki şirketlerle çalışır. İşi yapay zekâ yürütür; bir insan onaylar.",
+    heading: ["Geliştiriciyle doğrudan çalışın.","İşinizin ihtiyacından başlayın."],
+    lead: "MaydaLabs, girişimcilere ve şirketlere yeni ürünler geliştirmede ve işlerini iyileştirmede yardımcı olur. İstanbul merkezli full-stack geliştirici Mehmet E. Mayda liderliğinde web siteleri, yazılım, otomasyon ve müşteri iletişimini bir araya getirir.",
     story: [
       "Burada yapay bir ajans katı yok. Çalışmaları sorumluluğu üstlenen tek kişi yönetir ve büyük ölçüde inşa eder; gerçekten işe yaradığı yerde dikkatle kapsamlanmış otomasyon ve yapay zekâ sistemleri onu genişletir. Bu kısıt bir özelliktir: konuştuğunuz kişi inşa eden kişidir ve inşa eden kişi sonucun sahibidir.",
       "İş, eksiksiz ürünlere uzanır — pazar yerleri, yayınlar, operasyon sistemleri — çünkü kurucu liderliğindeki işletmelerin problemleri nadiren tek bir disipline saygı duyar. Ürün, otomasyon, büyüme ve güvenlik birbirine bağlı tek sistem olarak ele alınır.",
@@ -59,7 +59,7 @@ const COPY = {
       ["Kuran ve yöneten", "Mehmet E. Mayda"],
       ["Merkez", "İstanbul, dünya çapında çalışır"],
       ["Diller", "İngilizce, Türkçe, Fransızca site"],
-      ["Model", "Kurucu liderliğinde; kendi yapay zekâ operasyon sistemimizle çalışır"],
+      ["Model", "Kurucu liderliğinde, proje bazlı çalışma"],
     ],
     principlesKicker: "Şirket nasıl davranır",
     principles: [
@@ -71,19 +71,19 @@ const COPY = {
     profileNote: "Daha derin kurucu geçmişi mi arıyorsunuz — geçmiş işler, stack, işe alım bağlamı?",
     profileCta: "Kurucu profilini okuyun",
     ctaHeading: "İşin nasıl yapıldığını görün veya kendi işinizi başlatın.",
-    approachCta: "Yaklaşımı okuyun",
-    mapCta: "Sonraki hamlemi haritala",
+    approachCta: "Hizmetleri inceleyin",
+    mapCta: "İhtiyacınızı anlatın",
   },
   fr: {
     meta: {
       title: "À propos",
       socialTitle: "Dirigé par le fondateur, preuves d'abord · MaydaLabs",
       description:
-        "MaydaLabs est l'entreprise d'opérations de Mehmet E. Mayda — délibérément petite, dirigée par son fondateur et allergique aux affirmations invérifiables.",
+        "MaydaLabs crée des sites, des logiciels et des processus connectés. Dirigé par Mehmet E. Mayda depuis Istanbul, pour des entreprises partout dans le monde.",
     },
     kicker: "À propos",
-    heading: ["Délibérément petite.", "Fondée sur un travail inspectable."],
-    lead: "MaydaLabs est l'entreprise d'opérations de Mehmet E. Mayda — fondateur et builder produit full-stack, travaillant depuis Istanbul avec des entreprises partout dans le monde. L'IA fait le travail ; un humain l'approuve.",
+    heading: ["Travaillez directement avec le développeur.","Partez des besoins de votre entreprise."],
+    lead: "MaydaLabs aide les fondateurs et les entreprises à construire et à mieux travailler. Dirigé par Mehmet E. Mayda, développeur full-stack à Istanbul, le travail relie sites web, logiciels, automatisation et communication client.",
     story: [
       "Pas de faux plateau d'agence ici. Les missions sont dirigées et largement construites par une personne responsable, étendue par des systèmes d'automatisation et d'IA soigneusement cadrés là où ils aident vraiment. Cette contrainte est une qualité : vous parlez à la personne qui construit, et la personne qui construit répond du résultat.",
       "Le travail couvre des produits complets — marketplaces, publications, systèmes opérationnels — parce que les problèmes des entreprises de fondateurs respectent rarement une seule discipline. Produit, automatisation, croissance et sécurité sont traités comme un seul système connecté.",
@@ -94,7 +94,7 @@ const COPY = {
       ["Fondée et dirigée par", "Mehmet E. Mayda"],
       ["Basée à", "Istanbul, travaille dans le monde entier"],
       ["Langues", "Site en anglais, turc, français"],
-      ["Modèle", "Mené par le fondateur ; tourne sur notre propre système d'opérations IA"],
+      ["Modèle", "Dirigé par le fondateur, avec des projets au périmètre défini"],
     ],
     principlesKicker: "Comment l'entreprise se comporte",
     principles: [
@@ -106,8 +106,8 @@ const COPY = {
     profileNote: "Vous cherchez le parcours détaillé du fondateur — réalisations, stack, contexte de recrutement ?",
     profileCta: "Lire le profil du fondateur",
     ctaHeading: "Voyez comment le travail se fait, ou commencez le vôtre.",
-    approachCta: "Lire l'approche",
-    mapCta: "Cartographier ma prochaine étape",
+    approachCta: "Explorer les services",
+    mapCta: "Parlez-nous de votre besoin",
   },
 } as const;
 
@@ -176,10 +176,10 @@ export default async function AboutPage({ params }: LocalePageProps) {
       <section className="mayda-final-cta">
         <h2 className="mayda-heading">{copy.ctaHeading}</h2>
         <div className="mayda-hero-actions" style={{ justifyContent: "center" }}>
-          <Link href={localizePath("/approach", locale)} className="mayda-button mayda-button-outline">
+          <Link href={localizePath("/services", locale)} className="mayda-button mayda-button-outline">
             {copy.approachCta}
           </Link>
-          <Link href={localizePath("/start", locale)} className="mayda-button">
+          <Link href={localizePath("/contact", locale)} className="mayda-button">
             {copy.mapCta} <span aria-hidden>→</span>
           </Link>
         </div>

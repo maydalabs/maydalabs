@@ -34,7 +34,12 @@ const routes = [
   "/fr",
   "/start",
   "/proof",
+  "/services",
+  "/tr/services",
+  "/fr/services",
   "/approach",
+  "/tr/approach",
+  "/fr/approach",
   "/about",
   "/profile",
   "/contact",
@@ -60,11 +65,10 @@ for (const path of routes) {
 const redirects = [
   ...(!isLocalBase ? [["/en", 307, "/"]] : []),
   ["/pricing", 308, "/contact"],
-  ["/programs", 308, "/approach"],
+  ["/programs", 308, "/services"],
   ["/playbooks", 308, "/case-studies"],
   ["/newsletter", 308, "/"],
   ["/roi-quickcheck", 308, "/start"],
-  ["/services", 308, "/approach"],
 ];
 
 for (const [path, status, destination] of redirects) {
@@ -80,7 +84,7 @@ for (const [path, status, destination] of redirects) {
 
 await check("English metadata is canonical and localized", async () => {
   const html = await (await request("/")).text();
-  assert(html.includes("<title>MaydaLabs — AI-run operations, you stay in control</title>"), "unexpected English title");
+  assert(html.includes("<title>MaydaLabs — Websites, software &amp; automation</title>"), "unexpected English title");
   assert(html.includes(`rel="canonical" href="${canonicalUrl}"`), "missing canonical URL");
   assert(html.includes(`hrefLang="tr" href="${canonicalUrl}/tr"`), "missing Turkish alternate");
   assert(html.includes(`hrefLang="fr" href="${canonicalUrl}/fr"`), "missing French alternate");
@@ -91,8 +95,8 @@ await check("Turkish and French metadata is localized", async () => {
     request("/tr").then((response) => response.text()),
     request("/fr").then((response) => response.text()),
   ]);
-  assert(turkish.includes("<title>MaydaLabs — Yapay zekâ ile çalışan operasyonlar, kontrol sizde</title>"), "unexpected Turkish title");
-  assert(french.includes("<title>MaydaLabs — Opérations pilotées par l&#x27;IA, vous gardez le contrôle</title>") || french.includes("<title>MaydaLabs — Opérations pilotées par l'IA, vous gardez le contrôle</title>"), "unexpected French title");
+  assert(turkish.includes("<title>MaydaLabs — Web siteleri, yazılım ve otomasyon</title>"), "unexpected Turkish title");
+  assert(french.includes("<title>MaydaLabs — Sites web, logiciels &amp; automatisation</title>"), "unexpected French title");
 });
 
 await check("localized routes do not set a language-preference cookie", async () => {
@@ -165,6 +169,28 @@ await check("telemetry endpoint returns the expected public shape", async () => 
     console.warn(`! telemetry degraded: ${degraded.host}`);
   }
 });
+
+
+for (const [prefix, label] of [["", "Websites &amp; online stores"], ["/tr", "Web siteleri ve e-ticaret"], ["/fr", "Sites web &amp; boutiques en ligne"]]) {
+  await check(`${prefix || "/"} services journey and secondary Bitcoin dashboard`, async () => {
+    const html = await (await request(prefix || "/")).text();
+    assert(html.includes(label), "missing localized services");
+    assert(html.includes('id="services"') && html.includes('id="bitcoin-dashboard"'), "missing services or Bitcoin dashboard mount");
+    assert(html.indexOf('id="bitcoin-dashboard"') > html.indexOf('id="how-we-work"'), "Bitcoin dashboard precedes the main buyer journey");
+    assert(!/Bitcoin payments engineering|Bitcoin ödeme mühendisliği|Ingénierie des paiements Bitcoin|\$2,500/.test(html), "retired sales offer remains");
+    const response = await request(`${prefix}/services`);
+    assert(response.status === 200, "services route is not canonical");
+    const detail = await response.text();
+    for (const id of ["websites", "software", "automation", "email", "support"]) {
+      assert(detail.includes(`id="${id}"`), `missing service anchor ${id}`);
+    }
+    assert(detail.includes(`href="${prefix}/contact"`), "no direct contact path");
+    assert(!detail.includes('href="/os'), "public beta entry found");
+    const legacy = await (await request(`${prefix}/approach`)).text();
+    assert(legacy.includes('id="websites"'), "legacy approach does not render new services");
+    assert(legacy.includes(`rel="canonical" href="${canonicalUrl}${prefix}/services"`), "legacy approach is not canonicalized to services");
+  });
+}
 
 if (failures.length > 0) {
   console.error(`\n${failures.length} smoke check${failures.length === 1 ? "" : "s"} failed:`);
