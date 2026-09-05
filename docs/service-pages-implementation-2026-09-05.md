@@ -64,9 +64,13 @@ the gallery and service pages; native details handle FAQs without JavaScript.
   gather → prepare → review → approve → deliver → settled; no replay/footer DOM.
 - French automation at 200% text size: no horizontal page overflow.
 - Browser screenshots visually inspected for desktop gallery/full software page
-  and mobile automation hero/proof. Production-preview page reported zero errors
-  and warnings at the final check. Dev full-page/cross-viewport capture produced
-  Next's below-fold proof-image LCP advisory; no eager-loading workaround added.
+  and mobile automation hero/proof. The final translated-overview pass added
+  12 layouts, all without overflow. A later navigation observed the existing
+  non-blocking /contact?_rsc=... prefetch 404 (also recorded before this task);
+  actual contact navigation and form rendering passed for all five services.
+  No new application runtime exception observed. Dev full-page/cross-viewport
+  capture produced Next's below-fold proof-image LCP advisory; no eager-loading
+  workaround added. This is not a claim of a globally clean preview console.
 - git diff --check: pass. Existing Vite future CommonJS-loader advisory remains.
 
 ## State and release boundary
@@ -85,3 +89,5 @@ Mac remains sole canonical writer. Concurrent SG changes were preserved.
 No push, deploy, remote migration/data writes, form submission, emails/messages,
 lead contact, accounts, ads, spend, application, publishing or Monster sync.
 Next gate: Mehmet reviews these local pages and approves an exact release.
+Implementation commit: 3cfef54 (15 files, +649/-40); this later receipt update
+records the final additional browser observations without changing app code.
