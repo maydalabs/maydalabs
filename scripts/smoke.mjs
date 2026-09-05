@@ -193,13 +193,18 @@ for (const [prefix, label] of [["", "Websites &amp; online stores"], ["/tr", "We
 }
 
 for (const path of ["/", "/tr", "/fr"]) {
-  await check(`${path} retains the animation as an atmospheric hero background`, async () => {
+  await check(`${path} serves the Connected flow and native service examples`, async () => {
     const html = await (await request(path)).text();
-    const hero = html.slice(html.indexOf('<section class="mayda-hero'), html.indexOf("</section>"));
-    assert(hero.includes("mayda-hero-art") && hero.includes("mayda-hero-copy"), "ambient hero layout is missing");
-    assert(!hero.includes("mayda-hero-grid"), "old two-column diagram layout returned");
-    assert(hero.includes("gate-figure") && hero.includes("field-pulse"), "original hero figure is missing");
-    assert(hero.includes("signal-field"), "background animation is missing");
+    const hero = html.slice(html.indexOf('<section class="mc-hero'), html.indexOf("</section>"));
+    assert(hero.includes("mc-flow") && hero.includes("mc-copy"), "Connected flow layout is missing");
+    assert(hero.includes('data-stage="settled"'), "complete static diagram is not server-rendered");
+    for (const part of ["mc-prepared", "mc-approval", "mc-output-base", "mc-replay"]) {
+      assert(hero.includes(part), `missing hero part: ${part}`);
+    }
+    for (const id of ["build", "connect", "improve"]) {
+      assert(html.includes(`id="service-${id}"`) && html.includes(`id="example-${id}"`), `missing native example ${id}`);
+    }
+    assert(html.includes('type="radio"'), "service selection requires JavaScript");
   });
 }
 
@@ -213,7 +218,7 @@ await check("homepage stylesheet contains current services and animation rules",
     assert(response.status === 200, `stylesheet returned ${response.status}`);
     return response.text();
   }))).join("\n");
-  for (const rule of [".mayda-service-row", ".mayda-hero-art", ".mayda-hero-intro", "field-pulse-flow", "prefers-reduced-motion"]) {
+  for (const rule of [".mc-choice", ".mc-approval", ".mc-lead", "mc-incoming", "prefers-reduced-motion", ":has("]) {
     assert(styles.includes(rule), `missing current CSS rule: ${rule}`);
   }
 });

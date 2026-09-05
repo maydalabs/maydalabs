@@ -25,31 +25,23 @@ describe("approved public services", () => {
     const dashboard = home.indexOf('id="bitcoin-dashboard"');
     expect(dashboard).toBeGreaterThan(home.indexOf('id="how-we-work"'));
     expect(home.indexOf('id="how-we-work"')).toBeGreaterThan(home.indexOf('id="selected-work"'));
-    expect(home.indexOf('id="selected-work"')).toBeGreaterThan(home.indexOf('id="services"'));
+    const serviceStories = home.indexOf("<ServiceStories");
+    expect(serviceStories).toBeGreaterThan(0);
+    expect(home.indexOf('id="selected-work"')).toBeGreaterThan(serviceStories);
     expect(home).toContain("<BitcoinDesk locale={locale}");
     expect(home).not.toContain("<PaymentsFlow");
     expect(home).not.toContain("<StackStrip");
   });
 
-  it("weaves the animation into the hero background instead of a second content row", () => {
+  it("mounts the approved Connected flow before the real hero copy", () => {
     const home = readFileSync("app/[lang]/page.tsx", "utf8");
-    const hero = home.slice(home.indexOf('<section className="mayda-hero'), home.indexOf("</section>"));
-    expect(hero).toContain('className="mayda-hero-art" aria-hidden="true"');
-    expect(hero).toContain("mayda-hero-copy");
-    expect(hero).not.toContain("mayda-hero-grid");
-    expect(hero).toContain("<SignalField />");
-    expect(hero).toContain("<GateFigure />");
-    expect(hero.indexOf("<GateFigure />")).toBeLessThan(hero.indexOf("mayda-hero-content"));
-    const figure = readFileSync("components/GateFigure.tsx", "utf8");
-    expect(figure).toContain('aria-hidden="true"');
-    expect(figure).toContain('className="field-pulse"');
-    const css = readFileSync("app/field.css", "utf8");
-    expect(css).toContain("animation: field-pulse-flow 5.2s linear infinite");
-    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.field-figure \.field-pulse\s*\{\s*display: none/);
-    expect(css).toMatch(/\.mayda-hero-art\s*\{\s*position: absolute/);
-    expect(css).toMatch(/\.mayda-hero \.mayda-hero-actions\s*\{\s*margin-top: 2rem/);
-    expect(css).toContain("mask-image: linear-gradient");
-    expect(readFileSync("app/brand.css", "utf8")).not.toMatch(/\.signal-field\s*\{\s*display: none/);
+    const hero = home.slice(home.indexOf('<section className="mc-hero'), home.indexOf("</section>"));
+    expect(hero).toContain("<ConnectedFlow copy={connected.flow}");
+    expect(hero).toContain("mc-copy");
+    expect(hero.indexOf("<ConnectedFlow")).toBeLessThan(hero.indexOf("mc-copy"));
+    expect(hero).toContain('localizePath("/contact", locale)');
+    expect(hero).toContain('localizePath("/case-studies", locale)');
+    expect(hero).not.toMatch(/GateFigure|SignalField|<iframe/);
   });
 
   it("keeps old map keys readable without selling retired packages", () => {

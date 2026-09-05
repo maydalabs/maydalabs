@@ -1,5 +1,10 @@
 # Connected flow — selected direction and local motion prototype
 
+Later implementation: Mehmet explicitly requested app integration. See
+`connected-flow-implementation-2026-09-05.md` for the current local app and
+verification. The prototype-only state below is historical, not the latest
+implementation state. No new release approval.
+
 Mehmet chose A with "go with A" after comparing A — Connected flow and
 B — Project chapters. This advances gate 2 of the design-direction brief:
 refine one direction in an isolated review surface, without changing the app.

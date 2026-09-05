@@ -1,20 +1,20 @@
 import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { GateFigure } from "@/components/GateFigure";
-import { SignalField } from "@/components/SignalField";
+import { ConnectedFlow } from "@/components/ConnectedFlow";
+import { ServiceStories } from "@/components/ServiceStories";
+import { CONNECTED_COPY } from "@/lib/connectedFlow";
+import "../connected-flow.css";
 import { BitcoinDesk } from "@/components/BitcoinDesk";
 import { localizePath, SITE_DESCRIPTIONS } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
-import { SERVICES, SERVICES_COPY } from "@/lib/services";
+import { SERVICES_COPY } from "@/lib/services";
 
 const COPY = {
   en: {
     title: "Websites, software & automation",
     kicker: "Websites, software & automation",
-    hero: ["Build what’s next.", "Make work simpler."],
-    intro: "We build websites and software, automate the busywork, and connect your tools—so your business can move forward.",
     workKicker: "Selected work", workHeading: "Real projects. Clear ownership.",
     work: [
       { title: "HodlStay", tag: "Client build · Live", text: "A booking platform with guest and host journeys, payment integrations and a full-stack rebuild.", image: "/work/hodlstay-2026-09-home.jpg", alt: "HodlStay booking platform homepage", slug: "hodlstay" },
@@ -30,8 +30,6 @@ const COPY = {
   tr: {
     title: "Web siteleri, yazılım ve otomasyon",
     kicker: "Web siteleri, yazılım ve otomasyon",
-    hero: ["Fikrinizi hayata geçirin.", "İşinizi kolaylaştırın."],
-    intro: "Web siteleri ve yazılım geliştiriyor, tekrarlayan işleri otomatikleştiriyor, kullandığınız araçları birbirine bağlıyoruz. Siz işinizi büyütmeye odaklanın.",
     workKicker: "Seçili projeler", workHeading: "Gerçek projeler. Açık sahiplik.",
     work: [
       { title: "HodlStay", tag: "Müşteri projesi · Yayında", text: "Misafir ve ev sahibi akışları, ödeme entegrasyonları ve uçtan uca yeniden geliştirmeyle bir rezervasyon platformu.", image: "/work/hodlstay-2026-09-home.jpg", alt: "HodlStay rezervasyon platformu ana sayfası", slug: "hodlstay" },
@@ -47,8 +45,6 @@ const COPY = {
   fr: {
     title: "Sites web, logiciels & automatisation",
     kicker: "Sites web, logiciels & automatisation",
-    hero: ["Donnez vie à vos idées.", "Simplifiez votre activité."],
-    intro: "Nous créons vos sites et logiciels, automatisons les tâches répétitives et connectons vos outils. Pour faire avancer votre entreprise.",
     workKicker: "Projets sélectionnés", workHeading: "Des projets réels. Des rôles clairs.",
     work: [
       { title: "HodlStay", tag: "Projet client · En ligne", text: "Une plateforme de réservation avec parcours voyageurs et hôtes, intégrations de paiement et refonte complète.", image: "/work/hodlstay-2026-09-home.jpg", alt: "Page d’accueil de la plateforme HodlStay", slug: "hodlstay" },
@@ -72,42 +68,23 @@ export default async function Home(props: LocalePageProps) {
   const locale = await getPageLocale(props.params);
   const copy = COPY[locale];
   const services = SERVICES_COPY[locale];
+  const connected = CONNECTED_COPY[locale];
   return (
-    <div className="mayda-home">
-      <section className="mayda-hero">
-        <div className="mayda-hero-art" aria-hidden="true">
-          <SignalField />
-          <GateFigure />
-        </div>
-        <div className="mayda-shell mayda-hero-content">
-          <div className="mayda-hero-copy">
-            <p className="mayda-kicker">{copy.kicker}</p>
-            <h1 className="mayda-display">{copy.hero[0]}<br /><span className="mayda-multiply">{copy.hero[1]}</span></h1>
-            <p className="mayda-hero-intro">{copy.intro}</p>
-            <div className="mayda-hero-actions">
-              <Link href={localizePath("/contact", locale)} className="mayda-button">{services.cta} <span aria-hidden>→</span></Link>
-              <Link href={localizePath("/case-studies", locale)} className="mayda-button mayda-button-outline">{services.work}</Link>
-            </div>
+    <div className="mayda-home mayda-connected">
+      <section className="mc-hero">
+        <ConnectedFlow copy={connected.flow} />
+        <div className="mc-copy">
+          <p className="mc-eyebrow">{copy.kicker}</p>
+          <h1>{connected.hero[0]}<em>{connected.hero[1]}</em></h1>
+          <p className="mc-lead">{connected.intro}</p>
+          <div className="mc-actions">
+            <Link href={localizePath("/contact", locale)} className="mc-cta">{services.cta} <span aria-hidden>↗</span></Link>
+            <Link href={localizePath("/case-studies", locale)} className="mc-secondary">{services.work} <span aria-hidden>→</span></Link>
           </div>
         </div>
       </section>
 
-      <section id="services" className="mayda-section">
-        <div className="mayda-shell mayda-stack-lg">
-          <header><p className="mayda-kicker">{services.kicker}</p><h2 className="mayda-heading">{services.heading}</h2></header>
-          <div className="mayda-service-list">
-            {SERVICES[locale].map((service, index) => (
-              <Link key={service.id} href={localizePath(`/services#${service.id}`, locale)} className="mayda-service-row">
-                <span className="mayda-card-number" aria-hidden>0{index + 1}</span>
-                <h3 className="mayda-subheading">{service.title}</h3>
-                <p className="mayda-body">{service.summary}</p>
-                <span className="mayda-service-arrow" aria-hidden>↗</span>
-              </Link>
-            ))}
-          </div>
-          <Link href={localizePath("/services", locale)} className="mayda-text-link">{services.detail} <span aria-hidden>→</span></Link>
-        </div>
-      </section>
+      <ServiceStories locale={locale} />
 
       <section id="selected-work" className="mayda-section">
         <div className="mayda-shell mayda-stack-lg">
