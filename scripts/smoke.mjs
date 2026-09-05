@@ -104,7 +104,15 @@ await check("localized routes do not set a language-preference cookie", async ()
 for (const prefix of ["", "/en", "/tr", "/fr"]) {
   for (const route of ["", "/desk", "/record", "/record/00000000-0000-4000-8000-000000000000", "/pilot", "/account", "/terminal"]) {
     await check(`${prefix}/os${route} does not expose beta content`, async () => {
-      const response = await request(`${prefix}/os${route}`);
+      let response = await request(`${prefix}/os${route}`);
+      // Production canonicalizes /en URLs before the private page runs.
+      // Verify that redirect and then verify the destination's access gate.
+      if (!isLocalBase && prefix === "/en") {
+        assert(response.status === 307, `expected canonical redirect, received ${response.status}`);
+        const destination = new URL(response.headers.get("location") || "", baseUrl);
+        assert(destination.pathname === `/os${route}`, "wrong English beta redirect");
+        response = await request(`/os${route}`);
+      }
       const html = await response.text();
       assert([200, 404].includes(response.status), `unexpected status ${response.status}`);
       assert(html.includes('name="robots" content="noindex'), "missing noindex");

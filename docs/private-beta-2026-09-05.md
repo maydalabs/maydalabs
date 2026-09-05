@@ -5,8 +5,10 @@
 Mehmet asked to continue building privately: visitors must not engage with or
 enter MaydaOS. This supersedes both the public September 4 product page and
 the older footer-only public Lab. MaydaLabs remains the company and public
-commercial website. The code and migration here are locally verified only;
-production has NOT been migrated or deployed by this change.
+commercial website. Mehmet subsequently approved the exact migration and
+`4c2b2ea` release on September 5. Both are now applied and verified in
+production; no testers were added. See the
+[production receipt](private-beta-release-2026-09-05.md) for evidence and limits.
 
 ## Access contract
 
@@ -31,7 +33,10 @@ production has NOT been migrated or deployed by this change.
 - MaydaOS remains implemented. This does not replace its working apps with mock
   screens, erase runs/workflows, or enable any new external action.
 
-## Deployment gate — requires Mehmet's explicit approval
+## Deployment procedure — approved and completed for this release
+
+The September 5 approval applies only to this migration/application revision.
+Future releases and tester grants still require their own scoped authority.
 
 1. Verify the exact production Supabase project, backup posture, current heads,
    and the intended operator's existing membership. No production grant was
