@@ -6,8 +6,9 @@
 .svc-section-head > p { max-width:24rem; color:var(--mist); font-size:1rem; line-height:1.7; }
 .svc-grid { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:1rem; }
 .svc-card { min-width:0; grid-column:span 4; border:1px solid #afc6f31c; border-radius:1.15rem; background:#10151d; overflow:hidden; scroll-margin-top:6rem; }
-.svc-card-websites { grid-column:span 7; background:radial-gradient(ellipse at 80% 70%,#304b8040,transparent 70%),#111722; }
-.svc-card-software { grid-column:span 5; background:radial-gradient(ellipse at 50% 80%,#214b4638,transparent 65%),#10191b; }
+.svc-card-websites { background:radial-gradient(ellipse at 80% 70%,#304b8028,transparent 70%),#111722; }
+.svc-card-software { grid-column:span 6; background:radial-gradient(ellipse at 50% 80%,#214b4638,transparent 65%),#10191b; }
+.svc-card-automation { grid-column:span 6; background:radial-gradient(ellipse at 75% 70%,#304b8040,transparent 70%),#111722; }
 .svc-card-link { display:flex; flex-direction:column; height:100%; text-decoration:none; color:var(--frost); padding:clamp(1.25rem,2.4vw,2.25rem); }
 .svc-card:has(a:hover),.svc-card:has(a:focus-visible) { border-color:#92bbff80; }
 .svc-card-link:focus-visible { outline:2px solid var(--mint); outline-offset:-5px; }
@@ -24,7 +25,7 @@
 .svc-visual { margin:0; min-width:0; }
 .svc-drawing { min-height:12.5rem; display:flex; align-items:center; justify-content:center; padding:1rem .3rem; overflow:hidden; }
 .svc-visual figcaption { font-size:.75rem; line-height:1.5; color:#90a3be; margin-top:.5rem; }
-.svc-card-websites .svc-drawing,.svc-card-software .svc-drawing { min-height:17rem; }
+.svc-card-software .svc-drawing,.svc-card-automation .svc-drawing { min-height:15rem; }
 .svc-browser { width:min(100%,29rem); background:#eaf0fa; border:1px solid #c4d1eb; border-radius:.7rem; color:#172749; box-shadow:0 20px 60px #0004; transform:perspective(1000px) rotateY(-5deg) rotateZ(-1deg); }
 .svc-browser-bar { display:flex; align-items:center; gap:5px; padding:.65rem .8rem; border-bottom:1px solid #1f386c20; }
 .svc-browser-bar i { height:5px; width:5px; background:#9aaeca; border-radius:50%; }
@@ -110,7 +111,7 @@
 .svc-overview-head nav { display:flex; flex-wrap:wrap; gap:.7rem 1.2rem; margin-top:2rem; }.svc-overview-head nav a { font-size:.875rem; color:#c1cde0; text-decoration:underline; text-underline-offset:.3em; }
 .svc-gallery.is-overview { padding-top:3rem; }
 @media (max-width:1050px) {
-  .svc-card-websites,.svc-card-software { grid-column:span 6; }
+  .svc-card-software,.svc-card-automation { grid-column:span 6; }
   .svc-card-link { padding:1.35rem; }.svc-card-category { flex-wrap:wrap; gap:.4rem .7rem; }
   .svc-hero { grid-template-columns:1.15fr 1fr; gap:2rem; }.svc-hero-art { padding:1rem; }
   .svc-fit { grid-template-columns:1fr; gap:1rem; }.svc-faq { grid-template-columns:1fr 1.5fr; }

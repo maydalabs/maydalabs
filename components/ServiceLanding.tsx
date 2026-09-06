@@ -4,6 +4,7 @@ import { localizePath, type Locale } from "@/lib/i18n";
 import { SERVICES, SERVICES_COPY, type ServiceId } from "@/lib/services";
 import { SERVICE_PAGES, SERVICE_RELATED, SERVICE_UI, servicePath } from "@/lib/servicePages";
 import { ServiceVisual } from "@/components/ServiceVisual";
+import { ServiceFlow } from "@/components/ServiceFlow";
 import "@/app/services.css";
 
 export function ServiceLanding({ id, locale }: { id: ServiceId; locale: Locale }) {
@@ -21,7 +22,7 @@ export function ServiceLanding({ id, locale }: { id: ServiceId; locale: Locale }
       <nav className="svc-breadcrumb" aria-label={c.all}><Link href={localizePath("/services", locale)}>{c.all}</Link><span aria-hidden="true">/</span><span aria-current="page">{service.title}</span></nav>
       <section className="svc-hero">
         <div><p className="mayda-kicker">{service.title}</p><h1>{page.headline}</h1><p className="svc-hero-intro">{service.summary}</p><div className="svc-hero-actions"><Link className="mayda-button" href={contact}>{shared.cta} <span aria-hidden="true">↗</span></Link><a href="#scope">{c.scopeLink} <span aria-hidden="true">↓</span></a></div><p className="svc-assurance">{c.noGate}</p></div>
-        <div className="svc-hero-art"><ServiceVisual id={id} locale={locale}/></div>
+        <ServiceFlow id={id} locale={locale}/>
       </section>
 
       <section className="svc-fit" aria-labelledby="service-fit"><h2 id="service-fit">{c.fit}</h2><ul>{page.fit.map(item => <li key={item}>{item}</li>)}</ul></section>

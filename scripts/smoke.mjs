@@ -85,7 +85,7 @@ for (const [path, status, destination] of redirects) {
 
 await check("English metadata is canonical and localized", async () => {
   const html = await (await request("/")).text();
-  assert(html.includes("<title>MaydaLabs — Websites, software &amp; automation</title>"), "unexpected English title");
+  assert(html.includes("<title>MaydaLabs — Software &amp; automation</title>"), "unexpected English title");
   assert(html.includes(`rel="canonical" href="${canonicalUrl}"`), "missing canonical URL");
   assert(html.includes(`hrefLang="tr" href="${canonicalUrl}/tr"`), "missing Turkish alternate");
   assert(html.includes(`hrefLang="fr" href="${canonicalUrl}/fr"`), "missing French alternate");
@@ -96,8 +96,8 @@ await check("Turkish and French metadata is localized", async () => {
     request("/tr").then((response) => response.text()),
     request("/fr").then((response) => response.text()),
   ]);
-  assert(turkish.includes("<title>MaydaLabs — Web siteleri, yazılım ve otomasyon</title>"), "unexpected Turkish title");
-  assert(french.includes("<title>MaydaLabs — Sites web, logiciels &amp; automatisation</title>"), "unexpected French title");
+  assert(turkish.includes("<title>MaydaLabs — Yazılım ve otomasyon</title>"), "unexpected Turkish title");
+  assert(french.includes("<title>MaydaLabs — Logiciels &amp; automatisation</title>"), "unexpected French title");
 });
 
 await check("localized routes do not set a language-preference cookie", async () => {
@@ -207,6 +207,9 @@ for (const path of ["/", "/tr", "/fr"]) {
       assert(html.includes(`href="${path === "/" ? "" : path}/services/${slug}"`), `missing direct service link ${slug}`);
     }
     assert((html.match(/class="svc-card svc-card-/g) || []).length === 5, "all five service cards must be server-rendered");
+    assert(html.indexOf('class="mc-proof-strip"') < html.indexOf('id="services"'), "real proof should precede services");
+    assert(html.indexOf('class="svc-card svc-card-software"') < html.indexOf('class="svc-card svc-card-automation"'), "software should lead");
+    assert(html.indexOf('class="svc-card svc-card-automation"') < html.indexOf('class="svc-card svc-card-websites"'), "automation should precede supporting services");
   });
 }
 
@@ -229,6 +232,8 @@ for (const prefix of ["", "/tr", "/fr"]) {
       assert(html.includes(`href="${prefix}/contact"`), "missing direct enquiry path");
       assert(html.includes(`href="${prefix}/services"`), "missing overview return path");
       assert(html.includes('class="svc-related-links"'), "missing related service discovery");
+      assert(html.includes('class="sf sf-') && html.includes('class="sf-detail"'), "missing service process illustration");
+      assert(html.includes('class="sf-review"') && html.includes('class="sf-delivery"'), "process must explain review and handover");
       assert(!/href="\/(?:tr\/|fr\/)?os(?:\/|")/.test(html), "public beta invitation exposed");
       if (slug === "email-and-customer-journeys") {
         const proof = html.slice(html.indexOf('class="svc-proof"'), html.indexOf('class="svc-faq"'));

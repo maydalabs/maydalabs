@@ -2,6 +2,8 @@ import type { Locale } from "@/lib/i18n";
 
 export const SERVICE_IDS = ["websites", "software", "automation", "email", "support"] as const;
 export type ServiceId = (typeof SERVICE_IDS)[number];
+// Display priority is separate from persisted service IDs and old map answers.
+export const SERVICE_DISPLAY_ORDER: ServiceId[] = ["software", "automation", "websites", "email", "support"];
 type Service = { id: ServiceId; title: string; need: string; summary: string; deliverables: string[]; example: string };
 
 // Public services are independent of existing customers' pilot and billing records.

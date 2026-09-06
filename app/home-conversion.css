@@ -1,0 +1,20 @@
+.mc-proof-strip { width:min(90%,1296px); margin-inline:auto; padding-block:1.5rem; border-block:1px solid #b3c6e526; display:grid; grid-template-columns:.55fr 1fr 1.3fr; align-items:center; gap:1.5rem; }
+.mc-proof-strip>p { font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; color:#aab8ce; }
+.mc-proof-strip>a { display:flex; align-items:center; gap:1rem; min-width:0; border-radius:.3rem; }
+.mc-proof-strip img { display:block; width:5.6rem; height:3.5rem; object-fit:cover; object-position:top; border:1px solid #b3c6e52b; border-radius:.25rem; }
+.mc-proof-strip strong { display:block; color:#e9eef7; font-size:1rem; font-weight:500; }.mc-proof-strip small { display:block; color:#aebed2; font-size:.6875rem; line-height:1.5; margin-top:.3rem; }
+.mc-proof-arrow { color:#88e9c3; margin-left:auto; }.mc-proof-strip a:hover strong { text-decoration:underline; text-underline-offset:.2em; }
+.mc-founder { display:flex; align-items:center; gap:1.5rem; border-top:1px solid #b3c6e526; padding-top:2rem; }
+.mc-founder h3 { font-size:1.25rem; line-height:1.4; }
+.mc-founder p { color:#adbbcd; font-size:1rem; line-height:1.7; max-width:46rem; margin-block:.6rem .8rem; }.mc-founder a { color:#dbe6f7; font-size:.875rem; text-decoration:underline; text-underline-offset:.25em; }
+@media (max-width:1000px) { .mc-proof-strip { grid-template-columns:1fr 1fr; }.mc-proof-strip>p { grid-column:1/-1; } }
+@media (max-width:760px) {
+  .mc-proof-strip { gap:1rem; grid-template-columns:1fr; }.mc-proof-strip>a { padding-block:.25rem; }.mc-proof-strip img { width:5.6rem; height:3.5rem; }
+  .mayda-home .svc-gallery { padding-block:3rem; }
+  .mayda-home .svc-card .svc-drawing { min-height:11rem; }
+  /* Supporting services stay visible and linked, without three more tall mockups. */
+  .mayda-home .svc-card-websites .svc-visual,.mayda-home .svc-card-email .svc-visual,.mayda-home .svc-card-support .svc-visual { display:none; }
+  .mayda-home .svc-card-copy { margin-bottom:.25rem; }.mayda-home .svc-card .svc-card-heading { font-size:1.75rem; margin-block:.8rem .6rem; }
+  .mayda-home .svc-card-link { padding:1.25rem; }.mayda-home .svc-card-footer { padding-top:.8rem; }
+  .mc-founder { align-items:flex-start; gap:1rem; }.mc-founder h3 { font-size:1.125rem; }
+}

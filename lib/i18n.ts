@@ -23,9 +23,15 @@ export const OPEN_GRAPH_LOCALES: Record<Locale, string> = {
 };
 
 export const SITE_DESCRIPTIONS: Record<Locale, string> = {
-  en: "We build websites and software, automate repetitive work, and connect the systems businesses use to win and serve customers.",
-  tr: "Web siteleri ve yazılım geliştiriyor, tekrar eden işleri otomatikleştiriyor, şirketlerin müşteri kazanmak ve müşterilerine hizmet vermek için kullandığı sistemleri birbirine bağlıyoruz.",
-  fr: "Nous créons des sites et des logiciels, automatisons les tâches répétitives et connectons les systèmes qui aident les entreprises à acquérir et servir leurs clients.",
+  en: "We build custom software, connect your tools and automate repetitive work. Helping founders and businesses turn ideas into products and run things better.",
+  tr: "Özel yazılımlar geliştiriyor, araçlarınızı birbirine bağlıyor ve tekrar eden işleri otomatikleştiriyoruz. Girişimcilerin ve işletmelerin fikirlerini ürüne, işlerini daha iyi çalışan sistemlere dönüştürüyoruz.",
+  fr: "Nous développons des logiciels sur mesure, connectons vos outils et automatisons les tâches répétitives. Pour transformer vos idées en produits et mieux faire fonctionner votre entreprise.",
+};
+
+export const SITE_TITLES: Record<Locale, string> = {
+  en: "Software & automation",
+  tr: "Yazılım ve otomasyon",
+  fr: "Logiciels & automatisation",
 };
 
 export const SITE_CHROME_COPY = {
@@ -44,7 +50,7 @@ export const SITE_CHROME_COPY = {
     mapCta: "Map my next move",
     pilotCta: "Tell us what you need",
     seeWork: "See the work",
-    footerStatement: "Build what’s next. Make business work better.",
+    footerStatement: "Build what’s next. Run it better.",
     explore: "Explore",
     founderProfile: "Founder profile",
     maydaOsLab: "MaydaOS Lab",
@@ -72,7 +78,7 @@ export const SITE_CHROME_COPY = {
     mapCta: "Sonraki hamlemi haritala",
     pilotCta: "İhtiyacınızı anlatın",
     seeWork: "Projeleri gör",
-    footerStatement: "Sıradaki fikri hayata geçirin. İşinizi daha iyi çalıştırın.",
+    footerStatement: "Fikrinizi hayata geçirin. İşinizi kolaylaştırın.",
     explore: "Keşfet",
     founderProfile: "Kurucu profili",
     maydaOsLab: "MaydaOS Lab",
@@ -100,7 +106,7 @@ export const SITE_CHROME_COPY = {
     mapCta: "Cartographier ma prochaine étape",
     pilotCta: "Parlons de votre besoin",
     seeWork: "Voir les réalisations",
-    footerStatement: "Construisez la suite. Faites mieux fonctionner votre entreprise.",
+    footerStatement: "Donnez vie à vos idées. Simplifiez votre activité.",
     explore: "Explorer",
     founderProfile: "Profil du fondateur",
     maydaOsLab: "MaydaOS Lab",

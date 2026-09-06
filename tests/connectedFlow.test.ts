@@ -60,7 +60,8 @@ describe("Connected flow production contract", () => {
     const component = readFileSync("components/ServiceGallery.tsx", "utf8");
     expect(component).not.toContain('"use client"');
     expect(component).not.toContain('type="radio"');
-    expect(component).toContain("SERVICES[locale].map");
+    expect(component).toContain("SERVICE_DISPLAY_ORDER.map");
+    expect(component).toContain("orderedServices.map");
     expect(component).toContain("servicePath(service.id)");
     expect(readFileSync("app/services.css", "utf8")).toContain(".svc-card-link:focus-visible");
   });

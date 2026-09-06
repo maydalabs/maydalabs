@@ -5,17 +5,16 @@ import { ConnectedFlow } from "@/components/ConnectedFlow";
 import { ServiceGallery } from "@/components/ServiceGallery";
 import { CONNECTED_COPY } from "@/lib/connectedFlow";
 import "../connected-flow.css";
+import "../home-conversion.css";
 import { BitcoinDesk } from "@/components/BitcoinDesk";
-import { localizePath, SITE_DESCRIPTIONS } from "@/lib/i18n";
+import { localizePath, SITE_DESCRIPTIONS, SITE_TITLES } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
 import { SERVICES_COPY } from "@/lib/services";
 
 const COPY = {
   en: {
-    title: "Websites, software & automation",
-    kicker: "Websites, software & automation",
-    workKicker: "Selected work", workHeading: "Real projects. Clear ownership.",
+    workKicker: "Selected work", workHeading: "See what we’ve built.",
     work: [
       { title: "HodlStay", tag: "Client build · Live", text: "A booking platform with guest and host journeys, payment integrations and a full-stack rebuild.", image: "/work/hodlstay-2026-09-home.jpg", alt: "HodlStay booking platform homepage", slug: "hodlstay" },
       { title: "Satoshi Gazette", tag: "Owned project · Editorially independent", text: "A publication with data dashboards and source-linked editorial workflows. Our own working example, not a client engagement.", image: "/work/satoshi-gazette-2026-09-home.jpg", alt: "Satoshi Gazette publication homepage", slug: "satoshi-gazette" },
@@ -26,11 +25,11 @@ const COPY = {
       ["Build, test and hand over", "Review the work as it develops. Get a tested delivery and the instructions to use it."],
     ],
     close: "One useful change can be a good start.",
+    closeText: "Tell us about your idea, product or time-consuming workflow. We’ll review the context with you and agree whether there’s a useful first project. No account needed.",
+    founder: "Founder-led. Built with you.", founderText: "Mehmet E. Mayda leads MaydaLabs. You review the work as it takes shape, with scope, decisions and the handover agreed together.", founderLink: "Meet the person behind the work",
   },
   tr: {
-    title: "Web siteleri, yazılım ve otomasyon",
-    kicker: "Web siteleri, yazılım ve otomasyon",
-    workKicker: "Seçili projeler", workHeading: "Gerçek projeler. Açık sahiplik.",
+    workKicker: "Seçili projeler", workHeading: "Neler geliştirdiğimizi görün.",
     work: [
       { title: "HodlStay", tag: "Müşteri projesi · Yayında", text: "Misafir ve ev sahibi akışları, ödeme entegrasyonları ve uçtan uca yeniden geliştirmeyle bir rezervasyon platformu.", image: "/work/hodlstay-2026-09-home.jpg", alt: "HodlStay rezervasyon platformu ana sayfası", slug: "hodlstay" },
       { title: "Satoshi Gazette", tag: "Kendi projemiz · Editoryal olarak bağımsız", text: "Veri panelleri ve kaynaklara bağlı editoryal iş akışlarıyla bir yayın. Müşteri işi değil, çalışan kendi projemiz.", image: "/work/satoshi-gazette-2026-09-home.jpg", alt: "Satoshi Gazette yayın ana sayfası", slug: "satoshi-gazette" },
@@ -41,11 +40,11 @@ const COPY = {
       ["Geliştirelim, test edelim, teslim edelim", "İlerlerken çalışmayı inceleyin. Test edilmiş teslimi ve kullanım rehberini alın."],
     ],
     close: "Faydalı bir değişiklik iyi bir başlangıçtır.",
+    closeText: "Fikrinizi, ürününüzü veya çok zaman alan iş akışınızı anlatın. İhtiyacı birlikte inceleyip faydalı bir ilk proje olup olmadığına karar verelim. Hesap gerekmez.",
+    founder: "Kurucu liderliğinde. Sizinle birlikte.", founderText: "MaydaLabs’ı Mehmet E. Mayda yönetiyor. Çalışmayı geliştikçe incelersiniz; kapsamı, kararları ve teslimi birlikte netleştiririz.", founderLink: "İşin arkasındaki kişiyi tanıyın",
   },
   fr: {
-    title: "Sites web, logiciels & automatisation",
-    kicker: "Sites web, logiciels & automatisation",
-    workKicker: "Projets sélectionnés", workHeading: "Des projets réels. Des rôles clairs.",
+    workKicker: "Projets sélectionnés", workHeading: "Découvrez nos réalisations.",
     work: [
       { title: "HodlStay", tag: "Projet client · En ligne", text: "Une plateforme de réservation avec parcours voyageurs et hôtes, intégrations de paiement et refonte complète.", image: "/work/hodlstay-2026-09-home.jpg", alt: "Page d’accueil de la plateforme HodlStay", slug: "hodlstay" },
       { title: "Satoshi Gazette", tag: "Projet propre · Indépendance éditoriale", text: "Une publication avec tableaux de données et processus éditoriaux reliés aux sources. Notre propre réalisation, pas une mission client.", image: "/work/satoshi-gazette-2026-09-home.jpg", alt: "Page d’accueil de Satoshi Gazette", slug: "satoshi-gazette" },
@@ -56,12 +55,15 @@ const COPY = {
       ["Construire, tester et transmettre", "Suivez le travail au fil du projet. Recevez une livraison testée et son mode d’emploi."],
     ],
     close: "Un changement utile est un bon début.",
+    closeText: "Parlez-nous de votre idée, produit ou processus chronophage. Nous examinerons le contexte avec vous pour définir un premier projet utile, s’il y a lieu. Aucun compte requis.",
+    founder: "Dirigé par le fondateur. Construit avec vous.", founderText: "Mehmet E. Mayda dirige MaydaLabs. Vous examinez le travail au fil du projet, avec un périmètre, des décisions et une transmission convenus ensemble.", founderLink: "Rencontrer la personne derrière le travail",
   },
 } as const;
 
 export async function generateMetadata(props: LocalePageProps) {
   const locale = await getPageLocale(props.params);
-  return createPageMetadata({ title: `MaydaLabs — ${COPY[locale].title}`, socialTitle: COPY[locale].title, description: SITE_DESCRIPTIONS[locale], path: "/", locale });
+  const metadata = createPageMetadata({ title: `MaydaLabs — ${SITE_TITLES[locale]}`, socialTitle: SITE_TITLES[locale], description: SITE_DESCRIPTIONS[locale], path: "/", locale });
+  return { ...metadata, title: { absolute: `MaydaLabs — ${SITE_TITLES[locale]}` } };
 }
 
 export default async function Home(props: LocalePageProps) {
@@ -74,7 +76,7 @@ export default async function Home(props: LocalePageProps) {
       <section className="mc-hero">
         <ConnectedFlow copy={connected.flow} />
         <div className="mc-copy">
-          <p className="mc-eyebrow">{copy.kicker}</p>
+          <p className="mc-eyebrow">{SITE_TITLES[locale]}</p>
           <h1>{connected.hero[0]}<em>{connected.hero[1]}</em></h1>
           <p className="mc-lead">{connected.intro}</p>
           <div className="mc-actions">
@@ -82,6 +84,14 @@ export default async function Home(props: LocalePageProps) {
             <Link href={localizePath("/case-studies", locale)} className="mc-secondary">{services.work} <span aria-hidden>→</span></Link>
           </div>
         </div>
+      </section>
+
+      <section className="mc-proof-strip" aria-label={copy.workKicker}>
+        <p>{copy.workKicker}</p>
+        {copy.work.map(item => <Link key={item.slug} href={localizePath(`/case-studies/${item.slug}`, locale)}>
+          <Image src={item.image} alt="" width={112} height={70} sizes="112px" />
+          <span><strong>{item.title}</strong><small>{item.tag}</small></span><span className="mc-proof-arrow" aria-hidden="true">↗</span>
+        </Link>)}
       </section>
 
       <ServiceGallery locale={locale} />
@@ -105,6 +115,9 @@ export default async function Home(props: LocalePageProps) {
           <h2 className="mayda-heading">{copy.how}</h2>
           <div className="mayda-grid-3">{copy.steps.map(([title, text], index) => <article key={title} className="mayda-card"><p className="mayda-card-number">0{index + 1}</p><h3 className="mayda-subheading">{title}</h3><p className="mayda-body mt-3">{text}</p></article>)}</div>
           <p className="mayda-body" style={{ maxWidth: "48rem" }}>{services.scope}</p>
+          <div className="mc-founder">
+            <div><h3>{copy.founder}</h3><p>{copy.founderText}</p><Link href={localizePath("/about", locale)}>{copy.founderLink} <span aria-hidden="true">↗</span></Link></div>
+          </div>
         </div>
       </section>
 
@@ -113,7 +126,7 @@ export default async function Home(props: LocalePageProps) {
 
       <section className="mayda-final-cta mayda-shell">
         <h2 className="mayda-heading">{copy.close}</h2>
-        <p className="mayda-body" style={{ maxWidth: "38rem" }}>{services.unsureText}</p>
+        <p className="mayda-body" style={{ maxWidth: "38rem" }}>{copy.closeText}</p>
         <Link href={localizePath("/contact", locale)} className="mayda-button">{services.cta} <span aria-hidden>→</span></Link>
       </section>
     </div>

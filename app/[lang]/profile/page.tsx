@@ -5,163 +5,125 @@ import { BrandGlyph } from "@/components/BrandGlyph";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { createPageMetadata } from "@/lib/metadata";
+import "@/app/profile.css";
 
 const COPY = {
   en: {
-    meta: {
-      title: "Mehmet E. Mayda — Founder profile",
-      socialTitle: "Mehmet E. Mayda · Full-stack product builder",
-      description:
-        "A hiring-focused profile of Mehmet E. Mayda, connecting full-stack product engineering, growth systems, Bitcoin products, and public project evidence.",
-    },
-    kicker: "Founder profile / For hiring teams",
-    heading: ["Full-stack product builder", "across software and growth."],
-    intro:
-      "I build production web products and the systems around them: product flows, payments, lifecycle communication, analytics, technical SEO, localization, editorial operations, and AI-assisted workflows with deliberate human control.",
-    availability:
-      "Considering senior product engineering, full-stack, growth engineering, and technical product ownership roles where software-building and marketing systems strengthen each other.",
-    actions: { work: "Inspect project evidence", github: "GitHub", linkedin: "LinkedIn", email: "Discuss a role" },
-    factsLabel: "Profile summary",
-    facts: [
-      ["Base", "Istanbul, Türkiye · Remote and global collaboration"],
-      ["Role focus", "Senior full-stack · Product engineering · Growth engineering"],
-      ["Application materials", "A tailored CV and role-specific evidence are supplied with each application"],
-    ],
-    bridgeKicker: "Why this combination matters",
-    bridgeHeading: "The product surface and the growth system are one user journey.",
+    meta: { title: "Mehmet E. Mayda — Product engineer", socialTitle: "Mehmet E. Mayda · Software, systems & growth", description: "Mehmet E. Mayda is a full-stack product builder connecting software engineering, automation and growth systems. Explore selected projects, technical skills and contact details." },
+    kicker: "Mehmet E. Mayda",
+    heading: ["Full-stack product engineering.", "From the interface to the operation."],
+    intro: "I build software and the systems around it. My work connects product design, frontend, backend and integrations with the customer journeys and operations that make a product useful.",
+    availability: "I’m interested in product engineering, full-stack and growth engineering roles where I can take responsibility for a meaningful part of the product.",
+    actions: { work: "View my work", github: "GitHub", linkedin: "LinkedIn", email: "Get in touch" },
+    factsLabel: "At a glance",
+    facts: [["Based in", "Istanbul, Türkiye · Remote collaboration"], ["Focus", "Product engineering · Full-stack · Growth systems"], ["Core stack", "TypeScript · React · Next.js · PostgreSQL"]],
+    bridgeKicker: "Background",
+    bridgeHeading: "Engineering with a view of the whole product.",
     bridgeBody: [
-      "My background combines hands-on software building with marketing operations. I can work from interface and data model through acquisition, measurement, lifecycle communication, content systems, and production reliability.",
-      "That range is most useful in product teams that need an engineer to understand the commercial and operational system without losing engineering discipline or evidence boundaries.",
+      "My background brings together hands-on software development and marketing operations. I work across interfaces, data models and integrations, as well as analytics, lifecycle communication, technical SEO and localization.",
+      "Through MaydaLabs, I build client products and develop projects of my own. That work involves deciding what to build, implementing it, testing the important journeys and maintaining the systems behind it.",
     ],
-    capabilityKicker: "Working range / Evidence-led",
-    capabilityHeading: "What I can own.",
+    capabilityKicker: "Skills",
+    capabilityHeading: "Where I contribute.",
     capabilities: [
-      ["Product engineering", "Next.js and React applications, data models, integrations, marketplaces, payments, and operator workflows."],
-      ["Growth engineering", "Analytics, conversion surfaces, lifecycle email, technical SEO, localization, campaigns, and experimentation foundations."],
-      ["Product ownership", "Problem framing, information architecture, release shaping, cross-functional decisions, documentation, and operational handover."],
-      ["AI operations + Bitcoin payments", "Approval-gated research, editorial, retrieval, and production workflows; Bitcoin-native product and payment work."],
+      ["Full-stack development", "React and Next.js interfaces, data models, access controls, API integrations and operational tools."],
+      ["Growth systems", "Analytics, lifecycle email, technical SEO, localization and customer journeys that connect product and marketing."],
+      ["Product delivery", "Problem definition, information architecture, implementation, testing, release planning and documentation."],
+      ["Automation & integrations", "Connected workflows for research, publishing and operations, with human review and error handling where needed."],
     ],
-    proofKicker: "Selected evidence / Individual ownership",
-    proofHeading: "Four products. Clear boundaries.",
-    proofIntro:
-      "Each record separates what I personally own from the product's public status and ownership. In-progress work is not presented as a launch or commercial outcome.",
+    proofKicker: "Selected projects",
+    proofHeading: "Products I’ve worked on.",
+    proofIntro: "Client delivery, an owned publication and independent product development.",
     projects: [
-      { number: "01", name: "HodlStay", status: "Client build · Live", ownership: "Founder-led product strategy and hands-on full-stack delivery across marketplace architecture, guest and host journeys, booking operations, payments, migration, analytics, lifecycle systems, localization, and launch preparation.", evidence: "Inspect HodlStay case", path: "/case-studies/hodlstay" },
-      { number: "02", name: "Satoshi Gazette", status: "Owned publication · Live", ownership: "Product direction and implementation across editorial UX, publishing workflows, evidence-aware data models, newsroom operations, guarded retrieval foundations, and approval-gated distribution.", evidence: "Inspect Satoshi Gazette case", path: "/case-studies/satoshi-gazette" },
-      { number: "03", name: "Mortal Vault", status: "Lab product · Private alpha · Unaudited", ownership: "Product definition and implementation across the Solidity lifecycle, owner and beneficiary interfaces, event-backed state, threat modeling, tests, and explicit release gates.", evidence: "Inspect Mortal Vault case", path: "/case-studies/mortal-vault" },
-      { number: "04", name: "Sofra", status: "Lab product · Private Phase 1", ownership: "Product architecture and implementation across bilingual guest, host, and operator journeys, marketplace state, public/private data boundaries, and demo-safe infrastructure.", evidence: "Inspect Sofra case", path: "/case-studies/sofra" },
+      { number: "01", name: "HodlStay", status: "Client build · Live", ownership: "Full-stack delivery for a booking platform: marketplace architecture, guest and host journeys, booking operations, payment integrations, migration, analytics and localization.", evidence: "View HodlStay", path: "/case-studies/hodlstay" },
+      { number: "02", name: "Satoshi Gazette", status: "Owned publication · Live · Editorially independent", ownership: "Product direction and engineering for a publication: editorial interfaces, publishing workflows, source-linked data, research tools and human-reviewed distribution.", evidence: "View Satoshi Gazette", path: "/case-studies/satoshi-gazette" },
+      { number: "03", name: "Mortal Vault", status: "Lab product · Private alpha · Unaudited", ownership: "Independent product development across Solidity contracts, owner and beneficiary interfaces, event-driven state, threat modeling and tests.", evidence: "View Mortal Vault", path: "/case-studies/mortal-vault" },
+      { number: "04", name: "Sofra", status: "Lab product · Private Phase 1", ownership: "Product architecture and development for a bilingual marketplace, including guest, host and operator journeys, marketplace state and public/private data boundaries.", evidence: "View Sofra", path: "/case-studies/sofra" },
     ],
-    materialsKicker: "Application materials",
-    materialsHeading: "Evaluate the work, then discuss the fit.",
-    materialsBody:
-      "For an active opportunity, I provide a reviewed, role-specific CV and application package instead of presenting one generic document as the right fit for every role.",
-    requestCv: "Request the current CV",
-    studioPrompt: "Looking for the company instead?",
-    studioLink: "Explore how MaydaLabs works",
+    materialsKicker: "Contact",
+    materialsHeading: "Let’s talk about your team and product.",
+    materialsBody: "If you’re looking for someone who can connect software delivery with product and growth thinking, I’d be glad to hear what you’re building.",
+    requestCv: "Request my CV",
+    studioPrompt: "Looking for a project partner?",
+    studioLink: "About MaydaLabs",
   },
   tr: {
-    meta: {
-      title: "Mehmet E. Mayda — Kurucu profili",
-      socialTitle: "Mehmet E. Mayda · Full-stack ürün geliştirici",
-      description:
-        "Mehmet E. Mayda'nın full-stack ürün mühendisliği, büyüme sistemleri, Bitcoin ürünleri ve açık proje kanıtlarını birleştiren işe alım odaklı profili.",
-    },
-    kicker: "Kurucu profili / İşe alım ekipleri için",
-    heading: ["Yazılım ve büyümeyi birleştiren", "full-stack ürün geliştirici."],
-    intro:
-      "Üretimde çalışan web ürünlerini ve çevrelerindeki sistemleri geliştiriyorum: ürün akışları, ödemeler, yaşam döngüsü iletişimi, analitik, teknik SEO, yerelleştirme, editoryal operasyonlar ve kontrollü yapay zekâ destekli iş akışları.",
-    availability:
-      "Yazılım geliştirme ile pazarlama sistemlerinin birbirini güçlendirdiği kıdemli ürün mühendisliği, full-stack, growth engineering ve teknik ürün sahipliği rollerini değerlendiriyorum.",
-    actions: { work: "Proje kanıtlarını incele", github: "GitHub", linkedin: "LinkedIn", email: "Bir rolü konuşalım" },
-    factsLabel: "Profil özeti",
-    facts: [
-      ["Konum", "İstanbul, Türkiye · Uzaktan ve küresel iş birliği"],
-      ["Rol odağı", "Kıdemli full-stack · Ürün mühendisliği · Growth engineering"],
-      ["Başvuru materyalleri", "Her başvuruda role özel CV ve kanıt paketi sunulur"],
-    ],
-    bridgeKicker: "Bu birleşim neden önemli",
-    bridgeHeading: "Ürün yüzeyi ile büyüme sistemi tek bir kullanıcı yolculuğudur.",
+    meta: { title: "Mehmet E. Mayda — Ürün mühendisi", socialTitle: "Mehmet E. Mayda · Yazılım, sistemler ve büyüme", description: "Mehmet E. Mayda; yazılım mühendisliği, otomasyon ve büyüme sistemlerini birleştiren full-stack ürün geliştirici. Seçili projeler, teknik beceriler ve iletişim." },
+    kicker: "Mehmet E. Mayda",
+    heading: ["Full-stack ürün mühendisliği.", "Arayüzden operasyona."],
+    intro: "Yazılımı ve çevresindeki sistemleri geliştiriyorum. Ürün tasarımı, frontend, backend ve entegrasyonları; ürünü faydalı kılan müşteri yolculukları ve operasyonlarla birleştiriyorum.",
+    availability: "Ürünün anlamlı bir bölümünde sorumluluk alabileceğim ürün mühendisliği, full-stack ve growth engineering rolleriyle ilgileniyorum.",
+    actions: { work: "Projelerimi görün", github: "GitHub", linkedin: "LinkedIn", email: "İletişime geçin" },
+    factsLabel: "Bir bakışta",
+    facts: [["Konum", "İstanbul, Türkiye · Uzaktan çalışma"], ["Odak", "Ürün mühendisliği · Full-stack · Büyüme sistemleri"], ["Temel teknolojiler", "TypeScript · React · Next.js · PostgreSQL"]],
+    bridgeKicker: "Geçmişim",
+    bridgeHeading: "Ürünün tamamını gören mühendislik.",
     bridgeBody: [
-      "Geçmişim uygulamalı yazılım geliştirme ile pazarlama operasyonlarını birleştiriyor. Arayüz ve veri modelinden edinim, ölçüm, yaşam döngüsü iletişimi, içerik sistemleri ve üretim güvenilirliğine kadar çalışabiliyorum.",
-      "Bu kapsam; ticari ve operasyonel sistemi anlayan, ancak mühendislik disiplini ile kanıt sınırlarını koruyan bir geliştiriciye ihtiyaç duyan ürün ekiplerinde en değerlidir.",
+      "Geçmişim, uygulamalı yazılım geliştirmeyi pazarlama operasyonlarıyla birleştiriyor. Arayüz, veri modeli ve entegrasyonların yanında analitik, müşteri iletişimi, teknik SEO ve yerelleştirme üzerine çalışıyorum.",
+      "MaydaLabs aracılığıyla müşteri ürünleri geliştiriyor ve kendi projelerimi hayata geçiriyorum. Neyi geliştireceğimize karar vermek, uygulamak, önemli akışları test etmek ve sistemlerin bakımını yapmak bu çalışmanın parçaları.",
     ],
-    capabilityKicker: "Çalışma alanı / Kanıt odaklı",
-    capabilityHeading: "Neleri sahiplenebilirim.",
+    capabilityKicker: "Beceriler",
+    capabilityHeading: "Katkı sunduğum alanlar.",
     capabilities: [
-      ["Ürün mühendisliği", "Next.js ve React uygulamaları, veri modelleri, entegrasyonlar, pazar yerleri, ödemeler ve operatör akışları."],
-      ["Growth engineering", "Analitik, dönüşüm yüzeyleri, yaşam döngüsü e-postaları, teknik SEO, yerelleştirme, kampanyalar ve deney altyapısı."],
-      ["Ürün sahipliği", "Problem çerçeveleme, bilgi mimarisi, sürüm şekillendirme, ekipler arası kararlar, dokümantasyon ve operasyonel devir."],
-      ["Yapay zekâ operasyonları + Bitcoin ödemeleri", "Onay kapılı araştırma, editoryal, erişim ve üretim akışları; Bitcoin-native ürün ve ödeme işleri."],
+      ["Full-stack geliştirme", "React ve Next.js arayüzleri, veri modelleri, erişim kontrolleri, API entegrasyonları ve operasyon araçları."],
+      ["Büyüme sistemleri", "Ürün ile pazarlamayı bağlayan analitik, yaşam döngüsü e-postaları, teknik SEO, yerelleştirme ve müşteri yolculukları."],
+      ["Ürün geliştirme", "Problem tanımı, bilgi mimarisi, uygulama, test, sürüm planlama ve dokümantasyon."],
+      ["Otomasyon ve entegrasyonlar", "Araştırma, yayın ve operasyon için bağlantılı iş akışları; gerekli yerlerde insan kontrolü ve hata yönetimi."],
     ],
-    proofKicker: "Seçili kanıt / Bireysel sahiplik",
-    proofHeading: "Dört ürün. Açık sınırlar.",
-    proofIntro:
-      "Her kayıt kişisel sorumluluğumu ürünün açık durumu ve sahipliğinden ayırır. Devam eden işler lansman veya ticari sonuç gibi sunulmaz.",
+    proofKicker: "Seçili projeler",
+    proofHeading: "Üzerinde çalıştığım ürünler.",
+    proofIntro: "Müşteri işi, kendi yayınım ve bağımsız ürün geliştirme projeleri.",
     projects: [
-      { number: "01", name: "HodlStay", status: "Müşteri ürünü · Canlı", ownership: "Pazar yeri mimarisi, misafir ve ev sahibi yolculukları, rezervasyon operasyonları, ödemeler, veri göçü, analitik, yaşam döngüsü sistemleri, yerelleştirme ve lansman hazırlığında kurucu liderliğinde ürün stratejisi ve uygulamalı full-stack geliştirme.", evidence: "HodlStay vakasını incele", path: "/case-studies/hodlstay" },
-      { number: "02", name: "Satoshi Gazette", status: "Sahip olunan yayın · Canlı", ownership: "Editoryal UX, yayın akışları, kanıt odaklı veri modelleri, haber merkezi operasyonları, korumalı erişim temelleri ve onay kapılı dağıtımda ürün yönü ve uygulama.", evidence: "Satoshi Gazette vakasını incele", path: "/case-studies/satoshi-gazette" },
-      { number: "03", name: "Mortal Vault", status: "Lab ürünü · Özel alfa · Denetlenmedi", ownership: "Solidity yaşam döngüsü, sahip ve lehtar arayüzleri, event tabanlı durum, tehdit modeli, testler ve açık sürüm kapılarında ürün tanımı ve uygulama.", evidence: "Mortal Vault vakasını incele", path: "/case-studies/mortal-vault" },
-      { number: "04", name: "Sofra", status: "Lab ürünü · Özel Faz 1", ownership: "İki dilli misafir, ev sahibi ve operatör yolculukları, pazar yeri durumu, açık/özel veri sınırları ve demo güvenli altyapıda ürün mimarisi ve uygulama.", evidence: "Sofra vakasını incele", path: "/case-studies/sofra" },
+      { number: "01", name: "HodlStay", status: "Müşteri ürünü · Canlı", ownership: "Rezervasyon platformu için full-stack geliştirme: pazar yeri mimarisi, misafir ve ev sahibi yolculukları, rezervasyon operasyonları, ödeme entegrasyonları, veri göçü, analitik ve yerelleştirme.", evidence: "HodlStay’i görün", path: "/case-studies/hodlstay" },
+      { number: "02", name: "Satoshi Gazette", status: "Kendi yayınım · Canlı · Editoryal olarak bağımsız", ownership: "Bir yayın için ürün yönetimi ve mühendislik: editoryal arayüzler, yayın akışları, kaynaklara bağlı veriler, araştırma araçları ve insan kontrolünde dağıtım.", evidence: "Satoshi Gazette’i görün", path: "/case-studies/satoshi-gazette" },
+      { number: "03", name: "Mortal Vault", status: "Lab ürünü · Özel alfa · Denetlenmedi", ownership: "Solidity sözleşmeleri, sahip ve lehtar arayüzleri, olaya dayalı durum yönetimi, tehdit modelleme ve testler üzerine bağımsız ürün geliştirme.", evidence: "Mortal Vault’u görün", path: "/case-studies/mortal-vault" },
+      { number: "04", name: "Sofra", status: "Lab ürünü · Özel Faz 1", ownership: "İki dilli pazar yeri için ürün mimarisi ve geliştirme: misafir, ev sahibi ve operatör yolculukları, pazar yeri durumu ve açık/özel veri sınırları.", evidence: "Sofra’yı görün", path: "/case-studies/sofra" },
     ],
-    materialsKicker: "Başvuru materyalleri",
-    materialsHeading: "Önce işi değerlendirin, sonra uyumu konuşalım.",
-    materialsBody:
-      "Aktif bir fırsat için, tek bir genel belgeyi her role uygun göstermek yerine incelenmiş ve role özel CV ile başvuru paketi sunuyorum.",
-    requestCv: "Güncel CV'yi isteyin",
-    studioPrompt: "Şirketi mi arıyorsunuz?",
-    studioLink: "MaydaLabs'in nasıl çalıştığını keşfedin",
+    materialsKicker: "İletişim",
+    materialsHeading: "Ekibinizi ve ürününüzü konuşalım.",
+    materialsBody: "Yazılım geliştirmeyi ürün ve büyüme bakışıyla birleştirebilen birini arıyorsanız, ne geliştirdiğinizi duymaktan memnuniyet duyarım.",
+    requestCv: "CV’mi isteyin",
+    studioPrompt: "Projeniz için bir iş ortağı mı arıyorsunuz?",
+    studioLink: "MaydaLabs hakkında",
   },
   fr: {
-    meta: {
-      title: "Mehmet E. Mayda — Profil fondateur",
-      socialTitle: "Mehmet E. Mayda · Builder produit full-stack",
-      description:
-        "Le profil recrutement de Mehmet E. Mayda, reliant ingénierie produit full-stack, systèmes de croissance, produits Bitcoin et preuves publiques.",
-    },
-    kicker: "Profil fondateur / Pour les équipes de recrutement",
-    heading: ["Builder produit full-stack", "entre logiciel et croissance."],
-    intro:
-      "Je construis des produits web en production et les systèmes qui les entourent : parcours produit, paiements, communication de cycle de vie, analytics, SEO technique, localisation, opérations éditoriales et workflows IA sous contrôle humain.",
-    availability:
-      "J'étudie des rôles senior en ingénierie produit, full-stack, growth engineering et ownership technique où le logiciel et les systèmes marketing se renforcent.",
-    actions: { work: "Voir les preuves projet", github: "GitHub", linkedin: "LinkedIn", email: "Discuter d'un rôle" },
-    factsLabel: "Résumé du profil",
-    facts: [
-      ["Base", "Istanbul, Türkiye · Collaboration à distance et mondiale"],
-      ["Rôles ciblés", "Full-stack senior · Ingénierie produit · Growth engineering"],
-      ["Dossier", "CV adapté et preuves spécifiques fournis pour chaque candidature"],
-    ],
-    bridgeKicker: "Pourquoi cette combinaison compte",
-    bridgeHeading: "Le produit et le système de croissance forment un seul parcours utilisateur.",
+    meta: { title: "Mehmet E. Mayda — Ingénieur produit", socialTitle: "Mehmet E. Mayda · Logiciels, systèmes et croissance", description: "Mehmet E. Mayda associe développement full-stack, automatisation et systèmes de croissance. Découvrez ses projets, ses compétences techniques et ses coordonnées." },
+    kicker: "Mehmet E. Mayda",
+    heading: ["Ingénierie produit full-stack.", "De l’interface aux opérations."],
+    intro: "Je développe des logiciels et les systèmes qui les entourent. Mon travail relie design produit, frontend, backend et intégrations aux parcours clients et aux opérations qui rendent un produit utile.",
+    availability: "Je m’intéresse aux rôles en ingénierie produit, full-stack et growth engineering qui permettent de prendre en charge une partie significative du produit.",
+    actions: { work: "Voir mes projets", github: "GitHub", linkedin: "LinkedIn", email: "Me contacter" },
+    factsLabel: "En bref",
+    facts: [["Localisation", "Istanbul, Türkiye · Collaboration à distance"], ["Spécialités", "Ingénierie produit · Full-stack · Systèmes de croissance"], ["Technologies principales", "TypeScript · React · Next.js · PostgreSQL"]],
+    bridgeKicker: "Parcours",
+    bridgeHeading: "Une ingénierie qui comprend le produit dans son ensemble.",
     bridgeBody: [
-      "Mon parcours combine construction logicielle et opérations marketing concrètes. Je peux travailler de l'interface et du modèle de données jusqu'à l'acquisition, la mesure, le cycle de vie, les systèmes de contenu et la fiabilité en production.",
-      "Cette amplitude est particulièrement utile aux équipes qui veulent comprendre le système commercial et opérationnel sans perdre la discipline d'ingénierie ni les limites des preuves.",
+      "Mon parcours associe développement logiciel et opérations marketing. Je travaille sur les interfaces, les modèles de données et les intégrations, mais aussi sur l’analytics, les communications clients, le SEO technique et la localisation.",
+      "Avec MaydaLabs, je développe des produits clients et mes propres projets. Ce travail couvre les choix produit, la réalisation, les tests des parcours essentiels et la maintenance des systèmes.",
     ],
-    capabilityKicker: "Champ d'action / Fondé sur les preuves",
-    capabilityHeading: "Ce que je peux prendre en charge.",
+    capabilityKicker: "Compétences",
+    capabilityHeading: "Ce que j’apporte.",
     capabilities: [
-      ["Ingénierie produit", "Applications Next.js et React, modèles de données, intégrations, marketplaces, paiements et workflows opérateurs."],
-      ["Growth engineering", "Analytics, conversion, e-mails de cycle de vie, SEO technique, localisation, campagnes et fondations d'expérimentation."],
-      ["Ownership produit", "Cadrage, architecture de l'information, versions, décisions transverses, documentation et transmission opérationnelle."],
-      ["Opérations IA + paiements Bitcoin", "Workflows de recherche, d'édition, de retrieval et de production avec validation humaine ; produits et paiements Bitcoin-native."],
+      ["Développement full-stack", "Interfaces React et Next.js, modèles de données, contrôles d’accès, intégrations API et outils opérationnels."],
+      ["Systèmes de croissance", "Analytics, e-mails de cycle de vie, SEO technique, localisation et parcours reliant produit et marketing."],
+      ["Réalisation produit", "Définition du problème, architecture de l’information, développement, tests, préparation des versions et documentation."],
+      ["Automatisation et intégrations", "Processus connectés pour la recherche, la publication et les opérations, avec contrôle humain et gestion des erreurs selon les besoins."],
     ],
-    proofKicker: "Preuves sélectionnées / Ownership individuel",
-    proofHeading: "Quatre produits. Des limites claires.",
-    proofIntro:
-      "Chaque fiche distingue ma responsabilité personnelle du statut public et de la propriété du produit. Un travail en cours n'est pas présenté comme un lancement ou un résultat commercial.",
+    proofKicker: "Projets sélectionnés",
+    proofHeading: "Des produits auxquels j’ai contribué.",
+    proofIntro: "Travail client, publication indépendante et développement de produits personnels.",
     projects: [
-      { number: "01", name: "HodlStay", status: "Produit client · En ligne", ownership: "Stratégie produit dirigée par le fondateur et livraison full-stack sur architecture marketplace, parcours voyageurs et hôtes, réservations, paiements, migration, analytics, cycle de vie, localisation et préparation du lancement.", evidence: "Voir le cas HodlStay", path: "/case-studies/hodlstay" },
-      { number: "02", name: "Satoshi Gazette", status: "Publication détenue · En ligne", ownership: "Direction produit et réalisation sur UX éditoriale, publication, modèles de données fondés sur les preuves, opérations de rédaction, fondations de recherche gardées et distribution sous validation.", evidence: "Voir le cas Satoshi Gazette", path: "/case-studies/satoshi-gazette" },
-      { number: "03", name: "Mortal Vault", status: "Produit lab · Alpha privée · Non audité", ownership: "Définition et réalisation du cycle Solidity, interfaces propriétaire et bénéficiaire, état fondé sur les événements, modèle de menace, tests et conditions de sortie explicites.", evidence: "Voir le cas Mortal Vault", path: "/case-studies/mortal-vault" },
-      { number: "04", name: "Sofra", status: "Produit lab · Phase 1 privée", ownership: "Architecture et réalisation des parcours bilingues invité, hôte et opérateur, états marketplace, limites public/privé et infrastructure de démo sûre.", evidence: "Voir le cas Sofra", path: "/case-studies/sofra" },
+      { number: "01", name: "HodlStay", status: "Produit client · En ligne", ownership: "Développement full-stack d’une plateforme de réservation : architecture marketplace, parcours voyageurs et hôtes, opérations, intégrations de paiement, migration, analytics et localisation.", evidence: "Voir HodlStay", path: "/case-studies/hodlstay" },
+      { number: "02", name: "Satoshi Gazette", status: "Ma publication · En ligne · Indépendance éditoriale", ownership: "Direction produit et ingénierie d’une publication : interfaces éditoriales, processus de publication, données reliées aux sources, outils de recherche et distribution validée par une personne.", evidence: "Voir Satoshi Gazette", path: "/case-studies/satoshi-gazette" },
+      { number: "03", name: "Mortal Vault", status: "Produit lab · Alpha privée · Non audité", ownership: "Développement indépendant : contrats Solidity, interfaces propriétaire et bénéficiaire, état fondé sur les événements, modélisation des menaces et tests.", evidence: "Voir Mortal Vault", path: "/case-studies/mortal-vault" },
+      { number: "04", name: "Sofra", status: "Produit lab · Phase 1 privée", ownership: "Architecture et développement d’une marketplace bilingue : parcours invité, hôte et opérateur, états de la plateforme et séparation des données publiques et privées.", evidence: "Voir Sofra", path: "/case-studies/sofra" },
     ],
-    materialsKicker: "Dossier de candidature",
-    materialsHeading: "Évaluez le travail, puis discutons de l'adéquation.",
-    materialsBody:
-      "Pour une opportunité active, je fournis un CV vérifié et adapté au rôle plutôt que de présenter un document générique comme pertinent partout.",
-    requestCv: "Demander le CV actuel",
-    studioPrompt: "Vous cherchez plutôt l'entreprise ?",
-    studioLink: "Découvrir comment MaydaLabs travaille",
+    materialsKicker: "Contact",
+    materialsHeading: "Parlons de votre équipe et de votre produit.",
+    materialsBody: "Si vous cherchez quelqu’un qui relie réalisation logicielle, produit et croissance, je serais ravi de découvrir ce que vous construisez.",
+    requestCv: "Demander mon CV",
+    studioPrompt: "Vous cherchez un partenaire pour un projet ?",
+    studioLink: "À propos de MaydaLabs",
   },
 } as const;
 
@@ -177,7 +139,7 @@ export default async function ProfilePage({ params }: LocalePageProps) {
   const cvEmail = "mailto:info@maydalabs.com?subject=Current%20CV%20request%20for%20Mehmet%20E.%20Mayda";
 
   return (
-    <div className="mayda-shell" id="mehmet-e-mayda">
+    <div className="mayda-shell mayda-profile" id="mehmet-e-mayda">
       <section className="mayda-section">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:gap-16">
           <header className="mayda-stack">
@@ -281,7 +243,7 @@ export default async function ProfilePage({ params }: LocalePageProps) {
           </div>
           <p className="mayda-body mt-6" style={{ fontSize: "0.9rem" }}>
             {copy.studioPrompt}{" "}
-            <Link href={localizePath("/services", locale)} className="mayda-text-link">
+            <Link href={localizePath("/about", locale)} className="mayda-text-link">
               {copy.studioLink} →
             </Link>
           </p>

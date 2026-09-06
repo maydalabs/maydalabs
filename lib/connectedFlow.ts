@@ -7,7 +7,7 @@ export const STORY_SERVICES = { build: ["websites", "software"], connect: ["auto
 export const CONNECTED_COPY = {
   en: {
     hero: ["Build what’s next.", "Run it better."],
-    intro: "Websites, software and connected workflows—for a new idea or a business ready for its next step.",
+    intro: "We build custom software, connect your tools and automate repetitive work—for a new idea or a business ready for its next step.",
     flow: { label: "Illustrative workflow", replay: "Replay illustration", prepared: "Prepared work", review: "Human review", approval: "Human approval", outputs: ["Product", "Workflow", "Customer journey"], description: "Illustrative workflow: information is prepared, held for human review, then approved work becomes a product, workflow or customer journey. No real actions occur." },
     services: {
       kicker: "What do you want to change?", heading: "Start with your next move.", aside: "One useful project, or several connected pieces. Start where you are.", group: "Choose a service example", illustrative: "Illustrative", all: "Explore all five services", includes: "Related services",
@@ -23,7 +23,7 @@ export const CONNECTED_COPY = {
   },
   tr: {
     hero: ["Fikrinizi hayata geçirin.", "İşinizi kolaylaştırın."],
-    intro: "Yeni bir fikir ya da sıradaki adımına hazır bir işletme için web siteleri, yazılım ve birbirine bağlı iş akışları.",
+    intro: "Yeni bir fikir ya da sıradaki adımına hazır bir işletme için özel yazılımlar geliştiriyor, araçları birbirine bağlıyor ve tekrar eden işleri otomatikleştiriyoruz.",
     flow: { label: "Örnek iş akışı", replay: "Animasyonu tekrar oynat", prepared: "Hazırlanan iş", review: "İnsan incelemesi", approval: "İnsan onayı", outputs: ["Ürün", "İş akışı", "Müşteri yolculuğu"], description: "Örnek iş akışı: bilgiler hazırlanır, insan incelemesini bekler; onaylanan çalışma bir ürüne, iş akışına veya müşteri yolculuğuna dönüşür. Gerçek bir işlem yapılmaz." },
     services: {
       kicker: "Neyi değiştirmek istiyorsunuz?", heading: "Sıradaki adımınızla başlayın.", aside: "Tek bir faydalı proje ya da birbirine bağlı birkaç parça. Bulunduğunuz yerden başlayın.", group: "Bir hizmet örneği seçin", illustrative: "Örnek tasarım", all: "Beş hizmetin tamamını inceleyin", includes: "İlgili hizmetler",
@@ -39,7 +39,7 @@ export const CONNECTED_COPY = {
   },
   fr: {
     hero: ["Donnez vie à vos idées.", "Simplifiez votre activité."],
-    intro: "Sites web, logiciels et processus connectés—pour une nouvelle idée ou une entreprise prête à avancer.",
+    intro: "Nous développons vos logiciels, connectons vos outils et automatisons les tâches répétitives—pour une nouvelle idée ou une entreprise prête à avancer.",
     flow: { label: "Processus illustratif", replay: "Rejouer l’illustration", prepared: "Travail préparé", review: "Relecture humaine", approval: "Validation humaine", outputs: ["Produit", "Processus", "Parcours client"], description: "Processus illustratif : les informations sont préparées puis soumises à une relecture humaine. Le travail validé devient un produit, un processus ou un parcours client. Aucune action réelle n’est effectuée." },
     services: {
       kicker: "Que voulez-vous changer ?", heading: "Commencez par la prochaine étape.", aside: "Un projet utile ou plusieurs éléments connectés. Partez de là où vous êtes.", group: "Choisissez un exemple de service", illustrative: "Illustration", all: "Explorer les cinq services", includes: "Services associés",

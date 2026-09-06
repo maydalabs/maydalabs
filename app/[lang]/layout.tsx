@@ -12,6 +12,7 @@ import { SITE_URL } from "@/lib/site";
 import {
   LOCALES,
   SITE_DESCRIPTIONS,
+  SITE_TITLES,
   type Locale,
   isLocale,
 } from "@/lib/i18n";
@@ -47,7 +48,7 @@ export async function generateMetadata({
   return {
     metadataBase: new URL(SITE_URL),
     title: {
-      default: "MaydaLabs — Websites, software & automation",
+      default: `MaydaLabs — ${SITE_TITLES[lang]}`,
       template: "%s · MaydaLabs",
     },
     description,

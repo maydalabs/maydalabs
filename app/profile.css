@@ -1,0 +1,3 @@
+/* Ownership and stage labels remain readable on narrow screens. */
+.mayda-profile .mayda-tag { white-space:normal; max-width:100%; line-height:1.55; }
+.mayda-profile .mayda-card { min-width:0; }
