@@ -88,12 +88,15 @@ export async function runOsDraftAction(_prev: OsRunState, formData: FormData): P
   // already spent this month is the sum of what its runs actually cost, so
   // the limit is measured in the same units it is set in.
   const since = monthStart();
-  const { data: monthRuns } = await admin
+  const { data: monthRuns, error: monthError } = await admin
     .from("os_runs")
     .select("cost_usd")
     .eq("workflow_id", workflow.id)
     .gte("created_at", since.toISOString());
-  const spentThisMonth = (monthRuns ?? []).reduce((total, row) => total + Number(row.cost_usd ?? 0), 0);
+  // Unknown spend is not zero spend. Refuse before any source/model request
+  // if the database cannot establish the applicable budget usage.
+  if (monthError || !monthRuns) return { status: "error", code: "save_failed" };
+  const spentThisMonth = monthRuns.reduce((total, row) => total + Number(row.cost_usd ?? 0), 0);
   const budget = workflowBudget(spentThisMonth, Number(workflow.monthly_budget_usd ?? OS_DEFAULT_MONTHLY_BUDGET_USD));
   if (budget.exhausted) {
     return {
@@ -105,11 +108,12 @@ export async function runOsDraftAction(_prev: OsRunState, formData: FormData): P
 
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
-  const { data: todayRuns } = await admin
+  const { data: todayRuns, error: todayError } = await admin
     .from("os_runs")
     .select("cost_usd")
     .gte("created_at", today.toISOString());
-  const spentToday = (todayRuns ?? []).reduce((total, row) => total + Number(row.cost_usd ?? 0), 0);
+  if (todayError || !todayRuns) return { status: "error", code: "save_failed" };
+  const spentToday = todayRuns.reduce((total, row) => total + Number(row.cost_usd ?? 0), 0);
   if (spentToday >= DAILY_USD_CAP) return { status: "error", code: "daily_cap" };
 
   const { sources, failures } = await gatherSources(standing, urls, {
