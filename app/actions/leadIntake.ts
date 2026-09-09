@@ -8,8 +8,11 @@ import {
   cleanUtm,
   looksAutomated,
   validateIntake,
+  type IntakeInput,
 } from "@/lib/intakeValidation";
 import { checkRateLimit, clientKeyFromHeaders } from "@/lib/rateLimit";
+import { isEmailConfigured, notifyAddress, sendEmail } from "@/lib/email";
+import { acknowledgementEmail, notificationEmail } from "@/lib/emailTemplates";
 import { computeMapResult, parseMapAnswers, RUBRIC_VERSION } from "@/lib/multiplierMap";
 import { MAP_CLAIM_COOKIE, MAP_CLAIM_COOKIE_OPTIONS } from "@/lib/mapClaim";
 
@@ -25,8 +28,12 @@ export type IntakeFormState = {
  * checks, per-IP rate limiting, strict validation, and inserts through the
  * service credential only — the anon role has no table privileges at all.
  *
- * Nothing here contacts the lead or writes to Abidin. Intakes wait for
- * manual review; Abidin remains the canonical commercial record.
+ * Two transactional emails go out once the row is safely stored: an
+ * acknowledgement to the person and a notification to the operator. Both are
+ * best-effort — the enquiry is already saved, so a mail failure must never
+ * turn into a lost lead or an error the visitor sees. Nothing else is sent,
+ * nothing is written to Abidin, and the updates subscription stays pending;
+ * Abidin remains the canonical commercial record.
  */
 export async function submitLeadIntakeAction(
   _prev: IntakeFormState,
@@ -174,6 +181,8 @@ export async function submitLeadIntakeAction(
     );
   }
 
+  await notifyOfIntake(intake);
+
   return { status: "submitted" };
 }
 
@@ -182,5 +191,41 @@ function safeParseJson(value: string): unknown {
     return JSON.parse(value);
   } catch {
     return null;
+  }
+}
+
+/*
+ * Tell the person we have their message, and tell the operator it arrived.
+ *
+ * Both are awaited rather than left running: a serverless invocation can end
+ * the moment the action returns, and a fire-and-forget send would sometimes
+ * simply not happen. Both are also swallowed on failure — the row is already
+ * written, and no visitor should see an error because a mail provider was
+ * slow. When no key is configured the whole thing is a no-op, which is the
+ * state production is in until one is set.
+ */
+async function notifyOfIntake(intake: IntakeInput): Promise<void> {
+  if (!isEmailConfigured()) return;
+
+  const ack = acknowledgementEmail(intake);
+  const internal = notificationEmail(intake);
+
+  const results = await Promise.allSettled([
+    sendEmail({ to: intake.email, subject: ack.subject, html: ack.html, text: ack.text }),
+    sendEmail({
+      to: notifyAddress(),
+      subject: internal.subject,
+      html: internal.html,
+      text: internal.text,
+      // So replying goes straight to them instead of to ourselves.
+      replyTo: intake.email,
+    }),
+  ]);
+
+  for (const result of results) {
+    // Visible in the platform log without exposing anything about the
+    // person: the record is in the database either way.
+    if (result.status === "rejected") console.error("intake email not delivered: threw");
+    else if (!result.value.ok) console.error("intake email not delivered:", result.value.reason);
   }
 }
