@@ -1,21 +1,34 @@
 # MaydaLabs
 
-**AI-run operations, you stay in control.**
+**Build what's next. Run it better.**
 
-MaydaLabs installs AI operating systems that run real business workflows, with
-a human approval gate on every action that leaves the system. Built and
-operated by [Mehmet E. Mayda](https://maydalabs.com/profile) from Istanbul.
+MaydaLabs builds websites and software, automates repetitive work, and connects
+the systems a business uses to win and serve customers. Built and operated by
+[Mehmet E. Mayda](https://maydalabs.com/profile) from Istanbul, for companies in
+any industry.
 
-Two offers, both already running in production:
+Five services. Scope, price and responsibilities are agreed per project; there
+is no public price list and no subscription to get started.
 
-| Offer | What it is | Proof |
-| --- | --- | --- |
-| **Evidence-gated AI operations** | Pick the workflow. We install the system. Pilot from $2,500, three to four weeks, then from $1,000 a month. | [Satoshi Gazette](https://satoshigazette.org) runs on it, publicly. |
-| **Bitcoin payments engineering** | Scoped, fixed-price engagements. | [HodlStay](https://hodlstay.com)'s production payment system, built end to end. |
+| Service | What it is |
+| --- | --- |
+| **[Websites & online stores](https://maydalabs.com/services/websites-and-ecommerce)** | New sites, redesigns and stores, with the enquiry, booking or checkout journey that goes with them. |
+| **[Custom software](https://maydalabs.com/services/custom-software)** | Web apps, customer portals, dashboards and internal tools, frontend through database. |
+| **[AI & automation](https://maydalabs.com/services/ai-and-automation)** | Connect the tools, automate the repeated work, and put a person in front of anything consequential. |
+| **[Email & customer journeys](https://maydalabs.com/services/email-and-customer-journeys)** | Lead routing, CRM connections, onboarding and follow-up that respect consent. |
+| **[Fixes & ongoing support](https://maydalabs.com/services/fixes-and-support)** | Finish, repair and look after software a business already depends on. |
 
-Satoshi Gazette is the demo. A Bitcoin-only publication operated through the
-system: not a mockup, not a pitch deck, a running business you can read right
-now.
+On the two that can be operated rather than only installed, automation and email
+journeys, MaydaLabs can also keep running the work with you: each piece is
+prepared and handed over for approval, month to month, and nothing goes out
+without a decision. Optional, and scoped before it starts.
+
+**Proof you can open.** [HodlStay](https://hodlstay.com) is a client build,
+live: a booking platform with guest and host journeys, payments and a full-stack
+rebuild. [Satoshi Gazette](https://satoshigazette.org) is owned and editorially
+independent, not a client engagement: a publication with data desks and
+source-linked editorial workflows, and the working example of the approval-gated
+method described below.
 
 **[Founder profile](https://maydalabs.com/profile)** · **[Selected work](https://maydalabs.com/case-studies)** · **[What do you need?](https://maydalabs.com/contact)**
 
@@ -25,9 +38,10 @@ now.
 
 ## What this repository is
 
-The MaydaLabs platform: the public marketing surface, an authenticated client
-portal, the pilot intake and review workflow, and an on-chain Bitcoin invoicing
-path that takes payment without a processor and without a custodial server.
+The MaydaLabs platform: the public marketing surface in three languages, the
+authenticated client portal where a client reviews and approves the work, the
+engagement and proposal flow behind it, and an on-chain Bitcoin invoicing path
+that takes payment without a processor and without a custodial server.
 
 It is also the honest answer to "show me your code." Everything below is in
 this repository and can be read rather than taken on trust.
