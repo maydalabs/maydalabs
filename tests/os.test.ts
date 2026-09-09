@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { creditsLeft, normalizeSourceUrl, parseSourceUrls, runCostUsd, OS_MAX_SOURCES } from "@/lib/os";
+import { formatUsd, monthStart, normalizeSourceUrl, parseSourceUrls, runCostUsd, workflowBudget, OS_MAX_SOURCES } from "@/lib/os";
 import { fetchSource, isFailure } from "@/lib/osSources";
 import { draftFromSources, type DraftClient } from "@/lib/osDraft";
 
@@ -55,16 +55,44 @@ describe("fetchSource refuses to look inside our own network", () => {
   });
 });
 
-describe("credits and cost", () => {
-  it("never reports a negative balance", () => {
-    expect(creditsLeft(10, 3)).toBe(7);
-    expect(creditsLeft(10, 12)).toBe(0);
-  });
-
+describe("budget and cost", () => {
   it("prices a run at the model's published rates", () => {
     // 6 000 in, 1 000 out on Opus 5: $0.03 + $0.025.
     expect(runCostUsd(6_000, 1_000)).toBeCloseTo(0.055, 6);
     expect(runCostUsd(0, 0)).toBe(0);
+  });
+
+  it("reports what a workflow has left this month", () => {
+    const budget = workflowBudget(1.25, 5);
+    expect(budget.spentUsd).toBe(1.25);
+    expect(budget.leftUsd).toBe(3.75);
+    expect(budget.exhausted).toBe(false);
+  });
+
+  it("never reports a negative balance, and calls an overspend exhausted", () => {
+    const over = workflowBudget(7.5, 5);
+    expect(over.leftUsd).toBe(0);
+    expect(over.exhausted).toBe(true);
+    expect(workflowBudget(5, 5).exhausted).toBe(true);
+  });
+
+  /* A budget of zero pauses a workflow without deactivating or deleting it,
+   * so it has to read as exhausted rather than as unlimited. */
+  it("treats a zero budget as spent", () => {
+    expect(workflowBudget(0, 0).exhausted).toBe(true);
+  });
+
+  /* A balance of a thousandth of a cent must not read as money left. */
+  it("settles the balance at the cent it is displayed in", () => {
+    expect(workflowBudget(4.9999, 5).exhausted).toBe(true);
+    expect(formatUsd(5)).toBe("$5.00");
+    expect(formatUsd(0.055)).toBe("$0.06");
+  });
+
+  it("starts the month at the first instant of the UTC month", () => {
+    expect(monthStart(new Date("2026-09-30T23:59:59.999Z")).toISOString()).toBe("2026-09-01T00:00:00.000Z");
+    // A local time before UTC midnight on the first must not fall back a month.
+    expect(monthStart(new Date("2026-09-01T00:00:00.000Z")).toISOString()).toBe("2026-09-01T00:00:00.000Z");
   });
 });
 

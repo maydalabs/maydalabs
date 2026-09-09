@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { saveOsWorkflowAction, type OsWorkflowFormState } from "@/app/actions/os";
-import { asStandingSources, standingSourcesToText, type OsWorkflow } from "@/lib/os";
+import { OS_DEFAULT_MONTHLY_BUDGET_USD, asStandingSources, standingSourcesToText, type OsWorkflow } from "@/lib/os";
 
 /* Installing a workflow, which is the operator's core move: a pilot is a
  * workflow installed by hand, and the product is the same thing self-serve
@@ -72,6 +72,17 @@ export function OsWorkflowForm({
         <label className="mayda-field">
           <span>Feed window (days)</span>
           <input name="windowDays" type="number" min="1" max="90" defaultValue={workflow?.window_days ?? 7} />
+        </label>
+        <label className="mayda-field">
+          <span>Monthly budget (USD) — 0 pauses it without deactivating it</span>
+          <input
+            name="monthlyBudgetUsd"
+            type="number"
+            min="0"
+            max="10000"
+            step="0.01"
+            defaultValue={workflow?.monthly_budget_usd ?? OS_DEFAULT_MONTHLY_BUDGET_USD}
+          />
         </label>
         <label className="mayda-field">
           <span>Destination (where it is meant to go)</span>

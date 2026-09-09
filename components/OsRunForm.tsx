@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { runOsDraftAction, type OsRunState } from "@/app/actions/os";
 import { OS_TOPIC_LIMIT, asStandingSources, type OsWorkflow } from "@/lib/os";
-import type { OsDeskCopy } from "@/components/osCopy";
+import { fillBudget, type OsDeskCopy } from "@/components/osCopy";
 
 const IDLE: OsRunState = { status: "idle" };
 
@@ -11,32 +11,41 @@ function Message({ state, copy }: { state: OsRunState; copy: OsDeskCopy }) {
   if (state.status !== "error") return null;
   const fallback =
     state.code === "invite_only"
-      ? "The beta is invite-only for now."
+      ? "MaydaOS is not switched on for this account."
       : state.code === "no_workflow"
         ? "Pick a workflow."
-      : state.code === "no_credits"
+      : state.code === "budget_spent"
         ? copy.outOfHeading
       : state.code === "daily_cap"
-        ? "The beta has hit its budget for today. Try again tomorrow."
+        ? "MaydaOS has hit its ceiling for today. Try again tomorrow."
         : state.code === "not_signed_in"
           ? "Sign in first."
           : "That did not work.";
   return <span className="mayda-field-error" role="alert">{state.message ?? fallback}</span>;
 }
 
+/* Money the client can see before they spend it. Present only for a workflow
+ * installed for this person: a shared template is run by other people too, and
+ * their runs are rightly invisible here, so its total would be understated. */
+export type WorkflowBudgets = Record<string, { spent: string; budget: string; exhausted: boolean }>;
+
 export function OsRunForm({
   copy,
   disabled,
   workflows,
+  budgets = {},
 }: {
   copy: OsDeskCopy;
   disabled: boolean;
   workflows: OsWorkflow[];
+  budgets?: WorkflowBudgets;
 }) {
   const [state, dispatch, pending] = useActionState(runOsDraftAction, IDLE);
   const [selectedId, setSelectedId] = useState(workflows[0]?.id ?? "");
   const selected = workflows.find((workflow) => workflow.id === selectedId) ?? workflows[0];
   const standing = asStandingSources(selected?.standing_sources);
+  const budget = selected ? budgets[selected.id] : undefined;
+  const spent = Boolean(budget?.exhausted);
 
   return (
     <form action={dispatch} className="mayda-stack" style={{ gap: "0.8rem" }}>
@@ -85,13 +94,18 @@ export function OsRunForm({
       </label>
 
       <div className="mayda-hero-actions" style={{ gap: "0.7rem" }}>
-        <button type="submit" className="mayda-button" disabled={pending || disabled}>
+        <button type="submit" className="mayda-button" disabled={pending || disabled || spent}>
           {pending ? copy.running : copy.run}
         </button>
         <Message state={state} copy={copy} />
       </div>
+      {budget ? (
+        <p className="mayda-note" style={{ margin: 0 }}>
+          {spent ? copy.outOfHeading : fillBudget(copy.budgetLine, budget.spent, budget.budget)}
+        </p>
+      ) : null}
       <p className="mayda-note" style={{ margin: 0 }}>
-        {selected?.purpose} {copy.creditsNote}
+        {selected?.purpose} {copy.budgetNote}
       </p>
     </form>
   );

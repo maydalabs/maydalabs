@@ -34,6 +34,99 @@ export type Database = {
   }
   public: {
     Tables: {
+      company_prospects: {
+        Row: {
+          abidin_work_item_id: string | null
+          active_application_hold: boolean
+          aliases: string[]
+          bitcoin_relation: string
+          buyer_need: string
+          category: string
+          company_name: string
+          company_type: string
+          description_source_urls: string[]
+          description_status: string
+          evidence: Json
+          existing_job_record_count: number
+          imported_at: string
+          job_openings_status: string
+          last_checked_at: string | null
+          notes: string[]
+          outreach_authorized: boolean
+          parent_registry_id: string | null
+          products_services: string[]
+          qualification: string
+          registry_id: string
+          research_status: string
+          snapshot_date: string
+          snapshot_sha256: string
+          source_urls: string[]
+          verification_status: string
+          website: string | null
+          what_they_do: string | null
+        }
+        Insert: {
+          abidin_work_item_id?: string | null
+          active_application_hold?: boolean
+          aliases?: string[]
+          bitcoin_relation: string
+          buyer_need?: string
+          category: string
+          company_name: string
+          company_type: string
+          description_source_urls?: string[]
+          description_status: string
+          evidence: Json
+          existing_job_record_count?: number
+          imported_at?: string
+          job_openings_status?: string
+          last_checked_at?: string | null
+          notes?: string[]
+          outreach_authorized?: boolean
+          parent_registry_id?: string | null
+          products_services?: string[]
+          qualification?: string
+          registry_id: string
+          research_status: string
+          snapshot_date: string
+          snapshot_sha256: string
+          source_urls?: string[]
+          verification_status: string
+          website?: string | null
+          what_they_do?: string | null
+        }
+        Update: {
+          abidin_work_item_id?: string | null
+          active_application_hold?: boolean
+          aliases?: string[]
+          bitcoin_relation?: string
+          buyer_need?: string
+          category?: string
+          company_name?: string
+          company_type?: string
+          description_source_urls?: string[]
+          description_status?: string
+          evidence?: Json
+          existing_job_record_count?: number
+          imported_at?: string
+          job_openings_status?: string
+          last_checked_at?: string | null
+          notes?: string[]
+          outreach_authorized?: boolean
+          parent_registry_id?: string | null
+          products_services?: string[]
+          qualification?: string
+          registry_id?: string
+          research_status?: string
+          snapshot_date?: string
+          snapshot_sha256?: string
+          source_urls?: string[]
+          verification_status?: string
+          website?: string | null
+          what_they_do?: string | null
+        }
+        Relationships: []
+      }
       lead_intakes: {
         Row: {
           abidin_record_id: string | null
@@ -287,6 +380,7 @@ export type Database = {
           id: string
           key: string
           max_sources: number
+          monthly_budget_usd: number
           name: string
           owner_user_id: string | null
           purpose: string
@@ -303,6 +397,7 @@ export type Database = {
           id?: string
           key: string
           max_sources?: number
+          monthly_budget_usd?: number
           name: string
           owner_user_id?: string | null
           purpose: string
@@ -319,6 +414,7 @@ export type Database = {
           id?: string
           key?: string
           max_sources?: number
+          monthly_budget_usd?: number
           name?: string
           owner_user_id?: string | null
           purpose?: string

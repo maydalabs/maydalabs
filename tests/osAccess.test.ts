@@ -9,7 +9,7 @@ vi.mock("@/lib/supabase/server", () => ({
 }));
 vi.mock("next/navigation", () => ({ notFound: () => { throw new Error("NOT_FOUND"); } }));
 import { getOsBetaAccess } from "@/lib/osBetaAccess";
-import { requireOsSession } from "@/lib/osSession";
+import { getOsSession, requireOsSession } from "@/lib/osSession";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -44,15 +44,23 @@ describe("private beta authority", () => {
     mocks.claims.mockResolvedValue({ sub: "verified-user", user_metadata: { role: "operator", os_beta: true } });
     expect((await getOsBetaAccess()).allowed).toBe(false);
   });
-  it("rejects a page before querying credits or rendering the workspace", async () => {
+  it("rejects a page before reading anything else or rendering the workspace", async () => {
     await expect(requireOsSession()).rejects.toThrow("NOT_FOUND");
     expect(mocks.from.mock.calls.map(([table]) => table)).toEqual(["os_beta_status"]);
   });
-  it("scopes the admitted member's credits even when they are an operator", async () => {
-    mocks.single
-      .mockResolvedValueOnce({ data: { user_id: "verified-user" }, error: null })
-      .mockResolvedValueOnce({ data: { granted: 10, used: 3 }, error: null });
-    expect((await requireOsSession()).credits.left).toBe(7);
-    expect(mocks.eq).toHaveBeenNthCalledWith(2, "user_id", "verified-user");
+  /* The budget belongs to the workflow now, so a page load must not go
+   * looking for a per-person balance that no longer decides anything. */
+  it("admits a member without reading any per-person balance", async () => {
+    mocks.single.mockResolvedValue({ data: { user_id: "verified-user" }, error: null });
+    const session = await requireOsSession();
+    expect(session.claims.sub).toBe("verified-user");
+    expect(mocks.from.mock.calls.map(([table]) => table)).toEqual(["os_beta_status"]);
+  });
+  it("hides the work from a non-member without redirecting them away", async () => {
+    expect(await getOsSession()).toBeNull();
+  });
+  it("hands a member the same authority without a redirect", async () => {
+    mocks.single.mockResolvedValue({ data: { user_id: "verified-user" }, error: null });
+    expect((await getOsSession())?.claims.sub).toBe("verified-user");
   });
 });

@@ -4,7 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../field.css";
 import "../brand.css";
-import { SiteChromeFooter, SiteChromeHeader } from "@/components/SiteChrome";
+import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { GoogleTagManager } from "@/components/GoogleTagManager";
 import { SiteAnalytics } from "@/components/SiteAnalytics";
@@ -166,9 +166,9 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-        <SiteChromeHeader locale={lang} />
+        <SiteHeader locale={lang} />
         <main className="min-h-screen">{children}</main>
-        <SiteChromeFooter><SiteFooter locale={lang} /></SiteChromeFooter>
+        <SiteFooter locale={lang} />
         {hasVercelRuntime ? (
           <>
             <Analytics />

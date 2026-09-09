@@ -10,21 +10,23 @@ import { gatherSources } from "@/lib/osGather";
 import {
   asStandingSources,
   parseStandingSources,
+  monthStart,
+  workflowBudget,
   OS_MODEL,
   OS_EFFORT,
-  OS_STARTING_CREDITS,
+  OS_DEFAULT_MONTHLY_BUDGET_USD,
   OS_TOPIC_LIMIT,
   parseSourceUrls,
   runCostUsd,
 } from "@/lib/os";
 
 /*
- * One run of the MaydaOS beta.
+ * One run of a workflow.
  *
- * Two budgets stand between a signed-in stranger and the API bill: the
- * person's own credits, and a daily ceiling across everyone. A credit is
- * spent only when the model actually produced something, so a failed fetch
- * or a model error costs the person nothing.
+ * Two budgets stand between a run and the API bill: what this workflow may
+ * spend this calendar month, and a daily ceiling across every workflow. Only
+ * work that exists is charged, so a failed fetch or a model error costs
+ * nothing and is still recorded.
  */
 
 export type OsRunState = {
@@ -32,7 +34,7 @@ export type OsRunState = {
   code?:
     | "not_signed_in"
     | "invite_only"
-    | "no_credits"
+    | "budget_spent"
     | "daily_cap"
     | "invalid"
     | "no_workflow"
@@ -42,8 +44,8 @@ export type OsRunState = {
   message?: string;
 };
 
-/* Worst case this many dollars a day, so a bug or an enthusiast costs days
- * rather than the whole balance in an afternoon. */
+/* Worst case this many dollars a day across every workflow, so a bug or a
+ * busy morning costs days rather than the whole balance in an afternoon. */
 const DAILY_USD_CAP = Number(process.env.MAYDAOS_DAILY_USD_CAP ?? "2");
 
 export async function runOsDraftAction(_prev: OsRunState, formData: FormData): Promise<OsRunState> {
@@ -63,7 +65,7 @@ export async function runOsDraftAction(_prev: OsRunState, formData: FormData): P
   // decides whether it is a template or one installed for them.
   const { data: workflow } = await scoped
     .from("os_workflows")
-    .select("id, key, name, brief, shape, max_sources, active, standing_sources, window_days")
+    .select("id, key, name, brief, shape, max_sources, active, standing_sources, window_days, monthly_budget_usd")
     .eq("id", workflowId)
     .maybeSingle();
   if (!workflow || !workflow.active) return { status: "error", code: "no_workflow" };
@@ -82,33 +84,32 @@ export async function runOsDraftAction(_prev: OsRunState, formData: FormData): P
   const admin = createSupabaseAdminClient();
   if (!admin) return { status: "error", code: "save_failed" };
 
-  // Balance first: everything after this costs money. A first-time visitor
-  // gets their grant here rather than at sign-up, so the row exists only for
-  // people who actually try it.
-  let { data: credit } = await admin
-    .from("os_credits")
-    .select("granted, used")
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (!credit) {
-    const { data: created } = await admin
-      .from("os_credits")
-      .insert({ user_id: userId, granted: OS_STARTING_CREDITS })
-      .select("granted, used")
-      .maybeSingle();
-    credit = created ?? { granted: OS_STARTING_CREDITS, used: 0 };
-  }
-
-  if (credit.granted - credit.used <= 0) return { status: "error", code: "no_credits" };
-
-  const since = new Date();
-  since.setUTCHours(0, 0, 0, 0);
-  const { data: today } = await admin
+  // Budget first: everything after this costs money. What this workflow has
+  // already spent this month is the sum of what its runs actually cost, so
+  // the limit is measured in the same units it is set in.
+  const since = monthStart();
+  const { data: monthRuns } = await admin
     .from("os_runs")
     .select("cost_usd")
+    .eq("workflow_id", workflow.id)
     .gte("created_at", since.toISOString());
-  const spentToday = (today ?? []).reduce((total, row) => total + Number(row.cost_usd ?? 0), 0);
+  const spentThisMonth = (monthRuns ?? []).reduce((total, row) => total + Number(row.cost_usd ?? 0), 0);
+  const budget = workflowBudget(spentThisMonth, Number(workflow.monthly_budget_usd ?? OS_DEFAULT_MONTHLY_BUDGET_USD));
+  if (budget.exhausted) {
+    return {
+      status: "error",
+      code: "budget_spent",
+      message: `${workflow.name} has used its budget for this month ($${budget.budgetUsd.toFixed(2)}).`,
+    };
+  }
+
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const { data: todayRuns } = await admin
+    .from("os_runs")
+    .select("cost_usd")
+    .gte("created_at", today.toISOString());
+  const spentToday = (todayRuns ?? []).reduce((total, row) => total + Number(row.cost_usd ?? 0), 0);
   if (spentToday >= DAILY_USD_CAP) return { status: "error", code: "daily_cap" };
 
   const { sources, failures } = await gatherSources(standing, urls, {
@@ -138,7 +139,7 @@ export async function runOsDraftAction(_prev: OsRunState, formData: FormData): P
       effort: OS_EFFORT,
       error: drafted.error.slice(0, 500),
     });
-    revalidatePath("/os/desk");
+    revalidatePath("/portal");
     return { status: "error", code: "model_failed", message: drafted.error };
   }
 
@@ -160,11 +161,11 @@ export async function runOsDraftAction(_prev: OsRunState, formData: FormData): P
   });
   if (insertError) return { status: "error", code: "save_failed" };
 
-  // Charged only now, for work that exists, and incremented in the database
-  // so two runs at once cannot both spend the same last credit.
-  await admin.rpc("os_spend_credit", { p_user_id: userId });
-
-  revalidatePath("/os/desk");
+  // Nothing further to charge: the run row carries its own cost, and the
+  // month's spend is the sum of those rows. There is no second number to
+  // keep in step with the first.
+  revalidatePath("/portal");
+  revalidatePath("/portal/work");
   return { status: "drafted" };
 }
 
@@ -189,30 +190,8 @@ export async function decideOsRunAction(formData: FormData): Promise<void> {
     .update({ decision, decision_note: note, decided_at: new Date().toISOString() })
     .eq("id", runId);
 
-  revalidatePath("/os/desk");
-}
-
-/* Operator-only: more rope for one person, decided case by case while
- * pricing stays switched off. */
-export async function grantOsCreditsAction(formData: FormData): Promise<void> {
-  if (!isSupabaseConfigured()) return;
-  const claims = await getVerifiedClaims();
-  if (!claims?.sub) return;
-
-  const supabase = await createSupabaseServerClient();
-  const { data: operator } = await supabase.from("operator_status").select("user_id").maybeSingle();
-  if (!operator) return;
-
-  const userId = String(formData.get("userId") ?? "");
-  if (!/^[0-9a-f-]{36}$/.test(userId)) return;
-  const granted = Number(formData.get("granted"));
-  if (!Number.isInteger(granted) || granted < 0 || granted > 1000) return;
-
-  // Row-level security already limits this to operators; the check above only
-  // avoids doing the work for anyone else.
-  await supabase.from("os_credits").update({ granted }).eq("user_id", userId);
-
-  revalidatePath("/internal/os");
+  revalidatePath("/portal");
+  revalidatePath("/portal/work");
 }
 
 /* Where an approved draft ended up. MaydaOS never posts anything, so this is
@@ -245,8 +224,8 @@ export async function recordOsOutcomeAction(formData: FormData): Promise<void> {
     .eq("id", runId)
     .eq("decision", "approved");
 
-  revalidatePath("/os/desk");
-  revalidatePath("/os/record");
+  revalidatePath("/portal");
+  revalidatePath("/portal/work");
 }
 
 export type OsWorkflowFormState = {
@@ -285,6 +264,12 @@ export async function saveOsWorkflowAction(
   const destination = String(formData.get("destination") ?? "").trim().slice(0, 200) || null;
   const maxSources = Math.min(5, Math.max(1, Number(formData.get("maxSources")) || 5));
   const windowDays = Math.min(90, Math.max(1, Number(formData.get("windowDays")) || 7));
+  // The month's ceiling for this workflow. Zero is allowed and meaningful:
+  // it pauses the workflow without deactivating or deleting it.
+  const rawBudget = Number(formData.get("monthlyBudgetUsd"));
+  const monthlyBudgetUsd = Number.isFinite(rawBudget)
+    ? Math.min(10_000, Math.max(0, Math.round(rawBudget * 100) / 100))
+    : OS_DEFAULT_MONTHLY_BUDGET_USD;
   const standingSources = parseStandingSources(String(formData.get("standingSources") ?? ""));
   const active = formData.get("active") === "on";
 
@@ -311,6 +296,7 @@ export async function saveOsWorkflowAction(
       destination,
       max_sources: maxSources,
       window_days: windowDays,
+      monthly_budget_usd: monthlyBudgetUsd,
       standing_sources: standingSources,
       active,
     },
@@ -319,6 +305,6 @@ export async function saveOsWorkflowAction(
   if (error) return { status: "error", code: "save_failed" };
 
   revalidatePath("/internal/os");
-  revalidatePath("/os/desk");
+  revalidatePath("/portal");
   return { status: "saved" };
 }

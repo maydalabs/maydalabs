@@ -1,11 +1,12 @@
-# MaydaOS beta
+# MaydaOS beta (historical)
 
-> Superseded access model, September 5: Mehmet has closed MaydaOS to the public.
-> Read [private beta and rollout](private-beta-2026-09-05.md) first. The
-> public/free-entry and email-allowlist descriptions below are historical.
-> The current code uses live database membership plus operator access, fails
-> closed, and keeps the ordinary client portal separate. No public signup,
-> top-up, account creation, or deployment is authorized by this document.
+> **Superseded, 9 September 2026.** MaydaOS is no longer a beta, a public
+> destination, or a separate product. It was folded into the client's own
+> portal and its credits became a per-workflow monthly budget. Read
+> [what it is now](maydaos-direction-2026-09-09.md) first. Everything below —
+> ten credits for life, the desk at `/os`, the email allowlist, the free-entry
+> ladder — is historical, and the cost figures are the only part still current.
+> Nothing here authorizes a public signup, a top-up, or a deployment.
 
 Shipped 4 Sep 2026 (`2c19ef9`), migration applied to production. Hidden until
 the API key exists, so nothing is promised that cannot run.

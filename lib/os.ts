@@ -11,9 +11,10 @@ export type OsShape = (typeof OS_SHAPES)[number];
 export const OS_DECISIONS = ["pending", "approved", "rejected"] as const;
 export type OsDecision = (typeof OS_DECISIONS)[number];
 
-/* Ten for life, not ten a week. A refill costs money forever and never asks
- * anyone to decide anything; a wall is where the conversation starts. */
-export const OS_STARTING_CREDITS = 10;
+/* What a newly installed workflow may spend per month until the operator
+ * sets its real number. Small on purpose: an unset budget should be noticed
+ * in the first week, not at the end of the month. */
+export const OS_DEFAULT_MONTHLY_BUDGET_USD = 5;
 
 /* Guards that keep one person from emptying the budget. */
 export const OS_MAX_SOURCES = 5;
@@ -38,8 +39,30 @@ export function runCostUsd(inputTokens: number, outputTokens: number): number {
   return Math.round((input + output) * 1_000_000) / 1_000_000;
 }
 
-export function creditsLeft(granted: number, used: number): number {
-  return Math.max(0, granted - used);
+/* The first instant of the current calendar month, in UTC.
+ *
+ * Calendar month rather than a rolling window: a client reading "spent this
+ * month" means the month on the calendar, and a rolling 30 days would make
+ * the same workflow affordable or not depending on the day it is asked. */
+export function monthStart(now: Date = new Date()): Date {
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+}
+
+/* Money as the client reads it. Two decimals always, so a budget of five
+ * dollars is "$5.00" and never "$5". */
+export function formatUsd(value: number): string {
+  return `$${(Math.round(value * 100) / 100).toFixed(2)}`;
+}
+
+export type OsBudget = { spentUsd: number; budgetUsd: number; leftUsd: number; exhausted: boolean };
+
+/* What a workflow has left this month. Rounded to the cent it is reported in,
+ * so a balance of a thousandth of a cent does not read as money left. */
+export function workflowBudget(spentUsd: number, budgetUsd: number): OsBudget {
+  const spent = Math.max(0, Math.round(spentUsd * 100) / 100);
+  const budget = Math.max(0, Math.round(budgetUsd * 100) / 100);
+  const left = Math.round((budget - spent) * 100) / 100;
+  return { spentUsd: spent, budgetUsd: budget, leftUsd: Math.max(0, left), exhausted: left <= 0 };
 }
 
 /* A workflow's instruction lives in the os_workflows row, not here: a
@@ -58,6 +81,9 @@ export type OsWorkflow = {
    * the desk demand links from a workflow that already had its own. */
   standing_sources: unknown;
   window_days: number;
+  /* Required for the same reason as the two above: a page that forgets to
+   * select it would render a budget of zero and refuse to run. */
+  monthly_budget_usd: number;
 };
 
 /* http(s) only, and no credentials or fragments smuggled in. Shape only;

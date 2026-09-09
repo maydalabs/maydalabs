@@ -716,6 +716,51 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       expect(tampered ?? []).toHaveLength(0);
     });
 
+    /* The budget is what a workflow may spend on model calls in a month, so
+     * the client it is installed for is exactly the person who must not be
+     * able to raise it. The positive half matters as much as the negative:
+     * an operator who cannot set it would leave every workflow on its
+     * default, and a test that only proves a client cannot write passes for
+     * the wrong reason when nobody can. */
+    it("lets an operator set a workflow's monthly budget and refuses the client", async () => {
+      const { data: workflow } = await admin
+        .from("os_workflows")
+        .insert({
+          key: `budgeted_${suffix}`,
+          owner_user_id: idA,
+          name: "Budgeted",
+          purpose: "Installed for one client.",
+          brief: "a note",
+        })
+        .select("id, monthly_budget_usd")
+        .single();
+      // The default exists so a newly installed workflow is never unlimited.
+      expect(Number(workflow!.monthly_budget_usd)).toBe(5);
+
+      const { data: raised } = await userB
+        .from("os_workflows")
+        .update({ monthly_budget_usd: 25 })
+        .eq("id", workflow!.id)
+        .select("monthly_budget_usd");
+      expect(raised).toEqual([{ monthly_budget_usd: 25 }]);
+
+      const { data: selfRaised } = await userA
+        .from("os_workflows")
+        .update({ monthly_budget_usd: 9999 })
+        .eq("id", workflow!.id)
+        .select("id");
+      expect(selfRaised ?? []).toHaveLength(0);
+
+      const { data: after } = await admin
+        .from("os_workflows")
+        .select("monthly_budget_usd")
+        .eq("id", workflow!.id)
+        .single();
+      expect(Number(after!.monthly_budget_usd)).toBe(25);
+
+      await admin.from("os_workflows").delete().eq("key", `budgeted_${suffix}`);
+    });
+
     it("blocks a person from inserting a run, and hides other people's runs", async () => {
       const { error } = await userA.from("os_runs").insert({ user_id: idA, topic: "Mine", draft: "Free work" });
       expect(error).not.toBeNull();

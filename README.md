@@ -127,40 +127,37 @@ demo-safe and does not claim a public launch or real payments.
 
 ## MaydaOS
 
-![MaydaOS: the system bar, the dock, and one app in the window](docs/screens/2026-09-maydaos.png)
+MaydaOS is how MaydaLabs delivers and runs work for a client. It is not a
+product for sale, a public destination, or a second brand: the name is
+internal, and the thing itself is one section of the client's own portal.
 
-MaydaOS came back as an operating system rather than a wallpaper. The frame is a
-system bar, a dock, a window, and a status bar. What changed is underneath: the
-dock is made of links, so every app is its own address that can be deep-linked,
-bookmarked, and server-rendered, instead of tabs inside one client component.
+A workflow is installed by hand for one client. It reads its own standing
+sources, produces the piece, and attaches every claim to the source it came
+from. Then it stops, because a person decides what leaves. Nothing is published
+or sent by the system, ever; an approved draft records where its author put it.
 
-MaydaOS is a **private beta**, not a public signup destination. Existing
-operators and explicitly granted database members can use it after signing in;
-ordinary visitors and ordinary accounts cannot enter. The local September 5
-closure requires its migration and application release before production is
-closed too. See [access and rollout](docs/private-beta-2026-09-05.md).
+- **`/portal`** is the whole client surface: work waiting for a decision, then
+  their engagement and invoices, then their account. The work section renders
+  nothing for a client without a workflow installed, so the portal is unchanged
+  for everyone else.
+- **`/portal/work`** is the full record — every run, what it cost, what was
+  decided, and where it ended up. Rejected runs included.
+- **`/internal/os`** is the operator's side: install a workflow, set its brief
+  and its standing sources, and see what each one has spent this month.
 
-The same shell still runs five apps — Desk, Record, Pilot,
-Account, Terminal — and the Desk is the product rather than a picture of it: a
-person hands it links, the model produces the piece with every claim attached to
-the source it came from, and nothing leaves until they approve it. The Record
-keeps what happened, including the runs they rejected.
+The budget belongs to the workflow, not the person: one number per calendar
+month, set by the operator, enforced against what that workflow's runs actually
+cost. A global daily ceiling stands behind it. A run that fails is recorded and
+costs nothing.
 
-The beta gives ten credits for life. One credit is one model call; adding
-sources, previewing exactly what will be sent, editing, approving, rejecting and
-re-reading the record cost nothing, and a run that fails is recorded but not
-charged. [`docs/maydaos-beta.md`](docs/maydaos-beta.md) has the reasoning, the
-cost per run, and the daily ceiling.
-
-It is still being built. The operator view of beta usage, one-click top-ups, and
-revising a draft are all deliberately unfinished.
+The reasoning, what was deleted, and the freeze rule that governs what happens
+next are in [`docs/maydaos-direction-2026-09-09.md`](docs/maydaos-direction-2026-09-09.md).
 
 ## Architecture
 
 ```text
 app/[lang]/       Localized pages, metadata, and route composition
-app/[lang]/portal Authenticated client portal
-app/[lang]/os     Private MaydaOS beta; verified membership on every page/action
+app/[lang]/portal Authenticated client surface: work, engagement, account
 app/api/          Public telemetry endpoint
 components/       Interface, forms, diagrams, and case-study components
 lib/              Payments, Bitcoin address validation, Supabase clients,

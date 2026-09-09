@@ -34,6 +34,19 @@ export function ServiceLanding({ id, locale }: { id: ServiceId; locale: Locale }
         <div className="svc-proof-copy"><p className="mayda-kicker">{id === "email" ? c.approach : c.proof}</p><h2 id="service-proof">{id === "email" ? c.proofEmailTitle : caseName}</h2>{id !== "email" && <p className="mayda-tag">{id === "automation" ? c.owned : c.client}</p>}<p>{page.proof}</p>{id !== "email" && <Link className="mayda-text-link" href={localizePath(`/case-studies/${caseKey}`, locale)}>{c.case} <span aria-hidden="true">↗</span></Link>}</div>
       </section>
 
+      {page.runWithYou ? (
+        <section className="svc-run" aria-labelledby="service-run">
+          <div>
+            <p className="mayda-kicker">{c.runKicker}</p>
+            <h2 id="service-run">{page.runWithYou.heading}</h2>
+          </div>
+          <div>
+            <p>{page.runWithYou.body}</p>
+            <p className="svc-run-note">{page.runWithYou.note}</p>
+          </div>
+        </section>
+      ) : null}
+
       <section className="svc-faq"><h2>{c.questions}</h2><div>{questions.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div></section>
 
       <section className="svc-next"><div><p className="mayda-kicker">{c.next}</p><h2>{page.cta}</h2></div><div><p>{page.start}</p><Link className="mayda-button" href={contact}>{shared.cta} <span aria-hidden="true">↗</span></Link></div></section>

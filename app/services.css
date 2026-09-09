@@ -105,6 +105,13 @@
 .svc-faq summary { cursor:pointer; font-size:1.0625rem; line-height:1.5; padding-right:1rem; }.svc-faq p { margin-top:1rem; }
 .svc-next { padding:clamp(1.5rem,4vw,4rem); background:radial-gradient(ellipse at 90% 50%,#24564a38,transparent 65%),#111a23; border:1px solid #95b8e230; border-radius:1rem; display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:3rem; }
 .svc-next h2 { max-width:20ch; }.svc-next p { font-size:1rem; line-height:1.75; color:#bcc9dc; margin-bottom:1.5rem; }
+/* Optional continuing operation, offered only where MaydaLabs can truthfully
+   keep running what it built. Quieter than .svc-next: it is a second door,
+   not the page's call to action. */
+.svc-run { display:grid; grid-template-columns:1fr 1.5fr; gap:2rem 3rem; padding:clamp(1.4rem,3vw,2.6rem); border:1px solid #95b8e230; border-radius:1rem; background:#0f1720; }
+.svc-run h2 { font-size:clamp(1.5rem,2.6vw,2rem); max-width:20ch; }
+.svc-run p { font-size:1rem; line-height:1.75; color:#bcc9dc; }
+.svc-run p.svc-run-note { margin-top:1rem; font-size:.875rem; color:#8fa0b8; }
 .svc-related { padding-block:3rem 5rem; }.svc-related h2 { font-size:1.4rem; margin-bottom:1.5rem; }
 .svc-related-links { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }.svc-related-links a { padding:1.2rem 0; border-block:1px solid #afc2df29; font-size:1rem; display:flex; justify-content:space-between; gap:1rem; }.svc-related-links span { color:#89e7c6; }
 .svc-overview-head { padding-top:4rem; }.svc-overview-head h1 { max-width:22ch; }.svc-overview-head > p:not(.mayda-kicker) { font-size:1.125rem; line-height:1.7; max-width:42rem; color:#b0bed2; }
@@ -121,7 +128,7 @@
   .svc-card { grid-column:span 12; }.svc-card-link { padding:1.5rem; }.svc-card .svc-card-heading { font-size:2rem; max-width:24ch; }
   .svc-card-websites .svc-drawing,.svc-card-software .svc-drawing { min-height:14rem; }
   .svc-card-automation .svc-drawing,.svc-card-email .svc-drawing,.svc-card-support .svc-drawing { min-height:11rem; }
-  .svc-hero,.svc-proof,.svc-faq,.svc-next { grid-template-columns:1fr; gap:2rem; }.svc-hero { padding-block:2.5rem 3rem; }.svc-hero h1 { font-size:clamp(2.4rem,6vw,3.75rem); max-width:24ch; }
+  .svc-hero,.svc-proof,.svc-faq,.svc-next,.svc-run { grid-template-columns:1fr; gap:1.5rem; }.svc-hero { padding-block:2.5rem 3rem; }.svc-hero h1 { font-size:clamp(2.4rem,6vw,3.75rem); max-width:24ch; }
   .svc-hero-art .svc-drawing { min-height:13rem; }.svc-fit ul,.svc-scope-grid { grid-template-columns:1fr; gap:1.5rem; }
   .svc-fit li::before { display:inline; margin-right:.7rem; }.svc-fit { padding-bottom:2.5rem; }
   .svc-scope,.svc-faq { padding-block:3.5rem; }.svc-proof { padding:1.25rem; }

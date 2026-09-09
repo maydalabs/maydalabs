@@ -106,29 +106,51 @@ await check("localized routes do not set a language-preference cookie", async ()
   assert(!cookie.includes("maydalabs_locale"), "legacy language-preference cookie is still present");
 });
 
+// MaydaOS is no longer an address. It was folded into the client's own portal,
+// so every /os path is gone rather than gated: nothing here is reachable by
+// anyone, signed in or not. These stay as a regression guard against it ever
+// becoming a public destination again.
 for (const prefix of ["", "/en", "/tr", "/fr"]) {
   for (const route of ["", "/desk", "/record", "/record/00000000-0000-4000-8000-000000000000", "/pilot", "/account", "/terminal"]) {
-    await check(`${prefix}/os${route} does not expose beta content`, async () => {
+    await check(`${prefix}/os${route} is gone`, async () => {
       let response = await request(`${prefix}/os${route}`);
-      // Production canonicalizes /en URLs before the private page runs.
-      // Verify that redirect and then verify the destination's access gate.
+      // Production canonicalizes /en URLs before the page runs.
       if (!isLocalBase && prefix === "/en") {
         assert(response.status === 307, `expected canonical redirect, received ${response.status}`);
         const destination = new URL(response.headers.get("location") || "", baseUrl);
-        assert(destination.pathname === `/os${route}`, "wrong English beta redirect");
+        assert(destination.pathname === `/os${route}`, "wrong English redirect");
         response = await request(`/os${route}`);
       }
       const html = await response.text();
-      assert([200, 404].includes(response.status), `unexpected status ${response.status}`);
-      assert(html.includes('name="robots" content="noindex'), "missing noindex");
+      assert(response.status === 404, `expected 404, received ${response.status}`);
       assert(!html.includes('data-mayda-os="live"'), "workspace exposed");
-      assert(!html.includes("Open the desk"), "public beta invitation exposed");
+      assert(!html.includes("mayda-os-run"), "run interface exposed");
     });
   }
 }
-await check("public home does not link into MaydaOS", async () => {
+
+// The work moved here, and the portal is where a signed-out visitor is asked
+// to sign in rather than shown anything.
+for (const prefix of ["", "/tr", "/fr"]) {
+  for (const route of ["/portal", "/portal/work", "/portal/work/00000000-0000-4000-8000-000000000000"]) {
+    await check(`${prefix}${route} is closed to a signed-out visitor`, async () => {
+      const response = await request(`${prefix}${route}`);
+      assert([307, 404].includes(response.status), `unexpected status ${response.status}`);
+      if (response.status === 307) {
+        const destination = new URL(response.headers.get("location") || "", baseUrl);
+        assert(destination.pathname.endsWith("/auth/sign-in"), `portal sent a stranger to ${destination.pathname}`);
+      }
+      const html = await response.text();
+      assert(!html.includes("mayda-os-run"), "run interface exposed to a signed-out visitor");
+      assert(!html.includes("mayda-os-claims"), "drafted claims exposed to a signed-out visitor");
+    });
+  }
+}
+
+await check("public home does not link into MaydaOS or the portal work screen", async () => {
   const html = await (await request("/")).text();
   assert(!/href="\/(?:en\/|tr\/|fr\/)?os(?:\/|")/.test(html), "public OS link remains");
+  assert(!html.includes('href="/portal/work'), "public link into the work screen");
 });
 
 await check("robots and sitemap expose the public routes", async () => {
@@ -142,13 +164,16 @@ await check("robots and sitemap expose the public routes", async () => {
   }
 });
 
-await check("sitemap excludes the entire MaydaOS beta", async () => {
+await check("sitemap excludes MaydaOS and every signed-in route", async () => {
   const sitemap = await (await request("/sitemap.xml")).text();
   for (const prefix of ["", "/en", "/tr", "/fr"]) {
     assert(!sitemap.includes(`${canonicalUrl}${prefix}/os<`), "MaydaOS leaked into the sitemap");
   }
   for (const app of ["desk", "record", "pilot", "account", "terminal"]) {
-    assert(!sitemap.includes(`${canonicalUrl}/os/${app}`), `private OS app ${app} leaked into the sitemap`);
+    assert(!sitemap.includes(`${canonicalUrl}/os/${app}`), `retired OS app ${app} leaked into the sitemap`);
+  }
+  for (const path of ["/portal", "/portal/work"]) {
+    assert(!sitemap.includes(`${canonicalUrl}${path}`), `private route ${path} leaked into the sitemap`);
   }
 });
 
@@ -234,7 +259,16 @@ for (const prefix of ["", "/tr", "/fr"]) {
       assert(html.includes('class="svc-related-links"'), "missing related service discovery");
       assert(html.includes('class="sf sf-') && html.includes('class="sf-detail"'), "missing service process illustration");
       assert(html.includes('class="sf-review"') && html.includes('class="sf-delivery"'), "process must explain review and handover");
-      assert(!/href="\/(?:tr\/|fr\/)?os(?:\/|")/.test(html), "public beta invitation exposed");
+      assert(!/href="\/(?:tr\/|fr\/)?os(?:\/|")/.test(html), "retired OS entry exposed");
+      // Continuing operation is offered on exactly two services, and never
+      // with a price: scope and price are agreed before anything starts.
+      const runs = slug === "ai-and-automation" || slug === "email-and-customer-journeys";
+      assert(html.includes('class="svc-run"') === runs, `svc-run section on the wrong service: ${slug}`);
+      if (runs) {
+        const block = html.slice(html.indexOf('class="svc-run"'), html.indexOf('class="svc-faq"'));
+        assert(block.includes("svc-run-note"), "the running offer must carry its scope note");
+        assert(!/[$€£]\s?\d/.test(block), "the running offer must not quote a price");
+      }
       if (slug === "email-and-customer-journeys") {
         const proof = html.slice(html.indexOf('class="svc-proof"'), html.indexOf('class="svc-faq"'));
         assert(!proof.includes("HodlStay") && !proof.includes("Satoshi Gazette"), "email service borrowed unrelated client proof");
