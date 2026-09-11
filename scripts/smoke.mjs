@@ -33,7 +33,6 @@ const routes = [
   "/",
   "/tr",
   "/fr",
-  "/start",
   "/proof",
   "/services",
   "/tr/services",
@@ -69,7 +68,8 @@ const redirects = [
   ["/programs", 308, "/services"],
   ["/playbooks", 308, "/case-studies"],
   ["/newsletter", 308, "/"],
-  ["/roi-quickcheck", 308, "/start"],
+  ["/roi-quickcheck", 308, "/contact"],
+  ["/start", 308, "/contact"],
 ];
 
 for (const [path, status, destination] of redirects) {

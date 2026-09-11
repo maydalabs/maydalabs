@@ -25,6 +25,6 @@ export default async function PortalPage(props: LocalePageProps) {
     <h1 className="mayda-heading">{PORTAL_COPY[locale].heading}</h1>
     <WorkContent locale={locale} />
     <PilotContent locale={locale} userId={claims.sub} />
-    <AccountContent locale={locale} userId={claims.sub} email={typeof claims.email === "string" ? claims.email : null} />
+    <AccountContent locale={locale} email={typeof claims.email === "string" ? claims.email : null} />
   </div>;
 }

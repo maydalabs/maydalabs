@@ -8,7 +8,6 @@ import {
 
 export type SocialCardKind =
   | "studio"
-  | "start"
   | "approach"
   | "proof"
   | "work"

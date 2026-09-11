@@ -7,7 +7,6 @@ import { servicePath } from "@/lib/servicePages";
 const ROUTES = [
   "",
   "/proof",
-  "/start",
   "/services",
   ...SERVICE_IDS.map(servicePath),
   "/about",

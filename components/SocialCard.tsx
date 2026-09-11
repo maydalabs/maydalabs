@@ -19,7 +19,6 @@ const CARD_COPY: Record<Locale, Record<SocialCardKind, CardCopy>> = {
   en: {
     studio: { eyebrow: "AI-run operations, human-approved", title: "Let AI run your operation while you stay in control!" },
     proof: { eyebrow: "Proof · Live system", title: "The system behind Satoshi Gazette." },
-    start: { eyebrow: "Multiplier Map · Free diagnostic", title: "Map my next move." },
     approach: { eyebrow: "Offers", title: "Two offers, both already in production." },
     work: { eyebrow: "Selected work", title: "Real products, clearly labelled." },
     hodlstay: { eyebrow: "Client build · Live", title: "HodlStay: a global stay marketplace." },
@@ -36,7 +35,6 @@ const CARD_COPY: Record<Locale, Record<SocialCardKind, CardCopy>> = {
   tr: {
     studio: { eyebrow: "Yapay zekâ ile çalışan, insan onaylı operasyonlar", title: "Operasyonunuzu yapay zekâ yürütsün, kontrol sizde kalsın!" },
     proof: { eyebrow: "Kanıt · Canlı sistem", title: "Satoshi Gazette'in arkasındaki sistem." },
-    start: { eyebrow: "Multiplier Map · Ücretsiz tanı", title: "Sonraki hamlemi haritala." },
     approach: { eyebrow: "Teklifler", title: "İki teklif, ikisi de üretimde." },
     work: { eyebrow: "Seçili işler", title: "Gerçek ürünler, net etiketler." },
     hodlstay: { eyebrow: "Müşteri ürünü · Canlı", title: "HodlStay: küresel konaklama pazarı." },
@@ -53,7 +51,6 @@ const CARD_COPY: Record<Locale, Record<SocialCardKind, CardCopy>> = {
   fr: {
     studio: { eyebrow: "Opérations IA, approuvées par un humain", title: "Laissez l'IA faire tourner votre opération, vous gardez le contrôle !" },
     proof: { eyebrow: "Preuve · Système en direct", title: "Le système derrière Satoshi Gazette." },
-    start: { eyebrow: "Multiplier Map · Diagnostic gratuit", title: "Cartographier ma prochaine étape." },
     approach: { eyebrow: "Offres", title: "Deux offres, déjà en production." },
     work: { eyebrow: "Réalisations", title: "De vrais produits, clairement étiquetés." },
     hodlstay: { eyebrow: "Produit client · En ligne", title: "HodlStay : une marketplace mondiale de séjours." },

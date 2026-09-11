@@ -41,7 +41,6 @@ export function SiteFooter({ locale }: { locale: Locale }) {
             <div className="mt-4 flex flex-col gap-2 text-sm text-[color:var(--mist)]">
               <Link href={localizePath("/contact", locale)}>{copy.conversation}</Link>
               <a href="mailto:info@maydalabs.com">info@maydalabs.com</a>
-              <Link href={localizePath("/start", locale)}>{copy.mapCta} →</Link>
             </div>
           </div>
 

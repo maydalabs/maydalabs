@@ -38,7 +38,7 @@ export default async function InternalLeadsPage({ params }: LocalePageProps) {
   const { data: intakes } = await supabase
     .from("lead_intakes")
     .select(
-      "id, name, email, company, company_stage, primary_constraint, desired_outcome, budget_range, timeline, message, source, locale, utm, consent_updates, review_status, internal_tags, internal_note, abidin_record_id, transferred_to_abidin_at, multiplier_map_id, created_at",
+      "id, name, email, company, company_stage, primary_constraint, desired_outcome, budget_range, timeline, message, source, locale, utm, consent_updates, review_status, internal_tags, internal_note, abidin_record_id, transferred_to_abidin_at, created_at",
     )
     .order("created_at", { ascending: false })
     .limit(200);
@@ -113,7 +113,6 @@ export default async function InternalLeadsPage({ params }: LocalePageProps) {
                   <dt>Consents</dt>
                   <dd>
                     contact: yes{intake.consent_updates ? " · updates: yes" : ""}
-                    {intake.multiplier_map_id ? ` · map: ${intake.multiplier_map_id}` : ""}
                   </dd>
                 </div>
                 {intake.transferred_to_abidin_at ? (

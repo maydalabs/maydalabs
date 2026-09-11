@@ -55,7 +55,6 @@ const COPY = {
     discipline:
       "Client work is labelled client work. Owned products are labelled owned. Private-stage builds say exactly what is and isn't claimed. No metrics appear unless the underlying source can be inspected, and no testimonial appears unless a real client approved its exact wording.",
     ctaHeading: "Match your situation to the work.",
-    mapCta: "Map my next move",
     talkCta: "Start a conversation",
   },
   tr: {
@@ -108,7 +107,6 @@ const COPY = {
     discipline:
       "Müşteri işi müşteri işi olarak etiketlenir. Sahip olunan ürünler sahip olunan olarak. Özel aşamadaki geliştirmeler neyin iddia edilip edilmediğini tam olarak söyler. Kaynağı denetlenemeyen hiçbir metrik ve tam ifadesi gerçek bir müşteri tarafından onaylanmamış hiçbir referans burada yer almaz.",
     ctaHeading: "Durumunuzu işle eşleştirin.",
-    mapCta: "Sonraki hamlemi haritala",
     talkCta: "Bir görüşme başlat",
   },
   fr: {
@@ -161,7 +159,6 @@ const COPY = {
     discipline:
       "Le travail client est étiqueté travail client. Les produits détenus sont étiquetés détenus. Les builds en phase privée disent exactement ce qui est revendiqué et ce qui ne l'est pas. Aucune métrique n'apparaît sans source inspectable, et aucun témoignage sans l'accord d'un vrai client sur sa formulation exacte.",
     ctaHeading: "Reliez votre situation au travail.",
-    mapCta: "Cartographier ma prochaine étape",
     talkCta: "Démarrer un échange",
   },
 } as const;
@@ -236,11 +233,8 @@ export default async function WorkIndexPage({ params }: LocalePageProps) {
       <section className="mayda-final-cta">
         <h2 className="mayda-heading">{copy.ctaHeading}</h2>
         <div className="mayda-hero-actions" style={{ justifyContent: "center" }}>
-          <Link href={localizePath("/start", locale)} className="mayda-button">
-            {copy.mapCta} <span aria-hidden>→</span>
-          </Link>
-          <Link href={localizePath("/contact", locale)} className="mayda-button mayda-button-outline">
-            {copy.talkCta}
+          <Link href={localizePath("/contact", locale)} className="mayda-button">
+            {copy.talkCta} <span aria-hidden>→</span>
           </Link>
         </div>
       </section>
