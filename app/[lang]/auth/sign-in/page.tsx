@@ -15,7 +15,7 @@ const COPY = {
     kicker: "Account / Email code",
     heading: "Sign in without a password.",
     intro:
-      "Enter your email and we send a one-time code. New here? The same flow creates your account — it's used only for your saved Multiplier Maps, briefs, and preferences.",
+      "Enter your email and we send a one-time code. No password. New here? The same code creates your account.",
     form: {
       emailLabel: "Email",
       emailPlaceholder: "you@company.com",
@@ -44,7 +44,7 @@ const COPY = {
     kicker: "Hesap / E-posta kodu",
     heading: "Parolasız giriş yapın.",
     intro:
-      "E-postanızı girin, tek kullanımlık bir kod gönderelim. İlk kez mi? Aynı akış hesabınızı oluşturur — yalnızca kayıtlı Multiplier Map'leriniz, brief'leriniz ve tercihleriniz için kullanılır.",
+      "E-postanızı girin, tek kullanımlık bir kod gönderelim. Parola yok. İlk kez mi? Aynı kod hesabınızı oluşturur.",
     form: {
       emailLabel: "E-posta",
       emailPlaceholder: "siz@sirket.com",
@@ -73,7 +73,7 @@ const COPY = {
     kicker: "Compte / Code e-mail",
     heading: "Connectez-vous sans mot de passe.",
     intro:
-      "Entrez votre e-mail et nous envoyons un code à usage unique. Première visite ? Le même flux crée votre compte — utilisé uniquement pour vos Multiplier Maps, briefs et préférences.",
+      "Entrez votre e-mail et nous envoyons un code à usage unique. Sans mot de passe. Première visite ? Le même code crée votre compte.",
     form: {
       emailLabel: "E-mail",
       emailPlaceholder: "vous@entreprise.com",

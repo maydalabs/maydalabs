@@ -7,7 +7,9 @@ const nextConfig: NextConfig = {
       { source: "/programs", destination: "/services", permanent: true },
       { source: "/playbooks", destination: "/case-studies", permanent: true },
       { source: "/newsletter", destination: "/", permanent: true },
-      { source: "/roi-quickcheck", destination: "/start", permanent: true },
+      { source: "/roi-quickcheck", destination: "/contact", permanent: true },
+      // The Multiplier Map was retired on 11 September 2026; its address keeps working.
+      { source: "/start", destination: "/contact", permanent: true },
     ];
 
     return [

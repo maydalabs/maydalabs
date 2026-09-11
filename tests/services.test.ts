@@ -2,7 +2,6 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { LOCALES, SITE_CHROME_COPY, localizePath } from "@/lib/i18n";
 import { SERVICES, SERVICES_COPY, SERVICE_IDS } from "@/lib/services";
-import { MAP_COPY } from "@/components/multiplierMapCopy";
 
 describe("approved public services", () => {
   for (const locale of LOCALES) {
@@ -44,12 +43,6 @@ describe("approved public services", () => {
     expect(hero).not.toMatch(/GateFigure|SignalField|<iframe/);
   });
 
-  it("keeps old map keys readable without selling retired packages", () => {
-    for (const locale of LOCALES) {
-      expect(Object.keys(MAP_COPY[locale].offers)).toEqual(["multiplier_sprint", "build_partnership", "acceleration_partnership"]);
-      expect(JSON.stringify(MAP_COPY[locale].offers)).not.toMatch(/Multiplier Sprint|Build Partnership|Acceleration Partnership/);
-    }
-  });
 
   it("gives case readers a direct, account-free contact path", () => {
     const caseStudy = readFileSync("components/CaseStudy.tsx", "utf8");

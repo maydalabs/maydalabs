@@ -1,6 +1,6 @@
 "use server";
 
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getVerifiedClaims } from "@/lib/supabase/server";
 import { getSupabaseSecretKey, isSupabaseConfigured } from "@/lib/supabase/config";
@@ -13,8 +13,6 @@ import {
 import { checkRateLimit, clientKeyFromHeaders } from "@/lib/rateLimit";
 import { isEmailConfigured, notifyAddress, sendEmail } from "@/lib/email";
 import { acknowledgementEmail, notificationEmail } from "@/lib/emailTemplates";
-import { computeMapResult, parseMapAnswers, RUBRIC_VERSION } from "@/lib/multiplierMap";
-import { MAP_CLAIM_COOKIE, MAP_CLAIM_COOKIE_OPTIONS } from "@/lib/mapClaim";
 
 export type IntakeFormState = {
   status: "idle" | "submitted" | "error";
@@ -23,8 +21,7 @@ export type IntakeFormState = {
 };
 
 /**
- * The single write path for lead intakes (contact brief and Multiplier Map
- * "discuss" flow). Treated as a public endpoint: honeypot + fill-time
+ * The single write path for enquiries from the contact form. Treated as a public endpoint: honeypot + fill-time
  * checks, per-IP rate limiting, strict validation, and inserts through the
  * service credential only — the anon role has no table privileges at all.
  *
@@ -84,71 +81,16 @@ export async function submitLeadIntakeAction(
   const admin = createSupabaseAdminClient();
   const now = new Date().toISOString();
 
-  // Optional attached Multiplier Map: recompute the result server-side and
-  // persist the map so it can be claimed after a later sign-in.
-  let multiplierMapId: string | null = null;
-  let mapAnswerFields: {
-    stage: string;
-    constraint: string;
-    outcome: string;
-    timeline: string;
-  } | null = null;
-  const rawAnswers = formData.get("mapAnswers");
-  if (typeof rawAnswers === "string" && rawAnswers) {
-    let parsedJson: unknown = null;
-    try {
-      parsedJson = JSON.parse(rawAnswers);
-    } catch {
-      parsedJson = null;
-    }
-    const answers = parseMapAnswers(parsedJson);
-    if (answers) {
-      mapAnswerFields = {
-        stage: answers.stage,
-        constraint: answers.constraint,
-        outcome: answers.outcome,
-        timeline: answers.timeline,
-      };
-      const cookieStore = await cookies();
-      let claimTokenHash: string | null = null;
-      if (!userId) {
-        const { createHash, randomBytes } = await import("node:crypto");
-        let rawToken = cookieStore.get(MAP_CLAIM_COOKIE)?.value;
-        if (!rawToken || !/^[a-f0-9]{64}$/.test(rawToken)) {
-          rawToken = randomBytes(32).toString("hex");
-          cookieStore.set(MAP_CLAIM_COOKIE, rawToken, MAP_CLAIM_COOKIE_OPTIONS);
-        }
-        claimTokenHash = createHash("sha256").update(rawToken).digest("hex");
-      }
-
-      const { data: mapRow } = await admin
-        .from("multiplier_maps")
-        .insert({
-          user_id: userId,
-          claim_token_hash: userId ? null : claimTokenHash,
-          answers,
-          result: computeMapResult(answers),
-          rubric_version: RUBRIC_VERSION,
-          status: "discussed",
-          locale: intake.locale,
-        })
-        .select("id")
-        .single();
-      multiplierMapId = mapRow?.id ?? null;
-    }
-  }
-
   const { error } = await admin.from("lead_intakes").insert({
     user_id: userId,
-    multiplier_map_id: multiplierMapId,
     name: intake.name,
     email: intake.email,
     company: intake.company,
-    company_stage: intake.companyStage ?? mapAnswerFields?.stage ?? null,
-    primary_constraint: intake.primaryConstraint ?? mapAnswerFields?.constraint ?? null,
-    desired_outcome: intake.desiredOutcome ?? mapAnswerFields?.outcome ?? null,
+    company_stage: intake.companyStage,
+    primary_constraint: intake.primaryConstraint,
+    desired_outcome: intake.desiredOutcome,
     budget_range: intake.budgetRange,
-    timeline: intake.timeline ?? mapAnswerFields?.timeline ?? null,
+    timeline: intake.timeline,
     message: intake.message,
     source: intake.source,
     locale: intake.locale,
