@@ -222,7 +222,7 @@ enable_signup = true
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
-enable_confirmations = false
+enable_confirmations = true
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
@@ -248,9 +248,16 @@ otp_expiry = 3600
 # content_path = "./supabase/templates/invite.html"
 
 # Sign-in email: six-digit code first, confirmation link as fallback.
+# Local auth emails use the same branded templates production does, so what
+# Mailpit shows is what a real inbox gets. Production copies live in Supabase's
+# dashboard; these files are the source they were pasted from.
 [auth.email.template.magic_link]
-subject = "Your MaydaLabs sign-in code"
-content_path = "./supabase/templates/magic_link.html"
+subject = "Sign in to MaydaLabs"
+content_path = "./brand/email/templates/sign-in.html"
+
+[auth.email.template.confirmation]
+subject = "Confirm your email"
+content_path = "./brand/email/templates/confirmation.html"
 
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]
