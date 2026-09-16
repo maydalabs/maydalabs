@@ -970,6 +970,7 @@ export type Database = {
           status: string | null
           title: string | null
           updated_at: string | null
+          waiting_days: number | null
           waiting_for: string | null
         }
         Insert: {
@@ -982,6 +983,7 @@ export type Database = {
           status?: string | null
           title?: string | null
           updated_at?: string | null
+          waiting_days?: never
           waiting_for?: never
         }
         Update: {
@@ -994,6 +996,7 @@ export type Database = {
           status?: string | null
           title?: string | null
           updated_at?: string | null
+          waiting_days?: never
           waiting_for?: never
         }
         Relationships: [
@@ -1013,6 +1016,10 @@ export type Database = {
         Returns: boolean
       }
       os_is_member: { Args: { p_company_id: string }; Returns: boolean }
+      os_record_event: {
+        Args: { p_detail?: Json; p_event: string; p_item_id: string }
+        Returns: string
+      }
       os_spend_credit: { Args: { p_user_id: string }; Returns: number }
     }
     Enums: {

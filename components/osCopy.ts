@@ -217,3 +217,64 @@ export const OS_WORKFLOW_COPY = {
 } as const satisfies Record<Locale, unknown>;
 
 export type OsWorkflowCopy = (typeof OS_WORKFLOW_COPY)[Locale];
+
+/* The co-founder itself: what needs you, and starting a company so there is
+ * something for it to know. */
+export const OS_COFOUNDER_COPY = {
+  en: {
+    kicker: "MaydaOS",
+    heading: "What needs you.",
+    clear: "Nothing needs you right now. When something does, it waits here rather than chasing you.",
+    routes: { decide: "Waiting on your decision", finish: "Approved, waiting to be done", blocked: "Stuck", other: "Waiting" },
+    approve: "Approve",
+    sendBack: "Send back",
+    noteLabel: "Note (optional)",
+    startHeading: "Start with your company.",
+    startIntro: "MaydaOS works from what it knows about you. Two lines is enough to begin, and you can change them whenever.",
+    nameLabel: "Company name",
+    whatLabel: "What you do, and who for",
+    whatPlaceholder: "We build booking software for small hotels in Turkey.",
+    start: "Start",
+    starting: "Starting...",
+    startFailed: "That did not work.",
+    tooMany: "You already have three companies, which is the limit.",
+  },
+  tr: {
+    kicker: "MaydaOS",
+    heading: "Sizi bekleyenler.",
+    clear: "Şu anda sizi bekleyen bir şey yok. Olduğunda peşinizden koşmaz, burada bekler.",
+    routes: { decide: "Kararınızı bekliyor", finish: "Onaylandı, yapılmayı bekliyor", blocked: "Takıldı", other: "Bekliyor" },
+    approve: "Onayla",
+    sendBack: "Geri gönder",
+    noteLabel: "Not (isteğe bağlı)",
+    startHeading: "Şirketinizle başlayın.",
+    startIntro: "MaydaOS sizin hakkınızda bildiklerinden çalışır. Başlamak için iki satır yeter; istediğiniz zaman değiştirirsiniz.",
+    nameLabel: "Şirket adı",
+    whatLabel: "Ne yapıyorsunuz, kimin için?",
+    whatPlaceholder: "Türkiye'deki küçük oteller için rezervasyon yazılımı geliştiriyoruz.",
+    start: "Başla",
+    starting: "Başlatılıyor...",
+    startFailed: "Bu işe yaramadı.",
+    tooMany: "Zaten üç şirketiniz var, sınır bu.",
+  },
+  fr: {
+    kicker: "MaydaOS",
+    heading: "Ce qui vous attend.",
+    clear: "Rien ne vous attend pour le moment. Quand ce sera le cas, cela patientera ici au lieu de vous courir après.",
+    routes: { decide: "En attente de votre décision", finish: "Validé, en attente d'exécution", blocked: "Bloqué", other: "En attente" },
+    approve: "Valider",
+    sendBack: "Renvoyer",
+    noteLabel: "Note (facultatif)",
+    startHeading: "Commencez par votre entreprise.",
+    startIntro: "MaydaOS travaille à partir de ce qu'il sait de vous. Deux lignes suffisent pour commencer, et vous pouvez les changer quand vous voulez.",
+    nameLabel: "Nom de l'entreprise",
+    whatLabel: "Ce que vous faites, et pour qui",
+    whatPlaceholder: "Nous créons des logiciels de réservation pour de petits hôtels en Turquie.",
+    start: "Commencer",
+    starting: "Démarrage...",
+    startFailed: "Cela n'a pas fonctionné.",
+    tooMany: "Vous avez déjà trois entreprises, c'est la limite.",
+  },
+} as const satisfies Record<Locale, unknown>;
+
+export type OsCofounderCopy = (typeof OS_COFOUNDER_COPY)[Locale];

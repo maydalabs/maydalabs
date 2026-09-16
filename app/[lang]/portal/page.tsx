@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AccountContent } from "@/components/AccountContent";
+import { CofounderQueue } from "@/components/CofounderQueue";
 import { PilotContent } from "@/components/PilotContent";
 import { WorkContent } from "@/components/WorkContent";
 import { getVerifiedClaims } from "@/lib/supabase/server";
@@ -23,6 +24,7 @@ export default async function PortalPage(props: LocalePageProps) {
   if (!claims?.sub) redirect(localizePath("/auth/sign-in", locale));
   return <div className="mayda-shell mayda-section mayda-stack-lg" style={{ maxWidth: "64rem" }}>
     <h1 className="mayda-heading">{PORTAL_COPY[locale].heading}</h1>
+    <CofounderQueue locale={locale} userId={claims.sub} />
     <WorkContent locale={locale} />
     <PilotContent locale={locale} userId={claims.sub} />
     <AccountContent locale={locale} email={typeof claims.email === "string" ? claims.email : null} />
