@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { teachMemoryAction } from "@/app/actions/memory";
-import type { OsAppId } from "@/components/os/types";
+import { documentKey, type OsAppId, type OsWindowKey } from "@/components/os/types";
 
 /* One input that can do anything.
  *
@@ -45,7 +45,7 @@ export function OsCommandBar({
 }: {
   targets: CommandTarget[];
   copy: CommandBarCopy;
-  onOpenApp: (id: OsAppId) => void;
+  onOpenApp: (id: OsWindowKey) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -97,10 +97,10 @@ export function OsCommandBar({
         label: target.label,
         hint: target.hint,
         run: () => {
-          // Work and memory live inside apps rather than having windows of
-          // their own, so finding one means opening where it is.
+          // A piece of work opens as its own document; a memory lives in the
+          // list it belongs to.
           if (target.kind === "app") onOpenApp(target.id);
-          else if (target.kind === "item") onOpenApp("needs-you");
+          else if (target.kind === "item") onOpenApp(documentKey(target.id));
           else onOpenApp("memory");
         },
       }));

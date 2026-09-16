@@ -659,3 +659,52 @@ export const OS_RECORD_COPY = {
     unread: (count: number) => (count === 1 ? "1 nouveau" : `${count} nouveaux`),
   },
 } as const;
+
+/* A work item opened as a document. The words say what each part *is* —
+ * the draft, what it drew on, what happened to it — because the reader is
+ * about to put their name on it and should not have to guess which part is
+ * the machine's claim and which is the evidence. */
+export const OS_DOCUMENT_COPY = {
+  en: {
+    open: "Open",
+    draft: "The draft",
+    nothingWritten: "Nothing has been written for this yet.",
+    claims: "What it says, and where from",
+    unsupported: "not supported by any source",
+    sources: "What it read",
+    history: "What happened",
+    nothingHappened: "Nothing yet.",
+    waitingOn: "Waiting on",
+    byPerson: "a person",
+    bySystem: "the system",
+    draftedBy: { cofounder: "Drafted by the co-founder", worker: "Prepared while you were away" } as Record<string, string>,
+  },
+  tr: {
+    open: "Aç",
+    draft: "Taslak",
+    nothingWritten: "Bunun için henüz bir şey yazılmadı.",
+    claims: "Ne diyor, nereden",
+    unsupported: "hiçbir kaynakla desteklenmiyor",
+    sources: "Ne okudu",
+    history: "Ne oldu",
+    nothingHappened: "Henüz bir şey yok.",
+    waitingOn: "Bekleyen",
+    byPerson: "bir kişi",
+    bySystem: "sistem",
+    draftedBy: { cofounder: "Kurucu ortak hazırladı", worker: "Siz yokken hazırlandı" } as Record<string, string>,
+  },
+  fr: {
+    open: "Ouvrir",
+    draft: "Le brouillon",
+    nothingWritten: "Rien n'a encore été écrit pour ceci.",
+    claims: "Ce qu'il affirme, et d'où",
+    unsupported: "soutenu par aucune source",
+    sources: "Ce qu'il a lu",
+    history: "Ce qui s'est passé",
+    nothingHappened: "Rien encore.",
+    waitingOn: "En attente de",
+    byPerson: "une personne",
+    bySystem: "le système",
+    draftedBy: { cofounder: "Rédigé par le cofondateur", worker: "Préparé pendant votre absence" } as Record<string, string>,
+  },
+} as const;

@@ -835,6 +835,39 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
        * already approved and skip every check on the way in. Anything that
        * later trusts `approved` to mean "a person signed off" — the worker
        * that acts outward, above all — would have acted on a forgery. */
+      /* The queue used to show a title and an Approve button and nothing of
+       * the draft. A document window shows the draft, what it drew on, and
+       * what happened to it — so every one of those has to reach a member
+       * and none of them an outsider. */
+      it("lets a member read the whole document, and an outsider none of it", async () => {
+        await admin
+          .from("os_work_items")
+          .update({
+            notes: "Quote Hamburg honestly rather than sharply.",
+            sources: [{ url: "https://example.com/a", title: "Rates", chars: 31 }],
+            metadata: { by: "cofounder", claims: [{ text: "Rates rose 4%.", source_url: "https://example.com/a" }] },
+          })
+          .eq("id", itemId);
+        await admin.from("os_work_item_events").insert({ item_id: itemId, actor: null, event: "prepared", detail: {} });
+
+        const { data: doc } = await userA
+          .from("os_work_items")
+          .select("notes, sources, metadata")
+          .eq("id", itemId)
+          .single();
+        expect(doc!.notes).toBe("Quote Hamburg honestly rather than sharply.");
+        expect((doc!.sources as { url: string }[])[0].url).toBe("https://example.com/a");
+        expect((doc!.metadata as { claims: unknown[] }).claims).toHaveLength(1);
+
+        const { data: history } = await userA.from("os_work_item_events").select("event").eq("item_id", itemId);
+        expect((history ?? []).map((e) => e.event)).toContain("prepared");
+
+        const { data: hiddenDoc } = await outsider.from("os_work_items").select("notes").eq("id", itemId);
+        expect(hiddenDoc ?? []).toHaveLength(0);
+        const { data: hiddenHistory } = await outsider.from("os_work_item_events").select("event").eq("item_id", itemId);
+        expect(hiddenHistory ?? []).toHaveLength(0);
+      });
+
       it("refuses an item that is born already approved", async () => {
         const { error } = await userA.from("os_work_items").insert({
           company_id: companyId,

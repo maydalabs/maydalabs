@@ -1,7 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { OsApp, OsAppId, OsShellCopy, OsWindowState } from "@/components/os/types";
+import {
+  OS_OPEN_ITEM_EVENT,
+  documentKey,
+  type OsApp,
+  type OsDocument,
+  type OsShellCopy,
+  type OsWindowKey,
+  type OsWindowState,
+} from "@/components/os/types";
 import { saveDesktopAction, markSeenAction } from "@/app/actions/desktop";
 import { OsCommandBar, OS_COMMAND_EVENT, type CommandBarCopy, type CommandTarget } from "@/components/os/OsCommandBar";
 import { OsBackdrop } from "@/components/os/OsBackdrop";
@@ -27,8 +35,13 @@ const MIN_H = 160;
 const SNAP_EDGE = 26;
 
 type Gesture =
-  | { kind: "move"; app: OsAppId; pointerId: number; dx: number; dy: number }
-  | { kind: "resize"; app: OsAppId; pointerId: number; fromW: number; fromH: number; fromX: number; fromY: number };
+  | { kind: "move"; app: OsWindowKey; pointerId: number; dx: number; dy: number }
+  | { kind: "resize"; app: OsWindowKey; pointerId: number; fromW: number; fromH: number; fromX: number; fromY: number };
+
+/* What any window shows: an app from the dock or a document from the work.
+ * The shell only ever looks things up here; it does not know which is which
+ * beyond how they arrive in the dock. */
+type Surface = { key: OsWindowKey; title: string; icon: OsApp["icon"]; node: React.ReactNode; isDocument: boolean };
 
 function clamp(value: number, low: number, high: number) {
   return Math.min(Math.max(value, low), high);
@@ -38,7 +51,7 @@ function clamp(value: number, low: number, high: number) {
  * from an older version of the product. Anything unrecognised is dropped and
  * anything missing gets the app's default — a desk that half-restores is
  * better than a desk that throws. */
-function hydrate(apps: OsApp[], stored: unknown): OsWindowState[] {
+function hydrate(apps: OsApp[], documents: OsDocument[], stored: unknown): OsWindowState[] {
   const rows = Array.isArray(stored) ? stored : [];
   const byApp = new Map<string, Record<string, unknown>>();
   for (const row of rows) {
@@ -47,7 +60,25 @@ function hydrate(apps: OsApp[], stored: unknown): OsWindowState[] {
     }
   }
 
-  return apps.map((app, index) => {
+  /* A remembered document window comes back only if its item is still open
+   * work. A window onto finished work would be a window onto nothing, so it
+   * is dropped rather than restored empty. */
+  const remembered: OsWindowState[] = documents.flatMap((doc, index) => {
+    const saved = byApp.get(doc.key);
+    if (!saved || saved.open !== true) return [];
+    const num = (key: string, fallback: number) =>
+      typeof saved[key] === "number" && Number.isFinite(saved[key]) ? (saved[key] as number) : fallback;
+    return [{
+      app: doc.key,
+      x: num("x", 0.12), y: num("y", 0.1), w: num("w", 0.5), h: num("h", 0.72),
+      z: num("z", apps.length + index + 1),
+      open: true,
+      minimized: saved.minimized === true,
+      placed: saved.placed === true || ["x", "y", "w", "h"].some((k) => typeof saved[k] === "number" && Math.abs(saved[k] as number) > 2),
+    }];
+  });
+
+  return [...apps.map((app, index) => {
     const saved = byApp.get(app.id);
     const num = (key: string, fallback: number) =>
       typeof saved?.[key] === "number" && Number.isFinite(saved[key]) ? (saved[key] as number) : fallback;
@@ -77,11 +108,12 @@ function hydrate(apps: OsApp[], stored: unknown): OsWindowState[] {
         ),
       ),
     };
-  });
+  }), ...remembered];
 }
 
 export function OsShell({
   apps,
+  documents,
   copy,
   storedLayout,
   companyName,
@@ -93,6 +125,7 @@ export function OsShell({
   unreadCount,
 }: {
   apps: OsApp[];
+  documents: OsDocument[];
   copy: OsShellCopy;
   storedLayout: unknown;
   companyName: string | null;
@@ -103,10 +136,18 @@ export function OsShell({
   commandCopy: CommandBarCopy;
   unreadCount: number;
 }) {
-  const [windows, setWindows] = useState<OsWindowState[]>(() => hydrate(apps, storedLayout));
+  const [windows, setWindows] = useState<OsWindowState[]>(() => hydrate(apps, documents, storedLayout));
   const [gesture, setGesture] = useState<Gesture | null>(null);
   const [narrow, setNarrow] = useState(false);
-  const [phoneApp, setPhoneApp] = useState<OsAppId>(apps[0]?.id ?? "cofounder");
+  const [phoneApp, setPhoneApp] = useState<OsWindowKey>(apps[0]?.id ?? "cofounder");
+
+  /* One lookup for both kinds of window. */
+  const surfaces = useMemo<Map<OsWindowKey, Surface>>(() => {
+    const map = new Map<OsWindowKey, Surface>();
+    for (const app of apps) map.set(app.id, { key: app.id, title: app.title, icon: app.icon, node: app.node, isDocument: false });
+    for (const doc of documents) map.set(doc.key, { key: doc.key, title: doc.title, icon: doc.icon, node: doc.node, isDocument: true });
+    return map;
+  }, [apps, documents]);
   const surfaceRef = useRef<HTMLDivElement>(null);
   const pointer = useRef({ x: 0, y: 0 });
 
@@ -147,7 +188,7 @@ export function OsShell({
   const topZ = useMemo(() => windows.reduce((high, w) => Math.max(high, w.z), 0), [windows]);
 
   const focus = useCallback(
-    (app: OsAppId) => {
+    (app: OsWindowKey) => {
       update((prev) => {
         const highest = prev.reduce((high, w) => Math.max(high, w.z), 0);
         const current = prev.find((w) => w.app === app);
@@ -161,7 +202,7 @@ export function OsShell({
   );
 
   const toggle = useCallback(
-    (app: OsAppId) => {
+    (app: OsWindowKey) => {
       if (narrow) {
         setPhoneApp(app);
         return;
@@ -185,9 +226,46 @@ export function OsShell({
   );
 
   const close = useCallback(
-    (app: OsAppId) => update((prev) => prev.map((w) => (w.app === app ? { ...w, open: false } : w))),
+    (app: OsWindowKey) => update((prev) => prev.map((w) => (w.app === app ? { ...w, open: false } : w))),
     [update],
   );
+
+  /* Opening a document. It may already have a window (remembered, or opened
+   * earlier in this visit), in which case it is simply raised. Otherwise it
+   * gets a window cascaded from the last one, as a share of the surface so
+   * it fits whatever screen this is. */
+  const openDocument = useCallback(
+    (key: OsWindowKey) => {
+      if (!surfaces.get(key)?.isDocument) return;
+      if (narrow) {
+        setPhoneApp(key);
+        return;
+      }
+      update((prev) => {
+        const highest = prev.reduce((high, w) => Math.max(high, w.z), 0);
+        const existing = prev.find((w) => w.app === key);
+        if (existing) {
+          return prev.map((w) => (w.app === key ? { ...w, open: true, minimized: false, z: highest + 1 } : w));
+        }
+        const openDocs = prev.filter((w) => w.open && surfaces.get(w.app)?.isDocument).length;
+        const step = (openDocs % 6) * 0.03;
+        return [
+          ...prev,
+          { app: key, x: 0.12 + step, y: 0.08 + step, w: 0.5, h: 0.74, z: highest + 1, open: true, minimized: false, placed: false },
+        ];
+      });
+    },
+    [narrow, surfaces, update],
+  );
+
+  useEffect(() => {
+    const onOpen = (event: Event) => {
+      const id = (event as CustomEvent<string>).detail;
+      if (typeof id === "string" && id) openDocument(documentKey(id));
+    };
+    window.addEventListener(OS_OPEN_ITEM_EVENT, onOpen);
+    return () => window.removeEventListener(OS_OPEN_ITEM_EVENT, onOpen);
+  }, [openDocument]);
 
   // ------------------------------------------------------------- gestures
 
@@ -300,14 +378,21 @@ export function OsShell({
 
   // ---------------------------------------------------------------- render
 
-  const nodeFor = useCallback((id: OsAppId) => apps.find((a) => a.id === id)?.node ?? null, [apps]);
-  const appFor = useCallback((id: OsAppId) => apps.find((a) => a.id === id), [apps]);
-  const visible = windows.filter((w) => w.open && !w.minimized);
+  const nodeFor = useCallback((id: OsWindowKey) => surfaces.get(id)?.node ?? null, [surfaces]);
+  const appFor = useCallback((id: OsWindowKey) => surfaces.get(id), [surfaces]);
+  const visible = windows.filter((w) => w.open && !w.minimized && surfaces.has(w.app));
+  /* Documents join the dock only while they are open, so a put-away document
+   * stays reachable and a closed one leaves no trace. */
+  const openDocuments = windows.filter((w) => w.open && surfaces.get(w.app)?.isDocument);
 
   return (
     <div className="os-root" data-gesturing={gesture ? "true" : "false"}>
       <OsBackdrop activity={Math.min(waitingCount / 5, 1)} />
-      <OsCommandBar targets={commandTargets} copy={commandCopy} onOpenApp={focus} />
+      <OsCommandBar
+        targets={commandTargets}
+        copy={commandCopy}
+        onOpenApp={(key) => (surfaces.get(key)?.isDocument ? openDocument(key) : focus(key))}
+      />
 
       <div className="os-bar">
         <span className="os-bar-brand">MaydaOS</span>
@@ -356,7 +441,13 @@ export function OsShell({
       >
         {narrow ? (
           <div className="os-stack">
-            <h1 className="os-stack-title">{appFor(phoneApp)?.title ?? copy.desktop}</h1>
+            {/* A document carries its own heading. On the desk the window's
+                title bar is chrome and the heading is content, which is how
+                every document window works; in a single-pane stack the two
+                sit one above the other and read as a stammer. */}
+            {appFor(phoneApp)?.isDocument ? null : (
+              <h1 className="os-stack-title">{appFor(phoneApp)?.title ?? copy.desktop}</h1>
+            )}
             {nodeFor(phoneApp)}
           </div>
         ) : (
@@ -459,6 +550,26 @@ export function OsShell({
             >
               <OsIcon name={app.icon} size={15} />
               {app.title}
+            </button>
+          );
+        })}
+        {openDocuments.length > 0 ? <span className="os-dock-rule" aria-hidden="true" /> : null}
+        {openDocuments.map((state) => {
+          const doc = surfaces.get(state.app);
+          if (!doc) return null;
+          const open = narrow ? phoneApp === state.app : !state.minimized;
+          return (
+            <button
+              key={state.app}
+              type="button"
+              className="os-dock-item"
+              data-open={open}
+              data-document="true"
+              aria-pressed={open}
+              onClick={() => toggle(state.app)}
+            >
+              <OsIcon name={doc.icon} size={15} />
+              <span className="os-dock-doc-title">{doc.title}</span>
             </button>
           );
         })}

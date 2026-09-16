@@ -45,6 +45,24 @@ describe("a desk on its way into the database", () => {
     expect(row.placed).toBe(false);
   });
 
+  /* A document window is keyed by the work item it shows. It must be
+   * remembered like any window, and only a real uuid may follow the prefix:
+   * a key nobody can look up is a window that renders nothing forever. */
+  it("remembers a document window where it was left", () => {
+    const [row] = sanitizeLayout([
+      { app: "item:3f2a9c1e-4b7d-4e8a-9c2b-1d5e6f7a8b9c", x: 0.14, y: 0.1, w: 0.5, h: 0.74, z: 9, open: true },
+    ]);
+    expect(row.app).toBe("item:3f2a9c1e-4b7d-4e8a-9c2b-1d5e6f7a8b9c");
+    expect(row.open).toBe(true);
+    expect(row.w).toBe(0.5);
+  });
+
+  it("refuses a document key that is not a real item", () => {
+    expect(
+      sanitizeLayout([{ app: "item:not-an-id" }, { app: "item:../../etc" }, { app: "item:" }, { app: "item" }]),
+    ).toEqual([]);
+  });
+
   it("drops apps that do not exist", () => {
     expect(sanitizeLayout([{ app: "../etc/passwd" }, { app: "billing" }, { app: 7 }])).toEqual([]);
   });

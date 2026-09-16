@@ -1,4 +1,6 @@
 import { StartCompanyForm, WorkItemDecision } from "@/components/CofounderPanels";
+import { OpenItem } from "@/components/os/OpenItem";
+import { OS_DOCUMENT_COPY } from "@/components/osCopy";
 import { OS_COFOUNDER_COPY } from "@/components/osCopy";
 import Link from "next/link";
 import { localizePath } from "@/lib/i18n";
@@ -85,7 +87,14 @@ export async function CofounderQueue({
             <div className="mayda-os-run-head">
               <div>
                 <p className="mayda-kicker">{row.lane} / {row.kind}</p>
-                <strong>{row.title}</strong>
+                {/* On the desk the title opens the item as a document. On the
+                    account page there is no desk to open it in, so it stays a
+                    title — a button that does nothing is worse than none. */}
+                {bare ? (
+                  <OpenItem id={row.id!} title={row.title ?? ""} label={OS_DOCUMENT_COPY[locale].open} />
+                ) : (
+                  <strong>{row.title}</strong>
+                )}
               </div>
               <span className="mayda-status">
                 {copy.routes[(row.route ?? "other") as keyof typeof copy.routes]}

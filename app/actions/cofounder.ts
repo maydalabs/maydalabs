@@ -37,6 +37,7 @@ export async function startCompanyAction(_prev: CofounderState, formData: FormDa
   }
 
   revalidatePath("/portal");
+  revalidatePath("/os");
   return { status: "saved" };
 }
 
@@ -100,4 +101,7 @@ export async function decideWorkItemAction(formData: FormData): Promise<void> {
   }
 
   revalidatePath("/portal");
+  // The same decision is made from the desk now, and a desk that still shows
+  // the item as waiting after you approved it is lying.
+  revalidatePath("/os");
 }

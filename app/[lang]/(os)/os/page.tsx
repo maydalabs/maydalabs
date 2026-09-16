@@ -6,9 +6,10 @@ import { CompanyApp } from "@/components/os/CompanyApp";
 import { CofounderPane } from "@/components/os/CofounderPane";
 import { MemoryApp } from "@/components/os/MemoryApp";
 import { RecordApp } from "@/components/os/RecordApp";
+import { ItemDocument, type ItemEvent, type ItemRecord } from "@/components/os/ItemDocument";
 import { OsShell } from "@/components/os/OsShell";
 import { OS_SHELL_COPY, OS_COFOUNDER_CHAT_COPY, OS_MEMORY_COPY, OS_RECORD_COPY } from "@/components/osCopy";
-import type { OsApp } from "@/components/os/types";
+import { documentKey, type OsApp, type OsDocument } from "@/components/os/types";
 import type { CommandTarget } from "@/components/os/OsCommandBar";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -40,12 +41,13 @@ export default async function OsPage(props: LocalePageProps) {
   let seenAt: string | null = null;
   let unread = 0;
   const targets: CommandTarget[] = [];
+  const documents: OsDocument[] = [];
 
   if (isSupabaseConfigured()) {
     const supabase = await createSupabaseServerClient();
 
     const [{ data: company }, { count }, { data: desktop }] = await Promise.all([
-      supabase.from("os_companies").select("name").limit(1).maybeSingle(),
+      supabase.from("os_companies").select("id, name").limit(1).maybeSingle(),
       supabase.from("os_needs_you").select("id", { count: "exact", head: true }),
       supabase.from("os_desktops").select("layout, seen_at").eq("user_id", claims.sub).maybeSingle(),
     ]);
@@ -72,6 +74,47 @@ export default async function OsPage(props: LocalePageProps) {
     for (const item of items ?? []) {
       if (item.id && item.title) {
         targets.push({ kind: "item", id: item.id, label: item.title, hint: `${item.lane}/${item.kind}` });
+      }
+    }
+
+    /* Every open piece of work, rendered as a document up front and handed to
+     * the shell, which shows whichever are opened. Thirty small documents
+     * cost less than one round trip made the moment someone clicks — and it
+     * keeps an app a server component with its own data access, which is the
+     * contract everything else here rests on. */
+    if (company?.id) {
+      const { data: rows } = await supabase
+        .from("os_work_items")
+        .select("id, title, lane, kind, status, required_action, notes, sources, metadata, updated_at")
+        .eq("company_id", company.id)
+        .not("status", "in", "(completed,canceled)")
+        .order("updated_at", { ascending: false })
+        .limit(30);
+
+      const ids = (rows ?? []).map((r) => r.id);
+      const { data: history } = ids.length
+        ? await supabase
+            .from("os_work_item_events")
+            .select("item_id, event, actor, at")
+            .in("item_id", ids)
+            .order("at", { ascending: true })
+        : { data: [] as { item_id: string; event: string; actor: string | null; at: string }[] };
+
+      const byItem = new Map<string, ItemEvent[]>();
+      for (const e of history ?? []) {
+        const list = byItem.get(e.item_id) ?? [];
+        list.push({ event: e.event, actor: e.actor, at: e.at });
+        byItem.set(e.item_id, list);
+      }
+
+      for (const row of rows ?? []) {
+        const item: ItemRecord = row;
+        documents.push({
+          key: documentKey(item.id),
+          title: item.title,
+          icon: "record",
+          node: <ItemDocument locale={locale} item={item} events={byItem.get(item.id) ?? []} />,
+        });
       }
     }
     for (const fact of facts ?? []) {
@@ -130,6 +173,7 @@ export default async function OsPage(props: LocalePageProps) {
   return (
     <OsShell
       apps={apps}
+      documents={documents}
       copy={{
         desktop: copy.desktop,
         empty: copy.empty,

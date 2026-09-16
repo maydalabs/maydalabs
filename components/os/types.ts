@@ -9,6 +9,27 @@ import type { OsIconName } from "@/components/os/OsIcon";
  */
 export type OsAppId = "cofounder" | "needs-you" | "running" | "record" | "memory" | "company";
 
+/* A document is a work item opened in its own window. Apps are fixed and
+ * live in the dock; documents come and go with the work. The key carries the
+ * item's id so a saved desk can reopen it where it was left — and drop it
+ * silently once the item is done, because a window onto finished work is a
+ * window onto nothing. */
+export type OsDocumentKey = `item:${string}`;
+export type OsWindowKey = OsAppId | OsDocumentKey;
+
+export const OS_OPEN_ITEM_EVENT = "maydaos:open-item";
+
+export function documentKey(itemId: string): OsDocumentKey {
+  return `item:${itemId}`;
+}
+
+export type OsDocument = {
+  key: OsDocumentKey;
+  title: string;
+  icon: OsIconName;
+  node: ReactNode;
+};
+
 export type OsApp = {
   id: OsAppId;
   title: string;
@@ -27,7 +48,7 @@ export type OsApp = {
 export type OsRect = { x: number; y: number; w: number; h: number };
 
 export type OsWindowState = OsRect & {
-  app: OsAppId;
+  app: OsWindowKey;
   z: number;
   open: boolean;
   minimized: boolean;

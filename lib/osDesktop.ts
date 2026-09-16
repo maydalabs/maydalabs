@@ -12,6 +12,15 @@ export type OsKnownAppId = (typeof OS_APP_IDS)[number];
 const KNOWN = new Set<string>(OS_APP_IDS);
 const MAX_WINDOWS = 40;
 
+/* A document window is keyed by the work item it shows. Only a real uuid is
+ * accepted after the prefix: the key is later used to look the item up, and
+ * a key nobody can look up is a window that renders nothing forever. */
+const DOCUMENT_KEY = /^item:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+function knownWindow(app: string): boolean {
+  return KNOWN.has(app) || DOCUMENT_KEY.test(app);
+}
+
 export type StoredWindow = {
   app: string;
   x: number;
@@ -58,7 +67,7 @@ export function sanitizeLayout(rows: unknown): StoredWindow[] {
     const app = item.app;
     // An app we do not have is an app we will not store: a layout should not
     // outlive the thing it arranges.
-    if (typeof app !== "string" || !KNOWN.has(app) || seen.has(app)) continue;
+    if (typeof app !== "string" || !knownWindow(app) || seen.has(app)) continue;
     seen.add(app);
 
     /* Until a window is placed, x/y/w/h are shares of the surface rather than
