@@ -42,3 +42,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Paste-ready migration bundles, assembled for the Supabase SQL editor and
+# deleted after they are run. A stale copy of migration SQL living in the repo
+# is the one someone runs by mistake six weeks later; supabase/migrations is
+# the only place schema belongs.
+supabase/APPLY_TO_PRODUCTION.sql
