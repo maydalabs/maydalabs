@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { OS_ASK_EVENT } from "@/components/os/OsCommandBar";
 
 /* The conversation.
  *
@@ -43,11 +44,28 @@ export function CofounderApp({
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const composeRef = useRef<HTMLTextAreaElement>(null);
   const streamId = useRef(0);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end" });
   }, [messages, pending]);
+
+  /* The command bar hands a sentence over through the window rather than
+   * through props: this pane is rendered on the server and the bar is not, so
+   * there is no shared state between them to lift. The question is put in the
+   * box rather than sent, because ⌘K is for getting somewhere quickly and not
+   * for committing to what you half-typed. */
+  useEffect(() => {
+    const onAsk = (event: Event) => {
+      const asked = (event as CustomEvent<string>).detail;
+      if (typeof asked !== "string" || !asked.trim()) return;
+      setDraft(asked);
+      composeRef.current?.focus();
+    };
+    window.addEventListener(OS_ASK_EVENT, onAsk);
+    return () => window.removeEventListener(OS_ASK_EVENT, onAsk);
+  }, []);
 
   const send = useCallback(async () => {
     const said = draft.trim();
@@ -175,6 +193,7 @@ export function CofounderApp({
         }}
       >
         <textarea
+          ref={composeRef}
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           placeholder={canTalk ? copy.placeholder : copy.noCompany}

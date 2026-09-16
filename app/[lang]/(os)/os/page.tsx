@@ -5,9 +5,11 @@ import { CofounderActivity } from "@/components/CofounderActivity";
 import { CompanyApp } from "@/components/os/CompanyApp";
 import { CofounderPane } from "@/components/os/CofounderPane";
 import { MemoryApp } from "@/components/os/MemoryApp";
+import { RecordApp } from "@/components/os/RecordApp";
 import { OsShell } from "@/components/os/OsShell";
-import { OS_SHELL_COPY, OS_COFOUNDER_CHAT_COPY, OS_MEMORY_COPY } from "@/components/osCopy";
+import { OS_SHELL_COPY, OS_COFOUNDER_CHAT_COPY, OS_MEMORY_COPY, OS_RECORD_COPY } from "@/components/osCopy";
 import type { OsApp } from "@/components/os/types";
+import type { CommandTarget } from "@/components/os/OsCommandBar";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { localizePath } from "@/lib/i18n";
@@ -35,6 +37,9 @@ export default async function OsPage(props: LocalePageProps) {
   let companyName: string | null = null;
   let waiting = 0;
   let storedLayout: unknown = [];
+  let seenAt: string | null = null;
+  let unread = 0;
+  const targets: CommandTarget[] = [];
 
   if (isSupabaseConfigured()) {
     const supabase = await createSupabaseServerClient();
@@ -42,12 +47,36 @@ export default async function OsPage(props: LocalePageProps) {
     const [{ data: company }, { count }, { data: desktop }] = await Promise.all([
       supabase.from("os_companies").select("name").limit(1).maybeSingle(),
       supabase.from("os_needs_you").select("id", { count: "exact", head: true }),
-      supabase.from("os_desktops").select("layout").eq("user_id", claims.sub).maybeSingle(),
+      supabase.from("os_desktops").select("layout, seen_at").eq("user_id", claims.sub).maybeSingle(),
     ]);
 
     companyName = company?.name ?? null;
     waiting = count ?? 0;
     storedLayout = desktop?.layout ?? [];
+    seenAt = desktop?.seen_at ?? null;
+
+    /* What the command bar can find. Deliberately the things a person names
+     * out loud — an open piece of work, something it knows — rather than
+     * everything in the database. A search that returns four hundred rows is
+     * a search nobody uses twice. */
+    const [{ count: newCount }, { data: items }, { data: facts }] = await Promise.all([
+      seenAt
+        ? supabase.from("os_recent_record").select("id", { count: "exact", head: true }).gt("at", seenAt)
+        : Promise.resolve({ count: 0 } as { count: number | null }),
+      supabase.from("os_needs_you").select("id, title, lane, kind").limit(20),
+      supabase.from("os_company_memory").select("id, fact, kind").is("retired_at", null).limit(20),
+    ]);
+
+    unread = newCount ?? 0;
+
+    for (const item of items ?? []) {
+      if (item.id && item.title) {
+        targets.push({ kind: "item", id: item.id, label: item.title, hint: `${item.lane}/${item.kind}` });
+      }
+    }
+    for (const fact of facts ?? []) {
+      targets.push({ kind: "memory", id: fact.id, label: fact.fact, hint: fact.kind });
+    }
   }
 
   const apps: OsApp[] = [
@@ -74,6 +103,13 @@ export default async function OsPage(props: LocalePageProps) {
       node: <CofounderActivity locale={locale} bare />,
       defaultRect: { x: 636, y: 484, w: 500, h: 340 },
       openByDefault: false,
+    },
+    {
+      id: "record",
+      title: OS_RECORD_COPY[locale].title,
+      glyph: "≡",
+      node: <RecordApp locale={locale} seenAt={seenAt} />,
+      defaultRect: { x: 120, y: 200, w: 560, h: 420 },
     },
     {
       id: "memory",
@@ -104,7 +140,27 @@ export default async function OsPage(props: LocalePageProps) {
         resize: copy.resize,
         noCompany: copy.noCompany,
         leave: copy.leave,
+        newSince: copy.newSince,
+        markSeen: copy.markSeen,
       }}
+      commandTargets={[
+        ...apps.map((app) => ({
+          kind: "app" as const,
+          id: app.id,
+          label: app.title,
+          hint: copy.commandOpen,
+        })),
+        ...targets,
+      ]}
+      commandCopy={{
+        placeholder: copy.commandPlaceholder,
+        ask: copy.commandAsk,
+        tell: copy.commandTell,
+        open: copy.commandOpen,
+        nothing: copy.commandNothing,
+        hint: copy.commandHint,
+      }}
+      unreadCount={unread}
       storedLayout={storedLayout}
       companyName={companyName}
       waitingCount={waiting}

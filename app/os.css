@@ -404,3 +404,143 @@
   border-left: 2px solid var(--border-strong);
   padding-left: 0.6rem;
 }
+
+/* ------------------------------------------------------------- the record */
+
+.os-record { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+
+.os-record-line {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+  align-items: baseline;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.os-record-who {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.os-record-who[data-person="true"] { color: var(--cobalt); }
+
+.os-record-what { overflow-wrap: anywhere; }
+.os-record-lane { color: var(--muted); font-size: 0.75rem; }
+
+.os-record-line[data-new="true"] { border-left: 2px solid var(--cobalt); padding-left: 0.5rem; }
+
+.os-record-divider {
+  grid-column: 1 / -1;
+  margin-top: 0.5rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* -------------------------------------------------------- the command bar */
+
+.os-command-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: grid;
+  /* Not centred: a bar that appears under your eyes rather than in the middle
+     of the screen is the one you can type into without looking for it. */
+  align-content: start;
+  justify-items: center;
+  padding-top: 12vh;
+  background: rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(3px);
+}
+
+.os-command {
+  width: min(40rem, calc(100vw - 2rem));
+  border: 1px solid var(--border-strong);
+  border-radius: 0.75rem;
+  background: color-mix(in oklab, var(--surface) 96%, transparent);
+  box-shadow: 0 2rem 5rem rgb(0 0 0 / 0.6);
+  overflow: hidden;
+}
+
+.os-command-input {
+  width: 100%;
+  font: inherit;
+  font-size: 1rem;
+  padding: 0.85rem 1rem;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--foreground);
+  outline: none;
+}
+
+.os-command-list { list-style: none; margin: 0; padding: 0.35rem; max-height: 22rem; overflow-y: auto; }
+
+.os-command-item {
+  width: 100%;
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.5rem 0.65rem;
+  border: 0;
+  border-radius: 0.45rem;
+  background: transparent;
+  color: var(--foreground);
+  font: inherit;
+  font-size: 0.88rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.os-command-item[data-cursor="true"] { background: color-mix(in oklab, var(--cobalt) 22%, transparent); }
+.os-command-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.os-command-hint { color: var(--muted); font-size: 0.75rem; white-space: nowrap; }
+.os-command-empty { margin: 0; padding: 1rem; color: var(--muted); font-size: 0.88rem; }
+
+.os-command-foot {
+  margin: 0;
+  padding: 0.45rem 0.75rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.os-bar-new { display: inline-flex; align-items: center; gap: 0.4rem; }
+.os-bar-new .os-bar-count { border-color: color-mix(in oklab, var(--cobalt) 55%, var(--border)); }
+
+.os-bar-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  max-width: 18rem;
+  padding: 0.18rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.os-bar-search:hover { color: var(--foreground); border-color: var(--border-strong); }
+.os-bar-search kbd { font-family: var(--font-mono, monospace); font-size: 0.7rem; opacity: 0.7; }
+
+@media (max-width: 767px) {
+  /* The chord is the wrong half to keep when there is no keyboard. */
+  .os-bar-search kbd { display: none; }
+  .os-bar-search { flex: 1 1 auto; max-width: none; }
+  .os-bar-company { display: none; }
+}

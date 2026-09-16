@@ -1600,6 +1600,81 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         expect(context).not.toContain("They work weekends.");
       });
 
+      /* The record, and being told what happened while you were away. Both
+       * exist because MaydaOS now acts without you, and a system that acts on
+       * its own and cannot say what it did since you last looked is one you
+       * have to audit rather than one you can trust. */
+      it("says who did each thing, and a null actor is the answer", async () => {
+        const { data: item } = await admin
+          .from("os_work_items")
+          .insert({ company_id: companyId, lane: "ops", kind: "note", title: "Recorded thing" })
+          .select("id")
+          .single();
+
+        await admin.from("os_work_item_events").insert([
+          { item_id: item!.id, actor: null, event: "prepared", detail: { by: "worker" } },
+          { item_id: item!.id, actor: idA, event: "approved", detail: {} },
+        ]);
+
+        const { data: seen } = await userA
+          .from("os_recent_record")
+          .select("event, by_a_person")
+          .eq("item_id", item!.id)
+          .order("at", { ascending: true });
+
+        expect(seen).toEqual([
+          { event: "prepared", by_a_person: false },
+          { event: "approved", by_a_person: true },
+        ]);
+
+        const { data: hidden } = await outsider
+          .from("os_recent_record")
+          .select("id")
+          .eq("item_id", item!.id);
+        expect(hidden ?? []).toHaveLength(0);
+      });
+
+      /* "I looked at this" is not a claim worth letting anyone backdate, so
+       * the only writable value is now(). */
+      it("lets you mark the record seen, and only forward", async () => {
+        const { data: first, error } = await userA.rpc("os_mark_seen");
+        expect(error).toBeNull();
+        expect(first).toBeTruthy();
+
+        const { error: backdated } = await userA
+          .from("os_desktops")
+          .update({ seen_at: "2000-01-01T00:00:00Z" })
+          .eq("user_id", idA);
+        // No update grant on the column at all: the row is reachable, the
+        // change is not.
+        expect(backdated).not.toBeNull();
+
+        const { data: stored } = await admin
+          .from("os_desktops")
+          .select("seen_at")
+          .eq("user_id", idA)
+          .single();
+        expect(new Date(stored!.seen_at).getFullYear()).toBeGreaterThan(2020);
+
+        // And it is this person's mark, not anybody else's.
+        const { data: theirs } = await outsider.from("os_desktops").select("user_id").eq("user_id", idA);
+        expect(theirs ?? []).toHaveLength(0);
+      });
+
+      /* The companion to narrowing that grant. "seen_at cannot be written"
+       * and "the desk cannot be saved at all" look identical from outside,
+       * and only one of them is what was wanted. */
+      it("still lets a person save where their windows are", async () => {
+        const layout = [{ app: "cofounder", x: 64, y: 48, w: 520, h: 420, z: 2, open: true, minimized: false }];
+        const { error } = await userA
+          .from("os_desktops")
+          .upsert({ user_id: idA, layout }, { onConflict: "user_id" });
+        expect(error).toBeNull();
+
+        const { data } = await userA.from("os_desktops").select("layout").eq("user_id", idA).single();
+        expect(data!.layout).toEqual(layout);
+      });
+
       it("keeps one company's memory out of another's", async () => {
         const { data: mine } = await userA.from("os_company_memory").select("id").eq("company_id", companyId);
         expect((mine ?? []).length).toBeGreaterThan(0);

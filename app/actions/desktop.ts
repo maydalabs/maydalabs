@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { sanitizeLayout } from "@/lib/osDesktop";
@@ -20,4 +21,19 @@ export async function saveDesktopAction(layout: unknown): Promise<void> {
   await supabase
     .from("os_desktops")
     .upsert({ user_id: claims.sub, layout: sanitizeLayout(layout) }, { onConflict: "user_id" });
+}
+
+/* "I have looked at this."
+ *
+ * Through a function that can only ever set it to now(), because a claim
+ * about when you last looked is not one worth letting anyone backdate.
+ */
+export async function markSeenAction(): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  const claims = await getVerifiedClaims();
+  if (!claims?.sub) return;
+
+  const supabase = await createSupabaseServerClient();
+  await supabase.rpc("os_mark_seen");
+  revalidatePath("/os");
 }

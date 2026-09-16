@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { OsApp, OsAppId, OsShellCopy, OsWindowState } from "@/components/os/types";
-import { saveDesktopAction } from "@/app/actions/desktop";
+import { saveDesktopAction, markSeenAction } from "@/app/actions/desktop";
+import { OsCommandBar, OS_COMMAND_EVENT, type CommandBarCopy, type CommandTarget } from "@/components/os/OsCommandBar";
 
 /* The desktop.
  *
@@ -67,6 +68,9 @@ export function OsShell({
   waitingCount,
   email,
   accountHref,
+  commandTargets,
+  commandCopy,
+  unreadCount,
 }: {
   apps: OsApp[];
   copy: OsShellCopy;
@@ -75,6 +79,9 @@ export function OsShell({
   waitingCount: number;
   email: string | null;
   accountHref: string;
+  commandTargets: CommandTarget[];
+  commandCopy: CommandBarCopy;
+  unreadCount: number;
 }) {
   const [windows, setWindows] = useState<OsWindowState[]>(() => hydrate(apps, storedLayout));
   const [gesture, setGesture] = useState<Gesture | null>(null);
@@ -246,12 +253,30 @@ export function OsShell({
 
   return (
     <div className="os-root" data-gesturing={gesture ? "true" : "false"}>
+      <OsCommandBar targets={commandTargets} copy={commandCopy} onOpenApp={focus} />
       <div className="os-bar">
         <span className="os-bar-brand">
           MaydaOS
         </span>
         <span className="os-bar-company">{companyName ?? copy.noCompany}</span>
+        <button
+          type="button"
+          className="os-bar-search"
+          onClick={() => window.dispatchEvent(new Event(OS_COMMAND_EVENT))}
+        >
+          {commandCopy.placeholder} <kbd>⌘K</kbd>
+        </button>
         <span className="os-bar-right">
+          {/* What happened while you were away, and the means to stop being
+              told about it. The count is of the record, not of the queue:
+              those are different questions and conflating them is how a badge
+              stops meaning anything. */}
+          {unreadCount > 0 ? (
+            <form action={markSeenAction} className="os-bar-new">
+              <span className="os-bar-count">{unreadCount} {copy.newSince}</span>
+              <button type="submit" className="os-bar-exit">{copy.markSeen}</button>
+            </form>
+          ) : null}
           <span className="os-bar-count" data-waiting={waitingCount}>
             {copy.waitingLabel}
           </span>

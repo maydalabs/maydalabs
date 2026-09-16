@@ -436,16 +436,19 @@ export type Database = {
       os_desktops: {
         Row: {
           layout: Json
+          seen_at: string
           updated_at: string
           user_id: string
         }
         Insert: {
           layout?: Json
+          seen_at?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           layout?: Json
+          seen_at?: string
           updated_at?: string
           user_id?: string
         }
@@ -1253,6 +1256,45 @@ export type Database = {
           },
         ]
       }
+      os_recent_record: {
+        Row: {
+          actor: string | null
+          at: string | null
+          by_a_person: boolean | null
+          company_id: string | null
+          detail: Json | null
+          event: string | null
+          id: string | null
+          item_id: string | null
+          kind: string | null
+          lane: string | null
+          status: string | null
+          title: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_work_item_events_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_needs_you"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_work_item_events_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_work_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_work_items_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       os_action_approved: {
@@ -1296,6 +1338,7 @@ export type Database = {
       }
       os_has_company: { Args: never; Returns: boolean }
       os_is_member: { Args: { p_company_id: string }; Returns: boolean }
+      os_mark_seen: { Args: never; Returns: string }
       os_record_event: {
         Args: { p_detail?: Json; p_event: string; p_item_id: string }
         Returns: string
