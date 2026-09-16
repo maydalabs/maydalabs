@@ -1,3 +1,4 @@
+import { OsPaneEmpty } from "@/components/os/OsPaneEmpty";
 import { OS_SHELL_COPY } from "@/components/osCopy";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -21,7 +22,7 @@ export async function CompanyApp({ locale }: { locale: Locale }) {
     .limit(1)
     .maybeSingle();
 
-  if (!company) return <p className="mayda-body">{copy.companyNothing}</p>;
+  if (!company) return <OsPaneEmpty>{copy.companyNothing}</OsPaneEmpty>;
 
   const { data: members } = await supabase
     .from("os_company_members")
@@ -34,19 +35,19 @@ export async function CompanyApp({ locale }: { locale: Locale }) {
           label and the company name land on the same line on top of each
           other. */}
       <div className="mayda-stack" style={{ gap: "0.25rem" }}>
-        <p className="mayda-kicker" style={{ margin: 0 }}>{copy.companyHeading}</p>
+        <p className="mayda-kicker">{copy.companyHeading}</p>
         <strong style={{ fontSize: "1.05rem" }}>{company.name}</strong>
       </div>
 
       <div>
-        <p className="mayda-kicker" style={{ margin: "0 0 0.2rem" }}>{copy.companyWhat}</p>
+        <p className="mayda-kicker">{copy.companyWhat}</p>
         <p className="mayda-body" style={{ margin: 0 }}>
           {company.what_we_do || copy.companyWhatMissing}
         </p>
       </div>
 
       <div>
-        <p className="mayda-kicker" style={{ margin: "0 0 0.2rem" }}>{copy.companyPeople}</p>
+        <p className="mayda-kicker">{copy.companyPeople}</p>
         <p className="mayda-body" style={{ margin: 0 }}>
           {(members ?? []).length === 1
             ? `1 · ${(members ?? [])[0]?.role === "owner" ? copy.companyOwner : copy.companyMember}`

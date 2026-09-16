@@ -43,10 +43,15 @@ const PATHS: Record<OsIconName, React.ReactNode> = {
   // A pulse: something is happening without you.
   running: <path d="M2.5 12h4l2.5-6 4 12 2.5-6h6" />,
   // Ruled lines, one of them marked.
+  /* The marks down the left were `M2 6.5h.01` — a hundredth of a unit, which
+   * renders as nothing, so this icon read as a hamburger menu. They are dots,
+   * so they are drawn as dots. */
   record: (
     <>
-      <path d="M4 6.5h16M4 12h16M4 17.5h10" />
-      <path d="M2 6.5h.01M2 12h.01M2 17.5h.01" />
+      <path d="M7.5 6.5h13.5M7.5 12h13.5M7.5 17.5h8" />
+      <circle cx="3.8" cy="6.5" r="1" fill="currentColor" stroke="none" />
+      <circle cx="3.8" cy="12" r="1" fill="currentColor" stroke="none" />
+      <circle cx="3.8" cy="17.5" r="1" fill="currentColor" stroke="none" />
     </>
   ),
   // A bookmark: something kept on purpose.
@@ -55,7 +60,10 @@ const PATHS: Record<OsIconName, React.ReactNode> = {
     <>
       <path d="M4 20.5V6a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v14.5" />
       <path d="M14 10h5a1 1 0 0 1 1 1v9.5" />
-      <path d="M2.5 20.5h19M7.5 8.5h3M7.5 12h3M7.5 15.5h3M17 14h0M17 17.5h0" />
+      <path d="M2.5 20.5h19M7.5 8.5h3M7.5 12h3M7.5 15.5h3" />
+      {/* `M17 14h0` is zero-length and draws nothing at all. */}
+      <circle cx="17" cy="14" r="0.95" fill="currentColor" stroke="none" />
+      <circle cx="17" cy="17.5" r="0.95" fill="currentColor" stroke="none" />
     </>
   ),
   search: (
@@ -72,10 +80,23 @@ const PATHS: Record<OsIconName, React.ReactNode> = {
       <path d="M10 12h10.5m0 0-3.5-3.5M20.5 12 17 15.5" />
     </>
   ),
-  new: <circle cx="12" cy="12" r="4" />,
+  /* Filled, and larger: at size 9 a stroked ring is half a pixel of outline. */
+  new: <circle cx="12" cy="12" r="6" fill="currentColor" stroke="none" />,
 };
 
-export function OsIcon({ name, size = 16 }: { name: OsIconName; size?: number }) {
+/* strokeWidth on a 24 viewBox scales with the icon, so "1.5" rendered 0.94px
+ * in the dock, 0.75px on the window controls and 0.56px on the unread dot —
+ * sub-pixel lines the browser resolves to grey smears. Solving for a constant
+ * optical weight keeps every icon at the same 1.35 CSS px whatever its size. */
+export function OsIcon({
+  name,
+  size = 16,
+  weight = 1.35,
+}: {
+  name: OsIconName;
+  size?: number;
+  weight?: number;
+}) {
   return (
     <svg
       className="os-icon"
@@ -84,7 +105,7 @@ export function OsIcon({ name, size = 16 }: { name: OsIconName; size?: number })
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth={(24 * weight) / size}
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"

@@ -1,3 +1,4 @@
+import { OsPaneEmpty } from "@/components/os/OsPaneEmpty";
 import Link from "next/link";
 import { OS_ACTIVITY_COPY } from "@/components/osCopy";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -31,13 +32,13 @@ export async function CofounderActivity({ locale, bare = false }: { locale: Loca
     <section className="mayda-stack-lg" aria-labelledby="cofounder-activity">
       {bare ? null : (
         <header className="mayda-stack" style={{ gap: "0.4rem" }}>
-          <p className="mayda-kicker" style={{ margin: 0 }}>{copy.kicker}</p>
+          <p className="mayda-kicker">{copy.kicker}</p>
           <h2 className="mayda-subheading" id="cofounder-activity" style={{ margin: 0 }}>{copy.heading}</h2>
         </header>
       )}
 
       {activity.length === 0 ? (
-        <p className="mayda-body">{copy.empty}</p>
+        <OsPaneEmpty>{copy.empty}</OsPaneEmpty>
       ) : (
         activity.map((row) => {
           const cadence = (row.cadence ?? "manual") as "manual" | "daily" | "weekly";
@@ -62,7 +63,7 @@ export async function CofounderActivity({ locale, bare = false }: { locale: Loca
             <article key={row.id} className="mayda-card mayda-os-run">
               <div className="mayda-os-run-head">
                 <div>
-                  <p className="mayda-kicker" style={{ margin: 0 }}>{copy[cadence]}</p>
+                  <p className="mayda-kicker">{copy[cadence]}</p>
                   <strong>{row.name}</strong>
                 </div>
                 <span className="mayda-status">{state}</span>

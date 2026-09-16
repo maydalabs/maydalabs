@@ -1,3 +1,4 @@
+import { OsPaneEmpty } from "@/components/os/OsPaneEmpty";
 import { OS_RECORD_COPY } from "@/components/osCopy";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -24,7 +25,7 @@ export async function RecordApp({ locale, seenAt }: { locale: Locale; seenAt: st
     .order("at", { ascending: false })
     .limit(60);
 
-  if (!rows?.length) return <p className="mayda-body">{copy.empty}</p>;
+  if (!rows?.length) return <OsPaneEmpty>{copy.empty}</OsPaneEmpty>;
 
   const seen = seenAt ? new Date(seenAt).getTime() : 0;
 
@@ -48,6 +49,19 @@ export async function RecordApp({ locale, seenAt }: { locale: Locale; seenAt: st
               <strong>{row.title}</strong>
               <span className="os-record-lane"> {row.lane}/{row.kind}</span>
             </span>
+            {/* The grid reserves a column for this and nothing was filling it.
+                24-hour, tabular, so the times form a column you read down. */}
+            {row.at ? (
+              <span className="os-record-when">
+                {new Intl.DateTimeFormat(locale, {
+                  month: "short",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                }).format(new Date(row.at))}
+              </span>
+            ) : null}
             {/* A single divider where the new stops, rather than a badge on
                 every line: the useful fact is where to stop reading. */}
             {firstOld ? <span className="os-record-divider">{copy.newSince}</span> : null}

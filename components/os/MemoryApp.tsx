@@ -1,3 +1,4 @@
+import { OsPaneEmpty } from "@/components/os/OsPaneEmpty";
 import { OS_MEMORY_COPY } from "@/components/osCopy";
 import { teachMemoryAction, retireMemoryAction } from "@/app/actions/memory";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -18,7 +19,7 @@ export async function MemoryApp({ locale }: { locale: Locale }) {
 
   const supabase = await createSupabaseServerClient();
   const { data: company } = await supabase.from("os_companies").select("id").limit(1).maybeSingle();
-  if (!company) return <p className="mayda-body">{copy.noCompany}</p>;
+  if (!company) return <OsPaneEmpty>{copy.noCompany}</OsPaneEmpty>;
 
   const { data: live } = await supabase
     .from("os_company_memory")
@@ -50,7 +51,7 @@ export async function MemoryApp({ locale }: { locale: Locale }) {
       </form>
 
       {(live ?? []).length === 0 ? (
-        <p className="mayda-body">{copy.empty}</p>
+        <OsPaneEmpty>{copy.empty}</OsPaneEmpty>
       ) : (
         <ul className="os-memory-list">
           {(live ?? []).map((row) => (

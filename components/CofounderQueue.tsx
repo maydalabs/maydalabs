@@ -39,7 +39,7 @@ export async function CofounderQueue({
     return (
       <section className="mayda-stack-lg" aria-labelledby="cofounder-start">
         <header className="mayda-stack" style={{ gap: "0.4rem" }}>
-          {bare ? null : <p className="mayda-kicker" style={{ margin: 0 }}>{copy.kicker}</p>}
+          {bare ? null : <p className="mayda-kicker">{copy.kicker}</p>}
           <h2 className="mayda-subheading" id="cofounder-start" style={{ margin: 0 }}>{copy.startHeading}</h2>
           <p className="mayda-body">{copy.startIntro}</p>
         </header>
@@ -66,7 +66,7 @@ export async function CofounderQueue({
     <section className="mayda-stack-lg" aria-labelledby="cofounder-queue">
       {bare ? null : (
         <header className="mayda-stack" style={{ gap: "0.4rem" }}>
-          <p className="mayda-kicker" style={{ margin: 0 }}>{copy.kicker}</p>
+          <p className="mayda-kicker">{copy.kicker}</p>
           <h2 className="mayda-subheading" id="cofounder-queue" style={{ margin: 0 }}>{copy.heading}</h2>
           {/* The desk is the same work in a place you can arrange. Offered
               from the page rather than replacing it, because a link is a
@@ -84,7 +84,7 @@ export async function CofounderQueue({
           <article key={row.id} className="mayda-card mayda-os-run">
             <div className="mayda-os-run-head">
               <div>
-                <p className="mayda-kicker" style={{ margin: 0 }}>{row.lane} / {row.kind}</p>
+                <p className="mayda-kicker">{row.lane} / {row.kind}</p>
                 <strong>{row.title}</strong>
               </div>
               <span className="mayda-status">

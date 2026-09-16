@@ -67,17 +67,19 @@ void main() {
   float b = field(p * 0.9 - vec2(t * 0.7, t * 0.35));
   float mixed = mix(a, b, 0.45);
 
-  vec3 base = vec3(0.043, 0.043, 0.051);
+  // #050507, matching --os-bg. This was #0b0b0d — six points LIGHTER
+  // than the token it covers, so the canvas was quietly undoing the palette.
+  vec3 base = vec3(0.0196, 0.0196, 0.0275);
   vec3 cool = vec3(0.114, 0.125, 0.235);
-  vec3 warm = vec3(0.160, 0.110, 0.090);
 
   // The light sits off the top-left corner, matching where every window's
   // shadow says it is.
-  float lamp = smoothstep(1.35, 0.0, distance(p, vec2(0.16 * aspect, 1.02)));
+  float lamp = smoothstep(1.0, 0.0, distance(p, vec2(0.16 * aspect, 1.02)));
 
   vec3 color = base;
-  color += cool * (mixed * 0.16 + lamp * 0.10) * (0.75 + uActivity * 0.5);
-  color += warm * pow(max(mixed - 0.62, 0.0), 2.0) * 0.30;
+  // The old weights peaked at +9,+10,+19 of 255 across the whole screen,
+  // which is a gradient you cannot see. The lamp carries it now.
+  color += cool * (mixed * 0.09 + lamp * 0.50) * (0.8 + uActivity * 0.5);
 
   // A vignette that reads as depth rather than as a filter.
   color *= 1.0 - 0.30 * pow(distance(uv, vec2(0.5)), 2.1);

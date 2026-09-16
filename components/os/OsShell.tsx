@@ -401,6 +401,9 @@ export function OsShell({
                   aria-label={app.title}
                 >
                   <header className="os-window-title" onPointerDown={(e) => startMove(e, state)}>
+                    <span className="os-window-name">
+                      <OsIcon name={app.icon} size={14} /> {app.title}
+                    </span>
                     <button
                       type="button"
                       className="os-window-dot"
@@ -421,9 +424,6 @@ export function OsShell({
                     >
                       <OsIcon name="minimize" size={12} />
                     </button>
-                    <span className="os-window-name">
-                      <OsIcon name={app.icon} size={14} /> {app.title}
-                    </span>
                   </header>
 
                   <div className="os-window-body">{app.node}</div>
@@ -442,6 +442,9 @@ export function OsShell({
       </div>
 
       <nav className="os-dock" aria-label={copy.desktop}>
+        {/* The tray is what makes this a dock rather than six buttons that
+            happen to sit near each other. */}
+        <div className="os-dock-tray">
         {apps.map((app) => {
           const state = windows.find((w) => w.app === app.id);
           const open = narrow ? phoneApp === app.id : Boolean(state?.open && !state.minimized);
@@ -459,6 +462,7 @@ export function OsShell({
             </button>
           );
         })}
+        </div>
       </nav>
     </div>
   );
