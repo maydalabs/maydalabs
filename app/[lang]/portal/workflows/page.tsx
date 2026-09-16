@@ -20,11 +20,27 @@ export default async function PortalWorkflowsPage({ params }: LocalePageProps) {
 
   const { data: rows } = await supabase
     .from("os_workflows")
-    .select("id, key, name, purpose, brief, shape, destination, max_sources, owner_user_id, standing_sources, window_days, monthly_budget_usd, active")
+    .select("id, key, name, purpose, brief, shape, destination, max_sources, owner_user_id, standing_sources, window_days, monthly_budget_usd, active, company_id, cadence, required_action")
     .eq("owner_user_id", claims.sub)
     .order("name");
-  const mine = toOsWorkflows(rows ?? []) as (ReturnType<typeof toOsWorkflows>[number] & { active: boolean })[];
+  const mine = toOsWorkflows(rows ?? []) as (ReturnType<typeof toOsWorkflows>[number] & {
+    active: boolean;
+    company_id: string | null;
+    cadence: string | null;
+    required_action: string | null;
+  })[];
   const atLimit = mine.length >= OS_MAX_WORKFLOWS_PER_MEMBER;
+
+  /* The companies this person may file work into. The list is read through
+   * their own client, so it is the same set the database would accept — the
+   * select cannot offer a company the save would then refuse. */
+  const { data: memberships } = await supabase
+    .from("os_company_members")
+    .select("company_id, os_companies (id, name)")
+    .eq("user_id", claims.sub);
+  const companies = (memberships ?? [])
+    .map((row) => row.os_companies)
+    .filter((company): company is { id: string; name: string } => Boolean(company?.id));
 
   return (
     <div className="mayda-shell mayda-section mayda-stack-lg" style={{ maxWidth: "64rem" }}>
@@ -47,7 +63,7 @@ export default async function PortalWorkflowsPage({ params }: LocalePageProps) {
             {workflow.active ? "" : " · off"}
           </summary>
           <div className="mayda-stack" style={{ gap: "1rem", marginTop: "1rem" }}>
-            <MemberWorkflowForm copy={copy} shapes={deskCopy.shapes} workflow={workflow} />
+            <MemberWorkflowForm copy={copy} shapes={deskCopy.shapes} workflow={workflow} companies={companies} />
             <DeleteWorkflowButton id={workflow.id} label={copy.remove} confirmText={copy.removeConfirm} />
           </div>
         </details>
@@ -59,7 +75,7 @@ export default async function PortalWorkflowsPage({ params }: LocalePageProps) {
         <details className="mayda-details">
           <summary>{copy.add}</summary>
           <div style={{ marginTop: "1rem" }}>
-            <MemberWorkflowForm copy={copy} shapes={deskCopy.shapes} />
+            <MemberWorkflowForm copy={copy} shapes={deskCopy.shapes} companies={companies} />
           </div>
         </details>
       )}

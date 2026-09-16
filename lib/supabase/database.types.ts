@@ -491,6 +491,13 @@ export type Database = {
             foreignKeyName: "os_runs_workflow_id_fkey"
             columns: ["workflow_id"]
             isOneToOne: false
+            referencedRelation: "os_activity"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_runs_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
             referencedRelation: "os_workflows"
             referencedColumns: ["id"]
           },
@@ -1003,6 +1010,49 @@ export type Database = {
         }
         Relationships: []
       }
+      os_activity: {
+        Row: {
+          active: boolean | null
+          cadence: string | null
+          company_id: string | null
+          due_in_hours: number | null
+          id: string | null
+          last_run_at: string | null
+          last_run_days: number | null
+          last_run_item_id: string | null
+          last_run_status: string | null
+          monthly_budget_usd: number | null
+          name: string | null
+          next_run_at: string | null
+          paused_reason: string | null
+          runs_this_month: number | null
+          shape: string | null
+          spent_this_month_usd: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_runs_item_id_fkey"
+            columns: ["last_run_item_id"]
+            isOneToOne: false
+            referencedRelation: "os_needs_you"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_runs_item_id_fkey"
+            columns: ["last_run_item_id"]
+            isOneToOne: false
+            referencedRelation: "os_work_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_workflows_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       os_beta_status: {
         Row: {
           user_id: string | null
@@ -1096,6 +1146,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      os_has_company: { Args: never; Returns: boolean }
       os_is_member: { Args: { p_company_id: string }; Returns: boolean }
       os_record_event: {
         Args: { p_detail?: Json; p_event: string; p_item_id: string }

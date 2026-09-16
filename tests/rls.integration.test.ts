@@ -1164,6 +1164,107 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         await admin.from("os_work_items").delete().eq("id", item!.id);
       });
 
+      /* Scheduling from the product rather than from psql. Filing into a
+       * company is what makes the worker pick a workflow up at all, so the
+       * question of whose queue it lands in is the one that matters. */
+      it("lets a member schedule into their own company, and nobody else's", async () => {
+        const { data: mine, error: ok } = await userA
+          .from("os_workflows")
+          .insert({
+            key: `selfserve_${suffix}`,
+            name: "Mine",
+            purpose: "p",
+            brief: "b",
+            shape: "note",
+            company_id: companyId,
+            cadence: "weekly",
+            required_action: "publish",
+          })
+          .select("id, company_id, cadence, next_run_at, owner_user_id")
+          .single();
+        expect(ok).toBeNull();
+        expect(mine!.company_id).toBe(companyId);
+        expect(mine!.cadence).toBe("weekly");
+        // Scheduled means due, not merely labelled.
+        expect(mine!.next_run_at).not.toBeNull();
+        // And it is theirs, whatever the form claimed.
+        expect(mine!.owner_user_id).toBe(idA);
+
+        const { error: refused } = await outsider.from("os_workflows").insert({
+          key: `stolen_${suffix}`,
+          name: "Aimed at someone else",
+          purpose: "p",
+          brief: "b",
+          shape: "note",
+          company_id: companyId,
+          cadence: "daily",
+        });
+        expect(refused).not.toBeNull();
+
+        await admin.from("os_workflows").delete().eq("id", mine!.id);
+      });
+
+      /* The process surface. A co-founder who cannot see what the other one
+       * scheduled is not a co-founder; anyone else seeing it is a leak. */
+      it("shows a company its own activity and nobody else's", async () => {
+        const { data: seen } = await userA.from("os_activity").select("id, name, cadence").eq("id", workflowId);
+        expect((seen ?? []).map((row) => row.id)).toContain(workflowId);
+
+        const { data: hidden } = await outsider.from("os_activity").select("id").eq("id", workflowId);
+        expect(hidden ?? []).toHaveLength(0);
+      });
+
+      /* The gate that actually decides.
+       *
+       * os_workflows_private_beta is RESTRICTIVE, so it applies on top of
+       * every permissive policy. Every other test in this block runs as
+       * userA, who is on the beta allowlist — so they would all pass whether
+       * or not company membership grants anything, which is precisely how
+       * this shipped broken: the page opened and the save was refused by the
+       * database with a generic message. This user is on no allowlist and
+       * has nothing but a company. */
+      it("lets someone whose only entitlement is a company set work up", async () => {
+        const email = `founder-only-${suffix}@example.com`;
+        const created = await admin.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+        });
+        const founderId = created.data.user!.id;
+        await admin.from("os_company_members").insert({
+          company_id: companyId,
+          user_id: founderId,
+          role: "member",
+        });
+
+        const founder = anonClient();
+        const signedIn = await founder.auth.signInWithPassword({ email, password });
+        expect(signedIn.error).toBeNull();
+
+        // Not on the allowlist, and the view agrees.
+        expect((await founder.from("os_beta_status").select("*")).data).toEqual([]);
+
+        const { data: made, error } = await founder
+          .from("os_workflows")
+          .insert({
+            key: `company_only_${suffix}`,
+            name: "Set up by a founder",
+            purpose: "p",
+            brief: "b",
+            shape: "note",
+            company_id: companyId,
+            cadence: "daily",
+          })
+          .select("id, cadence, next_run_at")
+          .single();
+        expect(error).toBeNull();
+        expect(made!.cadence).toBe("daily");
+        expect(made!.next_run_at).not.toBeNull();
+
+        await admin.from("os_workflows").delete().eq("id", made!.id);
+        await admin.auth.admin.deleteUser(founderId);
+      });
+
       it("lets nobody but the server claim work", async () => {
         const { error } = await userA.rpc("os_claim_due_workflows", { p_limit: 1 });
         expect(error).not.toBeNull();

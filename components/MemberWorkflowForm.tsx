@@ -15,10 +15,17 @@ export function MemberWorkflowForm({
   copy,
   shapes,
   workflow,
+  companies = [],
 }: {
   copy: OsWorkflowCopy;
   shapes: OsDeskCopy["shapes"];
-  workflow?: OsWorkflow & { active?: boolean };
+  workflow?: OsWorkflow & {
+    active?: boolean;
+    company_id?: string | null;
+    cadence?: string | null;
+    required_action?: string | null;
+  };
+  companies?: { id: string; name: string }[];
 }) {
   const [state, dispatch, pending] = useActionState(saveMemberWorkflowAction, IDLE);
 
@@ -77,6 +84,43 @@ export function MemberWorkflowForm({
         </label>
       </div>
 
+      {/* The schedule. Filing into a company is what lets the worker pick
+          this up at all, so the two controls sit together: choosing a
+          cadence without a queue to file into would be a setting that
+          quietly does nothing. */}
+      {companies.length > 0 ? (
+        <div className="mayda-grid-2" style={{ gap: "0.7rem" }}>
+          <label className="mayda-field">
+            <span>{copy.companyLabel}</span>
+            <select name="companyId" defaultValue={workflow?.company_id ?? ""}>
+              <option value="">{copy.companyNone}</option>
+              {companies.map((company) => (
+                <option key={company.id} value={company.id}>
+                  {company.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="mayda-field">
+            <span>{copy.cadenceLabel}</span>
+            <select name="cadence" defaultValue={workflow?.cadence ?? "manual"}>
+              <option value="manual">{copy.cadenceManual}</option>
+              <option value="daily">{copy.cadenceDaily}</option>
+              <option value="weekly">{copy.cadenceWeekly}</option>
+            </select>
+          </label>
+          <label className="mayda-field">
+            <span>{copy.requiredActionLabel}</span>
+            <input
+              name="requiredAction"
+              maxLength={60}
+              defaultValue={workflow?.required_action ?? ""}
+              placeholder={copy.requiredActionPlaceholder}
+            />
+          </label>
+        </div>
+      ) : null}
+
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" name="active" defaultChecked={workflow?.active ?? true} /> {copy.activeLabel}
       </label>
@@ -88,10 +132,17 @@ export function MemberWorkflowForm({
         {state.status === "saved" ? <span className="mayda-status is-active" role="status">{copy.saved}</span> : null}
         {state.status === "error" ? (
           <span className="mayda-field-error" role="alert">
-            {state.code === "too_many" ? copy.limitReached : copy.failed}
+            {state.code === "too_many"
+              ? copy.limitReached
+              : state.code === "not_authorized"
+                ? copy.notYourCompany
+                : copy.failed}
           </span>
         ) : null}
       </div>
+      {companies.length > 0 ? (
+        <p className="mayda-note" style={{ margin: 0 }}>{copy.scheduleNote}</p>
+      ) : null}
       <p className="mayda-note" style={{ margin: 0 }}>{copy.budgetNote}</p>
     </form>
   );

@@ -10,6 +10,7 @@ import { gatherSources } from "@/lib/osGather";
 import {
   asStandingSources,
   OS_SHAPES,
+  OS_CADENCES,
   parseStandingSources,
   monthStart,
   workflowBudget,
@@ -271,6 +272,19 @@ export async function saveMemberWorkflowAction(
   const standingSources = parseStandingSources(String(formData.get("standingSources") ?? ""));
   const active = formData.get("active") === "on";
 
+  /* Putting the workflow in a company is what makes the worker pick it up.
+   * Whether this person actually belongs to that company is checked by the
+   * database, not here: a form is not a thing to be trusted about
+   * membership. */
+  const companyIdRaw = String(formData.get("companyId") ?? "").trim();
+  const companyId = /^[0-9a-f-]{36}$/.test(companyIdRaw) ? companyIdRaw : null;
+
+  const cadenceRaw = String(formData.get("cadence") ?? "manual");
+  const cadence = (OS_CADENCES as readonly string[]).includes(cadenceRaw) ? cadenceRaw : "manual";
+
+  const requiredActionRaw = String(formData.get("requiredAction") ?? "").trim().toLowerCase().slice(0, 60);
+  const requiredAction = requiredActionRaw || null;
+
   const fields = {
     name,
     purpose,
@@ -281,6 +295,14 @@ export async function saveMemberWorkflowAction(
     window_days: windowDays,
     standing_sources: standingSources,
     active,
+    company_id: companyId,
+    /* A schedule with nowhere to file the result would draft into a queue
+     * nobody reads, which is the failure this whole property replaced. */
+    cadence: companyId ? cadence : "manual",
+    required_action: requiredAction,
+    /* Changing the schedule clears a pause: the person has just looked at
+     * the thing and decided it should run again. */
+    paused_reason: null,
   };
 
   const id = String(formData.get("workflowId") ?? "");
@@ -293,7 +315,11 @@ export async function saveMemberWorkflowAction(
       .update(fields)
       .eq("id", id)
       .eq("owner_user_id", claims.sub);
-    if (error) return { status: "error", code: "save_failed" };
+    if (error) {
+      return error.message.includes("not your company")
+        ? { status: "error", code: "not_authorized" }
+        : { status: "error", code: "save_failed" };
+    }
   } else {
     const { randomBytes } = await import("node:crypto");
     const { error } = await supabase.from("os_workflows").insert({
@@ -304,9 +330,9 @@ export async function saveMemberWorkflowAction(
     // The trigger raises when a sixth is attempted; say so in those words
     // rather than reporting a generic failure.
     if (error) {
-      return error.message.includes("workflow limit reached")
-        ? { status: "error", code: "too_many" }
-        : { status: "error", code: "save_failed" };
+      if (error.message.includes("workflow limit reached")) return { status: "error", code: "too_many" };
+      if (error.message.includes("not your company")) return { status: "error", code: "not_authorized" };
+      return { status: "error", code: "save_failed" };
     }
   }
 

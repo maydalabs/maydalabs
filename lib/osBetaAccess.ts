@@ -15,6 +15,27 @@ export const getOsBetaAccess = cache(async () => {
     .eq("user_id", claims.sub)
     .maybeSingle();
 
-  if (error || !data) return { allowed: false, code: "invite_only" } as const;
-  return { allowed: true, claims, supabase } as const;
+  if (!error && data) return { allowed: true, claims, supabase } as const;
+
+  /* Belonging to a company is the entitlement now.
+   *
+   * os_beta_status is the allowlist from the per-user private beta, and it
+   * had become the wrong question: a founder who starts a company through
+   * the front door is not on it, so "Set up workflows" led to a 404 and they
+   * could never schedule anything. The loop was closed everywhere except
+   * where a customer touches it.
+   *
+   * What stands between someone signing up and a bill is money, not this
+   * gate: five workflows per person, five dollars a month each, and a daily
+   * ceiling across all of them. Nothing runs on a schedule at all without
+   * CRON_SECRET and a model key, neither of which is set in production. */
+  const { data: membership } = await supabase
+    .from("os_company_members")
+    .select("user_id")
+    .eq("user_id", claims.sub)
+    .limit(1)
+    .maybeSingle();
+
+  if (membership) return { allowed: true, claims, supabase } as const;
+  return { allowed: false, code: "invite_only" } as const;
 });

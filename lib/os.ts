@@ -8,6 +8,11 @@
 export const OS_SHAPES = ["note", "post", "summary"] as const;
 export type OsShape = (typeof OS_SHAPES)[number];
 
+/* How often a workflow runs itself. `manual` means the worker never picks it
+ * up, which is what everything that existed before a schedule did. */
+export const OS_CADENCES = ["manual", "daily", "weekly"] as const;
+export type OsCadence = (typeof OS_CADENCES)[number];
+
 export const OS_DECISIONS = ["pending", "approved", "rejected"] as const;
 export type OsDecision = (typeof OS_DECISIONS)[number];
 
