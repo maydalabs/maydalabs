@@ -261,6 +261,104 @@ export type Database = {
         }
         Relationships: []
       }
+      os_approvals: {
+        Row: {
+          action: string
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          id: string
+          item_id: string
+          notes: string
+        }
+        Insert: {
+          action: string
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          item_id: string
+          notes?: string
+        }
+        Update: {
+          action?: string
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          item_id?: string
+          notes?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_approvals_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_needs_you"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_approvals_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_work_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      os_companies: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          what_we_do: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          what_we_do?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          what_we_do?: string | null
+        }
+        Relationships: []
+      }
+      os_company_members: {
+        Row: {
+          company_id: string
+          created_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_company_members_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       os_credits: {
         Row: {
           created_at: string
@@ -367,6 +465,107 @@ export type Database = {
             columns: ["workflow_id"]
             isOneToOne: false
             referencedRelation: "os_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      os_work_item_events: {
+        Row: {
+          actor: string | null
+          at: string
+          detail: Json
+          event: string
+          id: string
+          item_id: string
+        }
+        Insert: {
+          actor?: string | null
+          at?: string
+          detail?: Json
+          event: string
+          id?: string
+          item_id: string
+        }
+        Update: {
+          actor?: string | null
+          at?: string
+          detail?: Json
+          event?: string
+          id?: string
+          item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_work_item_events_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_needs_you"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_work_item_events_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_work_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      os_work_items: {
+        Row: {
+          artifacts: Json
+          company_id: string
+          created_at: string
+          id: string
+          kind: string
+          lane: string
+          metadata: Json
+          notes: string
+          required_action: string | null
+          sources: Json
+          status: string
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          artifacts?: Json
+          company_id: string
+          created_at?: string
+          id?: string
+          kind: string
+          lane: string
+          metadata?: Json
+          notes?: string
+          required_action?: string | null
+          sources?: Json
+          status?: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          artifacts?: Json
+          company_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          lane?: string
+          metadata?: Json
+          notes?: string
+          required_action?: string | null
+          sources?: Json
+          status?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_work_items_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
             referencedColumns: ["id"]
           },
         ]
@@ -760,8 +959,60 @@ export type Database = {
         }
         Relationships: []
       }
+      os_needs_you: {
+        Row: {
+          company_id: string | null
+          id: string | null
+          kind: string | null
+          lane: string | null
+          required_action: string | null
+          route: string | null
+          status: string | null
+          title: string | null
+          updated_at: string | null
+          waiting_for: string | null
+        }
+        Insert: {
+          company_id?: string | null
+          id?: string | null
+          kind?: string | null
+          lane?: string | null
+          required_action?: string | null
+          route?: never
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+          waiting_for?: never
+        }
+        Update: {
+          company_id?: string | null
+          id?: string | null
+          kind?: string | null
+          lane?: string | null
+          required_action?: string | null
+          route?: never
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+          waiting_for?: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_work_items_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      os_action_approved: {
+        Args: { p_action: string; p_item_id: string }
+        Returns: boolean
+      }
+      os_is_member: { Args: { p_company_id: string }; Returns: boolean }
       os_spend_credit: { Args: { p_user_id: string }; Returns: number }
     }
     Enums: {

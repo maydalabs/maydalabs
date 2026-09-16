@@ -766,6 +766,163 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       await admin.from("os_workflows").delete().eq("key", `budgeted_${suffix}`);
     });
 
+    /* The co-founder's spine, 16 September. MaydaOS is Abidin made sellable,
+     * and what makes Abidin feel like a co-founder rather than a chat window
+     * is enforced here: it holds a company's state, it brings back what only
+     * a person can settle, and it cannot decide anything itself. Every one of
+     * those refusals is a database rule, because a product's promise that
+     * lives only in application code is a promise until the next bug. */
+    describe("the co-founder's spine", () => {
+      let companyId: string;
+      let itemId: string;
+
+      beforeAll(async () => {
+        const { data: company } = await admin
+          .from("os_companies")
+          .insert({ name: `Spine Co ${suffix}`, what_we_do: "We test things." })
+          .select("id")
+          .single();
+        companyId = company!.id;
+        await admin.from("os_company_members").insert({ company_id: companyId, user_id: idA, role: "owner" });
+
+        const { data: item } = await admin
+          .from("os_work_items")
+          .insert({
+            company_id: companyId,
+            lane: "content",
+            kind: "post",
+            title: "A post that needs a decision",
+            required_action: "publish",
+          })
+          .select("id")
+          .single();
+        itemId = item!.id;
+      });
+
+      afterAll(async () => {
+        if (companyId) await admin.from("os_companies").delete().eq("id", companyId);
+      });
+
+      it("shows a company's work to its members and to nobody else", async () => {
+        const { data: mine } = await userA.from("os_work_items").select("id").eq("company_id", companyId);
+        expect((mine ?? []).map((row) => row.id)).toContain(itemId);
+
+        const { data: theirs } = await outsider.from("os_work_items").select("id").eq("company_id", companyId);
+        expect(theirs ?? []).toHaveLength(0);
+
+        const { error } = await outsider
+          .from("os_work_items")
+          .insert({ company_id: companyId, lane: "content", kind: "post", title: "Not yours" });
+        expect(error).not.toBeNull();
+      });
+
+      it("refuses a move the machine does not allow", async () => {
+        // pending cannot jump straight to approved, skipping every gate.
+        const { error } = await userA.from("os_work_items").update({ status: "approved" }).eq("id", itemId);
+        expect(error).not.toBeNull();
+        expect(error!.message).toContain("cannot move from pending to approved");
+      });
+
+      /* The rule the whole product rests on: the system may prepare anything
+       * and may decide nothing. */
+      it("will not approve an item whose action nobody approved", async () => {
+        await userA.from("os_work_items").update({ status: "drafted" }).eq("id", itemId);
+        await userA.from("os_work_items").update({ status: "review" }).eq("id", itemId);
+
+        const { error } = await userA.from("os_work_items").update({ status: "approved" }).eq("id", itemId);
+        expect(error).not.toBeNull();
+        expect(error!.message).toContain('needs an approved "publish"');
+      });
+
+      it("is not unlocked by an approval for a different action", async () => {
+        await userA.from("os_approvals").insert({
+          item_id: itemId,
+          action: "email",
+          approved_by: idA,
+          approved_at: new Date().toISOString(),
+        });
+
+        const { error } = await userA.from("os_work_items").update({ status: "approved" }).eq("id", itemId);
+        expect(error).not.toBeNull();
+      });
+
+      it("lets the item through once a person approves that exact action", async () => {
+        await userA.from("os_approvals").insert({
+          item_id: itemId,
+          action: "publish",
+          approved_by: idA,
+          approved_at: new Date().toISOString(),
+        });
+
+        const { data, error } = await userA
+          .from("os_work_items")
+          .update({ status: "approved" })
+          .eq("id", itemId)
+          .select("status");
+        expect(error).toBeNull();
+        expect(data).toEqual([{ status: "approved" }]);
+      });
+
+      it("refuses an unsigned approval, and will not let a signed one be rewritten", async () => {
+        // Half a record is the one that gets believed later.
+        const { error: halfSigned } = await userA
+          .from("os_approvals")
+          .insert({ item_id: itemId, action: "half", approved_by: idA });
+        expect(halfSigned).not.toBeNull();
+
+        const { data: signed } = await admin
+          .from("os_approvals")
+          .select("id")
+          .eq("item_id", itemId)
+          .eq("action", "publish")
+          .single();
+        const { error: rewritten } = await userA
+          .from("os_approvals")
+          .update({ action: "something_else" })
+          .eq("id", signed!.id);
+        expect(rewritten).not.toBeNull();
+      });
+
+      it("keeps the record append-only", async () => {
+        const { data: event } = await admin
+          .from("os_work_item_events")
+          .insert({ item_id: itemId, event: "prepared", detail: { by: "the system" } })
+          .select("id")
+          .single();
+
+        const { error: edited } = await admin
+          .from("os_work_item_events")
+          .update({ event: "never happened" })
+          .eq("id", event!.id);
+        expect(edited).not.toBeNull();
+
+        const { error: erased } = await admin.from("os_work_item_events").delete().eq("id", event!.id);
+        expect(erased).not.toBeNull();
+      });
+
+      it("brings back only what a person can settle, and says why", async () => {
+        const { data } = await userA.from("os_needs_you").select("id, route, status").eq("company_id", companyId);
+        const routes = (data ?? []).map((row) => row.route);
+        // The item is approved with an action outstanding: it is waiting to be
+        // finished, not to be decided.
+        expect(routes).toContain("finish");
+        // Nothing the system can still move on its own appears here.
+        for (const row of data ?? []) {
+          expect(["review", "approved", "blocked"]).toContain(row.status);
+        }
+
+        const { data: hidden } = await outsider.from("os_needs_you").select("id").eq("company_id", companyId);
+        expect(hidden ?? []).toHaveLength(0);
+      });
+
+      it("treats finished work as finished", async () => {
+        await userA.from("os_work_items").update({ status: "completed" }).eq("id", itemId);
+        const { error } = await userA.from("os_work_items").update({ status: "review" }).eq("id", itemId);
+        expect(error).not.toBeNull();
+        expect(error!.message).toContain("cannot move from completed");
+      });
+    });
+
     /* Self-serve workflows, 16 September. A member may now set up their own
      * work, which is the difference between an internal tool and something a
      * person can buy. Everything they must NOT be able to do is enforced in
