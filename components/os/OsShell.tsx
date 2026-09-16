@@ -1,50 +1,30 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { OsApp, OsAppId, OsShellCopy, OsWindowState } from "@/components/os/types";
 import { saveDesktopAction, markSeenAction } from "@/app/actions/desktop";
 import { OsCommandBar, OS_COMMAND_EVENT, type CommandBarCopy, type CommandTarget } from "@/components/os/OsCommandBar";
+import { OsBackdrop } from "@/components/os/OsBackdrop";
 import { OsIcon } from "@/components/os/OsIcon";
 
 /* The desktop.
  *
  * A window manager rather than a layout: the arrangement is a person's, not
  * the designer's, and it is theirs across machines because it lives in the
- * database. Roughly four hundred lines and no dependency, because what this
- * has to do is small and specific and every library that does it also does
- * forty other things.
+ * database. No dependency, because what this has to do is small and specific
+ * and every library that does it also does forty other things.
  */
 
 const PHONE_WIDTH = 768;
-
-type OsTheme = "instrument" | "desk";
-
-/* The theme as an external store. Set on <html> before paint by a script in
- * the route's layout, so React reads it rather than owning it. */
-const themeListeners = new Set<() => void>();
-
-function subscribeToTheme(onChange: () => void) {
-  themeListeners.add(onChange);
-  return () => themeListeners.delete(onChange);
-}
-
-function readTheme(): OsTheme {
-  return document.documentElement.dataset.osTheme === "desk" ? "desk" : "instrument";
-}
-
-function setTheme(next: OsTheme) {
-  document.documentElement.dataset.osTheme = next;
-  try {
-    localStorage.setItem("maydaos-theme", next);
-  } catch {
-    // A private window refusing storage is no reason to refuse the toggle;
-    // it simply will not be remembered.
-  }
-  for (const listener of themeListeners) listener();
-}
 const TITLE_HEIGHT = 34;
 const MIN_W = 288;
 const MIN_H = 160;
+
+/* A window dragged against an edge takes that half; against the top it takes
+ * the whole surface. It is the one window gesture people already know from
+ * every desktop they have used, and without it a small screen means arranging
+ * panes by hand every session. */
+const SNAP_EDGE = 26;
 
 type Gesture =
   | { kind: "move"; app: OsAppId; pointerId: number; dx: number; dy: number }
@@ -74,15 +54,28 @@ function hydrate(apps: OsApp[], stored: unknown): OsWindowState[] {
     const bool = (key: string, fallback: boolean) =>
       typeof saved?.[key] === "boolean" ? (saved[key] as boolean) : fallback;
 
+    /* `placed` is the whole responsive story. A window nobody has moved is
+     * positioned as a share of the surface, so a fresh desk is laid out for
+     * the screen in front of you rather than for the 1280px one I happened to
+     * build on. The moment someone drags it, it becomes pixels — because at
+     * that point they mean *there*, not "44% of the way across". */
     return {
       app: app.id,
       x: num("x", app.defaultRect.x),
       y: num("y", app.defaultRect.y),
-      w: Math.max(MIN_W, num("w", app.defaultRect.w)),
-      h: Math.max(MIN_H, num("h", app.defaultRect.h)),
+      w: num("w", app.defaultRect.w),
+      h: num("h", app.defaultRect.h),
       z: num("z", index + 1),
       open: bool("open", Boolean(app.openByDefault)),
       minimized: bool("minimized", false),
+      /* A desk saved before windows had this flag holds pixels and says so
+       * only by their size: a share is never more than 2. */
+      placed: bool(
+        "placed",
+        ["x", "y", "w", "h"].some(
+          (key) => typeof saved?.[key] === "number" && Math.abs(saved[key] as number) > 2,
+        ),
+      ),
     };
   });
 }
@@ -115,20 +108,7 @@ export function OsShell({
   const [narrow, setNarrow] = useState(false);
   const [phoneApp, setPhoneApp] = useState<OsAppId>(apps[0]?.id ?? "cofounder");
   const surfaceRef = useRef<HTMLDivElement>(null);
-
-  /* Two visual directions, side by side, so the choice is made by looking
-   * rather than by reading a description of each.
-   *
-   * The theme lives on the document element, set before first paint so the
-   * light one does not flash dark on reload — which makes it external state,
-   * subscribed to rather than copied into React. Kept in the browser and not
-   * the database on purpose: this is a decision aid, and once a direction is
-   * chosen the loser is deleted rather than remembered. */
-  const theme = useSyncExternalStore(subscribeToTheme, readTheme, () => "instrument" as const);
-
-  const flipTheme = useCallback(() => {
-    setTheme(theme === "instrument" ? "desk" : "instrument");
-  }, [theme]);
+  const pointer = useRef({ x: 0, y: 0 });
 
   /* Measured, not guessed from a user agent: the same person is on a wide
    * screen and a narrow one during a single day. */
@@ -211,39 +191,60 @@ export function OsShell({
 
   // ------------------------------------------------------------- gestures
 
+  /* A window that has never been moved is sized in percentages, so the first
+   * drag has to learn where it actually is before it can move it anywhere.
+   * The element knows; nothing else does. */
+  const rectOf = useCallback((event: React.PointerEvent) => {
+    const el = (event.currentTarget as HTMLElement).closest(".os-window");
+    const bounds = surfaceRef.current?.getBoundingClientRect();
+    if (!el || !bounds) return null;
+    const box = el.getBoundingClientRect();
+    return { x: box.left - bounds.left, y: box.top - bounds.top, w: box.width, h: box.height };
+  }, []);
+
   const startMove = useCallback(
     (event: React.PointerEvent, state: OsWindowState) => {
       if (event.button !== 0) return;
+      const box = rectOf(event) ?? { x: state.x, y: state.y, w: state.w, h: state.h };
       event.currentTarget.setPointerCapture(event.pointerId);
       focus(state.app);
+      update(
+        (prev) => prev.map((w) => (w.app === state.app ? { ...w, ...box, placed: true } : w)),
+        false,
+      );
       setGesture({
         kind: "move",
         app: state.app,
         pointerId: event.pointerId,
-        dx: event.clientX - state.x,
-        dy: event.clientY - state.y,
+        dx: event.clientX - box.x,
+        dy: event.clientY - box.y,
       });
     },
-    [focus],
+    [focus, rectOf, update],
   );
 
   const startResize = useCallback(
     (event: React.PointerEvent, state: OsWindowState) => {
       if (event.button !== 0) return;
       event.stopPropagation();
+      const box = rectOf(event) ?? { x: state.x, y: state.y, w: state.w, h: state.h };
       event.currentTarget.setPointerCapture(event.pointerId);
       focus(state.app);
+      update(
+        (prev) => prev.map((w) => (w.app === state.app ? { ...w, ...box, placed: true } : w)),
+        false,
+      );
       setGesture({
         kind: "resize",
         app: state.app,
         pointerId: event.pointerId,
-        fromW: state.w,
-        fromH: state.h,
+        fromW: box.w,
+        fromH: box.h,
         fromX: event.clientX,
         fromY: event.clientY,
       });
     },
-    [focus],
+    [focus, rectOf, update],
   );
 
   const onPointerMove = useCallback(
@@ -251,6 +252,7 @@ export function OsShell({
       if (!gesture || event.pointerId !== gesture.pointerId) return;
       const bounds = surfaceRef.current?.getBoundingClientRect();
       if (!bounds) return;
+      pointer.current = { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
 
       update((prev) =>
         prev.map((w) => {
@@ -278,13 +280,23 @@ export function OsShell({
 
   const endGesture = useCallback(() => {
     if (!gesture) return;
+    const bounds = surfaceRef.current?.getBoundingClientRect();
+    const at = pointer.current;
+    const moved = gesture.kind === "move";
     setGesture(null);
-    // Where it came to rest is the thing worth remembering.
-    setWindows((prev) => {
-      persist(prev);
-      return prev;
-    });
-  }, [gesture, persist]);
+
+    update((prev) =>
+      prev.map((w) => {
+        if (!moved || w.app !== gesture.app || !bounds) return w;
+        if (at.y <= SNAP_EDGE) return { ...w, x: 0, y: 0, w: bounds.width, h: bounds.height };
+        if (at.x <= SNAP_EDGE) return { ...w, x: 0, y: 0, w: bounds.width / 2, h: bounds.height };
+        if (at.x >= bounds.width - SNAP_EDGE) {
+          return { ...w, x: bounds.width / 2, y: 0, w: bounds.width / 2, h: bounds.height };
+        }
+        return w;
+      }),
+    );
+  }, [gesture, update]);
 
   // ---------------------------------------------------------------- render
 
@@ -294,7 +306,9 @@ export function OsShell({
 
   return (
     <div className="os-root" data-gesturing={gesture ? "true" : "false"}>
+      <OsBackdrop activity={Math.min(waitingCount / 5, 1)} />
       <OsCommandBar targets={commandTargets} copy={commandCopy} onOpenApp={focus} />
+
       <div className="os-bar">
         <span className="os-bar-brand">MaydaOS</span>
         <span className="os-bar-company">{companyName ?? copy.noCompany}</span>
@@ -304,7 +318,8 @@ export function OsShell({
           onClick={() => window.dispatchEvent(new Event(OS_COMMAND_EVENT))}
         >
           <OsIcon name="search" size={14} />
-          {commandCopy.placeholder} <kbd>⌘K</kbd>
+          <span className="os-bar-long">{commandCopy.placeholder}</span>
+          <kbd>⌘K</kbd>
         </button>
         <span className="os-bar-right">
           {/* What happened while you were away, and the means to stop being
@@ -320,12 +335,10 @@ export function OsShell({
             </form>
           ) : null}
           <span className="os-bar-count" data-waiting={waitingCount}>
-            {copy.waitingLabel}
+            <span className="os-bar-long">{copy.waitingLabel}</span>
+            <span className="os-bar-short">{copy.waitingShort}</span>
           </span>
           {email ? <span className="os-bar-email">{email}</span> : null}
-          <button type="button" className="os-bar-theme" onClick={flipTheme} title={copy.theme}>
-            {theme === "instrument" ? copy.themeOther : copy.theme}
-          </button>
           {/* A desktop you cannot leave is a kiosk. */}
           <a className="os-bar-exit" href={accountHref}>
             <OsIcon name="leave" size={15} />
@@ -358,23 +371,32 @@ export function OsShell({
             {visible.map((state) => {
               const app = appFor(state.app);
               if (!app) return null;
-              return (
-                <section
-                  key={state.app}
-                  className="os-window"
-                  data-focused={state.z === topZ}
-                  /* Clamped in CSS rather than by measuring and correcting.
-                     A default layout is written for a screen nobody has, and
-                     correcting it in an effect both fights the React
-                     compiler and only runs once — this keeps a window
-                     reachable while the browser window itself is resized. */
-                  style={{
+
+              /* Unplaced windows are laid out as a share of the surface, so a
+               * fresh desk fits a laptop and an ultrawide without either
+               * measuring the viewport in an effect or hardcoding a size. */
+              const style = state.placed
+                ? {
                     left: `clamp(8px, ${state.x}px, max(8px, 100% - ${state.w}px - 8px))`,
                     top: `clamp(0px, ${state.y}px, max(0px, 100% - ${state.h}px - 8px))`,
                     width: `min(${state.w}px, calc(100% - 1rem))`,
                     height: `min(${state.h}px, calc(100% - 1rem))`,
                     zIndex: state.z,
-                  }}
+                  }
+                : {
+                    left: `${state.x * 100}%`,
+                    top: `${state.y * 100}%`,
+                    width: `max(${MIN_W}px, min(${state.w * 100}%, calc(100% - 1rem)))`,
+                    height: `max(${MIN_H}px, min(${state.h * 100}%, calc(100% - 1rem)))`,
+                    zIndex: state.z,
+                  };
+
+              return (
+                <section
+                  key={state.app}
+                  className="os-window"
+                  data-focused={state.z === topZ}
+                  style={style}
                   onPointerDown={() => focus(state.app)}
                   aria-label={app.title}
                 >

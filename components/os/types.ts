@@ -17,6 +17,7 @@ export type OsApp = {
   /* Rendered on the server and handed across as a node, so an app can be a
    * server component with its own data access. The shell only arranges. */
   node: ReactNode;
+  /* Shares of the surface, 0..1 — not pixels. See OsWindowState.placed. */
   defaultRect: OsRect;
   /* Opened the first time a person ever arrives. Everything else waits in
    * the dock. */
@@ -30,6 +31,11 @@ export type OsWindowState = OsRect & {
   z: number;
   open: boolean;
   minimized: boolean;
+  /* False while x/y/w/h are shares of the surface (0..1), true once a person
+   * has dragged or resized the window and they became pixels. A default
+   * expressed as a fraction fits whatever screen it lands on; a default
+   * expressed in pixels fits the one it was written on. */
+  placed: boolean;
 };
 
 /* Everything the shell shows, as plain strings.
@@ -43,13 +49,14 @@ export type OsShellCopy = {
   empty: string;
   emptyHint: string;
   waitingLabel: string;
+  /* The same fact in the space a phone has. Truncation is not a short
+   * form — "Sear" is not a word. */
+  waitingShort: string;
   close: string;
   minimize: string;
   resize: string;
   noCompany: string;
   leave: string;
-  theme: string;
-  themeOther: string;
   newSince: string;
   markSeen: string;
 };

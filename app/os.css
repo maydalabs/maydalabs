@@ -39,9 +39,10 @@
   --os-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-/* ------------------------------------------------------- instrument (dark) */
-
-:root[data-os-theme="instrument"] .os-root {
+.os-root {
+  /* One direction, chosen by looking at both. The other lives in git.
+   * Everything here is still a token, because the next change of mind
+   * should also be forty values rather than a rewrite. */
   --os-bg: #0b0b0d;
   --os-bg-glow: rgb(88 101 242 / 0.09);
   --os-pane: rgb(20 20 24 / 0.88);
@@ -62,31 +63,6 @@
   --os-shadow-lift: 0 1.6rem 4rem rgb(0 0 0 / 0.66), 0 0.2rem 0.5rem rgb(0 0 0 / 0.45);
   --os-blur: 18px;
   color-scheme: dark;
-}
-
-/* ------------------------------------------------------------ desk (light) */
-
-:root[data-os-theme="desk"] .os-root {
-  --os-bg: #f3f0e9;
-  --os-bg-glow: rgb(46 75 143 / 0.05);
-  --os-pane: rgb(255 253 249 / 0.94);
-  --os-pane-solid: #fffdf9;
-  --os-pane-head: rgb(248 245 238 / 0.95);
-  --os-ink: #23211d;
-  --os-ink-2: #5d5951;
-  --os-ink-3: #928d83;
-  --os-line: rgb(35 33 29 / 0.1);
-  --os-line-2: rgb(35 33 29 / 0.2);
-  --os-accent: #2e4b8f;
-  --os-accent-soft: rgb(46 75 143 / 0.1);
-  --os-danger: #a33434;
-  --os-radius: 11px;
-  --os-radius-sm: 8px;
-  --os-pad: 1.1rem;
-  --os-shadow: 0 0.7rem 1.8rem rgb(60 50 30 / 0.1), 0 0.1rem 0.3rem rgb(60 50 30 / 0.07);
-  --os-shadow-lift: 0 1.4rem 3.2rem rgb(60 50 30 / 0.16), 0 0.15rem 0.4rem rgb(60 50 30 / 0.1);
-  --os-blur: 12px;
-  color-scheme: light;
 }
 
 /* ------------------------------------------------------------------ ground */
@@ -817,4 +793,54 @@
   font-size: var(--os-t-small);
   color: var(--os-ink-2);
   cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- backdrop */
+
+/* A shader, one fullscreen triangle, behind everything. The token background
+   on .os-root stays underneath it and is what a person sees when WebGL is
+   unavailable or they have asked for less motion — the canvas simply never
+   paints in those cases, rather than the page having a second code path. */
+.os-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.os-bar,
+.os-surface,
+.os-dock { position: relative; z-index: 1; }
+
+/* ------------------------------------------------------------- the measure */
+
+/* A window on a 2560px screen is 1150px wide, and prose set across 1150px is
+   a line your eye loses its place on. Windows may be as wide as the screen
+   allows; the reading inside them stops at a measure. Set in ch so it follows
+   the type rather than a pixel guess. */
+.os-chat-body,
+.os-chat-empty,
+.os-empty,
+.os-memory-fact,
+.os-window-body .mayda-body { max-inline-size: 68ch; }
+
+.os-chat-turn[data-role="cofounder"] .os-chat-body { max-inline-size: 64ch; }
+
+/* The record is scanned rather than read, so it keeps more room — but not all
+   of it, or the lane and kind end up a screen away from the title. */
+.os-record-what { max-inline-size: 110ch; }
+
+/* Below this the bar has room for a mark, a count and a way out, and that is
+   all. Hiding the long form is not the same as letting it truncate: "Sear" is
+   not a word, and a button that renders one looks broken rather than tight. */
+.os-bar-short { display: none; }
+
+@media (max-width: 520px) {
+  .os-bar-long { display: none; }
+  .os-bar-short { display: inline; }
+  .os-bar-search { flex: 0 0 auto; max-width: none; padding: 0.2rem 0.55rem; }
+  .os-bar-brand { font-size: var(--os-t-small); }
 }

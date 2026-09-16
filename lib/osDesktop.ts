@@ -21,7 +21,26 @@ export type StoredWindow = {
   z: number;
   open: boolean;
   minimized: boolean;
+  placed: boolean;
 };
+
+/* Desks saved before windows had a `placed` flag hold pixels and say nothing
+ * about it. A share is never more than 2, and a window is never 3px wide, so
+ * the values identify themselves — which beats a one-off migration that would
+ * have to run against every stored desk and then be kept forever. */
+function looksLikePixels(item: Record<string, unknown>): boolean {
+  if ("placed" in item) return false;
+  return (["x", "y", "w", "h"] as const).some(
+    (key) => typeof item[key] === "number" && Math.abs(item[key] as number) > 2,
+  );
+}
+
+/* A share of the surface, kept inside sane bounds and to three decimals —
+ * more precision than that is noise in a jsonb column. */
+function share(value: unknown, fallback: number): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return fallback;
+  return Math.round(Math.min(Math.max(value, -2), 2) * 1000) / 1000;
+}
 
 function bounded(value: unknown, low: number, high: number, fallback: number): number {
   if (typeof value !== "number" || !Number.isFinite(value)) return fallback;
@@ -42,18 +61,24 @@ export function sanitizeLayout(rows: unknown): StoredWindow[] {
     if (typeof app !== "string" || !KNOWN.has(app) || seen.has(app)) continue;
     seen.add(app);
 
+    /* Until a window is placed, x/y/w/h are shares of the surface rather than
+     * pixels, so the two cases cannot share one set of bounds — rounding a
+     * 0.45 share to the nearest integer would store zero. */
+    const placed = item.placed === true || looksLikePixels(item);
+
     out.push({
       app,
-      x: bounded(item.x, -4000, 8000, 40),
-      y: bounded(item.y, -4000, 8000, 40),
+      x: placed ? bounded(item.x, -4000, 8000, 40) : share(item.x, 0.02),
+      y: placed ? bounded(item.y, -4000, 8000, 40) : share(item.y, 0.03),
       // A window narrower than this cannot show its own title bar, and one
       // larger than any screen is how a desk becomes unusable from a value
       // nobody typed on purpose.
-      w: bounded(item.w, 200, 8000, 520),
-      h: bounded(item.h, 120, 8000, 420),
+      w: placed ? bounded(item.w, 200, 8000, 520) : share(item.w, 0.45),
+      h: placed ? bounded(item.h, 120, 8000, 420) : share(item.h, 0.6),
       z: bounded(item.z, 0, 1000, 1),
       open: item.open === true,
       minimized: item.minimized === true,
+      placed,
     });
   }
 

@@ -85,7 +85,7 @@ export default async function OsPage(props: LocalePageProps) {
       title: OS_COFOUNDER_CHAT_COPY[locale].title,
       icon: "cofounder",
       node: <CofounderPane locale={locale} />,
-      defaultRect: { x: 48, y: 40, w: 560, h: 520 },
+      defaultRect: { x: 0.025, y: 0.03, w: 0.45, h: 0.9 },
       openByDefault: true,
     },
     {
@@ -93,7 +93,7 @@ export default async function OsPage(props: LocalePageProps) {
       title: copy.apps.needsYou,
       icon: "needs-you",
       node: <CofounderQueue locale={locale} userId={claims.sub} bare />,
-      defaultRect: { x: 636, y: 40, w: 500, h: 420 },
+      defaultRect: { x: 0.5, y: 0.03, w: 0.475, h: 0.56 },
       openByDefault: true,
     },
     {
@@ -101,7 +101,7 @@ export default async function OsPage(props: LocalePageProps) {
       title: copy.apps.running,
       icon: "running",
       node: <CofounderActivity locale={locale} bare />,
-      defaultRect: { x: 636, y: 484, w: 500, h: 340 },
+      defaultRect: { x: 0.5, y: 0.62, w: 0.475, h: 0.31 },
       openByDefault: false,
     },
     {
@@ -109,21 +109,21 @@ export default async function OsPage(props: LocalePageProps) {
       title: OS_RECORD_COPY[locale].title,
       icon: "record",
       node: <RecordApp locale={locale} seenAt={seenAt} />,
-      defaultRect: { x: 120, y: 200, w: 560, h: 420 },
+      defaultRect: { x: 0.14, y: 0.18, w: 0.55, h: 0.6 },
     },
     {
       id: "memory",
       title: OS_MEMORY_COPY[locale].title,
       icon: "memory",
       node: <MemoryApp locale={locale} />,
-      defaultRect: { x: 200, y: 260, w: 560, h: 400 },
+      defaultRect: { x: 0.18, y: 0.22, w: 0.58, h: 0.58 },
     },
     {
       id: "company",
       title: copy.apps.company,
       icon: "company",
       node: <CompanyApp locale={locale} />,
-      defaultRect: { x: 240, y: 300, w: 440, h: 320 },
+      defaultRect: { x: 0.22, y: 0.28, w: 0.42, h: 0.46 },
     },
   ];
 
@@ -135,6 +135,7 @@ export default async function OsPage(props: LocalePageProps) {
         empty: copy.empty,
         emptyHint: copy.emptyHint,
         waitingLabel: copy.waiting(waiting),
+        waitingShort: String(waiting),
         close: copy.close,
         minimize: copy.minimize,
         resize: copy.resize,
@@ -142,8 +143,6 @@ export default async function OsPage(props: LocalePageProps) {
         leave: copy.leave,
         newSince: copy.newSince,
         markSeen: copy.markSeen,
-        theme: copy.theme,
-        themeOther: copy.themeOther,
       }}
       commandTargets={[
         ...apps.map((app) => ({

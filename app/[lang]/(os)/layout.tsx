@@ -32,13 +32,6 @@ export default async function OsLayout({
 
   return (
     <div className={osSerif.variable} style={{ display: "contents" }}>
-      {/* Before paint, not after: a theme applied in an effect means the
-          light desk flashes dark on every reload. */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `try{document.documentElement.dataset.osTheme=localStorage.getItem("maydaos-theme")==="desk"?"desk":"instrument"}catch(e){document.documentElement.dataset.osTheme="instrument"}`,
-        }}
-      />
       {children}
     </div>
   );
