@@ -106,15 +106,33 @@ await check("localized routes do not set a language-preference cookie", async ()
   assert(!cookie.includes("maydalabs_locale"), "legacy language-preference cookie is still present");
 });
 
-// MaydaOS is no longer an address. It was folded into the client's own portal,
-// so every /os path is gone rather than gated: nothing here is reachable by
-// anyone, signed in or not. These stay as a regression guard against it ever
-// becoming a public destination again.
+// MaydaOS is an address again, and a closed one.
+//
+// It was folded into the portal in September and has come back as a desktop
+// at /os, so this splits: the desk itself must ask a stranger to sign in and
+// show them nothing, while every app-shaped path the old version had stays
+// gone. The second half is the regression guard — those were public once.
 for (const prefix of ["", "/en", "/tr", "/fr"]) {
-  for (const route of ["", "/desk", "/record", "/record/00000000-0000-4000-8000-000000000000", "/pilot", "/account", "/terminal"]) {
+  await check(`${prefix}/os is closed to a signed-out visitor`, async () => {
+    let response = await request(`${prefix}/os`);
+    // Production canonicalizes /en URLs before the page runs.
+    if (!isLocalBase && prefix === "/en") {
+      assert(response.status === 307, `expected canonical redirect, received ${response.status}`);
+      response = await request("/os");
+    }
+    assert([307, 404].includes(response.status), `unexpected status ${response.status}`);
+    if (response.status === 307) {
+      const destination = new URL(response.headers.get("location") || "", baseUrl);
+      assert(destination.pathname.endsWith("/auth/sign-in"), `the desk sent a stranger to ${destination.pathname}`);
+    }
+    const html = await response.text();
+    assert(!html.includes("os-window"), "desktop exposed to a signed-out visitor");
+    assert(!html.includes("mayda-os-run"), "run interface exposed");
+  });
+
+  for (const route of ["/desk", "/record", "/record/00000000-0000-4000-8000-000000000000", "/pilot", "/account", "/terminal"]) {
     await check(`${prefix}/os${route} is gone`, async () => {
       let response = await request(`${prefix}/os${route}`);
-      // Production canonicalizes /en URLs before the page runs.
       if (!isLocalBase && prefix === "/en") {
         assert(response.status === 307, `expected canonical redirect, received ${response.status}`);
         const destination = new URL(response.headers.get("location") || "", baseUrl);

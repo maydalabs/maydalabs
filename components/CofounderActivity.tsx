@@ -14,7 +14,7 @@ import { localizePath, type Locale } from "@/lib/i18n";
  * the last run, the month's spend — rather than a summary assembled in the
  * page, so two people looking at it see the same numbers.
  */
-export async function CofounderActivity({ locale }: { locale: Locale }) {
+export async function CofounderActivity({ locale, bare = false }: { locale: Locale; bare?: boolean }) {
   if (!isSupabaseConfigured()) return null;
   const copy = OS_ACTIVITY_COPY[locale];
   const supabase = await createSupabaseServerClient();
@@ -29,10 +29,12 @@ export async function CofounderActivity({ locale }: { locale: Locale }) {
 
   return (
     <section className="mayda-stack-lg" aria-labelledby="cofounder-activity">
-      <header className="mayda-stack" style={{ gap: "0.4rem" }}>
-        <p className="mayda-kicker" style={{ margin: 0 }}>{copy.kicker}</p>
-        <h2 className="mayda-subheading" id="cofounder-activity" style={{ margin: 0 }}>{copy.heading}</h2>
-      </header>
+      {bare ? null : (
+        <header className="mayda-stack" style={{ gap: "0.4rem" }}>
+          <p className="mayda-kicker" style={{ margin: 0 }}>{copy.kicker}</p>
+          <h2 className="mayda-subheading" id="cofounder-activity" style={{ margin: 0 }}>{copy.heading}</h2>
+        </header>
+      )}
 
       {activity.length === 0 ? (
         <p className="mayda-body">{copy.empty}</p>

@@ -4,8 +4,6 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../field.css";
 import "../brand.css";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 import { GoogleTagManager } from "@/components/GoogleTagManager";
 import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { SITE_URL } from "@/lib/site";
@@ -166,9 +164,11 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-        <SiteHeader locale={lang} />
-        <main className="min-h-screen">{children}</main>
-        <SiteFooter locale={lang} />
+        {/* No header, no footer, no <main> here. Those belong to the
+            marketing site, which is one of two things living under a locale
+            now: (site) wears the chrome, (os) owns the whole viewport. A
+            desktop cannot be a desktop with a navigation bar above it. */}
+        {children}
         {hasVercelRuntime ? (
           <>
             <Analytics />

@@ -60,7 +60,7 @@ describe("service-specific process illustrations", () => {
   it("leads with software and automation without changing persisted IDs", () => {
     expect(SERVICE_DISPLAY_ORDER.slice(0, 2)).toEqual(["software", "automation"]);
     expect([...SERVICE_DISPLAY_ORDER].sort()).toEqual([...SERVICE_IDS].sort());
-    const home = readFileSync("app/[lang]/page.tsx", "utf8");
+    const home = readFileSync("app/[lang]/(site)/page.tsx", "utf8");
     expect(home.indexOf('className="mc-proof-strip"')).toBeLessThan(home.indexOf("<ServiceGallery"));
     expect(home).toContain("<ConnectedFlow copy={connected.flow}");
     expect(home).toContain("mc-founder");

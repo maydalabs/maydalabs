@@ -1,0 +1,266 @@
+/* MaydaOS — the desktop.
+ *
+ * Everything here is scoped under .os-root, which owns the viewport. The
+ * marketing site's type and colour tokens are reused deliberately: this is
+ * the same company, and an operating system that looked like a different
+ * product would be a different product.
+ */
+
+.os-root {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background:
+    radial-gradient(90rem 60rem at 20% -10%, color-mix(in oklab, var(--cobalt) 16%, transparent), transparent 60%),
+    radial-gradient(70rem 50rem at 110% 110%, color-mix(in oklab, var(--btc) 10%, transparent), transparent 60%),
+    var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* ---------------------------------------------------------------- menu bar */
+
+.os-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.45rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklab, var(--background) 72%, transparent);
+  backdrop-filter: blur(14px);
+  font-size: 0.82rem;
+  min-height: 2.4rem;
+}
+
+.os-bar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.os-bar-company {
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.os-bar-right {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--muted);
+}
+
+.os-bar-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--foreground);
+}
+
+.os-bar-count[data-waiting="0"] { color: var(--muted); }
+
+/* ----------------------------------------------------------------- surface */
+
+.os-surface {
+  position: relative;
+  overflow: hidden;
+}
+
+.os-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 0.5rem;
+  text-align: center;
+  color: var(--muted);
+  padding: 2rem;
+  pointer-events: none;
+}
+
+/* ----------------------------------------------------------------- windows */
+
+.os-window {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  min-width: 18rem;
+  min-height: 10rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 0.8rem;
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 1.4rem 3.4rem rgb(0 0 0 / 0.45);
+  overflow: hidden;
+}
+
+.os-window[data-focused="true"] {
+  border-color: color-mix(in oklab, var(--cobalt) 55%, var(--border-strong));
+  box-shadow: 0 1.8rem 4rem rgb(0 0 0 / 0.55);
+}
+
+/* While a window is being dragged or resized, pointer events on the content
+   would otherwise steal the pointer mid-gesture — an iframe, a text
+   selection, a button hover. */
+.os-root[data-gesturing="true"] .os-window-body { pointer-events: none; }
+.os-root[data-gesturing="true"] { cursor: grabbing; user-select: none; }
+
+.os-window-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.7rem;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface-raised) 70%, transparent);
+  cursor: grab;
+  touch-action: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.os-window-title:active { cursor: grabbing; }
+
+.os-window-dot {
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  flex: none;
+}
+
+.os-window-dot:hover { background: var(--border-strong); }
+.os-window-dot[data-kind="close"]:hover { background: var(--error); border-color: var(--error); }
+
+.os-window-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.os-window-body {
+  flex: 1;
+  overflow: auto;
+  padding: 0.9rem;
+  font-size: 0.9rem;
+  overscroll-behavior: contain;
+}
+
+/* The app panels were written for a page. Inside a window they need to stop
+   behaving like one: no page-width shell, no section rhythm. */
+.os-window-body .mayda-shell,
+.os-window-body .mayda-section { max-width: none; padding: 0; }
+.os-window-body .mayda-heading { font-size: 1.15rem; }
+.os-window-body .mayda-subheading { font-size: 1rem; }
+
+.os-resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  cursor: nwse-resize;
+  touch-action: none;
+  background: linear-gradient(
+    135deg,
+    transparent 0 45%,
+    var(--border-strong) 45% 55%,
+    transparent 55% 70%,
+    var(--border-strong) 70% 80%,
+    transparent 80%
+  );
+}
+
+/* -------------------------------------------------------------------- dock */
+
+.os-dock {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.7rem calc(0.5rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  background: color-mix(in oklab, var(--background) 72%, transparent);
+  backdrop-filter: blur(14px);
+  flex-wrap: wrap;
+}
+
+.os-dock-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.os-dock-item:hover { color: var(--foreground); border-color: var(--border-strong); }
+.os-dock-item[data-open="true"] { color: var(--foreground); border-color: color-mix(in oklab, var(--cobalt) 50%, var(--border)); }
+.os-dock-glyph { font-size: 0.95rem; line-height: 1; }
+
+/* ------------------------------------------------------------------ phones */
+
+/* A draggable window on a 390px screen is a toy. Below this width the
+   desktop becomes what it actually is on a phone: one thing at a time, with
+   the dock as the way between them. */
+.os-stack { position: absolute; inset: 0; overflow: auto; padding: 0.9rem; }
+.os-stack-title { font-family: var(--font-display); font-size: 1.05rem; margin: 0 0 0.75rem; }
+
+.os-bar-exit {
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.os-bar-exit:hover { color: var(--foreground); border-bottom-color: var(--border-strong); }
+
+/* ------------------------------------------------------- narrow viewports */
+
+/* A grid child is as wide as its content unless told otherwise, so the bar
+   and the dock were 532px inside a 390px phone and pushed the whole desktop
+   sideways. Everything that must fit gets a floor of nothing. */
+.os-bar,
+.os-surface,
+.os-dock { min-width: 0; }
+
+.os-bar-brand { flex: none; }
+
+@media (max-width: 767px) {
+  /* The address is the least useful thing on a phone: whoever is holding it
+     knows who they are signed in as. */
+  .os-bar-email { display: none; }
+
+  .os-bar { gap: 0.6rem; font-size: 0.78rem; }
+  .os-bar-company { flex: 1 1 auto; min-width: 0; }
+  .os-bar-right { gap: 0.5rem; flex: none; }
+
+  /* Wrapping a dock turns it into two rows that push the surface upward.
+     Scrolling keeps it one row and keeps every app reachable. */
+  .os-dock {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    scrollbar-width: none;
+  }
+
+  .os-dock::-webkit-scrollbar { display: none; }
+  .os-dock-item { flex: none; }
+}

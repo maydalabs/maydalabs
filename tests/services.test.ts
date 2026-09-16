@@ -20,7 +20,7 @@ describe("approved public services", () => {
   }
 
   it("puts the Bitcoin dashboard after services, work and process", () => {
-    const home = readFileSync("app/[lang]/page.tsx", "utf8");
+    const home = readFileSync("app/[lang]/(site)/page.tsx", "utf8");
     const dashboard = home.indexOf('id="bitcoin-dashboard"');
     expect(dashboard).toBeGreaterThan(home.indexOf('id="how-we-work"'));
     expect(home.indexOf('id="how-we-work"')).toBeGreaterThan(home.indexOf('id="selected-work"'));
@@ -33,7 +33,7 @@ describe("approved public services", () => {
   });
 
   it("mounts the approved Connected flow before the real hero copy", () => {
-    const home = readFileSync("app/[lang]/page.tsx", "utf8");
+    const home = readFileSync("app/[lang]/(site)/page.tsx", "utf8");
     const hero = home.slice(home.indexOf('<section className="mc-hero'), home.indexOf("</section>"));
     expect(hero).toContain("<ConnectedFlow copy={connected.flow}");
     expect(hero).toContain("mc-copy");
@@ -54,6 +54,6 @@ describe("approved public services", () => {
     const config = readFileSync("next.config.ts", "utf8");
     expect(config).not.toContain('source: "/services"');
     expect(config).not.toContain('source: "/approach"');
-    expect(readFileSync("app/[lang]/approach/page.tsx", "utf8")).toContain('export { default, generateMetadata } from "../services/page"');
+    expect(readFileSync("app/[lang]/(site)/approach/page.tsx", "utf8")).toContain('export { default, generateMetadata } from "../services/page"');
   });
 });

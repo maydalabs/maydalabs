@@ -253,6 +253,7 @@ export type OsWorkflowCopy = (typeof OS_WORKFLOW_COPY)[Locale];
 export const OS_COFOUNDER_COPY = {
   en: {
     kicker: "MaydaOS",
+    openOs: "Open MaydaOS →",
     heading: "What needs you.",
     clear: "Nothing needs you right now. When something does, it waits here rather than chasing you.",
     routes: { decide: "Waiting on your decision", finish: "Approved, waiting to be done", blocked: "Stuck", other: "Waiting" },
@@ -271,6 +272,7 @@ export const OS_COFOUNDER_COPY = {
   },
   tr: {
     kicker: "MaydaOS",
+    openOs: "MaydaOS'u aç →",
     heading: "Sizi bekleyenler.",
     clear: "Şu anda sizi bekleyen bir şey yok. Olduğunda peşinizden koşmaz, burada bekler.",
     routes: { decide: "Kararınızı bekliyor", finish: "Onaylandı, yapılmayı bekliyor", blocked: "Takıldı", other: "Bekliyor" },
@@ -289,6 +291,7 @@ export const OS_COFOUNDER_COPY = {
   },
   fr: {
     kicker: "MaydaOS",
+    openOs: "Ouvrir MaydaOS →",
     heading: "Ce qui vous attend.",
     clear: "Rien ne vous attend pour le moment. Quand ce sera le cas, cela patientera ici au lieu de vous courir après.",
     routes: { decide: "En attente de votre décision", finish: "Validé, en attente d'exécution", blocked: "Bloqué", other: "En attente" },
@@ -371,3 +374,76 @@ export const OS_ACTIVITY_COPY = {
 } as const;
 
 export type OsActivityCopy = (typeof OS_ACTIVITY_COPY)[Locale];
+
+/* The desktop's own words. Small on purpose: an operating system that
+ * explains itself constantly is one nobody has learned. */
+export const OS_SHELL_COPY = {
+  en: {
+    desktop: "Desktop",
+    empty: "Nothing open.",
+    emptyHint: "Pick something from the dock below.",
+    waiting: (count: number) =>
+      count === 0 ? "Nothing waiting" : count === 1 ? "1 waiting on you" : `${count} waiting on you`,
+    close: "Close",
+    minimize: "Put away",
+    resize: "Resize",
+    signedInAs: "Signed in as",
+    noCompany: "No company yet",
+    leave: "Leave",
+    apps: { needsYou: "Needs you", running: "Running", company: "Company" },
+    companyHeading: "What it knows about you.",
+    companyNothing: "You have not started a company yet. Do that on your account page and this fills in.",
+    companyWhat: "What you do",
+    companyWhatMissing: "Not written down yet.",
+    companyPeople: "People",
+    companyOwner: "owner",
+    companyMember: "member",
+    companySince: "Since",
+  },
+  tr: {
+    desktop: "Masaüstü",
+    empty: "Açık bir şey yok.",
+    emptyHint: "Aşağıdaki çubuktan birini seçin.",
+    waiting: (count: number) =>
+      count === 0 ? "Bekleyen yok" : `Sizi bekleyen ${count}`,
+    close: "Kapat",
+    minimize: "Kaldır",
+    resize: "Yeniden boyutlandır",
+    signedInAs: "Giriş yapan",
+    noCompany: "Henüz şirket yok",
+    leave: "Çık",
+    apps: { needsYou: "Sizi bekleyen", running: "Çalışan", company: "Şirket" },
+    companyHeading: "Sizin hakkınızda bildikleri.",
+    companyNothing: "Henüz bir şirket kurmadınız. Hesap sayfanızdan kurun, burası dolsun.",
+    companyWhat: "Ne yapıyorsunuz",
+    companyWhatMissing: "Henüz yazılmamış.",
+    companyPeople: "Kişiler",
+    companyOwner: "sahip",
+    companyMember: "üye",
+    companySince: "Başlangıç",
+  },
+  fr: {
+    desktop: "Bureau",
+    empty: "Rien d'ouvert.",
+    emptyHint: "Choisissez quelque chose dans la barre ci-dessous.",
+    waiting: (count: number) =>
+      count === 0 ? "Rien en attente" : count === 1 ? "1 en attente de vous" : `${count} en attente de vous`,
+    close: "Fermer",
+    minimize: "Ranger",
+    resize: "Redimensionner",
+    signedInAs: "Connecté en tant que",
+    noCompany: "Pas encore d'entreprise",
+    leave: "Quitter",
+    apps: { needsYou: "Pour vous", running: "En cours", company: "Entreprise" },
+    companyHeading: "Ce qu'il sait de vous.",
+    companyNothing: "Vous n'avez pas encore créé d'entreprise. Faites-le depuis votre compte et ceci se remplira.",
+    companyWhat: "Ce que vous faites",
+    companyWhatMissing: "Pas encore noté.",
+    companyPeople: "Personnes",
+    companyOwner: "propriétaire",
+    companyMember: "membre",
+    companySince: "Depuis",
+  },
+} as const;
+
+export type OsShellCopyStrings = (typeof OS_SHELL_COPY)[Locale];

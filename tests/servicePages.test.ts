@@ -57,7 +57,7 @@ describe("service discovery and dedicated conversion pages", () => {
     expect(detail).toContain("<details");
     expect(detail).toContain('localizePath("/contact", locale)');
     expect(detail).not.toMatch(/<form|<button|\/os/);
-    const route = readFileSync("app/[lang]/services/[slug]/page.tsx", "utf8");
+    const route = readFileSync("app/[lang]/(site)/services/[slug]/page.tsx", "utf8");
     expect(route).toContain("generateStaticParams");
     expect(route).toContain("notFound()");
     expect(readFileSync("app/sitemap.ts", "utf8")).toContain("SERVICE_IDS.map(servicePath)");
