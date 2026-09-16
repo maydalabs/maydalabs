@@ -154,10 +154,16 @@
 
 .os-window-body {
   flex: 1;
+  min-height: 0;
   overflow: auto;
   padding: 0.9rem;
   font-size: 0.9rem;
   overscroll-behavior: contain;
+  /* A column, so an app that wants the whole pane — the conversation, whose
+     compose box must sit at the bottom — can ask for it with flex: 1 rather
+     than height: 100%, which does not survive a padded container. */
+  display: flex;
+  flex-direction: column;
 }
 
 /* The app panels were written for a page. Inside a window they need to stop
@@ -221,8 +227,15 @@
 /* A draggable window on a 390px screen is a toy. Below this width the
    desktop becomes what it actually is on a phone: one thing at a time, with
    the dock as the way between them. */
-.os-stack { position: absolute; inset: 0; overflow: auto; padding: 0.9rem; }
-.os-stack-title { font-family: var(--font-display); font-size: 1.05rem; margin: 0 0 0.75rem; }
+.os-stack {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+}
+.os-stack-title { flex: none; font-family: var(--font-display); font-size: 1.05rem; margin: 0 0 0.75rem; }
 
 .os-bar-exit {
   color: var(--muted);
@@ -264,3 +277,74 @@
   .os-dock::-webkit-scrollbar { display: none; }
   .os-dock-item { flex: none; }
 }
+
+/* ---------------------------------------------------------- the co-founder */
+
+.os-chat { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 0.6rem; }
+
+.os-chat-log {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding-right: 0.2rem;
+}
+
+.os-chat-empty {
+  margin: auto;
+  display: grid;
+  gap: 0.35rem;
+  text-align: center;
+  color: var(--muted);
+  max-width: 24rem;
+}
+
+.os-chat-turn { display: grid; gap: 0.2rem; }
+
+.os-chat-who {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.os-chat-turn[data-role="person"] .os-chat-who { color: var(--cobalt); }
+
+.os-chat-body {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+/* Filing something is an act, not a sentence. It reads differently because
+   it is a different kind of fact. */
+.os-chat-filed {
+  margin: 0;
+  padding: 0.4rem 0.6rem;
+  border-left: 2px solid var(--cobalt);
+  background: color-mix(in oklab, var(--cobalt) 10%, transparent);
+  font-size: 0.85rem;
+}
+
+.os-chat-notice { margin: 0; color: var(--error); font-size: 0.85rem; }
+
+.os-chat-compose { display: flex; gap: 0.5rem; align-items: flex-end; }
+
+.os-chat-compose textarea {
+  flex: 1;
+  min-width: 0;
+  resize: none;
+  font: inherit;
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-strong);
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.os-chat-compose textarea:disabled { opacity: 0.6; }
+.os-chat-compose .mayda-button { flex: none; }

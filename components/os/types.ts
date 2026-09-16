@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
  * co-founder conversation, the record, files — each arrives as one of these
  * rather than as a special case, and the shell never learns their names.
  */
-export type OsAppId = "needs-you" | "running" | "company";
+export type OsAppId = "cofounder" | "needs-you" | "running" | "company";
 
 export type OsApp = {
   id: OsAppId;

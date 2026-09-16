@@ -13,6 +13,20 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 import { runDueWorkflows } from "@/lib/osWorker";
+import { buildCompanyContext, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
+import { runCofounderTurn } from "@/lib/osCofounderRun";
+
+/* A model that says exactly what a test needs it to say, one scripted round
+ * at a time. The loop above it — tool calls, capping, accounting — is the
+ * part worth testing, and none of it should cost anything to test. */
+function fakeTurn(rounds: ModelEvent[][]): ModelTurn {
+  let round = 0;
+  return async function* () {
+    const script = rounds[Math.min(round, rounds.length - 1)];
+    round += 1;
+    for (const event of script) yield event;
+  };
+}
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -1301,6 +1315,224 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
           status: "drafted",
         });
         expect(written).not.toBeNull();
+      });
+    });
+
+    /* The co-founder you can talk to, 16 September.
+     *
+     * The conversation is the first part of MaydaOS that can decide to do
+     * something on its own initiative, so what is tested here is not that it
+     * talks — the model is stubbed — but that the one thing it can do cannot
+     * become the thing it must not do. */
+    describe("the co-founder conversation", () => {
+      let companyId: string;
+
+      beforeAll(async () => {
+        const { data: company } = await admin
+          .from("os_companies")
+          .insert({ name: `Chat Co ${suffix}`, what_we_do: "We move freight out of Izmir." })
+          .select("id")
+          .single();
+        companyId = company!.id;
+        await admin.from("os_company_members").insert({ company_id: companyId, user_id: idA, role: "owner" });
+      });
+
+      afterAll(async () => {
+        if (companyId) await admin.from("os_companies").delete().eq("id", companyId);
+      });
+
+      it("knows the company from what is actually stored", async () => {
+        const { data: item } = await admin
+          .from("os_work_items")
+          .insert({
+            company_id: companyId,
+            lane: "sales",
+            kind: "reply",
+            title: "Reply to the Bornova enquiry",
+            status: "review",
+            required_action: "send",
+          })
+          .select("id")
+          .single();
+
+        const context = await buildCompanyContext(admin, companyId);
+        expect(context).toContain("We move freight out of Izmir.");
+        expect(context).toContain("Reply to the Bornova enquiry");
+        expect(context).toContain("waiting-on: send");
+
+        await admin.from("os_work_items").delete().eq("id", item!.id);
+      });
+
+      /* It may prepare anything and decide nothing. This is the same promise
+       * the worker keeps, tested again here because this is the component
+       * that chooses for itself what to do. */
+      it("files work a person still has to settle, and cannot settle it", async () => {
+        const events: string[] = [];
+        for await (const event of runCofounderTurn({
+          supabase: admin,
+          companyId,
+          system: "stub",
+          history: [{ role: "person", body: "draft the Bornova reply" }],
+          turn: fakeTurn([
+            [
+              { type: "text", text: "Drafting it now." },
+              {
+                type: "tool",
+                id: "t1",
+                name: "file_work",
+                input: {
+                  title: "Reply to Bornova",
+                  lane: "sales",
+                  kind: "reply",
+                  notes: "Thanks for the enquiry.",
+                  needs_approval_for: "send",
+                },
+              },
+              { type: "done", stopReason: "tool_use", inputTokens: 900, outputTokens: 40 },
+            ],
+            [
+              { type: "text", text: " Filed for you." },
+              { type: "done", stopReason: "end_turn", inputTokens: 200, outputTokens: 10 },
+            ],
+          ]),
+        })) {
+          events.push(event.type);
+          if (event.type === "done") {
+            expect(event.text).toBe("Drafting it now. Filed for you.");
+            expect(event.costUsd).toBeGreaterThan(0);
+          }
+        }
+        expect(events).toContain("filed");
+
+        const { data: filed } = await admin
+          .from("os_work_items")
+          .select("id, status, required_action, metadata")
+          .eq("company_id", companyId)
+          .eq("title", "Reply to Bornova")
+          .single();
+
+        expect(filed!.status).toBe("review");
+        expect(filed!.required_action).toBe("send");
+        expect((filed!.metadata as { by?: string }).by).toBe("cofounder");
+
+        // And the thing the whole product rests on.
+        const { error } = await admin
+          .from("os_work_items")
+          .update({ status: "approved" })
+          .eq("id", filed!.id);
+        expect(error).not.toBeNull();
+        expect(error!.message).toContain('needs an approved "send"');
+
+        await admin.from("os_work_items").delete().eq("id", filed!.id);
+      });
+
+      it("files a draft when nothing leaves the building", async () => {
+        for await (const _ of runCofounderTurn({
+          supabase: admin,
+          companyId,
+          system: "stub",
+          history: [{ role: "person", body: "note the pricing idea" }],
+          turn: fakeTurn([
+            [
+              { type: "tool", id: "t1", name: "file_work", input: { title: "Pricing idea", lane: "ops", kind: "note" } },
+              { type: "done", stopReason: "tool_use", inputTokens: 10, outputTokens: 5 },
+            ],
+            [{ type: "done", stopReason: "end_turn", inputTokens: 5, outputTokens: 5 }],
+          ]),
+        })) void _;
+
+        const { data } = await admin
+          .from("os_work_items")
+          .select("status, required_action")
+          .eq("company_id", companyId)
+          .eq("title", "Pricing idea")
+          .single();
+        expect(data!.status).toBe("drafted");
+        expect(data!.required_action).toBeNull();
+      });
+
+      it("survives a tool it was never given", async () => {
+        const seen: string[] = [];
+        for await (const event of runCofounderTurn({
+          supabase: admin,
+          companyId,
+          system: "stub",
+          history: [{ role: "person", body: "send it" }],
+          turn: fakeTurn([
+            [
+              { type: "tool", id: "t1", name: "publish_it", input: {} },
+              { type: "done", stopReason: "tool_use", inputTokens: 10, outputTokens: 5 },
+            ],
+            [
+              { type: "text", text: "I cannot do that." },
+              { type: "done", stopReason: "end_turn", inputTokens: 5, outputTokens: 5 },
+            ],
+          ]),
+        })) {
+          seen.push(event.type);
+        }
+        expect(seen).toContain("refused");
+        expect(seen).toContain("done");
+      });
+
+      /* A loop that can call a tool can call it forever, and forever is
+       * measured in dollars. */
+      it("stops calling tools rather than looping", async () => {
+        let rounds = 0;
+        const endless: ModelTurn = async function* () {
+          rounds += 1;
+          yield { type: "tool", id: `t${rounds}`, name: "file_work", input: { title: `Loop ${rounds}`, lane: "ops", kind: "note" } };
+          yield { type: "done", stopReason: "tool_use", inputTokens: 1, outputTokens: 1 };
+        };
+
+        for await (const _ of runCofounderTurn({
+          supabase: admin,
+          companyId,
+          system: "stub",
+          history: [{ role: "person", body: "go" }],
+          turn: endless,
+        })) void _;
+
+        // Exactly the cap, not merely under it: "at most three" is also true
+        // of a loop that never ran, which would make this pass while proving
+        // nothing.
+        expect(rounds).toBe(3);
+        await admin.from("os_work_items").delete().eq("company_id", companyId).like("title", "Loop %");
+      });
+
+      it("keeps the transcript to the company, and lets no browser write one", async () => {
+        const { data: thread } = await admin
+          .from("os_threads")
+          .insert({ company_id: companyId })
+          .select("id")
+          .single();
+        const { data: message } = await admin
+          .from("os_messages")
+          .insert({ thread_id: thread!.id, role: "person", body: "hello", actor: idA })
+          .select("id")
+          .single();
+
+        const { data: mine } = await userA.from("os_messages").select("id").eq("thread_id", thread!.id);
+        expect((mine ?? []).map((row) => row.id)).toContain(message!.id);
+
+        const { data: theirs } = await outsider.from("os_messages").select("id").eq("thread_id", thread!.id);
+        expect(theirs ?? []).toHaveLength(0);
+
+        // Neither half of a transcript may be composed by its subject.
+        const { error: written } = await userA
+          .from("os_messages")
+          .insert({ thread_id: thread!.id, role: "cofounder", body: "I approved it." });
+        expect(written).not.toBeNull();
+
+        const { error: edited } = await admin
+          .from("os_messages")
+          .update({ body: "something else" })
+          .eq("id", message!.id);
+        expect(edited).not.toBeNull();
+        expect(edited!.message).toContain("append-only");
+
+        const { error: erased } = await admin.from("os_messages").delete().eq("id", message!.id);
+        expect(erased).not.toBeNull();
       });
     });
 

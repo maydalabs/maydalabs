@@ -447,3 +447,47 @@ export const OS_SHELL_COPY = {
 } as const;
 
 export type OsShellCopyStrings = (typeof OS_SHELL_COPY)[Locale];
+
+/* The conversation's own words. Plain strings only: this copy crosses into a
+ * client component. */
+export const OS_COFOUNDER_CHAT_COPY = {
+  en: {
+    title: "Co-founder",
+    placeholder: "Ask, or tell it what to look into.",
+    send: "Send",
+    sending: "Thinking...",
+    empty: "It knows your company.",
+    emptyHint: "Ask what is open, what you decided, or what it would do next. It can put work in your queue, and it cannot approve any of it.",
+    filed: 'Filed "{title}" — it is in your queue and waiting for you.',
+    failed: "That did not get through.",
+    budget: "This month's conversation budget is spent.",
+    notConfigured: "The co-founder is not switched on yet.",
+    noCompany: "Start a company first and it will have something to know.",
+  },
+  tr: {
+    title: "Kurucu ortak",
+    placeholder: "Sorun ya da neye bakmasını istediğinizi söyleyin.",
+    send: "Gönder",
+    sending: "Düşünüyor...",
+    empty: "Şirketinizi biliyor.",
+    emptyHint: "Neyin açık olduğunu, ne karar verdiğinizi ya da sırada ne yapacağını sorun. İşinizi sıraya koyabilir, ama hiçbirini onaylayamaz.",
+    filed: '"{title}" sıraya kondu — sizi bekliyor.',
+    failed: "Bu iletilemedi.",
+    budget: "Bu ayki konuşma bütçesi doldu.",
+    notConfigured: "Kurucu ortak henüz açık değil.",
+    noCompany: "Önce bir şirket kurun, bilecek bir şeyi olsun.",
+  },
+  fr: {
+    title: "Cofondateur",
+    placeholder: "Demandez, ou dites-lui quoi examiner.",
+    send: "Envoyer",
+    sending: "Réflexion...",
+    empty: "Il connaît votre entreprise.",
+    emptyHint: "Demandez ce qui est ouvert, ce que vous avez décidé, ou ce qu'il ferait ensuite. Il peut mettre du travail dans votre file, et n'en approuver aucun.",
+    filed: '« {title} » rangé — c\'est dans votre file et cela vous attend.',
+    failed: "Cela n'est pas passé.",
+    budget: "Le budget de conversation du mois est épuisé.",
+    notConfigured: "Le cofondateur n'est pas encore activé.",
+    noCompany: "Créez d'abord une entreprise et il aura de quoi savoir.",
+  },
+} as const;

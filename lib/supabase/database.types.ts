@@ -310,6 +310,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          monthly_chat_usd: number
           name: string
           updated_at: string
           what_we_do: string | null
@@ -317,6 +318,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          monthly_chat_usd?: number
           name: string
           updated_at?: string
           what_we_do?: string | null
@@ -324,6 +326,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          monthly_chat_usd?: number
           name?: string
           updated_at?: string
           what_we_do?: string | null
@@ -400,6 +403,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      os_messages: {
+        Row: {
+          actor: string | null
+          body: string
+          cost_usd: number | null
+          created_at: string
+          id: string
+          input_tokens: number | null
+          output_tokens: number | null
+          role: string
+          thread_id: string
+        }
+        Insert: {
+          actor?: string | null
+          body: string
+          cost_usd?: number | null
+          created_at?: string
+          id?: string
+          input_tokens?: number | null
+          output_tokens?: number | null
+          role: string
+          thread_id: string
+        }
+        Update: {
+          actor?: string | null
+          body?: string
+          cost_usd?: number | null
+          created_at?: string
+          id?: string
+          input_tokens?: number | null
+          output_tokens?: number | null
+          role?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "os_threads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       os_runs: {
         Row: {
@@ -517,6 +564,38 @@ export type Database = {
             columns: ["workflow_id"]
             isOneToOne: false
             referencedRelation: "os_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      os_threads: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_threads_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
             referencedColumns: ["id"]
           },
         ]
@@ -1132,6 +1211,10 @@ export type Database = {
       os_action_approved: {
         Args: { p_action: string; p_item_id: string }
         Returns: boolean
+      }
+      os_chat_spent_this_month: {
+        Args: { p_company_id: string }
+        Returns: number
       }
       os_claim_due_workflows: {
         Args: { p_limit?: number }

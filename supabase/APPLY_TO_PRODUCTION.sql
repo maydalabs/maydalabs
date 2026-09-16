@@ -1,18 +1,20 @@
--- MaydaOS — one migration, 16 September 2026 (third batch)
+-- MaydaOS — two migrations, 16 September 2026 (fourth batch)
 -- Paste into the Supabase SQL editor for project ltmypxcyzcxmzedgmakh and run once.
 --
--- 20260916220000 lets a founder schedule work from the product instead of
---   from psql, and adds the view behind "What is working while you are gone".
---
--- It also widens who may use workflows: belonging to a company is the
--- entitlement now, not the old private-beta allowlist. The allowlist still
--- works, so existing members and operators are unaffected.
+-- 20260916220000  scheduling from the product, the activity view, and the
+--                 entitlement change: belonging to a company now grants
+--                 workflow access, not only the old private-beta allowlist.
+-- 20260916240000  os_desktops: where your windows are.
 --
 -- One transaction: a failure anywhere leaves production exactly as it was.
 -- Supabase will warn about "destructive operations" — that is the two
--- `drop policy if exists` lines, each immediately recreated below.
+-- `drop policy if exists` lines, each recreated immediately below.
 
 begin;
+
+-- ─────────────────────────────────────────────────────────────────────
+-- 20260916220000_scheduling_is_self_serve.sql
+-- ─────────────────────────────────────────────────────────────────────
 
 -- Putting a workflow on a schedule, from the product rather than from psql.
 --
@@ -181,8 +183,50 @@ create policy "os_runs_private_beta" on public.os_runs
   using (exists (select 1 from public.os_beta_status) or public.os_has_company())
   with check (exists (select 1 from public.os_beta_status) or public.os_has_company());
 
+
+-- ─────────────────────────────────────────────────────────────────────
+-- 20260916240000_desktop.sql
+-- ─────────────────────────────────────────────────────────────────────
+
+-- Where your desk stays where you left it.
+--
+-- A window you moved is a small thing to remember and a loud thing to
+-- forget: an environment that resets every visit is a web page wearing a
+-- desktop's clothes. This lives in the database rather than the browser so
+-- it follows a person between machines, and into the desktop app later.
+
+create table public.os_desktops (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  -- [{ "app": "needs-you", "x": 40, "y": 60, "w": 520, "h": 420, "z": 1,
+  --    "open": true, "minimized": false }]
+  layout jsonb not null default '[]'::jsonb
+    check (jsonb_typeof(layout) = 'array' and jsonb_array_length(layout) <= 40),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.os_desktops enable row level security;
+
+revoke all on table public.os_desktops from anon, authenticated;
+grant select, insert, update on table public.os_desktops to authenticated;
+
+-- Your desk, and nobody else's. There is no shared-desktop concept and the
+-- absence is deliberate: two people dragging the same window is a feature
+-- nobody asked for.
+create policy "os_desktops_own" on public.os_desktops
+  for all to authenticated
+  using (user_id = (select auth.uid()))
+  with check (user_id = (select auth.uid()));
+
+create trigger os_desktops_set_updated_at
+  before update on public.os_desktops
+  for each row execute function internal.set_updated_at();
+
+comment on table public.os_desktops is
+  'One row per person: where their windows are. Deleting it resets the desk rather than losing anything.';
+
+
 insert into supabase_migrations.schema_migrations (version)
-values ('20260916220000')
+values ('20260916220000'), ('20260916240000')
 on conflict (version) do nothing;
 
 commit;

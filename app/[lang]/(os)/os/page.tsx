@@ -3,8 +3,9 @@ import { redirect } from "next/navigation";
 import { CofounderQueue } from "@/components/CofounderQueue";
 import { CofounderActivity } from "@/components/CofounderActivity";
 import { CompanyApp } from "@/components/os/CompanyApp";
+import { CofounderPane } from "@/components/os/CofounderPane";
 import { OsShell } from "@/components/os/OsShell";
-import { OS_SHELL_COPY } from "@/components/osCopy";
+import { OS_SHELL_COPY, OS_COFOUNDER_CHAT_COPY } from "@/components/osCopy";
 import type { OsApp } from "@/components/os/types";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -50,11 +51,19 @@ export default async function OsPage(props: LocalePageProps) {
 
   const apps: OsApp[] = [
     {
+      id: "cofounder",
+      title: OS_COFOUNDER_CHAT_COPY[locale].title,
+      glyph: "✦",
+      node: <CofounderPane locale={locale} />,
+      defaultRect: { x: 48, y: 40, w: 560, h: 520 },
+      openByDefault: true,
+    },
+    {
       id: "needs-you",
       title: copy.apps.needsYou,
       glyph: "◆",
       node: <CofounderQueue locale={locale} userId={claims.sub} bare />,
-      defaultRect: { x: 48, y: 40, w: 560, h: 460 },
+      defaultRect: { x: 636, y: 40, w: 500, h: 420 },
       openByDefault: true,
     },
     {
@@ -62,8 +71,8 @@ export default async function OsPage(props: LocalePageProps) {
       title: copy.apps.running,
       glyph: "▶",
       node: <CofounderActivity locale={locale} bare />,
-      defaultRect: { x: 636, y: 40, w: 480, h: 420 },
-      openByDefault: true,
+      defaultRect: { x: 636, y: 484, w: 500, h: 340 },
+      openByDefault: false,
     },
     {
       id: "company",
