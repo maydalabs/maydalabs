@@ -83,7 +83,7 @@ export default async function OsPage(props: LocalePageProps) {
     {
       id: "cofounder",
       title: OS_COFOUNDER_CHAT_COPY[locale].title,
-      glyph: "✦",
+      icon: "cofounder",
       node: <CofounderPane locale={locale} />,
       defaultRect: { x: 48, y: 40, w: 560, h: 520 },
       openByDefault: true,
@@ -91,7 +91,7 @@ export default async function OsPage(props: LocalePageProps) {
     {
       id: "needs-you",
       title: copy.apps.needsYou,
-      glyph: "◆",
+      icon: "needs-you",
       node: <CofounderQueue locale={locale} userId={claims.sub} bare />,
       defaultRect: { x: 636, y: 40, w: 500, h: 420 },
       openByDefault: true,
@@ -99,7 +99,7 @@ export default async function OsPage(props: LocalePageProps) {
     {
       id: "running",
       title: copy.apps.running,
-      glyph: "▶",
+      icon: "running",
       node: <CofounderActivity locale={locale} bare />,
       defaultRect: { x: 636, y: 484, w: 500, h: 340 },
       openByDefault: false,
@@ -107,21 +107,21 @@ export default async function OsPage(props: LocalePageProps) {
     {
       id: "record",
       title: OS_RECORD_COPY[locale].title,
-      glyph: "≡",
+      icon: "record",
       node: <RecordApp locale={locale} seenAt={seenAt} />,
       defaultRect: { x: 120, y: 200, w: 560, h: 420 },
     },
     {
       id: "memory",
       title: OS_MEMORY_COPY[locale].title,
-      glyph: "◈",
+      icon: "memory",
       node: <MemoryApp locale={locale} />,
       defaultRect: { x: 200, y: 260, w: 560, h: 400 },
     },
     {
       id: "company",
       title: copy.apps.company,
-      glyph: "▣",
+      icon: "company",
       node: <CompanyApp locale={locale} />,
       defaultRect: { x: 240, y: 300, w: 440, h: 320 },
     },
@@ -142,6 +142,8 @@ export default async function OsPage(props: LocalePageProps) {
         leave: copy.leave,
         newSince: copy.newSince,
         markSeen: copy.markSeen,
+        theme: copy.theme,
+        themeOther: copy.themeOther,
       }}
       commandTargets={[
         ...apps.map((app) => ({

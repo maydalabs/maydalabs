@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { OsIconName } from "@/components/os/OsIcon";
 
 /* What an app is.
  *
@@ -11,9 +12,8 @@ export type OsAppId = "cofounder" | "needs-you" | "running" | "record" | "memory
 export type OsApp = {
   id: OsAppId;
   title: string;
-  /* A glyph, not an icon set. Real icons are a later problem and a wrong
-   * icon set is harder to remove than none. */
-  glyph: string;
+  /* A drawn icon rather than a borrowed set: see components/os/OsIcon.tsx. */
+  icon: OsIconName;
   /* Rendered on the server and handed across as a node, so an app can be a
    * server component with its own data access. The shell only arranges. */
   node: ReactNode;
@@ -48,6 +48,8 @@ export type OsShellCopy = {
   resize: string;
   noCompany: string;
   leave: string;
+  theme: string;
+  themeOther: string;
   newSince: string;
   markSeen: string;
 };

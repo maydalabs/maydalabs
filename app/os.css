@@ -1,10 +1,95 @@
-/* MaydaOS — the desktop.
+/* MaydaOS — the desk.
  *
- * Everything here is scoped under .os-root, which owns the viewport. The
- * marketing site's type and colour tokens are reused deliberately: this is
- * the same company, and an operating system that looked like a different
- * product would be a different product.
+ * Two visual languages behind one set of tokens. Nothing below the theme
+ * blocks names a colour directly: every rule reads a token, so a direction is
+ * a change of about forty values rather than a rewrite.
+ *
+ *   instrument — dark, dense, typographic. Hairlines instead of boxes,
+ *                monospace for anything factual, colour only where it means
+ *                something. A tool that respects your attention.
+ *   desk       — light, warm, editorial. Windows as sheets of paper, generous
+ *                space, quiet ink. Recognisably not another dark AI product.
+ *
+ * One decision is common to both and carries the product's argument: what the
+ * co-founder wrote is set in a serif, and everything the interface says is
+ * sans. You can tell at a glance what a machine produced without a badge
+ * saying so.
  */
+
+.os-root {
+  --os-font-ui: var(--font-sans);
+  --os-font-voice: var(--font-os-serif), ui-serif, Georgia, serif;
+  --os-font-mono: var(--font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+
+  /* One scale, used everywhere. The desk shipped with almost everything at
+     one size, which is why nothing led the eye. */
+  --os-t-micro: 0.6875rem;
+  --os-t-small: 0.78125rem;
+  --os-t-body: 0.875rem;
+  --os-t-lead: 1rem;
+  --os-t-title: 1.25rem;
+
+  --os-gap-1: 0.25rem;
+  --os-gap-2: 0.5rem;
+  --os-gap-3: 0.75rem;
+  --os-gap-4: 1rem;
+  --os-gap-5: 1.5rem;
+
+  --os-dur: 180ms;
+  --os-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ------------------------------------------------------- instrument (dark) */
+
+:root[data-os-theme="instrument"] .os-root {
+  --os-bg: #0b0b0d;
+  --os-bg-glow: rgb(88 101 242 / 0.09);
+  --os-pane: rgb(20 20 24 / 0.88);
+  --os-pane-solid: #141418;
+  --os-pane-head: rgb(28 28 33 / 0.9);
+  --os-ink: #edece8;
+  --os-ink-2: #9d9c96;
+  --os-ink-3: #6b6a65;
+  --os-line: rgb(255 255 255 / 0.09);
+  --os-line-2: rgb(255 255 255 / 0.17);
+  --os-accent: #7b86ff;
+  --os-accent-soft: rgb(123 134 255 / 0.15);
+  --os-danger: #ff6b6b;
+  --os-radius: 7px;
+  --os-radius-sm: 5px;
+  --os-pad: 0.85rem;
+  --os-shadow: 0 1rem 2.6rem rgb(0 0 0 / 0.55), 0 0.15rem 0.4rem rgb(0 0 0 / 0.4);
+  --os-shadow-lift: 0 1.6rem 4rem rgb(0 0 0 / 0.66), 0 0.2rem 0.5rem rgb(0 0 0 / 0.45);
+  --os-blur: 18px;
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------ desk (light) */
+
+:root[data-os-theme="desk"] .os-root {
+  --os-bg: #f3f0e9;
+  --os-bg-glow: rgb(46 75 143 / 0.05);
+  --os-pane: rgb(255 253 249 / 0.94);
+  --os-pane-solid: #fffdf9;
+  --os-pane-head: rgb(248 245 238 / 0.95);
+  --os-ink: #23211d;
+  --os-ink-2: #5d5951;
+  --os-ink-3: #928d83;
+  --os-line: rgb(35 33 29 / 0.1);
+  --os-line-2: rgb(35 33 29 / 0.2);
+  --os-accent: #2e4b8f;
+  --os-accent-soft: rgb(46 75 143 / 0.1);
+  --os-danger: #a33434;
+  --os-radius: 11px;
+  --os-radius-sm: 8px;
+  --os-pad: 1.1rem;
+  --os-shadow: 0 0.7rem 1.8rem rgb(60 50 30 / 0.1), 0 0.1rem 0.3rem rgb(60 50 30 / 0.07);
+  --os-shadow-lift: 0 1.4rem 3.2rem rgb(60 50 30 / 0.16), 0 0.15rem 0.4rem rgb(60 50 30 / 0.1);
+  --os-blur: 12px;
+  color-scheme: light;
+}
+
+/* ------------------------------------------------------------------ ground */
 
 .os-root {
   position: fixed;
@@ -12,40 +97,46 @@
   display: grid;
   grid-template-rows: auto 1fr auto;
   background:
-    radial-gradient(90rem 60rem at 20% -10%, color-mix(in oklab, var(--cobalt) 16%, transparent), transparent 60%),
-    radial-gradient(70rem 50rem at 110% 110%, color-mix(in oklab, var(--btc) 10%, transparent), transparent 60%),
-    var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
+    radial-gradient(70rem 48rem at 18% -8%, var(--os-bg-glow), transparent 65%),
+    var(--os-bg);
+  color: var(--os-ink);
+  font-family: var(--os-font-ui);
+  font-size: var(--os-t-body);
   overflow: hidden;
   overscroll-behavior: none;
 }
+
+.os-icon { flex: none; display: block; }
 
 /* ---------------------------------------------------------------- menu bar */
 
 .os-bar {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.45rem 0.9rem;
-  border-bottom: 1px solid var(--border);
-  background: color-mix(in oklab, var(--background) 72%, transparent);
-  backdrop-filter: blur(14px);
-  font-size: 0.82rem;
+  gap: var(--os-gap-3);
+  padding: 0.4rem 0.8rem;
+  border-bottom: 1px solid var(--os-line);
+  background: var(--os-pane-head);
+  backdrop-filter: blur(var(--os-blur));
+  font-size: var(--os-t-small);
   min-height: 2.4rem;
+  min-width: 0;
 }
 
 .os-bar-brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-family: var(--font-display);
+  gap: var(--os-gap-2);
+  flex: none;
+  font-family: var(--font-display, var(--os-font-ui));
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  color: var(--os-ink);
 }
 
 .os-bar-company {
-  color: var(--muted);
+  color: var(--os-ink-2);
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -55,42 +146,99 @@
   margin-left: auto;
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  color: var(--muted);
+  gap: var(--os-gap-3);
+  color: var(--os-ink-2);
+  flex: none;
 }
 
 .os-bar-count {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.1rem 0.5rem;
-  border: 1px solid var(--border);
+  gap: var(--os-gap-1);
+  padding: 0.12rem 0.55rem;
+  border: 1px solid var(--os-line);
   border-radius: 999px;
-  color: var(--foreground);
+  color: var(--os-ink);
+  font-variant-numeric: tabular-nums;
 }
 
-.os-bar-count[data-waiting="0"] { color: var(--muted); }
+.os-bar-count[data-waiting="0"] { color: var(--os-ink-3); }
+
+.os-bar-new { display: inline-flex; align-items: center; gap: var(--os-gap-2); }
+.os-bar-new .os-bar-count { border-color: var(--os-accent); color: var(--os-accent); }
+
+.os-bar-email { color: var(--os-ink-3); }
+
+.os-bar-exit,
+.os-bar-theme {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--os-gap-1);
+  padding: 0.18rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--os-radius-sm);
+  background: none;
+  color: var(--os-ink-2);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--os-dur) var(--os-ease), border-color var(--os-dur) var(--os-ease);
+}
+
+.os-bar-exit:hover,
+.os-bar-theme:hover { color: var(--os-ink); border-color: var(--os-line-2); }
+
+.os-bar-search {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--os-gap-2);
+  min-width: 0;
+  max-width: 20rem;
+  padding: 0.2rem 0.7rem;
+  border: 1px solid var(--os-line);
+  border-radius: 999px;
+  background: none;
+  color: var(--os-ink-3);
+  font: inherit;
+  font-size: var(--os-t-small);
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transition: color var(--os-dur) var(--os-ease), border-color var(--os-dur) var(--os-ease);
+}
+
+.os-bar-search:hover { color: var(--os-ink); border-color: var(--os-line-2); }
+.os-bar-search kbd {
+  font-family: var(--os-font-mono);
+  font-size: var(--os-t-micro);
+  color: var(--os-ink-3);
+}
 
 /* ----------------------------------------------------------------- surface */
 
-.os-surface {
-  position: relative;
-  overflow: hidden;
-}
+.os-surface { position: relative; overflow: hidden; min-width: 0; }
 
 .os-empty {
   position: absolute;
   inset: 0;
   display: grid;
   place-content: center;
-  gap: 0.5rem;
+  gap: var(--os-gap-2);
   text-align: center;
-  color: var(--muted);
+  color: var(--os-ink-3);
   padding: 2rem;
   pointer-events: none;
 }
 
+.os-empty strong { color: var(--os-ink-2); font-size: var(--os-t-lead); font-weight: 500; }
+
 /* ----------------------------------------------------------------- windows */
+
+@keyframes os-window-in {
+  from { opacity: 0; transform: scale(0.985) translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
 
 .os-window {
   position: absolute;
@@ -98,55 +246,73 @@
   flex-direction: column;
   min-width: 18rem;
   min-height: 10rem;
-  border: 1px solid var(--border-strong);
-  border-radius: 0.8rem;
-  background: color-mix(in oklab, var(--surface) 92%, transparent);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 1.4rem 3.4rem rgb(0 0 0 / 0.45);
+  border: 1px solid var(--os-line);
+  border-radius: var(--os-radius);
+  background: var(--os-pane);
+  backdrop-filter: blur(var(--os-blur));
+  box-shadow: var(--os-shadow);
   overflow: hidden;
+  animation: os-window-in var(--os-dur) var(--os-ease);
+  transition: box-shadow var(--os-dur) var(--os-ease), border-color var(--os-dur) var(--os-ease);
 }
 
 .os-window[data-focused="true"] {
-  border-color: color-mix(in oklab, var(--cobalt) 55%, var(--border-strong));
-  box-shadow: 0 1.8rem 4rem rgb(0 0 0 / 0.55);
+  border-color: var(--os-line-2);
+  box-shadow: var(--os-shadow-lift);
 }
 
-/* While a window is being dragged or resized, pointer events on the content
-   would otherwise steal the pointer mid-gesture — an iframe, a text
-   selection, a button hover. */
+.os-root[data-gesturing="true"] .os-window { animation: none; transition: none; }
 .os-root[data-gesturing="true"] .os-window-body { pointer-events: none; }
 .os-root[data-gesturing="true"] { cursor: grabbing; user-select: none; }
 
 .os-window-title {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.5rem 0.7rem;
-  border-bottom: 1px solid var(--border);
-  background: color-mix(in oklab, var(--surface-raised) 70%, transparent);
+  gap: var(--os-gap-2);
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid var(--os-line);
+  background: var(--os-pane-head);
   cursor: grab;
   touch-action: none;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: var(--os-t-small);
+  font-weight: 500;
+  color: var(--os-ink-2);
 }
 
+.os-window[data-focused="true"] .os-window-title { color: var(--os-ink); }
 .os-window-title:active { cursor: grabbing; }
 
+/* The controls are quiet until you go near them. A title bar wearing three
+   coloured lights at all times is louder than anything it contains. */
 .os-window-dot {
-  width: 0.72rem;
-  height: 0.72rem;
-  border-radius: 999px;
-  border: 1px solid var(--border-strong);
-  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
   padding: 0;
+  border: 0;
+  border-radius: var(--os-radius-sm);
+  background: none;
+  color: var(--os-ink-3);
   cursor: pointer;
+  opacity: 0;
   flex: none;
+  transition: opacity var(--os-dur) var(--os-ease), color var(--os-dur) var(--os-ease),
+    background var(--os-dur) var(--os-ease);
 }
 
-.os-window-dot:hover { background: var(--border-strong); }
-.os-window-dot[data-kind="close"]:hover { background: var(--error); border-color: var(--error); }
+.os-window:hover .os-window-dot,
+.os-window[data-focused="true"] .os-window-dot { opacity: 1; }
+.os-window-dot:focus-visible { opacity: 1; outline: 1px solid var(--os-accent); }
+.os-window-dot:hover { background: var(--os-accent-soft); color: var(--os-ink); }
+.os-window-dot[data-kind="close"]:hover { background: var(--os-danger); color: #fff; }
 
 .os-window-name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--os-gap-2);
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -156,117 +322,394 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
-  padding: 0.9rem;
-  font-size: 0.9rem;
+  padding: var(--os-pad);
   overscroll-behavior: contain;
-  /* A column, so an app that wants the whole pane — the conversation, whose
-     compose box must sit at the bottom — can ask for it with flex: 1 rather
-     than height: 100%, which does not survive a padded container. */
   display: flex;
   flex-direction: column;
 }
 
-/* The app panels were written for a page. Inside a window they need to stop
-   behaving like one: no page-width shell, no section rhythm. */
+/* The panes were written for a page. Inside a window they must stop behaving
+   like one: no page shell, no section rhythm, and above all no card inside a
+   card — the window is already the card. */
 .os-window-body .mayda-shell,
 .os-window-body .mayda-section { max-width: none; padding: 0; }
-.os-window-body .mayda-heading { font-size: 1.15rem; }
-.os-window-body .mayda-subheading { font-size: 1rem; }
+.os-window-body .mayda-heading { font-size: var(--os-t-title); }
+.os-window-body .mayda-subheading { font-size: var(--os-t-lead); }
+.os-window-body .mayda-body { font-size: var(--os-t-body); color: var(--os-ink-2); }
+
+.os-window-body .mayda-card {
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--os-line);
+  border-radius: 0;
+  padding: var(--os-gap-4) 0;
+  box-shadow: none;
+}
+
+.os-window-body .mayda-card:first-child { border-top: 0; padding-top: 0; }
+
+.os-window-body .mayda-kicker {
+  font-family: var(--os-font-mono);
+  font-size: var(--os-t-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--os-ink-3);
+}
+
+.os-window-body .mayda-note { color: var(--os-ink-3); font-size: var(--os-t-small); }
+.os-window-body .mayda-status { border-color: var(--os-line-2); color: var(--os-ink-2); }
+
+/* Anything factual — a cost, a time, a count — is set in mono so it can be
+   scanned down a column instead of read. */
+.os-window-body .mayda-os-run .mayda-note,
+.os-record-when,
+.os-memory-source { font-variant-numeric: tabular-nums; }
 
 .os-resize {
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 1.1rem;
-  height: 1.1rem;
+  width: 1.05rem;
+  height: 1.05rem;
   cursor: nwse-resize;
   touch-action: none;
+  opacity: 0;
   background: linear-gradient(
     135deg,
-    transparent 0 45%,
-    var(--border-strong) 45% 55%,
-    transparent 55% 70%,
-    var(--border-strong) 70% 80%,
-    transparent 80%
+    transparent 0 48%,
+    var(--os-line-2) 48% 58%,
+    transparent 58% 72%,
+    var(--os-line-2) 72% 82%,
+    transparent 82%
   );
+  transition: opacity var(--os-dur) var(--os-ease);
 }
+
+.os-window:hover .os-resize,
+.os-window[data-focused="true"] .os-resize { opacity: 1; }
 
 /* -------------------------------------------------------------------- dock */
 
 .os-dock {
   display: flex;
   justify-content: center;
-  gap: 0.4rem;
-  padding: 0.5rem 0.7rem calc(0.5rem + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--border);
-  background: color-mix(in oklab, var(--background) 72%, transparent);
-  backdrop-filter: blur(14px);
-  flex-wrap: wrap;
+  gap: var(--os-gap-1);
+  padding: 0.45rem 0.7rem calc(0.45rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--os-line);
+  background: var(--os-pane-head);
+  backdrop-filter: blur(var(--os-blur));
+  min-width: 0;
 }
 
 .os-dock-item {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: var(--os-gap-2);
   padding: 0.35rem 0.7rem;
-  border: 1px solid var(--border);
-  border-radius: 0.6rem;
-  background: transparent;
-  color: var(--muted);
+  border: 1px solid transparent;
+  border-radius: var(--os-radius-sm);
+  background: none;
+  color: var(--os-ink-3);
   font: inherit;
-  font-size: 0.8rem;
+  font-size: var(--os-t-small);
+  cursor: pointer;
+  transition: color var(--os-dur) var(--os-ease), background var(--os-dur) var(--os-ease),
+    transform 90ms var(--os-ease);
+}
+
+.os-dock-item:hover { color: var(--os-ink); background: var(--os-accent-soft); }
+.os-dock-item:active { transform: translateY(1px); }
+
+.os-dock-item[data-open="true"] {
+  color: var(--os-ink);
+  border-color: var(--os-line);
+  background: var(--os-accent-soft);
+}
+
+/* ------------------------------------------------------------ command bar */
+
+@keyframes os-command-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.99); }
+  to { opacity: 1; transform: none; }
+}
+
+.os-command-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  padding-top: 11vh;
+  background: rgb(0 0 0 / 0.38);
+  backdrop-filter: blur(2px);
+}
+
+.os-command {
+  width: min(38rem, calc(100vw - 2rem));
+  border: 1px solid var(--os-line-2);
+  border-radius: var(--os-radius);
+  background: var(--os-pane-solid);
+  box-shadow: var(--os-shadow-lift);
+  overflow: hidden;
+  animation: os-command-in var(--os-dur) var(--os-ease);
+}
+
+.os-command-input {
+  width: 100%;
+  font: inherit;
+  font-size: var(--os-t-lead);
+  padding: 0.8rem 0.95rem;
+  border: 0;
+  border-bottom: 1px solid var(--os-line);
+  background: transparent;
+  color: var(--os-ink);
+  outline: none;
+}
+
+.os-command-input::placeholder { color: var(--os-ink-3); }
+
+.os-command-list { list-style: none; margin: 0; padding: 0.3rem; max-height: 21rem; overflow-y: auto; }
+
+.os-command-item {
+  width: 100%;
+  display: flex;
+  gap: var(--os-gap-3);
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.45rem 0.6rem;
+  border: 0;
+  border-radius: var(--os-radius-sm);
+  background: transparent;
+  color: var(--os-ink);
+  font: inherit;
+  font-size: var(--os-t-body);
+  text-align: left;
   cursor: pointer;
 }
 
-.os-dock-item:hover { color: var(--foreground); border-color: var(--border-strong); }
-.os-dock-item[data-open="true"] { color: var(--foreground); border-color: color-mix(in oklab, var(--cobalt) 50%, var(--border)); }
-.os-dock-glyph { font-size: 0.95rem; line-height: 1; }
+.os-command-item[data-cursor="true"] { background: var(--os-accent-soft); }
+.os-command-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.os-command-hint { color: var(--os-ink-3); font-size: var(--os-t-micro); white-space: nowrap; font-family: var(--os-font-mono); }
+.os-command-empty { margin: 0; padding: 1rem; color: var(--os-ink-3); }
+
+.os-command-foot {
+  margin: 0;
+  padding: 0.4rem 0.7rem;
+  border-top: 1px solid var(--os-line);
+  color: var(--os-ink-3);
+  font-size: var(--os-t-micro);
+  font-family: var(--os-font-mono);
+}
+
+/* ------------------------------------------------------------ conversation */
+
+.os-chat { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: var(--os-gap-3); }
+
+.os-chat-log {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--os-gap-4);
+  padding-right: var(--os-gap-1);
+}
+
+.os-chat-empty {
+  margin: auto;
+  display: grid;
+  gap: var(--os-gap-2);
+  text-align: center;
+  color: var(--os-ink-3);
+  max-width: 24rem;
+}
+
+.os-chat-empty strong { color: var(--os-ink-2); font-size: var(--os-t-lead); font-weight: 500; }
+
+.os-chat-turn { display: grid; gap: var(--os-gap-1); }
+
+.os-chat-who {
+  font-family: var(--os-font-mono);
+  font-size: var(--os-t-micro);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--os-ink-3);
+}
+
+.os-chat-turn[data-role="person"] .os-chat-who { color: var(--os-accent); }
+
+.os-chat-body { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; }
+
+/* The one move that carries the argument: what the co-founder wrote is set in
+   a serif, and everything the interface says is sans. You can see which is
+   which before reading a word, without a badge announcing it. */
+.os-chat-turn[data-role="cofounder"] .os-chat-body {
+  font-family: var(--os-font-voice);
+  font-size: 1.02rem;
+  line-height: 1.6;
+}
+
+.os-chat-filed {
+  margin: 0;
+  padding: 0.4rem 0.65rem;
+  border-left: 2px solid var(--os-accent);
+  background: var(--os-accent-soft);
+  font-size: var(--os-t-small);
+}
+
+.os-chat-learned {
+  margin: 0;
+  padding-left: 0.65rem;
+  border-left: 2px solid var(--os-line-2);
+  font-size: var(--os-t-small);
+  color: var(--os-ink-3);
+}
+
+.os-chat-notice { margin: 0; color: var(--os-danger); font-size: var(--os-t-small); }
+
+.os-chat-compose { display: flex; gap: var(--os-gap-2); align-items: flex-end; }
+
+.os-chat-compose textarea {
+  flex: 1;
+  min-width: 0;
+  resize: none;
+  font: inherit;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--os-radius-sm);
+  border: 1px solid var(--os-line-2);
+  background: var(--os-pane-solid);
+  color: var(--os-ink);
+  transition: border-color var(--os-dur) var(--os-ease);
+}
+
+.os-chat-compose textarea:focus { outline: none; border-color: var(--os-accent); }
+.os-chat-compose textarea:disabled { opacity: 0.55; }
+.os-chat-compose .mayda-button { flex: none; }
+
+/* ------------------------------------------------------------- what it knows */
+
+.os-memory-teach { display: flex; gap: var(--os-gap-2); flex-wrap: wrap; }
+.os-memory-teach input[name="fact"] { flex: 1 1 14rem; min-width: 0; }
+
+.os-memory-teach input,
+.os-memory-teach select,
+.os-memory-retire input {
+  font: inherit;
+  font-size: var(--os-t-small);
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--os-radius-sm);
+  border: 1px solid var(--os-line-2);
+  background: var(--os-pane-solid);
+  color: var(--os-ink);
+}
+
+.os-memory-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+
+/* A grid, not a wrapping row. Side by side, the controls landed beside the
+   kicker on one entry and under the sentence on the next, purely according to
+   how long the sentence happened to be. Where a control sits should not
+   depend on what it is next to. */
+.os-memory-item {
+  display: grid;
+  gap: var(--os-gap-2);
+  justify-items: start;
+  padding: var(--os-gap-3) 0;
+  border-top: 1px solid var(--os-line);
+}
+
+.os-memory-item.is-retired { opacity: 0.5; }
+.os-memory-item.is-retired .os-memory-fact { text-decoration: line-through; }
+
+/* What it learned is something it wrote, so it is set the way its writing is. */
+.os-memory-fact {
+  margin: 0.2rem 0;
+  font-family: var(--os-font-voice);
+  font-size: 1rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.os-memory-source { font-size: var(--os-t-micro); color: var(--os-ink-3); }
+
+.os-memory-retire { display: flex; gap: var(--os-gap-2); align-items: center; justify-self: end; }
+.os-memory-retire input { width: 9rem; }
+.os-memory-retire button { cursor: pointer; background: none; }
+
+/* ------------------------------------------------------------------ record */
+
+.os-record { list-style: none; margin: 0; padding: 0; display: grid; }
+
+.os-record-line {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--os-gap-3);
+  align-items: baseline;
+  padding: var(--os-gap-2) 0;
+  border-top: 1px solid var(--os-line);
+  font-size: var(--os-t-small);
+}
+
+.os-record-line:first-child { border-top: 0; }
+
+.os-record-who {
+  font-family: var(--os-font-mono);
+  font-size: var(--os-t-micro);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--os-ink-3);
+  white-space: nowrap;
+}
+
+.os-record-who[data-person="true"] { color: var(--os-accent); }
+.os-record-what { overflow-wrap: anywhere; color: var(--os-ink-2); }
+.os-record-what strong { color: var(--os-ink); font-weight: 500; }
+.os-record-lane { color: var(--os-ink-3); font-size: var(--os-t-micro); }
+
+.os-record-line[data-new="true"] {
+  box-shadow: inset 2px 0 0 var(--os-accent);
+  padding-left: var(--os-gap-2);
+}
+
+.os-record-divider {
+  grid-column: 1 / -1;
+  margin-top: var(--os-gap-2);
+  font-family: var(--os-font-mono);
+  font-size: var(--os-t-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--os-ink-3);
+}
 
 /* ------------------------------------------------------------------ phones */
 
-/* A draggable window on a 390px screen is a toy. Below this width the
-   desktop becomes what it actually is on a phone: one thing at a time, with
-   the dock as the way between them. */
 .os-stack {
   position: absolute;
   inset: 0;
   overflow: auto;
-  padding: 0.9rem;
+  padding: var(--os-pad);
   display: flex;
   flex-direction: column;
 }
-.os-stack-title { flex: none; font-family: var(--font-display); font-size: 1.05rem; margin: 0 0 0.75rem; }
 
-.os-bar-exit {
-  color: var(--muted);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
+.os-stack-title {
+  flex: none;
+  font-family: var(--font-display, var(--os-font-ui));
+  font-size: var(--os-t-title);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin: 0 0 var(--os-gap-3);
 }
 
-.os-bar-exit:hover { color: var(--foreground); border-bottom-color: var(--border-strong); }
-
-/* ------------------------------------------------------- narrow viewports */
-
-/* A grid child is as wide as its content unless told otherwise, so the bar
-   and the dock were 532px inside a 390px phone and pushed the whole desktop
-   sideways. Everything that must fit gets a floor of nothing. */
-.os-bar,
-.os-surface,
-.os-dock { min-width: 0; }
-
-.os-bar-brand { flex: none; }
-
 @media (max-width: 767px) {
-  /* The address is the least useful thing on a phone: whoever is holding it
-     knows who they are signed in as. */
-  .os-bar-email { display: none; }
+  .os-bar-email,
+  .os-bar-company,
+  .os-bar-search kbd { display: none; }
 
-  .os-bar { gap: 0.6rem; font-size: 0.78rem; }
-  .os-bar-company { flex: 1 1 auto; min-width: 0; }
-  .os-bar-right { gap: 0.5rem; flex: none; }
+  .os-bar { gap: var(--os-gap-2); }
+  .os-bar-search { flex: 1 1 auto; max-width: none; }
+  .os-bar-right { gap: var(--os-gap-2); }
 
-  /* Wrapping a dock turns it into two rows that push the surface upward.
-     Scrolling keeps it one row and keeps every app reachable. */
   .os-dock {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -276,271 +719,102 @@
 
   .os-dock::-webkit-scrollbar { display: none; }
   .os-dock-item { flex: none; }
-}
-
-/* ---------------------------------------------------------- the co-founder */
-
-.os-chat { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 0.6rem; }
-
-.os-chat-log {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  padding-right: 0.2rem;
-}
-
-.os-chat-empty {
-  margin: auto;
-  display: grid;
-  gap: 0.35rem;
-  text-align: center;
-  color: var(--muted);
-  max-width: 24rem;
-}
-
-.os-chat-turn { display: grid; gap: 0.2rem; }
-
-.os-chat-who {
-  font-family: var(--font-mono, monospace);
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.os-chat-turn[data-role="person"] .os-chat-who { color: var(--cobalt); }
-
-.os-chat-body {
-  margin: 0;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  line-height: 1.5;
-}
-
-/* Filing something is an act, not a sentence. It reads differently because
-   it is a different kind of fact. */
-.os-chat-filed {
-  margin: 0;
-  padding: 0.4rem 0.6rem;
-  border-left: 2px solid var(--cobalt);
-  background: color-mix(in oklab, var(--cobalt) 10%, transparent);
-  font-size: 0.85rem;
-}
-
-.os-chat-notice { margin: 0; color: var(--error); font-size: 0.85rem; }
-
-.os-chat-compose { display: flex; gap: 0.5rem; align-items: flex-end; }
-
-.os-chat-compose textarea {
-  flex: 1;
-  min-width: 0;
-  resize: none;
-  font: inherit;
-  padding: 0.5rem 0.6rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--border-strong);
-  background: var(--background);
-  color: var(--foreground);
-}
-
-.os-chat-compose textarea:disabled { opacity: 0.6; }
-.os-chat-compose .mayda-button { flex: none; }
-
-/* ------------------------------------------------------------ what it knows */
-
-.os-memory-teach { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-.os-memory-teach input[name="fact"] { flex: 1 1 14rem; min-width: 0; }
-
-.os-memory-teach input,
-.os-memory-teach select,
-.os-memory-retire input {
-  font: inherit;
-  padding: 0.35rem 0.5rem;
-  border-radius: 0.45rem;
-  border: 1px solid var(--border-strong);
-  background: var(--background);
-  color: var(--foreground);
-}
-
-.os-memory-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
-
-.os-memory-item {
-  display: flex;
-  gap: 0.6rem;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  padding: 0.55rem 0.65rem;
-  border: 1px solid var(--border);
-  border-radius: 0.55rem;
-}
-
-.os-memory-item.is-retired { opacity: 0.55; }
-.os-memory-item.is-retired .os-memory-fact { text-decoration: line-through; }
-
-.os-memory-fact { margin: 0.15rem 0; overflow-wrap: anywhere; }
-
-.os-memory-source {
-  font-size: 0.72rem;
-  color: var(--muted);
-}
-
-.os-memory-retire { display: flex; gap: 0.35rem; align-items: center; flex: 0 1 auto; }
-.os-memory-retire input { width: 8rem; font-size: 0.8rem; }
-.os-memory-retire button { cursor: pointer; background: none; }
-
-@media (max-width: 767px) {
   .os-memory-retire { width: 100%; }
   .os-memory-retire input { flex: 1; width: auto; }
 }
 
-.os-chat-learned {
-  margin: 0;
-  font-size: 0.8rem;
-  color: var(--muted);
-  border-left: 2px solid var(--border-strong);
-  padding-left: 0.6rem;
+@media (prefers-reduced-motion: reduce) {
+  .os-window,
+  .os-command { animation: none; }
+  .os-root * { transition-duration: 1ms !important; }
 }
 
-/* ------------------------------------------------------------- the record */
+/* ------------------------------------------- site controls, inside the desk */
 
-.os-record { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+/* The panes reuse the marketing site's form controls, which were written for
+   one dark page. Inside the desk they must take the desk's colours instead —
+   otherwise the light direction renders a black slab where a text field
+   should be, and an outline button disappears into the paper. */
 
-.os-record-line {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.5rem;
-  align-items: baseline;
-  padding-bottom: 0.4rem;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.85rem;
+.os-window-body .mayda-field > span,
+.os-stack .mayda-field > span {
+  font-size: var(--os-t-small);
+  font-weight: 500;
+  color: var(--os-ink-2);
 }
 
-.os-record-who {
-  font-family: var(--font-mono, monospace);
-  font-size: 0.68rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-  white-space: nowrap;
-}
-
-.os-record-who[data-person="true"] { color: var(--cobalt); }
-
-.os-record-what { overflow-wrap: anywhere; }
-.os-record-lane { color: var(--muted); font-size: 0.75rem; }
-
-.os-record-line[data-new="true"] { border-left: 2px solid var(--cobalt); padding-left: 0.5rem; }
-
-.os-record-divider {
-  grid-column: 1 / -1;
-  margin-top: 0.5rem;
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-/* -------------------------------------------------------- the command bar */
-
-.os-command-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 900;
-  display: grid;
-  /* Not centred: a bar that appears under your eyes rather than in the middle
-     of the screen is the one you can type into without looking for it. */
-  align-content: start;
-  justify-items: center;
-  padding-top: 12vh;
-  background: rgb(0 0 0 / 0.45);
-  backdrop-filter: blur(3px);
-}
-
-.os-command {
-  width: min(40rem, calc(100vw - 2rem));
-  border: 1px solid var(--border-strong);
-  border-radius: 0.75rem;
-  background: color-mix(in oklab, var(--surface) 96%, transparent);
-  box-shadow: 0 2rem 5rem rgb(0 0 0 / 0.6);
-  overflow: hidden;
-}
-
-.os-command-input {
-  width: 100%;
-  font: inherit;
-  font-size: 1rem;
-  padding: 0.85rem 1rem;
-  border: 0;
-  border-bottom: 1px solid var(--border);
-  background: transparent;
-  color: var(--foreground);
-  outline: none;
-}
-
-.os-command-list { list-style: none; margin: 0; padding: 0.35rem; max-height: 22rem; overflow-y: auto; }
-
-.os-command-item {
-  width: 100%;
-  display: flex;
-  gap: 0.75rem;
-  align-items: baseline;
-  justify-content: space-between;
+.os-window-body .mayda-field input,
+.os-window-body .mayda-field textarea,
+.os-window-body .mayda-field select,
+.os-stack .mayda-field input,
+.os-stack .mayda-field textarea,
+.os-stack .mayda-field select {
+  background: var(--os-pane-solid);
+  border: 1px solid var(--os-line-2);
+  border-radius: var(--os-radius-sm);
+  color: var(--os-ink);
+  font-size: var(--os-t-body);
   padding: 0.5rem 0.65rem;
+  transition: border-color var(--os-dur) var(--os-ease);
+}
+
+.os-window-body .mayda-field :is(input, textarea, select):focus,
+.os-stack .mayda-field :is(input, textarea, select):focus {
+  outline: none;
+  border-color: var(--os-accent);
+}
+
+.os-window-body .mayda-field :is(input, textarea)::placeholder,
+.os-stack .mayda-field :is(input, textarea)::placeholder { color: var(--os-ink-3); }
+
+.os-window-body .mayda-button,
+.os-stack .mayda-button {
+  background: var(--os-accent);
+  border: 1px solid var(--os-accent);
+  border-radius: var(--os-radius-sm);
+  color: #fff;
+  font-size: var(--os-t-small);
+  font-weight: 500;
+  padding: 0.45rem 0.9rem;
+  transition: opacity var(--os-dur) var(--os-ease), transform 90ms var(--os-ease);
+}
+
+.os-window-body .mayda-button:hover,
+.os-stack .mayda-button:hover { opacity: 0.88; }
+.os-window-body .mayda-button:active,
+.os-stack .mayda-button:active { transform: translateY(1px); }
+.os-window-body .mayda-button:disabled,
+.os-stack .mayda-button:disabled { opacity: 0.45; }
+
+/* The second choice must be legible and must not compete with the first. */
+.os-window-body .mayda-button-outline,
+.os-stack .mayda-button-outline {
+  background: none;
+  border-color: var(--os-line-2);
+  color: var(--os-ink);
+}
+
+.os-window-body .mayda-button-outline:hover,
+.os-stack .mayda-button-outline:hover { border-color: var(--os-ink-3); opacity: 1; }
+
+.os-window-body .mayda-field-error,
+.os-stack .mayda-field-error { color: var(--os-danger); font-size: var(--os-t-small); }
+
+.os-window-body .mayda-text-link,
+.os-stack .mayda-text-link { color: var(--os-accent); }
+
+.os-window-body .mayda-details,
+.os-stack .mayda-details {
   border: 0;
-  border-radius: 0.45rem;
-  background: transparent;
-  color: var(--foreground);
-  font: inherit;
-  font-size: 0.88rem;
-  text-align: left;
+  border-top: 1px solid var(--os-line);
+  border-radius: 0;
+  background: none;
+  padding: var(--os-gap-3) 0 0;
+}
+
+.os-window-body .mayda-details summary,
+.os-stack .mayda-details summary {
+  font-size: var(--os-t-small);
+  color: var(--os-ink-2);
   cursor: pointer;
-}
-
-.os-command-item[data-cursor="true"] { background: color-mix(in oklab, var(--cobalt) 22%, transparent); }
-.os-command-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.os-command-hint { color: var(--muted); font-size: 0.75rem; white-space: nowrap; }
-.os-command-empty { margin: 0; padding: 1rem; color: var(--muted); font-size: 0.88rem; }
-
-.os-command-foot {
-  margin: 0;
-  padding: 0.45rem 0.75rem;
-  border-top: 1px solid var(--border);
-  color: var(--muted);
-  font-size: 0.72rem;
-}
-
-.os-bar-new { display: inline-flex; align-items: center; gap: 0.4rem; }
-.os-bar-new .os-bar-count { border-color: color-mix(in oklab, var(--cobalt) 55%, var(--border)); }
-
-.os-bar-search {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
-  max-width: 18rem;
-  padding: 0.18rem 0.6rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.78rem;
-  cursor: pointer;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.os-bar-search:hover { color: var(--foreground); border-color: var(--border-strong); }
-.os-bar-search kbd { font-family: var(--font-mono, monospace); font-size: 0.7rem; opacity: 0.7; }
-
-@media (max-width: 767px) {
-  /* The chord is the wrong half to keep when there is no keyboard. */
-  .os-bar-search kbd { display: none; }
-  .os-bar-search { flex: 1 1 auto; max-width: none; }
-  .os-bar-company { display: none; }
 }

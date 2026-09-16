@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { OsApp, OsAppId, OsShellCopy, OsWindowState } from "@/components/os/types";
 import { saveDesktopAction, markSeenAction } from "@/app/actions/desktop";
 import { OsCommandBar, OS_COMMAND_EVENT, type CommandBarCopy, type CommandTarget } from "@/components/os/OsCommandBar";
+import { OsIcon } from "@/components/os/OsIcon";
 
 /* The desktop.
  *
@@ -15,6 +16,32 @@ import { OsCommandBar, OS_COMMAND_EVENT, type CommandBarCopy, type CommandTarget
  */
 
 const PHONE_WIDTH = 768;
+
+type OsTheme = "instrument" | "desk";
+
+/* The theme as an external store. Set on <html> before paint by a script in
+ * the route's layout, so React reads it rather than owning it. */
+const themeListeners = new Set<() => void>();
+
+function subscribeToTheme(onChange: () => void) {
+  themeListeners.add(onChange);
+  return () => themeListeners.delete(onChange);
+}
+
+function readTheme(): OsTheme {
+  return document.documentElement.dataset.osTheme === "desk" ? "desk" : "instrument";
+}
+
+function setTheme(next: OsTheme) {
+  document.documentElement.dataset.osTheme = next;
+  try {
+    localStorage.setItem("maydaos-theme", next);
+  } catch {
+    // A private window refusing storage is no reason to refuse the toggle;
+    // it simply will not be remembered.
+  }
+  for (const listener of themeListeners) listener();
+}
 const TITLE_HEIGHT = 34;
 const MIN_W = 288;
 const MIN_H = 160;
@@ -86,8 +113,22 @@ export function OsShell({
   const [windows, setWindows] = useState<OsWindowState[]>(() => hydrate(apps, storedLayout));
   const [gesture, setGesture] = useState<Gesture | null>(null);
   const [narrow, setNarrow] = useState(false);
-  const [phoneApp, setPhoneApp] = useState<OsAppId>(apps[0]?.id ?? "needs-you");
+  const [phoneApp, setPhoneApp] = useState<OsAppId>(apps[0]?.id ?? "cofounder");
   const surfaceRef = useRef<HTMLDivElement>(null);
+
+  /* Two visual directions, side by side, so the choice is made by looking
+   * rather than by reading a description of each.
+   *
+   * The theme lives on the document element, set before first paint so the
+   * light one does not flash dark on reload — which makes it external state,
+   * subscribed to rather than copied into React. Kept in the browser and not
+   * the database on purpose: this is a decision aid, and once a direction is
+   * chosen the loser is deleted rather than remembered. */
+  const theme = useSyncExternalStore(subscribeToTheme, readTheme, () => "instrument" as const);
+
+  const flipTheme = useCallback(() => {
+    setTheme(theme === "instrument" ? "desk" : "instrument");
+  }, [theme]);
 
   /* Measured, not guessed from a user agent: the same person is on a wide
    * screen and a narrow one during a single day. */
@@ -255,15 +296,14 @@ export function OsShell({
     <div className="os-root" data-gesturing={gesture ? "true" : "false"}>
       <OsCommandBar targets={commandTargets} copy={commandCopy} onOpenApp={focus} />
       <div className="os-bar">
-        <span className="os-bar-brand">
-          MaydaOS
-        </span>
+        <span className="os-bar-brand">MaydaOS</span>
         <span className="os-bar-company">{companyName ?? copy.noCompany}</span>
         <button
           type="button"
           className="os-bar-search"
           onClick={() => window.dispatchEvent(new Event(OS_COMMAND_EVENT))}
         >
+          <OsIcon name="search" size={14} />
           {commandCopy.placeholder} <kbd>⌘K</kbd>
         </button>
         <span className="os-bar-right">
@@ -273,7 +313,9 @@ export function OsShell({
               stops meaning anything. */}
           {unreadCount > 0 ? (
             <form action={markSeenAction} className="os-bar-new">
-              <span className="os-bar-count">{unreadCount} {copy.newSince}</span>
+              <span className="os-bar-count">
+                <OsIcon name="new" size={9} /> {unreadCount} {copy.newSince}
+              </span>
               <button type="submit" className="os-bar-exit">{copy.markSeen}</button>
             </form>
           ) : null}
@@ -281,8 +323,14 @@ export function OsShell({
             {copy.waitingLabel}
           </span>
           {email ? <span className="os-bar-email">{email}</span> : null}
+          <button type="button" className="os-bar-theme" onClick={flipTheme} title={copy.theme}>
+            {theme === "instrument" ? copy.themeOther : copy.theme}
+          </button>
           {/* A desktop you cannot leave is a kiosk. */}
-          <a className="os-bar-exit" href={accountHref}>{copy.leave}</a>
+          <a className="os-bar-exit" href={accountHref}>
+            <OsIcon name="leave" size={15} />
+            {copy.leave}
+          </a>
         </span>
       </div>
 
@@ -338,7 +386,9 @@ export function OsShell({
                       aria-label={`${copy.close}: ${app.title}`}
                       onPointerDown={(e) => e.stopPropagation()}
                       onClick={() => close(state.app)}
-                    />
+                    >
+                      <OsIcon name="close" size={12} />
+                    </button>
                     <button
                       type="button"
                       className="os-window-dot"
@@ -346,9 +396,11 @@ export function OsShell({
                       aria-label={`${copy.minimize}: ${app.title}`}
                       onPointerDown={(e) => e.stopPropagation()}
                       onClick={() => toggle(state.app)}
-                    />
+                    >
+                      <OsIcon name="minimize" size={12} />
+                    </button>
                     <span className="os-window-name">
-                      <span aria-hidden="true">{app.glyph}</span> {app.title}
+                      <OsIcon name={app.icon} size={14} /> {app.title}
                     </span>
                   </header>
 
@@ -380,7 +432,7 @@ export function OsShell({
               aria-pressed={open}
               onClick={() => toggle(app.id)}
             >
-              <span className="os-dock-glyph" aria-hidden="true">{app.glyph}</span>
+              <OsIcon name={app.icon} size={15} />
               {app.title}
             </button>
           );
