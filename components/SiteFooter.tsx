@@ -44,11 +44,15 @@ export function SiteFooter({ locale }: { locale: Locale }) {
             </div>
           </div>
 
+          {/* No way in from here.
+              MaydaOS and the client portal are not open to visitors: there is
+              nothing to sign up for yet, and a sign-in link on a public page
+              is an invitation to try. The routes still work for anyone who
+              knows the address — what is removed is the discovery, not the
+              door. */}
           <div>
-            <p className="mayda-footer-label">{copy.account}</p>
+            <p className="mayda-footer-label">{copy.elsewhere}</p>
             <div className="mt-4 flex flex-col gap-2 text-sm text-[color:var(--mist)]">
-              <Link href={localizePath("/auth/sign-in", locale)}>{copy.signIn}</Link>
-              <Link href={localizePath("/portal", locale)}>{copy.portal}</Link>
               <a className="mayda-social" href="https://x.com/maydalabs" target="_blank" rel="noopener noreferrer">
                 <BrandGlyph name="x" /> @maydalabs
               </a>

@@ -165,11 +165,28 @@ for (const prefix of ["", "/tr", "/fr"]) {
   }
 }
 
-await check("public home does not link into MaydaOS or the portal work screen", async () => {
-  const html = await (await request("/")).text();
-  assert(!/href="\/(?:en\/|tr\/|fr\/)?os(?:\/|")/.test(html), "public OS link remains");
-  assert(!html.includes('href="/portal/work'), "public link into the work screen");
-});
+/* Nothing on the public site leads in.
+ *
+ * MaydaOS and the portal are not open: there is nothing to sign up for yet,
+ * and a sign-in link on a public page is an invitation to try. The routes
+ * still answer for anyone who knows the address — what is removed is the
+ * discovery, not the door — so this checks every public page rather than only
+ * the homepage, which is where such a link would be least likely to reappear.
+ *
+ * Note that robots.txt deliberately does NOT disallow these paths: that file
+ * is public, so a disallow list is an index of exactly what is being hidden.
+ * The pages carry noindex instead. */
+const PRIVATE_LINK = /href="\/(?:en\/|tr\/|fr\/)?(?:os\b|portal\b|auth\/sign-in)/;
+
+for (const page of ["/", "/services", "/about", "/proof", "/contact", "/case-studies", "/profile"]) {
+  await check(`${page} offers no way into MaydaOS or the portal`, async () => {
+    const response = await request(page);
+    assert(response.status === 200, `${page} returned ${response.status}`);
+    const html = await response.text();
+    assert(!PRIVATE_LINK.test(html), `a public entrance is back on ${page}`);
+    assert(!html.includes('href="/portal/work'), "public link into the work screen");
+  });
+}
 
 await check("robots and sitemap expose the public routes", async () => {
   const [robotsResponse, sitemapResponse] = await Promise.all([request("/robots.txt"), request("/sitemap.xml")]);
