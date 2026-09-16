@@ -12,6 +12,7 @@ import { execFileSync } from "node:child_process";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
+import { runDueWorkflows } from "@/lib/osWorker";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -955,6 +956,250 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         const { error } = await userA.from("os_work_items").update({ status: "review" }).eq("id", itemId);
         expect(error).not.toBeNull();
         expect(error!.message).toContain("cannot move from completed");
+      });
+    });
+
+    /* Property three, 16 September: it works while you are gone. The part
+     * worth testing here is not that a draft appears — that costs a model
+     * call — but that the schedule cannot misbehave: a workflow must not be
+     * handed out twice, a manual one must never be picked up at all, and the
+     * record of what ran must not be writable by the people it describes. */
+    describe("working while you are gone", () => {
+      let companyId: string;
+      let workflowId: string;
+
+      beforeAll(async () => {
+        const { data: company } = await admin
+          .from("os_companies")
+          .insert({ name: `Worker Co ${suffix}` })
+          .select("id")
+          .single();
+        companyId = company!.id;
+        await admin.from("os_company_members").insert({ company_id: companyId, user_id: idA, role: "owner" });
+
+        const { data: workflow } = await admin
+          .from("os_workflows")
+          .insert({
+            key: `worker_${suffix}`,
+            name: "Weekly market note",
+            purpose: "Watch the feeds",
+            brief: "a short note",
+            shape: "note",
+            company_id: companyId,
+            cadence: "daily",
+            required_action: "publish",
+            standing_sources: [{ url: "https://example.com/feed", kind: "feed" }],
+          })
+          .select("id")
+          .single();
+        workflowId = workflow!.id;
+      });
+
+      afterAll(async () => {
+        if (workflowId) await admin.from("os_workflows").delete().eq("id", workflowId);
+        if (companyId) await admin.from("os_companies").delete().eq("id", companyId);
+      });
+
+      /* A cadence with no first due time is a workflow that never runs, which
+       * is the failure that looks exactly like success until someone checks. */
+      it("gives a scheduled workflow a time it is actually due", async () => {
+        const { data } = await admin
+          .from("os_workflows")
+          .select("next_run_at, cadence")
+          .eq("id", workflowId)
+          .single();
+        expect(data!.cadence).toBe("daily");
+        expect(data!.next_run_at).not.toBeNull();
+        /* Near now, not before now: this clock is the database's and the
+         * comparison would be against the test machine's, which drift apart
+         * by milliseconds. Whether it is genuinely due is settled by the
+         * claim below, which asks the database rather than guessing. */
+        expect(Math.abs(new Date(data!.next_run_at!).getTime() - Date.now())).toBeLessThan(60_000);
+      });
+
+      /* Two ticks overlapping must not draft the same thing twice. The claim
+       * moves next_run_at forward in the same statement that hands the
+       * workflow out, so the second caller finds nothing due. */
+      it("hands a due workflow to one caller only", async () => {
+        const first = await admin.rpc("os_claim_due_workflows", { p_limit: 5 });
+        expect(first.error).toBeNull();
+        expect((first.data ?? []).map((row) => row.id)).toContain(workflowId);
+
+        const second = await admin.rpc("os_claim_due_workflows", { p_limit: 5 });
+        expect(second.error).toBeNull();
+        expect((second.data ?? []).map((row) => row.id)).not.toContain(workflowId);
+
+        // And it was rescheduled rather than dropped.
+        const { data } = await admin.from("os_workflows").select("next_run_at").eq("id", workflowId).single();
+        expect(new Date(data!.next_run_at!).getTime()).toBeGreaterThan(Date.now());
+      });
+
+      it("never picks up a workflow nobody put on a schedule", async () => {
+        const { data: manual } = await admin
+          .from("os_workflows")
+          .insert({
+            key: `manual_${suffix}`,
+            name: "Only when asked",
+            purpose: "p",
+            brief: "b",
+            shape: "note",
+            company_id: companyId,
+            cadence: "manual",
+          })
+          .select("id, next_run_at")
+          .single();
+        expect(manual!.next_run_at).toBeNull();
+
+        const { data: claimed } = await admin.rpc("os_claim_due_workflows", { p_limit: 20 });
+        expect((claimed ?? []).map((row) => row.id)).not.toContain(manual!.id);
+        await admin.from("os_workflows").delete().eq("id", manual!.id);
+      });
+
+      /* The whole property, end to end, with the model and the network stood
+       * in for: a schedule comes due, something is prepared, and it arrives
+       * in a person's queue carrying the decision it needs. The two stubs
+       * replace the only parts that cost money and reach the internet —
+       * everything asserted below is the real database doing the real work. */
+      it("prepares work and files it where a person will see it", async () => {
+        await admin.from("os_workflows").update({ next_run_at: new Date().toISOString() }).eq("id", workflowId);
+
+        const report = await runDueWorkflows(admin, 5, {
+          gather: async () => ({
+            sources: [
+              { url: "https://example.com/a", title: "A", text: "Freight rates rose 4% in August.", chars: 31 },
+            ],
+            failures: [],
+          }),
+          draft: {
+            messages: {
+              parse: async () => ({
+                parsed_output: {
+                  draft: "Freight rates rose 4% in August.",
+                  claims: [{ text: "Freight rates rose 4% in August.", source_url: "https://example.com/a" }],
+                },
+                stop_reason: "end_turn",
+                usage: { input_tokens: 100, output_tokens: 50 },
+              }),
+            },
+          },
+        });
+
+        const mine = report.outcomes.find((o) => o.workflow === "Weekly market note");
+        expect(mine?.result).toBe("drafted");
+        const itemId = mine && "itemId" in mine ? mine.itemId : null;
+        expect(itemId).toBeTruthy();
+
+        // It arrived in the founder's queue, waiting on them.
+        const { data: queued } = await userA
+          .from("os_needs_you")
+          .select("id, route, status, required_action")
+          .eq("id", itemId!)
+          .single();
+        expect(queued!.status).toBe("review");
+        expect(queued!.route).toBe("decide");
+        expect(queued!.required_action).toBe("publish");
+
+        // The run points at what it produced, and claims nobody as its author.
+        const { data: run } = await admin
+          .from("os_runs")
+          .select("item_id, user_id, status, cost_usd")
+          .eq("item_id", itemId!)
+          .single();
+        expect(run!.user_id).toBeNull();
+        expect(run!.status).toBe("drafted");
+        expect(Number(run!.cost_usd)).toBeGreaterThan(0);
+
+        // The history says a machine did it.
+        const { data: events } = await admin
+          .from("os_work_item_events")
+          .select("event, actor, detail")
+          .eq("item_id", itemId!);
+        const prepared = (events ?? []).find((e) => e.event === "prepared");
+        expect(prepared).toBeTruthy();
+        expect(prepared!.actor).toBeNull();
+
+        /* And the thing that makes it a co-founder rather than an autopilot:
+         * what it prepared still cannot go anywhere without a person. */
+        const { error: selfApproved } = await admin
+          .from("os_work_items")
+          .update({ status: "approved" })
+          .eq("id", itemId!);
+        expect(selfApproved).not.toBeNull();
+        expect(selfApproved!.message).toContain('needs an approved "publish"');
+      });
+
+      /* The companion to the refusal above. Trusted server code must be able
+       * to move work through the states it is allowed to move it through —
+       * otherwise "the gate refused it" and "the server cannot write at all"
+       * look identical from outside, and they did for a while. */
+      it("lets the server move work the way the machine allows", async () => {
+        const { data: item } = await admin
+          .from("os_work_items")
+          .insert({
+            company_id: companyId,
+            lane: "content",
+            kind: "note",
+            title: "A thing the server is finishing",
+            status: "review",
+            required_action: "publish",
+          })
+          .select("id")
+          .single();
+
+        // Back to drafted is legal, and the server may do it.
+        const { error: sentBack } = await admin
+          .from("os_work_items")
+          .update({ status: "drafted" })
+          .eq("id", item!.id);
+        expect(sentBack).toBeNull();
+
+        // Drafted to approved is not, and the message is the machine's.
+        const { error: jumped } = await admin
+          .from("os_work_items")
+          .update({ status: "approved" })
+          .eq("id", item!.id);
+        expect(jumped).not.toBeNull();
+        expect(jumped!.message).toContain("cannot move from drafted to approved");
+
+        await admin.from("os_work_items").delete().eq("id", item!.id);
+      });
+
+      it("lets nobody but the server claim work", async () => {
+        const { error } = await userA.rpc("os_claim_due_workflows", { p_limit: 1 });
+        expect(error).not.toBeNull();
+      });
+
+      /* A member may see what ran on their behalf. Nobody may write one:
+       * a record its subject can shape is not a record. */
+      it("shows a company its runs, and lets no browser write one", async () => {
+        const { data: run } = await admin
+          .from("os_runs")
+          .insert({
+            user_id: null,
+            company_id: companyId,
+            workflow_id: workflowId,
+            shape: "note",
+            topic: "Weekly market note",
+            status: "drafted",
+          })
+          .select("id")
+          .single();
+
+        const { data: mine } = await userA.from("os_runs").select("id").eq("company_id", companyId);
+        expect((mine ?? []).map((row) => row.id)).toContain(run!.id);
+
+        const { data: theirs } = await outsider.from("os_runs").select("id").eq("company_id", companyId);
+        expect(theirs ?? []).toHaveLength(0);
+
+        const { error: written } = await userA.from("os_runs").insert({
+          user_id: null,
+          company_id: companyId,
+          workflow_id: workflowId,
+          shape: "note",
+          topic: "I did this myself",
+          status: "drafted",
+        });
+        expect(written).not.toBeNull();
       });
     });
 

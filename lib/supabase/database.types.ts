@@ -386,6 +386,7 @@ export type Database = {
       os_runs: {
         Row: {
           claims: Json
+          company_id: string | null
           cost_usd: number
           created_at: string
           decided_at: string | null
@@ -396,6 +397,7 @@ export type Database = {
           error: string | null
           id: string
           input_tokens: number
+          item_id: string | null
           model: string | null
           output_tokens: number
           published_at: string | null
@@ -406,11 +408,12 @@ export type Database = {
           template: string
           topic: string
           updated_at: string
-          user_id: string
+          user_id: string | null
           workflow_id: string | null
         }
         Insert: {
           claims?: Json
+          company_id?: string | null
           cost_usd?: number
           created_at?: string
           decided_at?: string | null
@@ -421,6 +424,7 @@ export type Database = {
           error?: string | null
           id?: string
           input_tokens?: number
+          item_id?: string | null
           model?: string | null
           output_tokens?: number
           published_at?: string | null
@@ -431,11 +435,12 @@ export type Database = {
           template?: string
           topic: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
           workflow_id?: string | null
         }
         Update: {
           claims?: Json
+          company_id?: string | null
           cost_usd?: number
           created_at?: string
           decided_at?: string | null
@@ -446,6 +451,7 @@ export type Database = {
           error?: string | null
           id?: string
           input_tokens?: number
+          item_id?: string | null
           model?: string | null
           output_tokens?: number
           published_at?: string | null
@@ -456,10 +462,31 @@ export type Database = {
           template?: string
           topic?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           workflow_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "os_runs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_runs_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_needs_you"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_runs_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_work_items"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "os_runs_workflow_id_fkey"
             columns: ["workflow_id"]
@@ -574,6 +601,8 @@ export type Database = {
         Row: {
           active: boolean
           brief: string
+          cadence: string
+          company_id: string | null
           created_at: string
           destination: string | null
           id: string
@@ -581,8 +610,11 @@ export type Database = {
           max_sources: number
           monthly_budget_usd: number
           name: string
+          next_run_at: string | null
           owner_user_id: string | null
+          paused_reason: string | null
           purpose: string
+          required_action: string | null
           shape: string
           standing_sources: Json
           updated_at: string
@@ -591,6 +623,8 @@ export type Database = {
         Insert: {
           active?: boolean
           brief: string
+          cadence?: string
+          company_id?: string | null
           created_at?: string
           destination?: string | null
           id?: string
@@ -598,8 +632,11 @@ export type Database = {
           max_sources?: number
           monthly_budget_usd?: number
           name: string
+          next_run_at?: string | null
           owner_user_id?: string | null
+          paused_reason?: string | null
           purpose: string
+          required_action?: string | null
           shape?: string
           standing_sources?: Json
           updated_at?: string
@@ -608,6 +645,8 @@ export type Database = {
         Update: {
           active?: boolean
           brief?: string
+          cadence?: string
+          company_id?: string | null
           created_at?: string
           destination?: string | null
           id?: string
@@ -615,14 +654,25 @@ export type Database = {
           max_sources?: number
           monthly_budget_usd?: number
           name?: string
+          next_run_at?: string | null
           owner_user_id?: string | null
+          paused_reason?: string | null
           purpose?: string
+          required_action?: string | null
           shape?: string
           standing_sources?: Json
           updated_at?: string
           window_days?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "os_workflows_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pilot_invoices: {
         Row: {
@@ -1015,6 +1065,37 @@ export type Database = {
         Args: { p_action: string; p_item_id: string }
         Returns: boolean
       }
+      os_claim_due_workflows: {
+        Args: { p_limit?: number }
+        Returns: {
+          active: boolean
+          brief: string
+          cadence: string
+          company_id: string | null
+          created_at: string
+          destination: string | null
+          id: string
+          key: string
+          max_sources: number
+          monthly_budget_usd: number
+          name: string
+          next_run_at: string | null
+          owner_user_id: string | null
+          paused_reason: string | null
+          purpose: string
+          required_action: string | null
+          shape: string
+          standing_sources: Json
+          updated_at: string
+          window_days: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "os_workflows"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       os_is_member: { Args: { p_company_id: string }; Returns: boolean }
       os_record_event: {
         Args: { p_detail?: Json; p_event: string; p_item_id: string }
@@ -1156,3 +1237,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
