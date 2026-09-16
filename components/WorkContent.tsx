@@ -84,7 +84,12 @@ export async function WorkContent({ locale }: { locale: Locale }) {
 
       <div className="mayda-stack" style={{ gap: "0.8rem" }}>
         <h3 className="mayda-kicker" style={{ margin: 0 }}>{copy.produceHeading}</h3>
-        {!isOsConfigured() || workflows.length === 0 ? (
+        {/* Three different reasons the form is absent, and a person should be
+            told which one applies to them. Collapsing them tells someone with
+            five workflows that they have none. */}
+        {!isOsConfigured() ? (
+          <p className="mayda-body">{copy.notConfigured}</p>
+        ) : workflows.length === 0 ? (
           <p className="mayda-body">{copy.noWorkflow}</p>
         ) : everyOwnedBudgetSpent ? (
           <p className="mayda-body">{copy.outOfHeading} {copy.outOfBody}</p>
@@ -100,11 +105,16 @@ export async function WorkContent({ locale }: { locale: Locale }) {
         </div>
       ) : null}
 
-      {rows.length > 0 ? (
-        <Link href={localizePath("/portal/work", locale)} className="mayda-text-link" style={{ alignSelf: "flex-start" }}>
-          {copy.historyLink} <span aria-hidden="true">→</span>
+      <div className="mayda-hero-actions" style={{ gap: "1.2rem" }}>
+        <Link href={localizePath("/portal/workflows", locale)} className="mayda-text-link">
+          {copy.setUp} <span aria-hidden="true">→</span>
         </Link>
-      ) : null}
+        {rows.length > 0 ? (
+          <Link href={localizePath("/portal/work", locale)} className="mayda-text-link">
+            {copy.historyLink} <span aria-hidden="true">→</span>
+          </Link>
+        ) : null}
+      </div>
     </section>
   );
 }

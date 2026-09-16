@@ -9,6 +9,7 @@ import { getOsBetaAccess } from "@/lib/osBetaAccess";
 import { gatherSources } from "@/lib/osGather";
 import {
   asStandingSources,
+  OS_SHAPES,
   parseStandingSources,
   monthStart,
   workflowBudget,
@@ -18,6 +19,7 @@ import {
   OS_TOPIC_LIMIT,
   parseSourceUrls,
   runCostUsd,
+  workflowKeyFromName,
 } from "@/lib/os";
 
 /*
@@ -234,9 +236,102 @@ export async function recordOsOutcomeAction(formData: FormData): Promise<void> {
 
 export type OsWorkflowFormState = {
   status: "idle" | "saved" | "error";
-  code?: "not_authorized" | "invalid" | "save_failed" | "unknown_client";
+  code?: "not_authorized" | "invalid" | "save_failed" | "unknown_client" | "too_many";
   field?: string;
 };
+/* A member setting up their own work.
+ *
+ * Everything that must not happen here is refused by the database, not by
+ * this function: the trigger in migration 16 pins the owner to the caller,
+ * pins the budget out of their reach, and stops them at five. So this runs
+ * through the caller's own client with no elevated credential anywhere, and a
+ * bug in the form below cannot become a way to spend our API balance.
+ */
+export async function saveMemberWorkflowAction(
+  _prev: OsWorkflowFormState,
+  formData: FormData,
+): Promise<OsWorkflowFormState> {
+  if (!isSupabaseConfigured()) return { status: "error", code: "not_authorized" };
+  const access = await getOsBetaAccess();
+  if (!access.allowed) return { status: "error", code: "not_authorized" };
+  const { claims, supabase } = access;
+
+  const name = String(formData.get("name") ?? "").trim().slice(0, 120);
+  const purpose = String(formData.get("purpose") ?? "").trim().slice(0, 300);
+  const brief = String(formData.get("brief") ?? "").trim().slice(0, 4000);
+  if (!name) return { status: "error", code: "invalid", field: "name" };
+  if (!purpose) return { status: "error", code: "invalid", field: "purpose" };
+  if (!brief) return { status: "error", code: "invalid", field: "brief" };
+
+  const shapeRaw = String(formData.get("shape") ?? "note");
+  const shape = (OS_SHAPES as readonly string[]).includes(shapeRaw) ? shapeRaw : "note";
+  const destination = String(formData.get("destination") ?? "").trim().slice(0, 200) || null;
+  const maxSources = Math.min(5, Math.max(1, Number(formData.get("maxSources")) || 5));
+  const windowDays = Math.min(90, Math.max(1, Number(formData.get("windowDays")) || 7));
+  const standingSources = parseStandingSources(String(formData.get("standingSources") ?? ""));
+  const active = formData.get("active") === "on";
+
+  const fields = {
+    name,
+    purpose,
+    brief,
+    shape,
+    destination,
+    max_sources: maxSources,
+    window_days: windowDays,
+    standing_sources: standingSources,
+    active,
+  };
+
+  const id = String(formData.get("workflowId") ?? "");
+  if (id) {
+    if (!/^[0-9a-f-]{36}$/.test(id)) return { status: "error", code: "invalid", field: "workflowId" };
+    // Scoped to the caller twice over: the filter below, and the policy that
+    // only matches rows they own.
+    const { error } = await supabase
+      .from("os_workflows")
+      .update(fields)
+      .eq("id", id)
+      .eq("owner_user_id", claims.sub);
+    if (error) return { status: "error", code: "save_failed" };
+  } else {
+    const { randomBytes } = await import("node:crypto");
+    const { error } = await supabase.from("os_workflows").insert({
+      ...fields,
+      key: workflowKeyFromName(name, randomBytes(4).toString("hex")),
+      owner_user_id: claims.sub,
+    });
+    // The trigger raises when a sixth is attempted; say so in those words
+    // rather than reporting a generic failure.
+    if (error) {
+      return error.message.includes("workflow limit reached")
+        ? { status: "error", code: "too_many" }
+        : { status: "error", code: "save_failed" };
+    }
+  }
+
+  revalidatePath("/portal");
+  revalidatePath("/portal/workflows");
+  return { status: "saved" };
+}
+
+export async function deleteMemberWorkflowAction(formData: FormData): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  const access = await getOsBetaAccess();
+  if (!access.allowed) return;
+  const id = String(formData.get("workflowId") ?? "");
+  if (!/^[0-9a-f-]{36}$/.test(id)) return;
+
+  await access.supabase
+    .from("os_workflows")
+    .delete()
+    .eq("id", id)
+    .eq("owner_user_id", access.claims.sub);
+
+  revalidatePath("/portal");
+  revalidatePath("/portal/workflows");
+}
+
 
 /* Installing a workflow. This is the operator's core move: a named piece of
  * work, its instruction, and who it belongs to. Leave the client email blank

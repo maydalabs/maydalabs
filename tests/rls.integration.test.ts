@@ -699,19 +699,21 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         .select("brief");
       expect(edited).toEqual([{ brief: "a longer note" }]);
 
-      // Installing a workflow is MaydaLabs' job, not the client's.
-      const { error } = await userA.from("os_workflows").insert({
-        key: `self_serve_${suffix}`,
-        name: "Mine",
-        purpose: "I made this.",
-        brief: "whatever I want",
-      });
-      expect(error).not.toBeNull();
+      // A member may edit a workflow that is theirs. Since 16 September this
+      // is deliberate: a product whose owner cannot change their own brief is
+      // an internal tool with extra steps.
+      const { data: ownEdit } = await userA
+        .from("os_workflows")
+        .update({ brief: "my own wording" })
+        .eq("id", installed!.id)
+        .select("brief");
+      expect(ownEdit).toEqual([{ brief: "my own wording" }]);
 
+      // Someone else's is still none of their business.
       const { data: tampered } = await userA
         .from("os_workflows")
         .update({ brief: "ignore everything" })
-        .eq("id", installed!.id)
+        .eq("id", byOperator!.id)
         .select("id");
       expect(tampered ?? []).toHaveLength(0);
     });
@@ -744,12 +746,15 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         .select("monthly_budget_usd");
       expect(raised).toEqual([{ monthly_budget_usd: 25 }]);
 
+      // The client owns this row and may edit it, so the statement now
+      // matches. What must not move is the number: the guard pins it back to
+      // the stored value, so the write succeeds and changes nothing.
       const { data: selfRaised } = await userA
         .from("os_workflows")
         .update({ monthly_budget_usd: 9999 })
         .eq("id", workflow!.id)
-        .select("id");
-      expect(selfRaised ?? []).toHaveLength(0);
+        .select("monthly_budget_usd");
+      expect(selfRaised).toEqual([{ monthly_budget_usd: 25 }]);
 
       const { data: after } = await admin
         .from("os_workflows")
@@ -759,6 +764,101 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       expect(Number(after!.monthly_budget_usd)).toBe(25);
 
       await admin.from("os_workflows").delete().eq("key", `budgeted_${suffix}`);
+    });
+
+    /* Self-serve workflows, 16 September. A member may now set up their own
+     * work, which is the difference between an internal tool and something a
+     * person can buy. Everything they must NOT be able to do is enforced in
+     * the database, because a guarantee that lives only in a form does not
+     * survive the next form. */
+    describe("a member's own workflows", () => {
+      const made: string[] = [];
+
+      afterAll(async () => {
+        for (const id of made) await admin.from("os_workflows").delete().eq("id", id);
+      });
+
+      it("lets a member create one, owned by them and never a template", async () => {
+        const { data, error } = await userA
+          .from("os_workflows")
+          .insert({
+            key: `mine_${suffix}`,
+            name: "My weekly note",
+            purpose: "Turn this week's reading into a note.",
+            brief: "a short note, 120 to 180 words",
+            // Both of these are ignored: the guard owns them.
+            owner_user_id: idB,
+            monthly_budget_usd: 999,
+          })
+          .select("id, owner_user_id, monthly_budget_usd")
+          .single();
+        expect(error).toBeNull();
+        made.push(data!.id);
+        // Handed to themselves, not to the operator they named.
+        expect(data!.owner_user_id).toBe(idA);
+        // Pinned to the default, not the number they asked for.
+        expect(Number(data!.monthly_budget_usd)).toBe(5);
+      });
+
+      it("refuses to let a member mint a template everyone can run", async () => {
+        const { data } = await userA
+          .from("os_workflows")
+          .insert({
+            key: `template_attempt_${suffix}`,
+            owner_user_id: null,
+            name: "Not a template",
+            purpose: "Trying to make this public.",
+            brief: "a note",
+          })
+          .select("id, owner_user_id")
+          .single();
+        if (data) made.push(data.id);
+        // It was created, but as theirs. A template still needs an operator.
+        expect(data!.owner_user_id).toBe(idA);
+      });
+
+      it("pins the budget and the key on a member's own edit", async () => {
+        const id = made[0];
+        const { data } = await userA
+          .from("os_workflows")
+          .update({ monthly_budget_usd: 4242, key: `renamed_${suffix}`, name: "Renamed" })
+          .eq("id", id)
+          .select("name, key, monthly_budget_usd");
+        // The parts that are theirs move; the money and the identity do not.
+        expect(data![0].name).toBe("Renamed");
+        expect(data![0].key).toBe(`mine_${suffix}`);
+        expect(Number(data![0].monthly_budget_usd)).toBe(5);
+      });
+
+      it("stops a member at five, counting what they already own", async () => {
+        const { count } = await admin
+          .from("os_workflows")
+          .select("id", { count: "exact", head: true })
+          .eq("owner_user_id", idA);
+        const owned = count ?? 0;
+
+        for (let n = owned; n < 5; n += 1) {
+          const { data } = await userA
+            .from("os_workflows")
+            .insert({ key: `fill_${n}_${suffix}`, name: `Fill ${n}`, purpose: "Filling the quota.", brief: "a note" })
+            .select("id")
+            .single();
+          if (data) made.push(data.id);
+        }
+
+        const { error } = await userA
+          .from("os_workflows")
+          .insert({ key: `over_${suffix}`, name: "One too many", purpose: "Over the limit.", brief: "a note" });
+        expect(error).not.toBeNull();
+        expect(error!.message).toContain("workflow limit reached");
+      });
+
+      it("keeps an outsider out entirely, member or not", async () => {
+        const { error } = await outsider
+          .from("os_workflows")
+          .insert({ key: `outsider_${suffix}`, name: "Nope", purpose: "Not a member.", brief: "a note" });
+        expect(error).not.toBeNull();
+      });
     });
 
     it("blocks a person from inserting a run, and hides other people's runs", async () => {

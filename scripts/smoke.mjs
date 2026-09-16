@@ -132,7 +132,7 @@ for (const prefix of ["", "/en", "/tr", "/fr"]) {
 // The work moved here, and the portal is where a signed-out visitor is asked
 // to sign in rather than shown anything.
 for (const prefix of ["", "/tr", "/fr"]) {
-  for (const route of ["/portal", "/portal/work", "/portal/work/00000000-0000-4000-8000-000000000000"]) {
+  for (const route of ["/portal", "/portal/work", "/portal/work/00000000-0000-4000-8000-000000000000", "/portal/workflows"]) {
     await check(`${prefix}${route} is closed to a signed-out visitor`, async () => {
       const response = await request(`${prefix}${route}`);
       assert([307, 404].includes(response.status), `unexpected status ${response.status}`);
@@ -172,7 +172,7 @@ await check("sitemap excludes MaydaOS and every signed-in route", async () => {
   for (const app of ["desk", "record", "pilot", "account", "terminal"]) {
     assert(!sitemap.includes(`${canonicalUrl}/os/${app}`), `retired OS app ${app} leaked into the sitemap`);
   }
-  for (const path of ["/portal", "/portal/work"]) {
+  for (const path of ["/portal", "/portal/work", "/portal/workflows"]) {
     assert(!sitemap.includes(`${canonicalUrl}${path}`), `private route ${path} leaked into the sitemap`);
   }
 });

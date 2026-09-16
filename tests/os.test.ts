@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatUsd, monthStart, normalizeSourceUrl, parseSourceUrls, runCostUsd, workflowBudget, OS_MAX_SOURCES } from "@/lib/os";
+import { formatUsd, monthStart, normalizeSourceUrl, parseSourceUrls, runCostUsd, workflowBudget, workflowKeyFromName, OS_MAX_SOURCES } from "@/lib/os";
 import { fetchSource, isFailure } from "@/lib/osSources";
 import { draftFromSources, type DraftClient } from "@/lib/osDraft";
 
@@ -52,6 +52,38 @@ describe("fetchSource refuses to look inside our own network", () => {
     const result = await fetchSource(url);
     expect(isFailure(result)).toBe(true);
     if (isFailure(result)) expect(result.reason).toBe("host is not publicly routable");
+  });
+});
+
+/* A member names their workflow; the key is ours to derive. It has to satisfy
+ * the column's own check constraint whatever they type. */
+describe("workflowKeyFromName", () => {
+  const VALID = /^[a-z0-9_]{3,60}$/;
+
+  it("derives a readable key and keeps it unique", () => {
+    expect(workflowKeyFromName("Weekly market note", "a1b2c3")).toBe("weekly_market_note_a1b2c3");
+  });
+
+  it("survives Turkish and French names the column would reject", () => {
+    for (const name of ["Haftalık İş Akışı", "Résumé hebdomadaire", "Müşteri yolculuğu"]) {
+      expect(workflowKeyFromName(name, "ff00ff")).toMatch(VALID);
+    }
+    expect(workflowKeyFromName("Résumé hebdomadaire", "ff00ff")).toBe("resume_hebdomadaire_ff00ff");
+    // Letters with no combining form must become letters, not gaps: NFKD
+    // alone turned "Haftalık" into "haftal_k".
+    expect(workflowKeyFromName("Haftalık piyasa notu", "ff00ff")).toBe("haftalik_piyasa_notu_ff00ff");
+    expect(workflowKeyFromName("İş Akışı", "ff00ff")).toBe("is_akisi_ff00ff");
+  });
+
+  it("still produces a valid key when the name leaves nothing behind", () => {
+    for (const name of ["...", "???", "  ", "\u4e2d\u6587"]) {
+      expect(workflowKeyFromName(name, "abc123")).toMatch(VALID);
+    }
+    expect(workflowKeyFromName("!!!", "abc123")).toBe("workflow_abc123");
+  });
+
+  it("stays inside the column's length limit for a very long name", () => {
+    expect(workflowKeyFromName("x".repeat(200), "abcdef12")).toMatch(VALID);
   });
 });
 

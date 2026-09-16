@@ -116,6 +116,40 @@ export function parseSourceUrls(raw: string): { urls: string[]; rejected: string
   return { urls: urls.slice(0, OS_MAX_SOURCES), rejected };
 }
 
+/* Five per person, matched by the database trigger that actually enforces it.
+ * The number here is for the interface; the guarantee is in the migration. */
+export const OS_MAX_WORKFLOWS_PER_MEMBER = 5;
+
+/* A key nobody should have to invent.
+ *
+ * The column is globally unique and machine-shaped, which is fine for an
+ * operator typing one in and hostile to a person naming their own work. So
+ * the name gives the readable part and a random tail keeps it unique. Turkish
+ * and French names survive: accents are decomposed and dropped rather than
+ * mangled, and a name with nothing left at all still yields a valid key.
+ */
+/* Letters Unicode decomposition leaves alone. The Turkish dotless i and the
+ * soft g have no combining form to strip, so NFKD turns them into nothing and
+ * a name like "Haftalik piyasa notu" comes out pitted with underscores. */
+const TRANSLITERATE: Record<string, string> = {
+  "\u0131": "i", "\u0130": "i", "\u015f": "s", "\u015e": "s",
+  "\u011f": "g", "\u011e": "g", "\u00df": "ss", "\u0142": "l", "\u0141": "l",
+  "\u00e6": "ae", "\u00c6": "ae", "\u00f8": "o", "\u00d8": "o", "\u0111": "d",
+};
+
+export function workflowKeyFromName(name: string, suffix: string): string {
+  const slug = name
+    .replace(/[^\u0000-\u007f]/g, (character) => TRANSLITERATE[character] ?? character)
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 40);
+  const tail = suffix.replace(/[^a-z0-9]/g, "").slice(0, 8) || "0";
+  return `${slug || "workflow"}_${tail}`;
+}
+
 /* A source the workflow reads on every run, before anything a person adds. */
 export type StandingSource = { url: string; kind: "page" | "feed" };
 
