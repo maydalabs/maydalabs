@@ -816,6 +816,41 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         expect(error).not.toBeNull();
       });
 
+      /* The gate only ever watched UPDATE, so an item could be *born*
+       * already approved and skip every check on the way in. Anything that
+       * later trusts `approved` to mean "a person signed off" — the worker
+       * that acts outward, above all — would have acted on a forgery. */
+      it("refuses an item that is born already approved", async () => {
+        const { error } = await userA.from("os_work_items").insert({
+          company_id: companyId,
+          lane: "content",
+          kind: "post",
+          title: "Born approved",
+          status: "approved",
+          required_action: "publish",
+        });
+        expect(error).not.toBeNull();
+        expect(error!.message).toContain('needs an approved "publish"');
+      });
+
+      it("lets an item be born in a state a person still has to settle", async () => {
+        const { data, error } = await userA
+          .from("os_work_items")
+          .insert({
+            company_id: companyId,
+            lane: "content",
+            kind: "post",
+            title: "Born in review",
+            status: "review",
+            required_action: "publish",
+          })
+          .select("id")
+          .single();
+        expect(error).toBeNull();
+        expect(data?.id).toBeTruthy();
+        if (data?.id) await admin.from("os_work_items").delete().eq("id", data.id);
+      });
+
       it("refuses a move the machine does not allow", async () => {
         // pending cannot jump straight to approved, skipping every gate.
         const { error } = await userA.from("os_work_items").update({ status: "approved" }).eq("id", itemId);
