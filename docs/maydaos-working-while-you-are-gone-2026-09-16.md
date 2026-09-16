@@ -26,7 +26,8 @@ machine and the approval gate already govern what happens next.
 `next_run_at`, `required_action` and `paused_reason`. `manual` is the default,
 so nothing that exists today starts running on its own.
 
-`/api/os/tick` is called hourly by Vercel Cron, authenticated with
+`/api/os/tick` is called once a day, at 07:00 UTC, by Vercel Cron,
+authenticated with
 `CRON_SECRET` compared in constant time. With no secret configured the
 endpoint refuses everything — an open URL that spends money on model calls is
 a bill waiting to be run up by whoever finds it.
@@ -39,6 +40,14 @@ after it.
 
 It lives in `public` because that is the only schema PostgREST exposes and the
 only one `service_role` can reach. Execute is granted to `service_role` alone.
+
+**Once a day is a plan limit, not a design choice.** The first deploy of this
+work failed outright: the schedule was hourly, and this Vercel plan permits
+crons no more often than daily. It costs nothing here, because the only
+cadences that exist are `daily` and `weekly` and the claim asks
+`next_run_at <= now()` rather than assuming the tick and the cadence line up.
+Anything finer than daily needs a different plan or a trigger from outside
+Vercel.
 
 ## What it may and may not do
 

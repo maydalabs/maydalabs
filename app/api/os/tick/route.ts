@@ -1,9 +1,9 @@
-import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { isOsConfigured } from "@/lib/osDraft";
 import { runDueWorkflows } from "@/lib/osWorker";
+import { isCronAuthorized } from "@/lib/cronAuth";
 
 /* The clock that makes MaydaOS work while you are gone.
  *
@@ -16,23 +16,8 @@ import { runDueWorkflows } from "@/lib/osWorker";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
-function authorized(request: Request): boolean {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) return false;
-
-  const offered = request.headers.get("authorization") ?? "";
-  const expected = `Bearer ${secret}`;
-
-  // Compared byte-for-byte in constant time. Lengths are compared first
-  // because timingSafeEqual throws on a mismatch, and the length of a secret
-  // is not the part worth protecting.
-  const a = Buffer.from(offered);
-  const b = Buffer.from(expected);
-  return a.length === b.length && timingSafeEqual(a, b);
-}
-
 async function tick(request: Request) {
-  if (!authorized(request)) {
+  if (!isCronAuthorized(request.headers.get("authorization"), process.env.CRON_SECRET)) {
     return NextResponse.json({ error: "not authorized" }, { status: 401 });
   }
   if (!isSupabaseConfigured() || !isOsConfigured()) {
