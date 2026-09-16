@@ -1,5 +1,6 @@
 import {
   fileWork,
+  rememberFact,
   type CofounderMessage,
   type Db,
   type ModelTurn,
@@ -20,6 +21,7 @@ import { runCostUsd } from "@/lib/os";
 export type TurnEvent =
   | { type: "text"; text: string }
   | { type: "filed"; title: string }
+  | { type: "learned"; fact: string }
   | { type: "refused"; reason: string }
   | { type: "done"; text: string; inputTokens: number; outputTokens: number; costUsd: number };
 
@@ -78,32 +80,47 @@ export async function* runCofounderTurn(options: {
 
     const results: Block[] = [];
     for (const call of calls) {
-      if (call.name !== "file_work") {
-        // A tool it was never given. Answering honestly is better than
-        // failing the turn: the model recovers, and the transcript shows what
-        // it tried.
-        results.push({
-          type: "tool_result",
-          tool_use_id: call.id,
-          content: `There is no tool called ${call.name}.`,
-          is_error: true,
-        });
-        yield { type: "refused", reason: call.name };
+      if (call.name === "file_work") {
+        const filed = await fileWork(options.supabase, options.companyId, call.input);
+        if (filed.ok) {
+          results.push({
+            type: "tool_result",
+            tool_use_id: call.id,
+            content: `Filed "${filed.title}". It is in their queue and waits for them.`,
+          });
+          yield { type: "filed", title: filed.title };
+        } else {
+          results.push({ type: "tool_result", tool_use_id: call.id, content: filed.error, is_error: true });
+          yield { type: "refused", reason: filed.error };
+        }
         continue;
       }
 
-      const filed = await fileWork(options.supabase, options.companyId, call.input);
-      if (filed.ok) {
-        results.push({
-          type: "tool_result",
-          tool_use_id: call.id,
-          content: `Filed "${filed.title}". It is in their queue and waits for them.`,
-        });
-        yield { type: "filed", title: filed.title };
-      } else {
-        results.push({ type: "tool_result", tool_use_id: call.id, content: filed.error, is_error: true });
-        yield { type: "refused", reason: filed.error };
+      if (call.name === "remember") {
+        const learned = await rememberFact(options.supabase, options.companyId, call.input);
+        if (learned.ok) {
+          results.push({
+            type: "tool_result",
+            tool_use_id: call.id,
+            content: "Written down. They can see it and retire it if you have it wrong.",
+          });
+          yield { type: "learned", fact: learned.fact };
+        } else {
+          results.push({ type: "tool_result", tool_use_id: call.id, content: learned.error, is_error: true });
+          yield { type: "refused", reason: learned.error };
+        }
+        continue;
       }
+
+      // A tool it was never given. Answering honestly is better than failing
+      // the turn: the model recovers, and the transcript shows what it tried.
+      results.push({
+        type: "tool_result",
+        tool_use_id: call.id,
+        content: `There is no tool called ${call.name}.`,
+        is_error: true,
+      });
+      yield { type: "refused", reason: call.name };
     }
 
     messages.push({ role: "user", content: results });

@@ -4,8 +4,9 @@ import { CofounderQueue } from "@/components/CofounderQueue";
 import { CofounderActivity } from "@/components/CofounderActivity";
 import { CompanyApp } from "@/components/os/CompanyApp";
 import { CofounderPane } from "@/components/os/CofounderPane";
+import { MemoryApp } from "@/components/os/MemoryApp";
 import { OsShell } from "@/components/os/OsShell";
-import { OS_SHELL_COPY, OS_COFOUNDER_CHAT_COPY } from "@/components/osCopy";
+import { OS_SHELL_COPY, OS_COFOUNDER_CHAT_COPY, OS_MEMORY_COPY } from "@/components/osCopy";
 import type { OsApp } from "@/components/os/types";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -73,6 +74,13 @@ export default async function OsPage(props: LocalePageProps) {
       node: <CofounderActivity locale={locale} bare />,
       defaultRect: { x: 636, y: 484, w: 500, h: 340 },
       openByDefault: false,
+    },
+    {
+      id: "memory",
+      title: OS_MEMORY_COPY[locale].title,
+      glyph: "◈",
+      node: <MemoryApp locale={locale} />,
+      defaultRect: { x: 200, y: 260, w: 560, h: 400 },
     },
     {
       id: "company",

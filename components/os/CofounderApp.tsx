@@ -22,6 +22,7 @@ export type CofounderCopy = {
   /* A template with a {title} slot, not a function: copy crosses the
    * server/client boundary and functions do not. */
   filed: string;
+  learned: string;
   failed: string;
   budget: string;
   notConfigured: string;
@@ -104,7 +105,7 @@ export function CofounderApp({
 
         for (const line of lines) {
           if (!line.trim()) continue;
-          let event: { type?: string; text?: string; title?: string; message?: string };
+          let event: { type?: string; text?: string; title?: string; fact?: string; message?: string };
           try {
             event = JSON.parse(line);
           } catch {
@@ -115,6 +116,11 @@ export function CofounderApp({
             setMessages((prev) => [
               ...prev,
               { id: `filed-${prev.length}`, role: "cofounder", body: `__filed__${event.title}` },
+            ]);
+          } else if (event.type === "learned" && event.fact) {
+            setMessages((prev) => [
+              ...prev,
+              { id: `learned-${prev.length}`, role: "cofounder", body: `__learned__${event.fact}` },
             ]);
           } else if (event.type === "error") setNotice(event.message ?? copy.failed);
         }
@@ -140,6 +146,12 @@ export function CofounderApp({
           message.body.startsWith("__filed__") ? (
             <p key={message.id} className="os-chat-filed">
               {copy.filed.replace("{title}", message.body.slice("__filed__".length))}
+            </p>
+          ) : message.body.startsWith("__learned__") ? (
+            /* Learning is a third kind of fact, alongside saying and doing.
+               Shown quietly — it happens often and is not the answer. */
+            <p key={message.id} className="os-chat-learned">
+              {copy.learned.replace("{fact}", message.body.slice("__learned__".length))}
             </p>
           ) : (
             <div key={message.id} className="os-chat-turn" data-role={message.role}>

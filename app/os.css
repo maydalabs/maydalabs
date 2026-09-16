@@ -348,3 +348,59 @@
 
 .os-chat-compose textarea:disabled { opacity: 0.6; }
 .os-chat-compose .mayda-button { flex: none; }
+
+/* ------------------------------------------------------------ what it knows */
+
+.os-memory-teach { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.os-memory-teach input[name="fact"] { flex: 1 1 14rem; min-width: 0; }
+
+.os-memory-teach input,
+.os-memory-teach select,
+.os-memory-retire input {
+  font: inherit;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.45rem;
+  border: 1px solid var(--border-strong);
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.os-memory-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+
+.os-memory-item {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+}
+
+.os-memory-item.is-retired { opacity: 0.55; }
+.os-memory-item.is-retired .os-memory-fact { text-decoration: line-through; }
+
+.os-memory-fact { margin: 0.15rem 0; overflow-wrap: anywhere; }
+
+.os-memory-source {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.os-memory-retire { display: flex; gap: 0.35rem; align-items: center; flex: 0 1 auto; }
+.os-memory-retire input { width: 8rem; font-size: 0.8rem; }
+.os-memory-retire button { cursor: pointer; background: none; }
+
+@media (max-width: 767px) {
+  .os-memory-retire { width: 100%; }
+  .os-memory-retire input { flex: 1; width: auto; }
+}
+
+.os-chat-learned {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  border-left: 2px solid var(--border-strong);
+  padding-left: 0.6rem;
+}

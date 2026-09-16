@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { FILE_WORK_TOOL, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
+import { FILE_WORK_TOOL, REMEMBER_TOOL, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
 import { OS_MODEL } from "@/lib/os";
 
 /* The SDK side of the seam, and the only part of the co-founder that costs
@@ -19,7 +19,7 @@ export function anthropicTurn(): ModelTurn {
       model: OS_MODEL,
       max_tokens: 2000,
       system,
-      tools: [FILE_WORK_TOOL],
+      tools: [FILE_WORK_TOOL, REMEMBER_TOOL],
       messages: messages as Anthropic.MessageParam[],
     });
 

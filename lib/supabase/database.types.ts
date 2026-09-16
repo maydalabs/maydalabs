@@ -362,6 +362,53 @@ export type Database = {
           },
         ]
       }
+      os_company_memory: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          fact: string
+          id: string
+          kind: string
+          retired_at: string | null
+          retired_by: string | null
+          retired_reason: string | null
+          source: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          fact: string
+          id?: string
+          kind?: string
+          retired_at?: string | null
+          retired_by?: string | null
+          retired_reason?: string | null
+          source?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          fact?: string
+          id?: string
+          kind?: string
+          retired_at?: string | null
+          retired_by?: string | null
+          retired_reason?: string | null
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_company_memory_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       os_credits: {
         Row: {
           created_at: string
@@ -1252,6 +1299,10 @@ export type Database = {
       os_record_event: {
         Args: { p_detail?: Json; p_event: string; p_item_id: string }
         Returns: string
+      }
+      os_retire_memory: {
+        Args: { p_id: string; p_reason?: string }
+        Returns: undefined
       }
       os_spend_credit: { Args: { p_user_id: string }; Returns: number }
     }

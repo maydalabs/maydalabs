@@ -1500,6 +1500,128 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         await admin.from("os_work_items").delete().eq("company_id", companyId).like("title", "Loop %");
       });
 
+      /* What "trained" means here: it accumulates. The test that matters is
+       * not that a row was written but that the thing it learned comes back
+       * in what it knows next time — otherwise memory is a table nobody
+       * reads. */
+      it("learns something and still knows it next time", async () => {
+        const before = await buildCompanyContext(admin, companyId);
+        expect(before).toContain("nothing yet");
+
+        for await (const _ of runCofounderTurn({
+          supabase: admin,
+          companyId,
+          system: "stub",
+          history: [{ role: "person", body: "we never quote below 40 euros a pallet" }],
+          turn: fakeTurn([
+            [
+              {
+                type: "tool",
+                id: "m1",
+                name: "remember",
+                input: { fact: "They never quote below 40 euros a pallet.", kind: "constraint" },
+              },
+              { type: "done", stopReason: "tool_use", inputTokens: 10, outputTokens: 5 },
+            ],
+            [
+              { type: "text", text: "Noted." },
+              { type: "done", stopReason: "end_turn", inputTokens: 5, outputTokens: 5 },
+            ],
+          ]),
+        })) void _;
+
+        const after = await buildCompanyContext(admin, companyId);
+        expect(after).toContain("[constraint] They never quote below 40 euros a pallet.");
+      });
+
+      it("marks what a person told it apart from what it worked out", async () => {
+        const { error } = await userA.from("os_company_memory").insert({
+          company_id: companyId,
+          fact: "Hamburg is our best lane.",
+          kind: "fact",
+          // Both of these are lies the form could tell, and the trigger
+          // overwrites them rather than trusting them.
+          source: "cofounder",
+          created_by: null,
+        });
+        expect(error).toBeNull();
+
+        const { data } = await admin
+          .from("os_company_memory")
+          .select("source, created_by, retired_at")
+          .eq("company_id", companyId)
+          .eq("fact", "Hamburg is our best lane.")
+          .single();
+        expect(data!.source).toBe("person");
+        expect(data!.created_by).toBe(idA);
+        // Nothing is born retired: a retirement is an act with a date and a
+        // person attached.
+        expect(data!.retired_at).toBeNull();
+      });
+
+      /* Being wrong is the hard part. A memory that turned out to be false is
+       * itself worth keeping — "it used to think this, and then I said
+       * otherwise" is the record, and the record is the product. */
+      it("is corrected by retiring, never by rewriting or erasing", async () => {
+        const { data: wrong } = await admin
+          .from("os_company_memory")
+          .insert({ company_id: companyId, fact: "They work weekends.", kind: "preference" })
+          .select("id")
+          .single();
+
+        const { error: rewritten } = await admin
+          .from("os_company_memory")
+          .update({ fact: "They do not work weekends." })
+          .eq("id", wrong!.id);
+        expect(rewritten).not.toBeNull();
+        expect(rewritten!.message).toContain("retiring it");
+
+        const { error: erased } = await admin.from("os_company_memory").delete().eq("id", wrong!.id);
+        expect(erased).not.toBeNull();
+        expect(erased!.message).toContain("never deleted");
+
+        const { error: retired } = await userA.rpc("os_retire_memory", {
+          p_id: wrong!.id,
+          p_reason: "They told me the opposite.",
+        });
+        expect(retired).toBeNull();
+
+        const { data: after } = await admin
+          .from("os_company_memory")
+          .select("retired_at, retired_by, retired_reason")
+          .eq("id", wrong!.id)
+          .single();
+        expect(after!.retired_at).not.toBeNull();
+        expect(after!.retired_by).toBe(idA);
+        expect(after!.retired_reason).toBe("They told me the opposite.");
+
+        // And it stops being something it knows.
+        const context = await buildCompanyContext(admin, companyId);
+        expect(context).not.toContain("They work weekends.");
+      });
+
+      it("keeps one company's memory out of another's", async () => {
+        const { data: mine } = await userA.from("os_company_memory").select("id").eq("company_id", companyId);
+        expect((mine ?? []).length).toBeGreaterThan(0);
+
+        const { data: theirs } = await outsider.from("os_company_memory").select("id").eq("company_id", companyId);
+        expect(theirs ?? []).toHaveLength(0);
+
+        const { error: written } = await outsider
+          .from("os_company_memory")
+          .insert({ company_id: companyId, fact: "Not their company.", kind: "fact" });
+        expect(written).not.toBeNull();
+
+        const { data: target } = await admin
+          .from("os_company_memory")
+          .select("id")
+          .eq("company_id", companyId)
+          .limit(1)
+          .single();
+        const { error: reached } = await outsider.rpc("os_retire_memory", { p_id: target!.id, p_reason: "mine now" });
+        expect(reached).not.toBeNull();
+      });
+
       it("keeps the transcript to the company, and lets no browser write one", async () => {
         const { data: thread } = await admin
           .from("os_threads")

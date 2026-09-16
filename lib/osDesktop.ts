@@ -6,7 +6,7 @@
  * place to put arbitrary things.
  */
 
-export const OS_APP_IDS = ["cofounder", "needs-you", "running", "company"] as const;
+export const OS_APP_IDS = ["cofounder", "needs-you", "running", "memory", "company"] as const;
 export type OsKnownAppId = (typeof OS_APP_IDS)[number];
 
 const KNOWN = new Set<string>(OS_APP_IDS);

@@ -55,6 +55,27 @@ export const FILE_WORK_TOOL = {
   },
 };
 
+export const REMEMBER_TOOL = {
+  name: "remember",
+  description:
+    "Write down something about this company that should still be true next month: how they price, who a person is, a constraint they work under, a preference you have learned. Do not use this for anything already in the context below, for a task (file_work is for those), or for something only true today.",
+  input_schema: {
+    type: "object" as const,
+    properties: {
+      fact: {
+        type: "string",
+        description: "One thing, in a plain sentence, readable on its own by someone who was not in this conversation.",
+      },
+      kind: {
+        type: "string",
+        enum: ["fact", "preference", "constraint", "person", "decision"],
+        description: "What sort of thing it is.",
+      },
+    },
+    required: ["fact"],
+  },
+};
+
 const SYSTEM = `You are the co-founder inside MaydaOS, working with the person who owns this company.
 
 What you are:
@@ -65,13 +86,16 @@ What you are:
 What you may do:
 - Think, research what you are told to research, draft, and file work into their queue with the file_work tool.
 - File work when something should outlive this conversation. Do not file a task for something you just answered.
+- Remember things with the remember tool. Use it when you learn something about the company that will still be true next month — how they price, who someone is, a constraint, a preference. Do not use it for tasks, for anything already in the context below, or for something only true today. Remember quietly: one short line at most, and never a list of what you have stored.
 
 What you may not do:
 - You cannot approve, publish, send, or finish anything. Everything you file waits for a person, and the system enforces that regardless of what you or they say here. Do not offer to do it anyway.
 - Do not invent facts about the company. If the context does not say, say it does not say and ask.
 - Do not pad. No "Great question", no bullet lists where two sentences would do, no closing offers of further help.
 
-If they ask what you know, answer from the context below and be specific about what is missing.`;
+If they ask what you know, answer from the context below and be specific about what is missing.
+
+What you remember is shown to them in full and they can retire anything you got wrong, so write memories you would be content to have read back to you.`;
 
 /* What the co-founder knows, assembled from what is actually stored.
  *
@@ -80,7 +104,7 @@ If they ask what you know, answer from the context below and be specific about w
  * given a hundred stale rows reasons about the wrong five.
  */
 export async function buildCompanyContext(supabase: Db, companyId: string): Promise<string> {
-  const [company, items, approvals, workflows, events] = await Promise.all([
+  const [company, items, approvals, workflows, events, memory] = await Promise.all([
     supabase.from("os_companies").select("name, what_we_do, created_at").eq("id", companyId).maybeSingle(),
     supabase
       .from("os_work_items")
@@ -104,6 +128,13 @@ export async function buildCompanyContext(supabase: Db, companyId: string): Prom
       .select("event, detail, at, os_work_items(title)")
       .order("at", { ascending: false })
       .limit(15),
+    supabase
+      .from("os_company_memory")
+      .select("fact, kind, source, created_at")
+      .eq("company_id", companyId)
+      .is("retired_at", null)
+      .order("created_at", { ascending: false })
+      .limit(80),
   ]);
 
   const lines: string[] = [];
@@ -112,6 +143,19 @@ export async function buildCompanyContext(supabase: Db, companyId: string): Prom
   lines.push(`name: ${company.data?.name ?? "unknown"}`);
   lines.push(`what they do: ${company.data?.what_we_do || "not written down yet"}`);
   lines.push("</company>");
+
+  /* What it has learned, first and in full. This is the part that makes the
+   * conversation feel like a colleague rather than a competent stranger, and
+   * it is cheap: eighty short lines cost less than one stale work item. */
+  lines.push("<what_you_have_learned>");
+  if (!memory.data?.length) {
+    lines.push("nothing yet — you have not written anything down about this company");
+  } else {
+    for (const row of memory.data) {
+      lines.push(`- [${row.kind}] ${row.fact}${row.source === "person" ? " (they told you this)" : ""}`);
+    }
+  }
+  lines.push("</what_you_have_learned>");
 
   lines.push("<open_work>");
   if (!items.data?.length) {
@@ -204,4 +248,34 @@ export async function fileWork(
 
   if (error) return { ok: false, error: error.message };
   return { ok: true, title };
+}
+
+/* Writing something down.
+ *
+ * Deliberately narrow: one sentence, one kind, no structure. A memory the
+ * co-founder can shape freely becomes a place to put whole conversations,
+ * and the value of this list is that a person can read all of it.
+ */
+export async function rememberFact(
+  supabase: Db,
+  companyId: string,
+  input: Record<string, unknown>,
+): Promise<{ ok: true; fact: string } | { ok: false; error: string }> {
+  const raw = typeof input.fact === "string" ? input.fact.trim() : "";
+  if (raw.length < 3) return { ok: false, error: "a memory needs to say something" };
+  const fact = raw.slice(0, 2000);
+
+  const kinds = ["fact", "preference", "constraint", "person", "decision"];
+  const kindRaw = typeof input.kind === "string" ? input.kind : "fact";
+  const kind = kinds.includes(kindRaw) ? kindRaw : "fact";
+
+  /* Written by the server, so the guard leaves source alone: this is the
+   * co-founder learning something, not a person typing it, and the list says
+   * which is which because that changes how much to believe it. */
+  const { error } = await supabase
+    .from("os_company_memory")
+    .insert({ company_id: companyId, fact, kind, source: "cofounder" });
+
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, fact };
 }
