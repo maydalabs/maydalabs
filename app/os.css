@@ -1227,3 +1227,33 @@ a.os-doc-claim-source:hover { color: var(--os-accent); }
 .os-dock-item[data-document="true"] { color: var(--os-ink-3); }
 .os-dock-item[data-document="true"][data-open="true"] { color: var(--os-ink); }
 .os-dock-doc-title { max-width: 12rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ------------------------------------------------------------- lifecycle */
+
+/* What a person can do with a piece of work from where it stands. The main
+   move leads; dismissing sits beneath it, outlined and quiet, because it is
+   always available and should never be the thing the eye lands on. */
+.os-lifecycle { display: grid; gap: var(--os-gap-2); justify-items: start; }
+.os-lifecycle .mayda-field { width: 100%; }
+
+.os-lifecycle-dismiss {
+  display: flex;
+  gap: var(--os-gap-2);
+  align-items: center;
+  margin-top: var(--os-gap-3);
+  padding-top: var(--os-gap-3);
+  border-top: 1px dashed var(--os-line);
+}
+
+.os-lifecycle-dismiss input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: var(--os-t-small);
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--os-radius-sm);
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-top-color: rgb(0 0 0 / 0.55);
+  background: var(--os-pane-sunken);
+  color: var(--os-ink);
+}

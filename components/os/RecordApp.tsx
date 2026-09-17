@@ -1,5 +1,6 @@
 import { OsPaneEmpty } from "@/components/os/OsPaneEmpty";
-import { OS_RECORD_COPY } from "@/components/osCopy";
+import { OS_DOCUMENT_COPY, OS_RECORD_COPY } from "@/components/osCopy";
+import { OpenItem } from "@/components/os/OpenItem";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import type { Locale } from "@/lib/i18n";
@@ -14,14 +15,24 @@ import type { Locale } from "@/lib/i18n";
  * comes from the view rather than being inferred here: a null actor is not
  * missing data, it is the answer.
  */
-export async function RecordApp({ locale, seenAt }: { locale: Locale; seenAt: string | null }) {
+export async function RecordApp({
+  locale,
+  seenAt,
+  openable = [],
+}: {
+  locale: Locale;
+  seenAt: string | null;
+  /* The items that have a document on this desk. A line about one of them
+   * opens it; a line about work too old to be loaded stays a line. */
+  openable?: string[];
+}) {
   const copy = OS_RECORD_COPY[locale];
   if (!isSupabaseConfigured()) return null;
 
   const supabase = await createSupabaseServerClient();
   const { data: rows } = await supabase
     .from("os_recent_record")
-    .select("id, title, lane, kind, event, actor, by_a_person, at")
+    .select("id, item_id, title, lane, kind, event, actor, by_a_person, at")
     .order("at", { ascending: false })
     .limit(60);
 
@@ -46,7 +57,11 @@ export async function RecordApp({ locale, seenAt }: { locale: Locale; seenAt: st
             <span className="os-record-what">
               {copy.events[row.event ?? ""] ?? row.event}
               {" · "}
-              <strong>{row.title}</strong>
+              {row.item_id && openable.includes(row.item_id) ? (
+                <OpenItem id={row.item_id} title={row.title ?? ""} label={OS_DOCUMENT_COPY[locale].open} />
+              ) : (
+                <strong>{row.title}</strong>
+              )}
               <span className="os-record-lane"> {row.lane}/{row.kind}</span>
             </span>
             {/* The grid reserves a column for this and nothing was filling it.

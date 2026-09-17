@@ -50,6 +50,14 @@ export async function startCompanyAction(_prev: CofounderState, formData: FormDa
  * approval stands on its own, which is the honest failure: a person did
  * decide, and the record says so.
  */
+/* The moves a person can make that are not an approval. Each is a status and
+ * the word the record will use for it. */
+const MOVES = {
+  send_back: { status: "drafted", event: "sent_back" },
+  reopen: { status: "drafted", event: "reopened" },
+  resubmit: { status: "review", event: "resubmitted" },
+} as const;
+
 export async function decideWorkItemAction(formData: FormData): Promise<void> {
   if (!isSupabaseConfigured()) return;
   const claims = await getVerifiedClaims();
@@ -58,7 +66,7 @@ export async function decideWorkItemAction(formData: FormData): Promise<void> {
   const itemId = String(formData.get("itemId") ?? "");
   if (!/^[0-9a-f-]{36}$/.test(itemId)) return;
   const decision = String(formData.get("decision") ?? "");
-  if (decision !== "approve" && decision !== "send_back") return;
+  if (!(decision === "approve" || decision in MOVES)) return;
   const note = String(formData.get("note") ?? "").trim().slice(0, 2000);
 
   const supabase = await createSupabaseServerClient();
@@ -91,11 +99,14 @@ export async function decideWorkItemAction(formData: FormData): Promise<void> {
       p_detail: { action: item.required_action, note },
     });
   } else {
-    const { error } = await supabase.from("os_work_items").update({ status: "drafted" }).eq("id", item.id);
+    // Whether this move is legal from where the item stands is the
+    // database's question; this only names the move.
+    const move = MOVES[decision as keyof typeof MOVES];
+    const { error } = await supabase.from("os_work_items").update({ status: move.status }).eq("id", item.id);
     if (error) return;
     await supabase.rpc("os_record_event", {
       p_item_id: item.id,
-      p_event: "sent_back",
+      p_event: move.event,
       p_detail: { note },
     });
   }
@@ -103,5 +114,53 @@ export async function decideWorkItemAction(formData: FormData): Promise<void> {
   revalidatePath("/portal");
   // The same decision is made from the desk now, and a desk that still shows
   // the item as waiting after you approved it is lying.
+  revalidatePath("/os");
+}
+
+/*
+ * Finishing, and dismissing.
+ *
+ * Both are one call into the database, because both are several writes that
+ * must happen together or not at all: the walk to `completed`, the outcome
+ * appended to the item, the line in the record. The link is checked here for
+ * a useful early no, and checked again there because a form is not where a
+ * rule lives.
+ */
+export async function completeWorkItemAction(formData: FormData): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  const claims = await getVerifiedClaims();
+  if (!claims?.sub) return;
+
+  const itemId = String(formData.get("itemId") ?? "");
+  if (!/^[0-9a-f-]{36}$/.test(itemId)) return;
+
+  const rawUrl = String(formData.get("url") ?? "").trim().slice(0, 2000);
+  if (rawUrl && !/^https?:\/\/\S+$/i.test(rawUrl)) return;
+  const note = String(formData.get("note") ?? "").trim().slice(0, 2000);
+
+  const supabase = await createSupabaseServerClient();
+  await supabase.rpc("os_complete_item", {
+    p_item_id: itemId,
+    p_url: rawUrl || undefined,
+    p_note: note || undefined,
+  });
+
+  revalidatePath("/portal");
+  revalidatePath("/os");
+}
+
+export async function dismissWorkItemAction(formData: FormData): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  const claims = await getVerifiedClaims();
+  if (!claims?.sub) return;
+
+  const itemId = String(formData.get("itemId") ?? "");
+  if (!/^[0-9a-f-]{36}$/.test(itemId)) return;
+  const reason = String(formData.get("reason") ?? "").trim().slice(0, 500);
+
+  const supabase = await createSupabaseServerClient();
+  await supabase.rpc("os_dismiss_item", { p_item_id: itemId, p_reason: reason || undefined });
+
+  revalidatePath("/portal");
   revalidatePath("/os");
 }

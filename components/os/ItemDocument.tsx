@@ -1,5 +1,5 @@
-import { WorkItemDecision } from "@/components/CofounderPanels";
-import { OS_COFOUNDER_COPY, OS_DOCUMENT_COPY } from "@/components/osCopy";
+import { ItemLifecycle } from "@/components/os/ItemLifecycle";
+import { OS_DOCUMENT_COPY } from "@/components/osCopy";
 import type { Locale } from "@/lib/i18n";
 
 /* A work item, opened.
@@ -26,6 +26,7 @@ export type ItemRecord = {
   required_action: string | null;
   notes: string | null;
   sources: unknown;
+  artifacts: unknown;
   metadata: unknown;
   updated_at: string;
 };
@@ -37,6 +38,13 @@ export type ItemEvent = {
 };
 
 type Source = { url?: string; title?: string; chars?: number };
+type Outcome = { kind?: string; url?: string; note?: string; at?: string };
+
+function asOutcomes(value: unknown): Outcome[] {
+  return Array.isArray(value)
+    ? value.filter((v): v is Outcome => Boolean(v) && typeof v === "object" && (v as Outcome).kind === "outcome")
+    : [];
+}
 type Claim = { text?: string; source_url?: string | null };
 
 function asSources(value: unknown): Source[] {
@@ -55,8 +63,9 @@ function author(value: unknown): string | null {
 
 export function ItemDocument({ locale, item, events }: { locale: Locale; item: ItemRecord; events: ItemEvent[] }) {
   const copy = OS_DOCUMENT_COPY[locale];
-  const decisionCopy = OS_COFOUNDER_COPY[locale];
   const sources = asSources(item.sources);
+  const outcomes = asOutcomes(item.artifacts);
+  const over = item.status === "completed" || item.status === "canceled";
   const claims = asClaims(item.metadata);
   const by = author(item.metadata);
   const when = new Intl.DateTimeFormat(locale, { month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false });
@@ -70,14 +79,38 @@ export function ItemDocument({ locale, item, events }: { locale: Locale; item: I
         </p>
         <h1 className="os-doc-title">{item.title}</h1>
         <p className="os-doc-meta">
-          <span className="mayda-status is-active">{item.status}</span>
-          {item.required_action ? (
+          {/* Colour means "this needs a person". Finished or dismissed work
+              does not, and must not say it is still waiting on anything — a
+              completed reply reading "Waiting on send" is the record
+              contradicting itself in its own header. */}
+          <span className={`mayda-status${over ? "" : " is-active"}`}>{item.status}</span>
+          {item.required_action && !over ? (
             <span className="os-doc-waiting">
               {copy.waitingOn} <code>{item.required_action}</code>
             </span>
           ) : null}
         </p>
       </header>
+
+      {/* Where it went comes first on finished work: it is the answer to the
+          only question anyone opens a finished item to ask. */}
+      {outcomes.length > 0 ? (
+        <section className="os-doc-section">
+          <h2 className="os-doc-label">{copy.whereItWent}</h2>
+          <ul className="os-doc-sources">
+            {outcomes.map((outcome, index) => (
+              <li key={index}>
+                {outcome.url ? (
+                  <a href={outcome.url} target="_blank" rel="noopener noreferrer">{outcome.url}</a>
+                ) : (
+                  <span>{copy.finished}</span>
+                )}
+                {outcome.note ? <span className="os-doc-chars"> {outcome.note}</span> : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section className="os-doc-section">
         <h2 className="os-doc-label">{copy.draft}</h2>
@@ -147,11 +180,12 @@ export function ItemDocument({ locale, item, events }: { locale: Locale; item: I
         )}
       </section>
 
-      {item.status === "review" ? (
-        <section className="os-doc-section os-doc-decide">
-          <WorkItemDecision itemId={item.id} copy={decisionCopy} />
-        </section>
-      ) : null}
+      <ItemLifecycle
+        locale={locale}
+        itemId={item.id}
+        status={item.status}
+        requiredAction={item.required_action}
+      />
     </article>
   );
 }

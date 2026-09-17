@@ -61,21 +61,14 @@ export default async function OsPage(props: LocalePageProps) {
      * out loud — an open piece of work, something it knows — rather than
      * everything in the database. A search that returns four hundred rows is
      * a search nobody uses twice. */
-    const [{ count: newCount }, { data: items }, { data: facts }] = await Promise.all([
+    const [{ count: newCount }, { data: facts }] = await Promise.all([
       seenAt
         ? supabase.from("os_recent_record").select("id", { count: "exact", head: true }).gt("at", seenAt)
         : Promise.resolve({ count: 0 } as { count: number | null }),
-      supabase.from("os_needs_you").select("id, title, lane, kind").limit(20),
       supabase.from("os_company_memory").select("id, fact, kind").is("retired_at", null).limit(20),
     ]);
 
     unread = newCount ?? 0;
-
-    for (const item of items ?? []) {
-      if (item.id && item.title) {
-        targets.push({ kind: "item", id: item.id, label: item.title, hint: `${item.lane}/${item.kind}` });
-      }
-    }
 
     /* Every open piece of work, rendered as a document up front and handed to
      * the shell, which shows whichever are opened. Thirty small documents
@@ -83,15 +76,51 @@ export default async function OsPage(props: LocalePageProps) {
      * keeps an app a server component with its own data access, which is the
      * contract everything else here rests on. */
     if (company?.id) {
-      const { data: rows } = await supabase
-        .from("os_work_items")
-        .select("id, title, lane, kind, status, required_action, notes, sources, metadata, updated_at")
-        .eq("company_id", company.id)
-        .not("status", "in", "(completed,canceled)")
-        .order("updated_at", { ascending: false })
-        .limit(30);
+      const COLUMNS =
+        "id, title, lane, kind, status, required_action, notes, sources, artifacts, metadata, updated_at";
+      const [{ data: open }, { data: finished }] = await Promise.all([
+        supabase
+          .from("os_work_items")
+          .select(COLUMNS)
+          .eq("company_id", company.id)
+          .not("status", "in", "(completed,canceled)")
+          .order("updated_at", { ascending: false })
+          .limit(30),
+        /* Finished work stays openable for a fortnight — long enough to check
+         * where something went, short enough that the desk is not an archive.
+         * The fortnight is the view's clock, not this page's. */
+        supabase
+          .from("os_finished_lately")
+          .select(COLUMNS)
+          .eq("company_id", company.id)
+          .order("updated_at", { ascending: false })
+          .limit(15),
+      ]);
 
-      const ids = (rows ?? []).map((r) => r.id);
+      /* A view's columns are all nullable to the type generator, and a type
+       * predicate cannot narrow jsonb to `unknown`. So each row is rebuilt
+       * field by field: a real item has every one of these, and anything that
+       * does not is simply not shown. */
+      const rows: ItemRecord[] = [...(open ?? []), ...(finished ?? [])].flatMap((r) =>
+        r.id && r.title && r.lane && r.kind && r.status && r.updated_at
+          ? [
+              {
+                id: r.id,
+                title: r.title,
+                lane: r.lane,
+                kind: r.kind,
+                status: r.status,
+                required_action: r.required_action,
+                notes: r.notes,
+                sources: r.sources,
+                artifacts: r.artifacts,
+                metadata: r.metadata,
+                updated_at: r.updated_at,
+              },
+            ]
+          : [],
+      );
+      const ids = rows.map((r) => r.id);
       const { data: history } = ids.length
         ? await supabase
             .from("os_work_item_events")
@@ -107,8 +136,10 @@ export default async function OsPage(props: LocalePageProps) {
         byItem.set(e.item_id, list);
       }
 
-      for (const row of rows ?? []) {
-        const item: ItemRecord = row;
+      for (const item of rows) {
+        // Every document is findable from ⌘K — including drafts, which need
+        // nobody and so appear in no queue, and work finished this fortnight.
+        targets.push({ kind: "item", id: item.id, label: item.title, hint: `${item.lane}/${item.kind}` });
         documents.push({
           key: documentKey(item.id),
           title: item.title,
@@ -151,7 +182,13 @@ export default async function OsPage(props: LocalePageProps) {
       id: "record",
       title: OS_RECORD_COPY[locale].title,
       icon: "record",
-      node: <RecordApp locale={locale} seenAt={seenAt} />,
+      node: (
+        <RecordApp
+          locale={locale}
+          seenAt={seenAt}
+          openable={documents.map((d) => d.key.slice("item:".length))}
+        />
+      ),
       defaultRect: { x: 0.14, y: 0.18, w: 0.55, h: 0.6 },
     },
     {

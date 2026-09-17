@@ -104,7 +104,7 @@ What you remember is shown to them in full and they can retire anything you got 
  * given a hundred stale rows reasons about the wrong five.
  */
 export async function buildCompanyContext(supabase: Db, companyId: string): Promise<string> {
-  const [company, items, approvals, workflows, events, memory] = await Promise.all([
+  const [company, items, approvals, workflows, events, memory, finished] = await Promise.all([
     supabase.from("os_companies").select("name, what_we_do, created_at").eq("id", companyId).maybeSingle(),
     supabase
       .from("os_work_items")
@@ -135,6 +135,12 @@ export async function buildCompanyContext(supabase: Db, companyId: string): Prom
       .is("retired_at", null)
       .order("created_at", { ascending: false })
       .limit(80),
+    supabase
+      .from("os_finished_lately")
+      .select("title, lane, kind, artifacts, updated_at")
+      .eq("company_id", companyId)
+      .order("updated_at", { ascending: false })
+      .limit(15),
   ]);
 
   const lines: string[] = [];
@@ -180,6 +186,22 @@ export async function buildCompanyContext(supabase: Db, companyId: string): Prom
     }
   }
   lines.push("</decisions_already_made>");
+
+  /* A colleague who drafted the reply should know the reply was sent.
+   * Without this the co-founder goes on proposing work that is already done. */
+  lines.push("<finished_in_the_last_fortnight>");
+  if (!finished.data?.length) {
+    lines.push("nothing");
+  } else {
+    for (const row of finished.data) {
+      const outcomes = Array.isArray(row.artifacts) ? (row.artifacts as { url?: string; note?: string }[]) : [];
+      const last = outcomes[outcomes.length - 1];
+      const where = last?.url ? ` -> ${last.url}` : "";
+      const note = last?.note ? ` ("${String(last.note).slice(0, 160)}")` : "";
+      lines.push(`- ${row.lane}/${row.kind}: ${row.title} (${row.updated_at})${where}${note}`);
+    }
+  }
+  lines.push("</finished_in_the_last_fortnight>");
 
   lines.push("<what_runs_on_its_own>");
   if (!workflows.data?.length) {

@@ -1766,6 +1766,177 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       });
     });
 
+    /* The executor, 17 September. Approval has to lead somewhere: until this,
+     * no code anywhere moved an item to `completed`, so approved work sat at
+     * `approved` for good. The first honest executor is the person — they do
+     * the thing in the world and record that it is done and where it went —
+     * and the function they call adds no approval rule of its own. It simply
+     * cannot get past the gate that is already there, and neither can the
+     * server. */
+    describe("finishing work", () => {
+      let companyId: string;
+
+      const make = async (fields: { status: string; required_action?: string; title: string }) => {
+        const { data } = await admin
+          .from("os_work_items")
+          .insert({ company_id: companyId, lane: "sales", kind: "reply", ...fields })
+          .select("id")
+          .single();
+        return data!.id as string;
+      };
+
+      const approve = async (id: string, action: string) => {
+        await userA.from("os_approvals").insert({
+          item_id: id,
+          action,
+          approved_by: idA,
+          approved_at: new Date().toISOString(),
+        });
+        await userA.from("os_work_items").update({ status: "approved" }).eq("id", id);
+      };
+
+      const statusOf = async (id: string) =>
+        (await admin.from("os_work_items").select("status").eq("id", id).single()).data!.status;
+
+      beforeAll(async () => {
+        const { data: company } = await admin
+          .from("os_companies")
+          .insert({ name: `Finish Co ${suffix}` })
+          .select("id")
+          .single();
+        companyId = company!.id;
+        await admin.from("os_company_members").insert({ company_id: companyId, user_id: idA, role: "owner" });
+      });
+
+      it("finishes approved work, says where it went, and tells the co-founder", async () => {
+        const id = await make({ status: "review", required_action: "send", title: `Reply sent ${suffix}` });
+        await approve(id, "send");
+
+        const { error } = await userA.rpc("os_complete_item", {
+          p_item_id: id,
+          p_url: "https://example.com/sent/42",
+          p_note: "Sent Tuesday morning.",
+        });
+        expect(error).toBeNull();
+        expect(await statusOf(id)).toBe("completed");
+
+        const { data: item } = await admin.from("os_work_items").select("artifacts").eq("id", id).single();
+        const [outcome] = item!.artifacts as { kind: string; url: string; note: string; by: string }[];
+        expect(outcome.kind).toBe("outcome");
+        expect(outcome.url).toBe("https://example.com/sent/42");
+        expect(outcome.note).toBe("Sent Tuesday morning.");
+        expect(outcome.by).toBe(idA);
+
+        // The record says a person did it.
+        const { data: events } = await admin
+          .from("os_work_item_events")
+          .select("event, actor, detail")
+          .eq("item_id", id);
+        const done = (events ?? []).find((e) => e.event === "completed");
+        expect(done!.actor).toBe(idA);
+        expect((done!.detail as { url: string }).url).toBe("https://example.com/sent/42");
+
+        // It leaves the queue and stays openable for a while.
+        expect((await userA.from("os_needs_you").select("id").eq("id", id)).data ?? []).toHaveLength(0);
+        expect((await userA.from("os_finished_lately").select("id").eq("id", id)).data ?? []).toHaveLength(1);
+
+        // And the co-founder stops proposing work that is already done.
+        const context = await buildCompanyContext(admin, companyId);
+        expect(context).toContain(`Reply sent ${suffix}`);
+        expect(context).toContain("https://example.com/sent/42");
+      });
+
+      /* The walk is several updates. If the gate refuses the last hop, the
+       * earlier ones must not have happened either — an item left at `review`
+       * because finishing it failed would be a state nobody chose. */
+      it("will not finish what nobody approved, and leaves it exactly where it stood", async () => {
+        const id = await make({ status: "drafted", required_action: "send", title: `Unapproved ${suffix}` });
+
+        const { error } = await userA.rpc("os_complete_item", { p_item_id: id });
+        expect(error).not.toBeNull();
+        expect(error!.message).toContain('needs an approved "send"');
+        expect(await statusOf(id)).toBe("drafted");
+      });
+
+      it("finishes a draft that needs nobody's approval", async () => {
+        const id = await make({ status: "drafted", title: `Just a note ${suffix}` });
+
+        const { error } = await userA.rpc("os_complete_item", { p_item_id: id });
+        expect(error).toBeNull();
+        expect(await statusOf(id)).toBe("completed");
+      });
+
+      /* The seam an automatic executor will use. It is tested now, before
+       * one exists, because it is the promise the whole product rests on:
+       * the server may finish what a person approved, and nothing else. */
+      it("holds the server to the same gate, and records its work as the system's", async () => {
+        const refused = await make({ status: "review", required_action: "publish", title: `Server refused ${suffix}` });
+        const { error } = await admin.rpc("os_complete_item", { p_item_id: refused });
+        expect(error).not.toBeNull();
+        expect(error!.message).toContain('needs an approved "publish"');
+        expect(await statusOf(refused)).toBe("review");
+
+        const allowed = await make({ status: "review", required_action: "publish", title: `Server allowed ${suffix}` });
+        await approve(allowed, "publish");
+        const { error: ok } = await admin.rpc("os_complete_item", {
+          p_item_id: allowed,
+          p_url: "https://example.com/published",
+        });
+        expect(ok).toBeNull();
+        expect(await statusOf(allowed)).toBe("completed");
+
+        const { data: events } = await admin
+          .from("os_work_item_events")
+          .select("event, actor")
+          .eq("item_id", allowed);
+        expect((events ?? []).find((e) => e.event === "completed")!.actor).toBeNull();
+      });
+
+      it("dismisses from anywhere but the end, once, and keeps the reason", async () => {
+        const id = await make({ status: "blocked", title: `Stuck thing ${suffix}` });
+
+        const { error } = await userA.rpc("os_dismiss_item", { p_item_id: id, p_reason: "The customer went elsewhere." });
+        expect(error).toBeNull();
+        expect(await statusOf(id)).toBe("canceled");
+
+        const { data: events } = await admin
+          .from("os_work_item_events")
+          .select("event, detail")
+          .eq("item_id", id);
+        const dismissed = (events ?? []).filter((e) => e.event === "dismissed");
+        expect(dismissed).toHaveLength(1);
+        expect((dismissed[0].detail as { reason: string }).reason).toBe("The customer went elsewhere.");
+
+        // The end is the end: no second line in the record, no resurrection.
+        const { error: again } = await userA.rpc("os_dismiss_item", { p_item_id: id });
+        expect(again!.message).toContain("already canceled");
+        const { error: finish } = await userA.rpc("os_complete_item", { p_item_id: id });
+        expect(finish!.message).toContain("already canceled");
+        const { data: after } = await admin.from("os_work_item_events").select("event").eq("item_id", id);
+        expect((after ?? []).filter((e) => e.event === "dismissed")).toHaveLength(1);
+      });
+
+      it("refuses an outcome link that is not a web address", async () => {
+        const id = await make({ status: "review", required_action: "send", title: `Bad link ${suffix}` });
+        await approve(id, "send");
+
+        const { error } = await userA.rpc("os_complete_item", { p_item_id: id, p_url: "javascript:alert(1)" });
+        expect(error).not.toBeNull();
+        expect(error!.message).toContain("http");
+        expect(await statusOf(id)).toBe("approved");
+      });
+
+      it("is not reachable from outside the company", async () => {
+        const id = await make({ status: "drafted", title: `Not yours ${suffix}` });
+
+        const { error: finish } = await outsider.rpc("os_complete_item", { p_item_id: id });
+        expect(finish!.message).toContain("not your work item");
+        const { error: dismiss } = await outsider.rpc("os_dismiss_item", { p_item_id: id });
+        expect(dismiss!.message).toContain("not your work item");
+        expect(await statusOf(id)).toBe("drafted");
+      });
+    });
+
     /* Self-serve workflows, 16 September. A member may now set up their own
      * work, which is the difference between an internal tool and something a
      * person can buy. Everything they must NOT be able to do is enforced in

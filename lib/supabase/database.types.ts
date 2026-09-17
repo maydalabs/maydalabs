@@ -294,6 +294,13 @@ export type Database = {
             foreignKeyName: "os_approvals_item_id_fkey"
             columns: ["item_id"]
             isOneToOne: false
+            referencedRelation: "os_finished_lately"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_approvals_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
             referencedRelation: "os_needs_you"
             referencedColumns: ["id"]
           },
@@ -592,6 +599,13 @@ export type Database = {
             foreignKeyName: "os_runs_item_id_fkey"
             columns: ["item_id"]
             isOneToOne: false
+            referencedRelation: "os_finished_lately"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_runs_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
             referencedRelation: "os_needs_you"
             referencedColumns: ["id"]
           },
@@ -676,6 +690,13 @@ export type Database = {
           item_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "os_work_item_events_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_finished_lately"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "os_work_item_events_item_id_fkey"
             columns: ["item_id"]
@@ -1181,6 +1202,13 @@ export type Database = {
             foreignKeyName: "os_runs_item_id_fkey"
             columns: ["last_run_item_id"]
             isOneToOne: false
+            referencedRelation: "os_finished_lately"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_runs_item_id_fkey"
+            columns: ["last_run_item_id"]
+            isOneToOne: false
             referencedRelation: "os_needs_you"
             referencedColumns: ["id"]
           },
@@ -1205,6 +1233,65 @@ export type Database = {
           user_id: string | null
         }
         Relationships: []
+      }
+      os_finished_lately: {
+        Row: {
+          artifacts: Json | null
+          company_id: string | null
+          created_at: string | null
+          id: string | null
+          kind: string | null
+          lane: string | null
+          metadata: Json | null
+          notes: string | null
+          required_action: string | null
+          sources: Json | null
+          status: string | null
+          tags: string[] | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          artifacts?: Json | null
+          company_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          kind?: string | null
+          lane?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          required_action?: string | null
+          sources?: Json | null
+          status?: string | null
+          tags?: string[] | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          artifacts?: Json | null
+          company_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          kind?: string | null
+          lane?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          required_action?: string | null
+          sources?: Json | null
+          status?: string | null
+          tags?: string[] | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_work_items_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       os_needs_you: {
         Row: {
@@ -1276,6 +1363,13 @@ export type Database = {
             foreignKeyName: "os_work_item_events_item_id_fkey"
             columns: ["item_id"]
             isOneToOne: false
+            referencedRelation: "os_finished_lately"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_work_item_events_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
             referencedRelation: "os_needs_you"
             referencedColumns: ["id"]
           },
@@ -1335,6 +1429,14 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      os_complete_item: {
+        Args: { p_item_id: string; p_note?: string; p_url?: string }
+        Returns: undefined
+      }
+      os_dismiss_item: {
+        Args: { p_item_id: string; p_reason?: string }
+        Returns: undefined
       }
       os_has_company: { Args: never; Returns: boolean }
       os_is_member: { Args: { p_company_id: string }; Returns: boolean }
