@@ -200,7 +200,9 @@ export async function runDueWorkflows(
         required_action: workflow.required_action,
         notes: draft.draft.slice(0, 20_000),
         sources: sourceRecord,
-        metadata: { claims: draft.claims, workflow_key: workflow.key },
+        // `by` is what the document reads to say "prepared while you were away";
+        // without it the worker's items arrived unattributed.
+        metadata: { by: "worker", claims: draft.claims, workflow_key: workflow.key },
       })
       .select("id")
       .single();

@@ -1257,3 +1257,128 @@ a.os-doc-claim-source:hover { color: var(--os-accent); }
   background: var(--os-pane-sunken);
   color: var(--os-ink);
 }
+
+/* ----------------------------------------------------------------- work */
+
+/* Everything open, as a table you read down: what it asks of you, what it
+   is, what kind, when it last moved. Fixed columns, because a list whose rows
+   each measure their own gutter is a list of sentences — the same mistake the
+   record made before it became a log. */
+.os-work { display: grid; gap: var(--os-gap-5); align-content: start; }
+
+.os-work-add { display: flex; gap: var(--os-gap-2); flex-wrap: wrap; }
+.os-work-add input { flex: 1 1 14rem; min-width: 0; }
+
+.os-work-add input,
+.os-work-add select {
+  font: inherit;
+  font-size: var(--os-t-small);
+  padding: 0.4rem 0.55rem;
+  border-radius: var(--os-radius-sm);
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-top-color: rgb(0 0 0 / 0.55);
+  background: var(--os-pane-sunken);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.45), inset 0 -1px 0 rgb(255 255 255 / 0.04);
+  color: var(--os-ink);
+}
+
+.os-work-add :is(input, select):focus {
+  outline: none;
+  border-color: var(--os-accent);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.45), 0 0 0 3px var(--os-accent-soft);
+}
+
+.os-work-group { display: grid; gap: 0; }
+
+.os-work-lane {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0;
+  padding-bottom: var(--os-gap-2);
+  font-family: var(--os-font-mono);
+  font-size: var(--os-t-micro);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--os-ink-2);
+}
+
+.os-work-count { color: var(--os-ink-3); letter-spacing: 0.04em; }
+
+.os-work-list { list-style: none; margin: 0; padding: 0; display: grid; }
+
+.os-work-row {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr) 5rem 4rem;
+  column-gap: var(--os-gap-3);
+  align-items: baseline;
+  padding: var(--os-gap-2) var(--os-pad);
+  margin-inline: calc(var(--os-pad) * -1);
+  border-top: 1px solid var(--os-line);
+  transition: background 90ms linear;
+}
+
+.os-work-row:hover { background: rgb(255 255 255 / 0.035); }
+
+.os-work-row .os-open-item {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.os-work-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--os-font-mono);
+  font-size: var(--os-t-micro);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--os-ink-3);
+  white-space: nowrap;
+}
+
+.os-work-status::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: currentColor;
+  flex: none;
+}
+
+/* Colour means "this needs a person", here as everywhere. */
+.os-work-status[data-needs="true"] { color: var(--os-accent); }
+
+.os-work-kind,
+.os-work-when {
+  font-family: var(--os-font-mono);
+  font-size: var(--os-t-micro);
+  color: var(--os-ink-3);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.os-work-when { justify-self: end; }
+.os-work-finished { opacity: 0.6; }
+
+/* A person's own note is not the co-founder's writing, so it does not borrow
+   the co-founder's serif. The typography is the provenance; it has to be
+   true. */
+.os-doc-draft[data-voice="person"] {
+  font-family: var(--os-font-ui);
+  font-size: var(--os-t-body);
+  line-height: 1.55;
+}
+
+@media (max-width: 767px) {
+  /* A fixed gutter here too. With `auto` each row measured its own status,
+     so a title after "DECIDE" began further right than one after "NEW" — the
+     same list-of-sentences flaw the record had, reintroduced one breakpoint
+     down. 5rem holds the longest label in any of the three languages. */
+  .os-work-row { grid-template-columns: 5rem minmax(0, 1fr) auto; }
+  .os-work-kind { display: none; }
+}

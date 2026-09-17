@@ -63,6 +63,12 @@ describe("a desk on its way into the database", () => {
     ).toEqual([]);
   });
 
+  it("knows the work app, so its window is remembered like any other", () => {
+    const [row] = sanitizeLayout([{ app: "work", x: 0.08, y: 0.1, w: 0.6, h: 0.7, open: true }]);
+    expect(row.app).toBe("work");
+    expect(row.open).toBe(true);
+  });
+
   it("drops apps that do not exist", () => {
     expect(sanitizeLayout([{ app: "../etc/passwd" }, { app: "billing" }, { app: 7 }])).toEqual([]);
   });

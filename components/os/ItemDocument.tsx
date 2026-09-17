@@ -1,5 +1,6 @@
 import { ItemLifecycle } from "@/components/os/ItemLifecycle";
-import { OS_DOCUMENT_COPY } from "@/components/osCopy";
+import { OS_DOCUMENT_COPY, OS_WORKAPP_COPY } from "@/components/osCopy";
+import { needsAPerson } from "@/lib/osWork";
 import type { Locale } from "@/lib/i18n";
 
 /* A work item, opened.
@@ -68,6 +69,9 @@ export function ItemDocument({ locale, item, events }: { locale: Locale; item: I
   const over = item.status === "completed" || item.status === "canceled";
   const claims = asClaims(item.metadata);
   const by = author(item.metadata);
+  /* The serif means "the co-founder wrote this". Work a person added
+   * themselves is theirs, and says so in the type. */
+  const mine = by === "person";
   const when = new Intl.DateTimeFormat(locale, { month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false });
 
   return (
@@ -83,7 +87,12 @@ export function ItemDocument({ locale, item, events }: { locale: Locale; item: I
               does not, and must not say it is still waiting on anything — a
               completed reply reading "Waiting on send" is the record
               contradicting itself in its own header. */}
-          <span className={`mayda-status${over ? "" : " is-active"}`}>{item.status}</span>
+          {/* The same words the Work app uses, so an item is not "New" in one
+              window and "pending" in the next — and the same rule for colour:
+              it means this needs a person, which a new task does not. */}
+          <span className={`mayda-status${needsAPerson(item.status) ? " is-active" : ""}`}>
+            {OS_WORKAPP_COPY[locale].status[item.status] ?? item.status}
+          </span>
           {item.required_action && !over ? (
             <span className="os-doc-waiting">
               {copy.waitingOn} <code>{item.required_action}</code>
@@ -113,9 +122,9 @@ export function ItemDocument({ locale, item, events }: { locale: Locale; item: I
       ) : null}
 
       <section className="os-doc-section">
-        <h2 className="os-doc-label">{copy.draft}</h2>
+        <h2 className="os-doc-label">{mine ? copy.yourNote : copy.draft}</h2>
         {item.notes?.trim() ? (
-          <div className="os-doc-draft">{item.notes}</div>
+          <div className="os-doc-draft" data-voice={mine ? "person" : "cofounder"}>{item.notes}</div>
         ) : (
           <p className="os-doc-quiet">{copy.nothingWritten}</p>
         )}

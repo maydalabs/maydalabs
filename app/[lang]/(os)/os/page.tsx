@@ -6,9 +6,16 @@ import { CompanyApp } from "@/components/os/CompanyApp";
 import { CofounderPane } from "@/components/os/CofounderPane";
 import { MemoryApp } from "@/components/os/MemoryApp";
 import { RecordApp } from "@/components/os/RecordApp";
+import { WorkApp } from "@/components/os/WorkApp";
 import { ItemDocument, type ItemEvent, type ItemRecord } from "@/components/os/ItemDocument";
 import { OsShell } from "@/components/os/OsShell";
-import { OS_SHELL_COPY, OS_COFOUNDER_CHAT_COPY, OS_MEMORY_COPY, OS_RECORD_COPY } from "@/components/osCopy";
+import {
+  OS_SHELL_COPY,
+  OS_COFOUNDER_CHAT_COPY,
+  OS_MEMORY_COPY,
+  OS_RECORD_COPY,
+  OS_WORKAPP_COPY,
+} from "@/components/osCopy";
 import { documentKey, type OsApp, type OsDocument } from "@/components/os/types";
 import type { CommandTarget } from "@/components/os/OsCommandBar";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
@@ -42,6 +49,9 @@ export default async function OsPage(props: LocalePageProps) {
   let unread = 0;
   const targets: CommandTarget[] = [];
   const documents: OsDocument[] = [];
+  // The same rows the documents are built from, kept for the Work app: one
+  // query feeding two views, not two queries that could disagree.
+  let workItems: ItemRecord[] = [];
 
   if (isSupabaseConfigured()) {
     const supabase = await createSupabaseServerClient();
@@ -120,6 +130,7 @@ export default async function OsPage(props: LocalePageProps) {
             ]
           : [],
       );
+      workItems = rows;
       const ids = rows.map((r) => r.id);
       const { data: history } = ids.length
         ? await supabase
@@ -169,6 +180,13 @@ export default async function OsPage(props: LocalePageProps) {
       node: <CofounderQueue locale={locale} userId={claims.sub} bare />,
       defaultRect: { x: 0.5, y: 0.03, w: 0.475, h: 0.56 },
       openByDefault: true,
+    },
+    {
+      id: "work",
+      title: OS_WORKAPP_COPY[locale].title,
+      icon: "work",
+      node: <WorkApp locale={locale} items={workItems} />,
+      defaultRect: { x: 0.1, y: 0.1, w: 0.62, h: 0.74 },
     },
     {
       id: "running",

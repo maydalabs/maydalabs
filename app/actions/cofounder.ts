@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
+import { OS_LANES } from "@/lib/osWork";
 
 /*
  * The co-founder's two acts a person actually performs: starting a company,
@@ -162,5 +163,53 @@ export async function dismissWorkItemAction(formData: FormData): Promise<void> {
   await supabase.rpc("os_dismiss_item", { p_item_id: itemId, p_reason: reason || undefined });
 
   revalidatePath("/portal");
+  revalidatePath("/os");
+}
+
+/*
+ * A person adds their own work.
+ *
+ * Until this, every item was made by the co-founder or the worker, and
+ * neither runs without a model key — so the live desk had no way to hold any
+ * work at all. It is born `pending`, through the caller's own client, so the
+ * insert policy decides whether this is their company and the gate decides
+ * whether that birth state is allowed.
+ *
+ * `by: "person"` is a rendering hint and nothing more: it stops the document
+ * setting a person's own note in the co-founder's serif. Who actually added
+ * it is the event below, which the database stamps with the actor itself —
+ * a form that says who wrote something is a form that can lie about it.
+ */
+export async function addWorkItemAction(formData: FormData): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  const claims = await getVerifiedClaims();
+  if (!claims?.sub) return;
+
+  const title = String(formData.get("title") ?? "").trim().slice(0, 200);
+  if (!title) return;
+  const laneRaw = String(formData.get("lane") ?? "ops");
+  const lane = (OS_LANES as readonly string[]).includes(laneRaw) ? laneRaw : "ops";
+
+  const supabase = await createSupabaseServerClient();
+  const { data: company } = await supabase.from("os_companies").select("id").limit(1).maybeSingle();
+  if (!company) return;
+
+  const { data: item, error } = await supabase
+    .from("os_work_items")
+    .insert({
+      company_id: company.id,
+      lane,
+      kind: "task",
+      title,
+      notes: "",
+      status: "pending",
+      metadata: { by: "person" },
+    })
+    .select("id")
+    .single();
+  if (error || !item) return;
+
+  await supabase.rpc("os_record_event", { p_item_id: item.id, p_event: "added", p_detail: {} });
+
   revalidatePath("/os");
 }

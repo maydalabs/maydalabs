@@ -7,7 +7,7 @@ import type { OsIconName } from "@/components/os/OsIcon";
  * co-founder conversation, the record, files — each arrives as one of these
  * rather than as a special case, and the shell never learns their names.
  */
-export type OsAppId = "cofounder" | "needs-you" | "running" | "record" | "memory" | "company";
+export type OsAppId = "cofounder" | "needs-you" | "work" | "running" | "record" | "memory" | "company";
 
 /* A document is a work item opened in its own window. Apps are fixed and
  * live in the dock; documents come and go with the work. The key carries the

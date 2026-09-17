@@ -11,6 +11,7 @@
 export type OsIconName =
   | "cofounder"
   | "needs-you"
+  | "work"
   | "running"
   | "record"
   | "memory"
@@ -38,6 +39,15 @@ const PATHS: Record<OsIconName, React.ReactNode> = {
     <>
       <path d="M3.5 13.5h4l1.5 2.5h6l1.5-2.5h4" />
       <path d="M5.4 5.4h13.2l1.9 8.1v4a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5v-4l1.9-8.1Z" />
+    </>
+  ),
+  // Three columns of differing depth: a board of work in flight. Outlined
+  // boxes rather than lines, so it cannot be mistaken for the record's rules.
+  work: (
+    <>
+      <rect x="3.5" y="4" width="4.6" height="15.5" rx="1.2" />
+      <rect x="9.7" y="4" width="4.6" height="9" rx="1.2" />
+      <rect x="15.9" y="4" width="4.6" height="12.5" rx="1.2" />
     </>
   ),
   // A pulse: something is happening without you.

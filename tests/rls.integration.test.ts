@@ -1926,6 +1926,50 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         expect(await statusOf(id)).toBe("approved");
       });
 
+      /* Every item used to be made by the co-founder or the worker, and
+       * neither runs without a model key, so the live desk could hold no work
+       * at all. This is the path the Work app's form takes — and finishing it
+       * is the longest legal walk there is, pending to completed, which
+       * nothing else exercised. */
+      it("lets a person add their own work and finish it the long way round", async () => {
+        const { data: item, error } = await userA
+          .from("os_work_items")
+          .insert({
+            company_id: companyId,
+            lane: "ops",
+            kind: "task",
+            title: `Call the carrier ${suffix}`,
+            notes: "",
+            status: "pending",
+            metadata: { by: "person" },
+          })
+          .select("id, status")
+          .single();
+        expect(error).toBeNull();
+        expect(item!.status).toBe("pending");
+
+        const { error: recorded } = await userA.rpc("os_record_event", {
+          p_item_id: item!.id,
+          p_event: "added",
+          p_detail: {},
+        });
+        expect(recorded).toBeNull();
+
+        // pending → drafted → review → approved → completed, each hop judged.
+        const { error: finished } = await userA.rpc("os_complete_item", { p_item_id: item!.id });
+        expect(finished).toBeNull();
+        expect(await statusOf(item!.id)).toBe("completed");
+
+        const { data: events } = await admin
+          .from("os_work_item_events")
+          .select("event, actor")
+          .eq("item_id", item!.id)
+          .order("at", { ascending: true });
+        expect((events ?? []).map((e) => e.event)).toEqual(["added", "completed"]);
+        // Who added it is the database's stamp, not the form's claim.
+        expect((events ?? []).every((e) => e.actor === idA)).toBe(true);
+      });
+
       it("is not reachable from outside the company", async () => {
         const id = await make({ status: "drafted", title: `Not yours ${suffix}` });
 
