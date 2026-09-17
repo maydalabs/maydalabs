@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
-import { buildCompanyContext, systemFor } from "@/lib/osCofounder";
+import { buildCompanyContext, openOnThePerson, recentMessages, systemFor } from "@/lib/osCofounder";
 import { runCofounderTurn } from "@/lib/osCofounderRun";
 import { anthropicTurn, isCofounderConfigured } from "@/lib/osCofounderModel";
 import { formatUsd } from "@/lib/os";
@@ -85,12 +85,8 @@ export async function POST(request: Request) {
     threadId = created.id;
   }
 
-  const { data: history } = await admin
-    .from("os_messages")
-    .select("role, body")
-    .eq("thread_id", threadId)
-    .order("created_at", { ascending: true })
-    .limit(40);
+  // The latest forty, not the first forty: see recentMessages.
+  const history = openOnThePerson(await recentMessages(admin, threadId, 40));
 
   await admin.from("os_messages").insert({
     thread_id: threadId,
@@ -111,7 +107,7 @@ export async function POST(request: Request) {
           companyId: company.id,
           system,
           history: [
-            ...(history ?? []).map((m) => ({ role: m.role as "person" | "cofounder", body: m.body })),
+            ...history.map((m) => ({ role: m.role, body: m.body })),
             { role: "person" as const, body: said },
           ],
           turn,

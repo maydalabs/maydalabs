@@ -228,6 +228,39 @@ export async function buildCompanyContext(supabase: Db, companyId: string): Prom
   return lines.join("\n");
 }
 
+/* The recent end of a conversation, oldest first.
+ *
+ * Asking for the first N rows in ascending order returns the *oldest* N. That
+ * reads correctly and is invisible until a thread outgrows N — after which the
+ * co-founder would never again see anything said this week, and the pane would
+ * stop showing new messages on reload. So: newest first, so the limit keeps
+ * the recent end, then turned round for reading.
+ */
+export async function recentMessages(
+  supabase: Db,
+  threadId: string,
+  limit: number,
+): Promise<{ id: string; role: "person" | "cofounder"; body: string }[]> {
+  const { data } = await supabase
+    .from("os_messages")
+    .select("id, role, body")
+    .eq("thread_id", threadId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  return (data ?? [])
+    .map((row) => ({ id: row.id, role: row.role as "person" | "cofounder", body: row.body }))
+    .reverse();
+}
+
+/* A window cut from the middle of a thread can open on the co-founder's half
+ * of an exchange, and a model conversation has to open on the person's. The
+ * orphaned reply is dropped rather than the turn refused. */
+export function openOnThePerson<T extends { role: "person" | "cofounder" }>(history: T[]): T[] {
+  const first = history.findIndex((message) => message.role === "person");
+  return first === -1 ? [] : history.slice(first);
+}
+
 export function systemFor(context: string): string {
   return `${SYSTEM}\n\nHere is the company, as the database has it right now.\n\n${context}`;
 }

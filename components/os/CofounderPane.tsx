@@ -1,5 +1,6 @@
 import { CofounderApp, type ChatMessage } from "@/components/os/CofounderApp";
 import { OS_COFOUNDER_CHAT_COPY } from "@/components/osCopy";
+import { recentMessages } from "@/lib/osCofounder";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import type { Locale } from "@/lib/i18n";
@@ -28,20 +29,8 @@ export async function CofounderPane({ locale }: { locale: Locale }) {
     .limit(1)
     .maybeSingle();
 
-  let messages: ChatMessage[] = [];
-  if (thread) {
-    const { data } = await supabase
-      .from("os_messages")
-      .select("id, role, body")
-      .eq("thread_id", thread.id)
-      .order("created_at", { ascending: true })
-      .limit(60);
-    messages = (data ?? []).map((row) => ({
-      id: row.id,
-      role: row.role as "person" | "cofounder",
-      body: row.body,
-    }));
-  }
+  // The latest sixty, read through the caller's own client.
+  const messages: ChatMessage[] = thread ? await recentMessages(supabase, thread.id, 60) : [];
 
   return <CofounderApp initialMessages={messages} copy={copy} canTalk />;
 }

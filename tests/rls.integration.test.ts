@@ -13,7 +13,13 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 import { runDueWorkflows } from "@/lib/osWorker";
-import { buildCompanyContext, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
+import {
+  buildCompanyContext,
+  openOnThePerson,
+  recentMessages,
+  type ModelEvent,
+  type ModelTurn,
+} from "@/lib/osCofounder";
 import { runCofounderTurn } from "@/lib/osCofounderRun";
 
 /* A model that says exactly what a test needs it to say, one scripted round
@@ -1763,6 +1769,52 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
 
         const { error: erased } = await admin.from("os_messages").delete().eq("id", message!.id);
         expect(erased).not.toBeNull();
+      });
+
+      /* Found by reading rather than by a failure, 17 September. The route and
+       * the pane both asked for the first N messages in ascending order, which
+       * is the OLDEST N. Nothing failed, because no scripted conversation was
+       * ever longer than the window — and a real one would have been within a
+       * fortnight, at which point the co-founder stops hearing anything new. */
+      it("reads the recent end of a long conversation, not the beginning", async () => {
+        const { data: thread } = await admin
+          .from("os_threads")
+          .insert({ company_id: companyId })
+          .select("id")
+          .single();
+
+        // Explicit, spaced timestamps: one bulk insert stamps every row with
+        // the same now() and leaves their order to chance.
+        const start = Date.now() - 50 * 60_000;
+        const rows = Array.from({ length: 45 }, (_, i) => ({
+          thread_id: thread!.id,
+          role: i % 2 === 0 ? "person" : "cofounder",
+          body: `message ${i + 1}`,
+          actor: i % 2 === 0 ? idA : null,
+          created_at: new Date(start + i * 60_000).toISOString(),
+        }));
+        const { error } = await admin.from("os_messages").insert(rows);
+        expect(error).toBeNull();
+
+        const recent = await recentMessages(admin, thread!.id, 40);
+        expect(recent).toHaveLength(40);
+        expect(recent[0].body).toBe("message 6");
+        expect(recent[39].body).toBe("message 45");
+
+        // A window of forty cut from forty-five opens on the co-founder's half
+        // of an exchange, and a model conversation must open on the person's.
+        const forModel = openOnThePerson(recent);
+        expect(forModel).toHaveLength(39);
+        expect(forModel[0]).toMatchObject({ role: "person", body: "message 7" });
+
+        // The pane reads through the person's own client, and row-level
+        // security still decides whose conversation it is.
+        const mine = await recentMessages(userA, thread!.id, 60);
+        expect(mine).toHaveLength(45);
+        expect(mine[44].body).toBe("message 45");
+
+        const theirs = await recentMessages(outsider, thread!.id, 60);
+        expect(theirs).toHaveLength(0);
       });
     });
 
