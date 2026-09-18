@@ -353,6 +353,17 @@
   to { opacity: 1; transform: none; }
 }
 
+/* Leaving: the same path in reverse, and slightly further, so closing reads
+   as the window going somewhere rather than the frame being dropped. Put
+   away sinks toward the dock; closed shrinks toward its own centre. */
+@keyframes os-window-away {
+  to { opacity: 0; transform: scale(0.94) translateY(24px); }
+}
+
+@keyframes os-window-close {
+  to { opacity: 0; transform: scale(0.97); }
+}
+
 .os-window {
   position: absolute;
   display: flex;
@@ -377,6 +388,13 @@
   border-top-color: rgb(255 255 255 / 0.14);
   border-bottom-color: rgb(0 0 0 / 0.5);
 }
+
+.os-window[data-leaving="away"] { animation: os-window-away 200ms var(--os-ease) forwards; pointer-events: none; }
+.os-window[data-leaving="close"] { animation: os-window-close 200ms var(--os-ease) forwards; pointer-events: none; }
+
+/* A blur under a pane that is 92% opaque is invisible and is not free: it is
+   recomputed on every frame of a drag. Off while anything moves. */
+.os-root[data-gesturing="true"] .os-window { backdrop-filter: none; }
 
 .os-window[data-focused="true"] {
   border-color: var(--os-line-2);
@@ -969,9 +987,52 @@
 
 @media (prefers-reduced-motion: reduce) {
   .os-window,
+  .os-notice,
   .os-command { animation: none; }
+  /* A window on its way out still has to go; without motion it goes at once. */
+  .os-window[data-leaving] { opacity: 0; }
   .os-root * { transition-duration: 1ms !important; }
 }
+
+/* ----------------------------------------------------------------- notices */
+
+/* One quiet line above the dock, for a few seconds. It confirms and asks for
+   nothing, so it takes no space from anything and cannot be pressed. */
+.os-notices {
+  position: absolute;
+  left: 50%;
+  bottom: calc(3.4rem + env(safe-area-inset-bottom));
+  translate: -50% 0;
+  display: grid;
+  gap: var(--os-gap-1);
+  justify-items: center;
+  z-index: 60;
+  pointer-events: none;
+}
+
+@keyframes os-notice-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.os-notice {
+  margin: 0;
+  padding: 0.38rem 0.85rem;
+  border: 1px solid var(--os-line-2);
+  border-radius: 999px;
+  background: var(--os-pane-solid);
+  box-shadow: var(--os-shadow);
+  color: var(--os-ink);
+  font-size: var(--os-t-small);
+  white-space: nowrap;
+  animation: os-notice-in var(--os-dur) var(--os-ease);
+}
+
+.os-notice[data-tone="problem"] { border-color: var(--os-danger); color: var(--os-danger); }
+
+/* A form that is working: its buttons go quiet until the answer comes back,
+   so a second press cannot approve something twice. */
+form[data-pending] button { opacity: 0.55; cursor: progress; pointer-events: none; }
 
 /* ------------------------------------------- site controls, inside the desk */
 

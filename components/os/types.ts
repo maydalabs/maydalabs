@@ -81,8 +81,12 @@ export type OsShellCopy = {
   close: string;
   minimize: string;
   resize: string;
+  leftHalf: string;
+  rightHalf: string;
+  fill: string;
   noCompany: string;
   leave: string;
   newSince: string;
   markSeen: string;
+  seen: string;
 };

@@ -18,7 +18,10 @@ import { OS_LANES } from "@/lib/osWork";
 export type CommandTarget =
   | { kind: "app"; id: OsAppId; label: string; hint: string }
   | { kind: "item"; id: string; label: string; hint: string }
-  | { kind: "memory"; id: string; label: string; hint: string };
+  | { kind: "memory"; id: string; label: string; hint: string }
+  /* Something the shell does to a window: the shell supplies these and runs
+   * them, the bar only lists them. */
+  | { kind: "command"; id: string; label: string; hint: string };
 
 export type CommandBarCopy = {
   placeholder: string;
@@ -47,10 +50,12 @@ export function OsCommandBar({
   targets,
   copy,
   onOpenApp,
+  onCommand,
 }: {
   targets: CommandTarget[];
   copy: CommandBarCopy;
   onOpenApp: (id: OsWindowKey) => void;
+  onCommand: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -122,9 +127,15 @@ export function OsCommandBar({
       );
     }
 
+    /* Nothing typed: the apps and what can be done to the front window —
+     * the desk's own commands, which is what a bar with nothing in it is
+     * for. Something typed: everything that matches, work and memories
+     * included, eight at most. */
     const matched = targets
-      .filter((target) => !needle || target.label.toLowerCase().includes(needle))
-      .slice(0, 8)
+      .filter((target) =>
+        needle ? target.label.toLowerCase().includes(needle) : target.kind === "app" || target.kind === "command",
+      )
+      .slice(0, needle ? 8 : 12)
       .map((target): Runnable => ({
         key: `${target.kind}:${target.id}`,
         label: target.label,
@@ -134,6 +145,7 @@ export function OsCommandBar({
           // list it belongs to.
           if (target.kind === "app") onOpenApp(target.id);
           else if (target.kind === "item") onOpenApp(documentKey(target.id));
+          else if (target.kind === "command") onCommand(target.id);
           else onOpenApp("memory");
         },
       }));
@@ -175,7 +187,7 @@ export function OsCommandBar({
       : [];
 
     return [...matched, ...verbs];
-  }, [adding, copy.add, copy.ask, copy.lanes, copy.tell, onOpenApp, targets, trimmed]);
+  }, [adding, copy.add, copy.ask, copy.lanes, copy.tell, onCommand, onOpenApp, targets, trimmed]);
 
   const run = useCallback(
     (index: number) => {

@@ -103,7 +103,16 @@ export async function CofounderQueue({
             {/* The relative time stands on its own. A prefix turns
                 "today" and "yesterday" into things nobody says. */}
             <p className="mayda-note" style={{ margin: 0 }}>{row.waited}</p>
-            {row.status === "review" ? <WorkItemDecision itemId={row.id!} copy={copy} /> : null}
+            {row.status === "review" ? (
+              <WorkItemDecision
+                itemId={row.id!}
+                copy={copy}
+                notices={{
+                  approve: OS_DOCUMENT_COPY[locale].notices.approve,
+                  send_back: OS_DOCUMENT_COPY[locale].notices.send_back,
+                }}
+              />
+            ) : null}
           </article>
         ))
       )}

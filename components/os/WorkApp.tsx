@@ -1,4 +1,5 @@
 import { addWorkItemAction } from "@/app/actions/cofounder";
+import { ActionForm } from "@/components/os/ActionForm";
 import { OpenItem } from "@/components/os/OpenItem";
 import { OsPaneEmpty } from "@/components/os/OsPaneEmpty";
 import { OS_DOCUMENT_COPY, OS_WORKAPP_COPY } from "@/components/osCopy";
@@ -57,9 +58,8 @@ export function WorkApp({ locale, items }: { locale: Locale; items: ItemRecord[]
 
   return (
     <div className="os-work">
-      {/* One line: what, and which part of the business. A plain form, so it
-          works before any JavaScript arrives. */}
-      <form action={addWorkItemAction} className="os-work-add">
+      {/* One line: what, and which part of the business. */}
+      <ActionForm action={addWorkItemAction} done={OS_DOCUMENT_COPY[locale].notices.added} className="os-work-add">
         <input
           name="title"
           required
@@ -74,7 +74,7 @@ export function WorkApp({ locale, items }: { locale: Locale; items: ItemRecord[]
         </select>
         <input name="due_on" type="date" aria-label={copy.dueLabel} title={copy.dueLabel} />
         <button type="submit" className="mayda-button">{copy.add}</button>
-      </form>
+      </ActionForm>
 
       {open.length === 0 && finished.length === 0 ? <OsPaneEmpty>{copy.empty}</OsPaneEmpty> : null}
 

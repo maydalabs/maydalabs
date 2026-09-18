@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { editWorkItemAction, type EditResult } from "@/app/actions/cofounder";
+import { notify } from "@/components/os/notice";
 import { OS_LANES } from "@/lib/osWork";
 
 /* Editing a piece of work, in place.
@@ -24,6 +25,7 @@ export type ItemEditorCopy = {
   cancel: string;
   frozen: string;
   editFailed: string;
+  saved: string;
   lanes: Record<string, string>;
 };
 
@@ -44,7 +46,14 @@ export function ItemEditor({
   dueOn: string | null;
   copy: ItemEditorCopy;
 }) {
-  const [state, submit, pending] = useActionState(editWorkItemAction, START);
+  const [state, submit, pending] = useActionState(
+    async (previous: EditResult, formData: FormData) => {
+      const result = await editWorkItemAction(previous, formData);
+      if (!result.error) notify(copy.saved);
+      return result;
+    },
+    START,
+  );
   /* Which submission the editor was opened for. A successful save bumps the
    * version past it and the editor closes by arithmetic, with no effect to
    * set state in; a refusal keeps it open with the reason. */

@@ -300,10 +300,14 @@ export default async function OsPage(props: LocalePageProps) {
         close: copy.close,
         minimize: copy.minimize,
         resize: copy.resize,
+        leftHalf: copy.leftHalf,
+        rightHalf: copy.rightHalf,
+        fill: copy.fill,
         noCompany: copy.noCompany,
         leave: copy.leave,
         newSince: copy.newSince,
         markSeen: copy.markSeen,
+        seen: copy.seen,
       }}
       commandTargets={[
         ...apps.map((app) => ({

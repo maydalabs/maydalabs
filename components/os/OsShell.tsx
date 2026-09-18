@@ -18,6 +18,8 @@ import { OsClock } from "@/components/os/OsClock";
 import { OsCommandBar, OS_COMMAND_EVENT, type CommandBarCopy, type CommandTarget } from "@/components/os/OsCommandBar";
 import { OsBackdrop } from "@/components/os/OsBackdrop";
 import { OsIcon } from "@/components/os/OsIcon";
+import { OsNotices } from "@/components/os/OsNotices";
+import { ActionForm } from "@/components/os/ActionForm";
 
 /* The desktop.
  *
@@ -37,6 +39,19 @@ const MIN_H = 160;
  * every desktop they have used, and without it a small screen means arranging
  * panes by hand every session. */
 const SNAP_EDGE = 26;
+
+/* How long a window takes to leave. The CSS animation is this long too; the
+ * state change waits for it rather than listening for animationend, which
+ * never fires when a person has asked for reduced motion. */
+const LEAVE_MS = 200;
+
+/* Where a window can be sent with a chord or a command. */
+type Placement = "left" | "right" | "full";
+
+/* The chords are Rectangle's — ⌃⌥ and an arrow — because that is the
+ * convention on the Mac this imitates, and because plain ⌥ combinations are
+ * how a Turkish keyboard types @ and {. */
+export type WindowCommand = Placement | "away" | "close" | "next";
 
 type Gesture =
   | { kind: "move"; app: OsWindowKey; pointerId: number; dx: number; dy: number }
@@ -88,6 +103,8 @@ export function OsShell({
 }) {
   const [windows, setWindows] = useState<OsWindowState[]>(() => hydrateWindows(apps, documents, storedLayout));
   const [gesture, setGesture] = useState<Gesture | null>(null);
+  /* Windows on their way out, still drawn while they go. */
+  const [leaving, setLeaving] = useState<Map<OsWindowKey, "close" | "away">>(() => new Map());
   const [narrow, setNarrow] = useState(false);
   const [phoneApp, setPhoneApp] = useState<Pane>(BRIEF_PANE);
 
@@ -151,34 +168,125 @@ export function OsShell({
     [update],
   );
 
+  /* A window leaves the way it arrived: drawn for a moment on its way out,
+   * then gone. The state changes when the moment is over. */
+  const leave = useCallback(
+    (app: OsWindowKey, how: "close" | "away") => {
+      setLeaving((was) => {
+        if (was.has(app)) return was;
+        const next = new Map(was);
+        next.set(app, how);
+        return next;
+      });
+      setTimeout(() => {
+        update((prev) =>
+          prev.map((w) => (w.app === app ? (how === "close" ? { ...w, open: false } : { ...w, minimized: true }) : w)),
+        );
+        setLeaving((was) => {
+          const next = new Map(was);
+          next.delete(app);
+          return next;
+        });
+      }, LEAVE_MS);
+    },
+    [update],
+  );
+
   const toggle = useCallback(
     (app: OsWindowKey) => {
       if (narrow) {
         setPhoneApp(app);
         return;
       }
-      update((prev) => {
-        const current = prev.find((w) => w.app === app);
-        if (!current) return prev;
-        const highest = prev.reduce((high, w) => Math.max(high, w.z), 0);
-        // Open it, raise it, or put it away: one control, three meanings,
-        // decided by what the window is already doing.
-        const next =
-          !current.open || current.minimized
-            ? { ...current, open: true, minimized: false, z: highest + 1 }
-            : current.z === highest
-              ? { ...current, minimized: true }
-              : { ...current, z: highest + 1 };
-        return prev.map((w) => (w.app === app ? next : w));
-      });
+      const current = windows.find((w) => w.app === app);
+      if (!current) return;
+      const highest = windows.reduce((high, w) => Math.max(high, w.z), 0);
+      // Open it, raise it, or put it away: one control, three meanings,
+      // decided by what the window is already doing.
+      if (!current.open || current.minimized) focus(app);
+      else if (current.z === highest) leave(app, "away");
+      else focus(app);
     },
-    [narrow, update],
+    [focus, leave, narrow, windows],
   );
 
-  const close = useCallback(
-    (app: OsWindowKey) => update((prev) => prev.map((w) => (w.app === app ? { ...w, open: false } : w))),
+  const close = useCallback((app: OsWindowKey) => leave(app, "close"), [leave]);
+
+  /* The window in front: the one chords and commands act on. */
+  const focused = useMemo(() => {
+    const open = windows.filter((w) => w.open && !w.minimized && surfaces.has(w.app));
+    return open.reduce<OsWindowState | null>((top, w) => (top === null || w.z > top.z ? w : top), null);
+  }, [surfaces, windows]);
+
+  /* Half the desk, or all of it. Pixels from here on: a placement is a
+   * choice about this screen, which is what `placed` means. */
+  const place = useCallback(
+    (app: OsWindowKey, where: Placement) => {
+      const bounds = surfaceRef.current?.getBoundingClientRect();
+      if (!bounds) return;
+      const rect =
+        where === "full"
+          ? { x: 0, y: 0, w: bounds.width, h: bounds.height }
+          : where === "left"
+            ? { x: 0, y: 0, w: bounds.width / 2, h: bounds.height }
+            : { x: bounds.width / 2, y: 0, w: bounds.width / 2, h: bounds.height };
+      update((prev) => prev.map((w) => (w.app === app ? { ...w, ...rect, placed: true } : w)));
+    },
     [update],
   );
+
+  const command = useCallback(
+    (what: WindowCommand) => {
+      if (narrow) return;
+      if (what === "next") {
+        // Front to back, then round again: the window under the front one.
+        const open = windows
+          .filter((w) => w.open && !w.minimized && surfaces.has(w.app))
+          .sort((a, b) => b.z - a.z);
+        if (open.length > 1) focus(open[open.length - 1].app);
+        return;
+      }
+      if (!focused) return;
+      if (what === "away") leave(focused.app, "away");
+      else if (what === "close") leave(focused.app, "close");
+      else place(focused.app, what);
+    },
+    [focus, focused, leave, narrow, place, surfaces, windows],
+  );
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (!event.ctrlKey || !event.altKey || event.metaKey) return;
+      const chords: Record<string, WindowCommand> = {
+        ArrowLeft: "left",
+        ArrowRight: "right",
+        ArrowUp: "full",
+        Enter: "full",
+        ArrowDown: "away",
+        Backspace: "close",
+        Tab: "next",
+      };
+      const what = chords[event.key];
+      if (what) {
+        event.preventDefault();
+        command(what);
+        return;
+      }
+      // ⌃⌥1 … ⌃⌥7: the dock, by position. The physical key first, because
+      // on some layouts ⌥ turns the digit row into symbols; the key itself
+      // second, for the keyboards that report no code at all.
+      const digit = /^Digit([1-9])$/.exec(event.code) ?? /^([1-9])$/.exec(event.key);
+      if (digit) {
+        const app = apps[Number(digit[1]) - 1];
+        if (app) {
+          event.preventDefault();
+          toggle(app.id);
+        }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [apps, command, toggle]);
 
   /* Opening a document. It may already have a window (remembered, or opened
    * earlier in this visit), in which case it is simply raised. Otherwise it
@@ -350,10 +458,26 @@ export function OsShell({
     <div className="os-root" data-gesturing={gesture ? "true" : "false"}>
       <OsBackdrop activity={Math.min(waitingCount / 5, 1)} />
       <OsCommandBar
-        targets={commandTargets}
+        targets={[
+          ...commandTargets,
+          /* Window commands, for anyone who does not know the chords, and as
+             the place to learn them: the hint is the chord. Only while there
+             is a window to act on. */
+          ...(focused && !narrow
+            ? ([
+                { kind: "command", id: "left", label: copy.leftHalf, hint: "⌃⌥←" },
+                { kind: "command", id: "right", label: copy.rightHalf, hint: "⌃⌥→" },
+                { kind: "command", id: "full", label: copy.fill, hint: "⌃⌥↑" },
+                { kind: "command", id: "away", label: `${copy.minimize}: ${surfaces.get(focused.app)?.title ?? ""}`, hint: "⌃⌥↓" },
+                { kind: "command", id: "close", label: `${copy.close}: ${surfaces.get(focused.app)?.title ?? ""}`, hint: "⌃⌥⌫" },
+              ] satisfies CommandTarget[])
+            : []),
+        ]}
         copy={commandCopy}
         onOpenApp={(key) => (surfaces.get(key)?.isDocument ? openDocument(key) : focus(key))}
+        onCommand={(id) => command(id as WindowCommand)}
       />
+      <OsNotices />
 
       <div className="os-bar">
         <span className="os-bar-brand">MaydaOS</span>
@@ -374,12 +498,12 @@ export function OsShell({
               those are different questions and conflating them is how a badge
               stops meaning anything. */}
           {unreadCount > 0 ? (
-            <form action={markSeenAction} className="os-bar-new">
+            <ActionForm action={markSeenAction} done={copy.seen} className="os-bar-new">
               <span className="os-bar-count">
                 <OsIcon name="new" size={9} /> {unreadCount} {copy.newSince}
               </span>
               <button type="submit" className="os-bar-exit">{copy.markSeen}</button>
-            </form>
+            </ActionForm>
           ) : null}
           <span className="os-bar-count" data-waiting={waitingCount}>
             <span className="os-bar-long">{copy.waitingLabel}</span>
@@ -456,6 +580,7 @@ export function OsShell({
                   key={state.app}
                   className="os-window"
                   data-focused={state.z === topZ}
+                  data-leaving={leaving.get(state.app)}
                   style={style}
                   onPointerDown={() => focus(state.app)}
                   aria-label={app.title}

@@ -338,6 +338,7 @@ export async function saveMemberWorkflowAction(
 
   revalidatePath("/portal");
   revalidatePath("/portal/workflows");
+  revalidatePath("/os");
   return { status: "saved" };
 }
 
@@ -356,6 +357,7 @@ export async function deleteMemberWorkflowAction(formData: FormData): Promise<vo
 
   revalidatePath("/portal");
   revalidatePath("/portal/workflows");
+  revalidatePath("/os");
 }
 
 

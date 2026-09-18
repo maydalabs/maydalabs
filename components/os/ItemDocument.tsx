@@ -135,6 +135,7 @@ export function ItemDocument({ locale, item, events }: { locale: Locale; item: I
               cancel: copy.cancel,
               frozen: copy.frozen,
               editFailed: copy.editFailed,
+              saved: copy.notices.saved,
               lanes,
             }}
           />

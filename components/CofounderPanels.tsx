@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { startCompanyAction, decideWorkItemAction, type CofounderState } from "@/app/actions/cofounder";
 import type { OsCofounderCopy } from "@/components/osCopy";
+import { ActionForm } from "@/components/os/ActionForm";
 
 const IDLE: CofounderState = { status: "idle" };
 
@@ -33,12 +34,19 @@ export function StartCompanyForm({ copy }: { copy: OsCofounderCopy }) {
   );
 }
 
-/* Approve and send back. Both are ordinary form submissions, so they work
- * before any JavaScript arrives: a decision should never be the thing that
- * needs a good connection. */
-export function WorkItemDecision({ itemId, copy }: { itemId: string; copy: OsCofounderCopy }) {
+/* Approve and send back. The form says which it did when it is done: a
+ * decision that lands in silence is a decision you make twice. */
+export function WorkItemDecision({
+  itemId,
+  copy,
+  notices,
+}: {
+  itemId: string;
+  copy: OsCofounderCopy;
+  notices: { approve: string; send_back: string };
+}) {
   return (
-    <form action={decideWorkItemAction} className="mayda-os-decide">
+    <ActionForm action={decideWorkItemAction} done={notices} className="mayda-os-decide">
       <input type="hidden" name="itemId" value={itemId} />
       <label className="mayda-field" style={{ flex: "1 1 16rem" }}>
         <span>{copy.noteLabel}</span>
@@ -52,6 +60,6 @@ export function WorkItemDecision({ itemId, copy }: { itemId: string; copy: OsCof
           {copy.sendBack}
         </button>
       </div>
-    </form>
+    </ActionForm>
   );
 }

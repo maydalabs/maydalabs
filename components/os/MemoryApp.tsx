@@ -1,3 +1,4 @@
+import { ActionForm } from "@/components/os/ActionForm";
 import { OsPaneEmpty } from "@/components/os/OsPaneEmpty";
 import { OS_MEMORY_COPY } from "@/components/osCopy";
 import { teachMemoryAction, retireMemoryAction } from "@/app/actions/memory";
@@ -39,7 +40,7 @@ export async function MemoryApp({ locale }: { locale: Locale }) {
 
   return (
     <div className="mayda-stack" style={{ gap: "1rem" }}>
-      <form action={teachMemoryAction} className="os-memory-teach">
+      <ActionForm action={teachMemoryAction} done={copy.noted} className="os-memory-teach">
         <input name="fact" maxLength={2000} placeholder={copy.teachPlaceholder} aria-label={copy.teachLabel} required />
         <select name="kind" defaultValue="fact" aria-label={copy.kindLabel}>
           <option value="fact">{copy.kinds.fact}</option>
@@ -49,7 +50,7 @@ export async function MemoryApp({ locale }: { locale: Locale }) {
           <option value="decision">{copy.kinds.decision}</option>
         </select>
         <button type="submit" className="mayda-button">{copy.teach}</button>
-      </form>
+      </ActionForm>
 
       {(live ?? []).length === 0 ? (
         <OsPaneEmpty>{copy.empty}</OsPaneEmpty>
@@ -64,11 +65,11 @@ export async function MemoryApp({ locale }: { locale: Locale }) {
                   {row.source === "person" ? copy.fromYou : copy.fromIt}
                 </span>
               </div>
-              <form action={retireMemoryAction} className="os-memory-retire">
+              <ActionForm action={retireMemoryAction} done={copy.retired} className="os-memory-retire">
                 <input type="hidden" name="memoryId" value={row.id} />
                 <input name="reason" maxLength={500} placeholder={copy.reasonPlaceholder} aria-label={copy.reasonLabel} />
                 <button type="submit" className="mayda-status is-muted">{copy.retire}</button>
-              </form>
+              </ActionForm>
             </li>
           ))}
         </ul>
