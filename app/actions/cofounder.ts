@@ -252,7 +252,7 @@ export async function editWorkItemAction(previous: EditResult, formData: FormDat
   if (!title) return { error: "empty", version };
   const laneRaw = String(formData.get("lane") ?? "");
   const lane = (OS_LANES as readonly string[]).includes(laneRaw) ? laneRaw : null;
-  const notes = String(formData.get("notes") ?? "").slice(0, 20_000);
+  const notes = String(formData.get("notes") ?? "").slice(0, 8_000);
 
   const supabase = await createSupabaseServerClient();
   const { error, count } = await supabase
@@ -266,4 +266,27 @@ export async function editWorkItemAction(previous: EditResult, formData: FormDat
 
   revalidatePath("/os");
   return { error: null, version };
+}
+
+/*
+ * An operator routes the site's leads to a company, or stops.
+ *
+ * Through the caller's own client: the connection table's policy admits
+ * operators and nobody else, so a member pressing this gets the database's
+ * refusal, not a form's. The company id is the one on the form, but the
+ * function refuses any company the caller could not route to anyway.
+ */
+export async function connectSiteLeadsAction(formData: FormData): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  const claims = await getVerifiedClaims();
+  if (!claims?.sub) return;
+
+  const companyId = String(formData.get("companyId") ?? "");
+  if (!/^[0-9a-f-]{36}$/.test(companyId)) return;
+  const active = String(formData.get("active") ?? "") === "on";
+
+  const supabase = await createSupabaseServerClient();
+  await supabase.rpc("os_connect_site_leads", { p_company_id: companyId, p_active: active });
+
+  revalidatePath("/os");
 }

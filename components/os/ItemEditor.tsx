@@ -94,7 +94,7 @@ export function ItemEditor({
       </div>
       <label className="mayda-field">
         <span>{copy.editNote}</span>
-        <textarea name="notes" defaultValue={notes} rows={6} maxLength={20_000} />
+        <textarea name="notes" defaultValue={notes} rows={6} maxLength={8_000} />
       </label>
 
       {refusal ? (

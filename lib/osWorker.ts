@@ -198,7 +198,8 @@ export async function runDueWorkflows(
         title: workflow.name,
         status: "review",
         required_action: workflow.required_action,
-        notes: draft.draft.slice(0, 20_000),
+        // The column takes 8000; the run below keeps the whole draft.
+        notes: draft.draft.slice(0, 8_000),
         sources: sourceRecord,
         // `by` is what the document reads to say "prepared while you were away";
         // without it the worker's items arrived unattributed.

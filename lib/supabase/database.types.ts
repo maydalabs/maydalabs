@@ -423,6 +423,38 @@ export type Database = {
           },
         ]
       }
+      os_connections: {
+        Row: {
+          active: boolean
+          company_id: string
+          created_at: string
+          id: string
+          kind: string
+        }
+        Insert: {
+          active?: boolean
+          company_id: string
+          created_at?: string
+          id?: string
+          kind: string
+        }
+        Update: {
+          active?: boolean
+          company_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_connections_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       os_credits: {
         Row: {
           created_at: string
@@ -645,6 +677,75 @@ export type Database = {
             columns: ["workflow_id"]
             isOneToOne: false
             referencedRelation: "os_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      os_signals: {
+        Row: {
+          company_id: string
+          external_id: string
+          id: string
+          item_id: string | null
+          kind: string
+          payload: Json
+          received_at: string
+          source: string
+        }
+        Insert: {
+          company_id: string
+          external_id: string
+          id?: string
+          item_id?: string | null
+          kind: string
+          payload?: Json
+          received_at?: string
+          source: string
+        }
+        Update: {
+          company_id?: string
+          external_id?: string
+          id?: string
+          item_id?: string | null
+          kind?: string
+          payload?: Json
+          received_at?: string
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_signals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_signals_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_finished_lately"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_signals_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_needs_you"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_signals_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_work_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_signals_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_work_open"
             referencedColumns: ["id"]
           },
         ]
@@ -1541,6 +1642,10 @@ export type Database = {
       }
       os_complete_item: {
         Args: { p_item_id: string; p_note?: string; p_url?: string }
+        Returns: undefined
+      }
+      os_connect_site_leads: {
+        Args: { p_active?: boolean; p_company_id: string }
         Returns: undefined
       }
       os_dismiss_item: {

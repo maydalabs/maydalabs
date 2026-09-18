@@ -295,7 +295,8 @@ export async function fileWork(
     title,
     // NOT NULL on the table: an item with nothing written is an item
     // with an empty note, not an item with a missing one.
-    notes: text("notes", 20_000),
+    // The column takes 8000: a longer draft would be refused and lost.
+    notes: text("notes", 8_000),
     status: requiredAction ? "review" : "drafted",
     required_action: requiredAction,
     metadata: { by: "cofounder" },

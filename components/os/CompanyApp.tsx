@@ -1,3 +1,5 @@
+import { connectSiteLeadsAction } from "@/app/actions/cofounder";
+import { ActionForm } from "@/components/os/ActionForm";
 import { OsPaneEmpty } from "@/components/os/OsPaneEmpty";
 import { OS_SHELL_COPY } from "@/components/osCopy";
 import { currentCompany } from "@/lib/osCompany";
@@ -25,10 +27,14 @@ export async function CompanyApp({ locale }: { locale: Locale }) {
 
   if (!company) return <OsPaneEmpty>{copy.companyNothing}</OsPaneEmpty>;
 
-  const { data: members } = await supabase
-    .from("os_company_members")
-    .select("user_id, role, created_at")
-    .eq("company_id", company.id);
+  const [{ data: members }, { data: connection }, { data: operator }] = await Promise.all([
+    supabase.from("os_company_members").select("user_id, role, created_at").eq("company_id", company.id),
+    supabase.from("os_connections").select("active").eq("company_id", company.id).eq("kind", "maydalabs_site").maybeSingle(),
+    /* Whether this person may change the routing: the operator view shows
+     * a row to operators and nothing to anyone else. */
+    supabase.from("operator_status").select("user_id").maybeSingle(),
+  ]);
+  const routed = connection?.active === true;
 
   return (
     <div className="mayda-stack" style={{ gap: "0.9rem" }}>
@@ -54,6 +60,25 @@ export async function CompanyApp({ locale }: { locale: Locale }) {
             ? `1 · ${(members ?? [])[0]?.role === "owner" ? copy.companyOwner : copy.companyMember}`
             : `${(members ?? []).length}`}
         </p>
+      </div>
+
+      {/* What arrives here from outside. The first source is the site's own
+          lead form; an operator decides which company receives it, because
+          the site's leads belong to exactly one. */}
+      <div className="mayda-stack" style={{ gap: "0.4rem" }}>
+        <p className="mayda-kicker">{copy.companyLeads}</p>
+        <p className="mayda-body" style={{ margin: 0 }}>{routed ? copy.companyLeadsOn : copy.companyLeadsOff}</p>
+        {operator ? (
+          <ActionForm action={connectSiteLeadsAction} done={routed ? copy.companyLeadsOff : copy.companyLeadsOn}>
+            <input type="hidden" name="companyId" value={company.id} />
+            <input type="hidden" name="active" value={routed ? "off" : "on"} />
+            <button type="submit" className="mayda-button mayda-button-outline">
+              {routed ? copy.disconnectLeads : copy.connectLeads}
+            </button>
+          </ActionForm>
+        ) : (
+          <p className="mayda-note" style={{ margin: 0 }}>{copy.leadsOperator}</p>
+        )}
       </div>
     </div>
   );

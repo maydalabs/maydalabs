@@ -1,6 +1,6 @@
 import { ItemEditor } from "@/components/os/ItemEditor";
 import { ItemLifecycle } from "@/components/os/ItemLifecycle";
-import { OS_DOCUMENT_COPY, OS_WORKAPP_COPY } from "@/components/osCopy";
+import { OS_DOCUMENT_COPY, OS_RECORD_COPY, OS_WORKAPP_COPY } from "@/components/osCopy";
 import { needsAPerson } from "@/lib/osWork";
 import type { Locale } from "@/lib/i18n";
 
@@ -75,8 +75,10 @@ export function ItemDocument({ locale, item, events }: { locale: Locale; item: I
   const claims = asClaims(item.metadata);
   const by = author(item.metadata);
   /* The serif means "the co-founder wrote this". Work a person added
-   * themselves is theirs, and says so in the type. */
+   * themselves is theirs, and what arrived from outside is someone else's;
+   * both say so in the type. */
   const mine = by === "person";
+  const arrived = by === "signal";
   const when = new Intl.DateTimeFormat(locale, { month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false });
   const day = new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" });
   const lanes = OS_WORKAPP_COPY[locale].lanes;
@@ -163,9 +165,9 @@ export function ItemDocument({ locale, item, events }: { locale: Locale; item: I
       ) : null}
 
       <section className="os-doc-section">
-        <h2 className="os-doc-label">{mine ? copy.yourNote : copy.draft}</h2>
+        <h2 className="os-doc-label">{mine ? copy.yourNote : arrived ? copy.arrived : copy.draft}</h2>
         {item.notes?.trim() ? (
-          <div className="os-doc-draft" data-voice={mine ? "person" : "cofounder"}>{item.notes}</div>
+          <div className="os-doc-draft" data-voice={mine || arrived ? "person" : "cofounder"}>{item.notes}</div>
         ) : (
           <p className="os-doc-quiet">{copy.nothingWritten}</p>
         )}
@@ -222,7 +224,11 @@ export function ItemDocument({ locale, item, events }: { locale: Locale; item: I
                 <span className="os-record-who" data-person={event.actor !== null}>
                   {event.actor !== null ? copy.byPerson : copy.bySystem}
                 </span>
-                <span className="os-record-what">{event.event.replace(/_/g, " ")}</span>
+                {/* The record's verbs, so the same act is not "arrived" in
+                    one window and "received" in the next. */}
+                <span className="os-record-what">
+                  {OS_RECORD_COPY[locale].events[event.event] ?? event.event.replace(/_/g, " ")}
+                </span>
                 <span className="os-record-when">{when.format(new Date(event.at))}</span>
               </li>
             ))}

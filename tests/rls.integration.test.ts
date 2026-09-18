@@ -2240,6 +2240,128 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       });
     });
 
+    /* The first input, 18 September. A lead from the site's own form becomes
+     * a piece of sales work for the one company connected to the site — no
+     * model, a rule — and the record says the system filed it. */
+    describe("the first input", () => {
+      let connectedId: string;
+      let otherId: string;
+      let operator: Db;
+      let operatorId: string;
+
+      beforeAll(async () => {
+        const [{ data: connected }, { data: other }] = await Promise.all([
+          admin.from("os_companies").insert({ name: `Connected Co ${suffix}` }).select("id").single(),
+          admin.from("os_companies").insert({ name: `Other Co ${suffix}` }).select("id").single(),
+        ]);
+        connectedId = connected!.id;
+        otherId = other!.id;
+        await admin.from("os_company_members").insert({ company_id: connectedId, user_id: idA, role: "owner" });
+        await admin.from("os_company_members").insert({ company_id: otherId, user_id: idA, role: "owner" });
+
+        const email = `rls-operator-${suffix}@example.com`;
+        const created = await admin.auth.admin.createUser({ email, password: "rls-test-password-1", email_confirm: true });
+        operatorId = created.data.user!.id;
+        runSql(`insert into internal.operators (user_id, label) values ('${operatorId}', 'signals-operator');`);
+        operator = anonClient();
+        await operator.auth.signInWithPassword({ email, password: "rls-test-password-1" });
+      });
+
+      it("lets only an operator connect a company to the site's leads", async () => {
+        const { error: refused } = await userA.rpc("os_connect_site_leads", { p_company_id: connectedId });
+        expect(refused).not.toBeNull();
+        expect(refused!.message).toContain("row-level security");
+
+        const { error } = await operator.rpc("os_connect_site_leads", { p_company_id: connectedId });
+        expect(error).toBeNull();
+
+        // A member sees their company's connection; nobody else's.
+        const { data: mine } = await userA.from("os_connections").select("kind, active").eq("company_id", connectedId);
+        expect(mine).toEqual([{ kind: "maydalabs_site", active: true }]);
+        const { data: theirs } = await outsider.from("os_connections").select("id").eq("company_id", connectedId);
+        expect(theirs ?? []).toHaveLength(0);
+      });
+
+      it("turns a new lead into sales work, due tomorrow, for the connected company only", async () => {
+        const { data: lead, error } = await admin
+          .from("lead_intakes")
+          .insert({
+            name: "Ayşe Demir",
+            email: `ayse-${suffix}@egefreight.example`,
+            company: "Ege Freight",
+            company_stage: "growing",
+            budget_range: "10k_30k",
+            message: "We ship weekly to Hamburg and want a second quote.",
+            source: "contact",
+            locale: "tr",
+            consent_contact: true,
+            consent_updates: false,
+          })
+          .select("id")
+          .single();
+        expect(error).toBeNull();
+
+        // Other companies on this stack may be connected too (a local desk
+        // routed by hand); the claim is about these two.
+        const { data: items } = await admin
+          .from("os_work_items")
+          .select("company_id, lane, kind, title, status, notes, due_on, metadata")
+          .contains("metadata", { lead_id: lead!.id })
+          .in("company_id", [connectedId, otherId]);
+        expect(items).toHaveLength(1);
+        const item = items![0];
+        expect(item.company_id).toBe(connectedId);
+        expect(item).toMatchObject({ lane: "sales", kind: "reply", status: "pending", title: "Reply to Ayşe Demir — Ege Freight" });
+        expect(item.notes).toContain("second quote");
+        expect(item.notes).toContain("They agreed to be contacted.");
+        // The form stores codes; what arrives reads as the visitor saw it.
+        expect(item.notes).toContain("Stage: Growing");
+        expect(item.notes).toContain("Budget: $10k–30k");
+        expect(item.notes).not.toContain("10k_30k");
+        const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
+        expect(item.due_on).toBe(tomorrow);
+        expect((item.metadata as { by?: string }).by).toBe("signal");
+
+        // The record says the system filed it, and the signal remembers the lead.
+        const { data: signals } = await userA.from("os_signals").select("source, kind, external_id, item_id").eq("company_id", connectedId);
+        expect(signals).toHaveLength(1);
+        expect(signals![0]).toMatchObject({ source: "maydalabs_site", kind: "lead", external_id: lead!.id });
+        const { data: events } = await admin
+          .from("os_work_item_events")
+          .select("event, actor")
+          .eq("item_id", signals![0].item_id!);
+        expect(events).toEqual([{ event: "arrived", actor: null }]);
+
+        // The unconnected company got nothing, and an outsider sees no signal.
+        const { data: none } = await admin.from("os_work_items").select("id").eq("company_id", otherId);
+        expect(none ?? []).toHaveLength(0);
+        const { data: hidden } = await outsider.from("os_signals").select("id").eq("company_id", connectedId);
+        expect(hidden ?? []).toHaveLength(0);
+      });
+
+      it("lets no browser write a signal", async () => {
+        const { error } = await userA
+          .from("os_signals")
+          .insert({ company_id: connectedId, source: "forged", kind: "lead", external_id: "x" });
+        expect(error).not.toBeNull();
+      });
+
+      it("stops filing once the connection is switched off", async () => {
+        const { error } = await operator.rpc("os_connect_site_leads", { p_company_id: connectedId, p_active: false });
+        expect(error).toBeNull();
+        await admin.from("lead_intakes").insert({
+          name: "Quiet Lead",
+          email: `quiet-${suffix}@example.com`,
+          source: "contact",
+          locale: "en",
+          consent_contact: false,
+          consent_updates: false,
+        });
+        const { data: signals } = await admin.from("os_signals").select("id").eq("company_id", connectedId);
+        expect(signals).toHaveLength(1);
+      });
+    });
+
     describe("a member's own workflows", () => {
       const made: string[] = [];
 
