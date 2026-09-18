@@ -1,3 +1,4 @@
+import { ItemEditor } from "@/components/os/ItemEditor";
 import { ItemLifecycle } from "@/components/os/ItemLifecycle";
 import { OS_DOCUMENT_COPY, OS_WORKAPP_COPY } from "@/components/osCopy";
 import { needsAPerson } from "@/lib/osWork";
@@ -30,6 +31,10 @@ export type ItemRecord = {
   artifacts: unknown;
   metadata: unknown;
   updated_at: string;
+  due_on: string | null;
+  /* From the database's clock, for open work; null for finished work and
+   * for anything undated. */
+  due_in_days: number | null;
 };
 
 export type ItemEvent = {
@@ -73,12 +78,18 @@ export function ItemDocument({ locale, item, events }: { locale: Locale; item: I
    * themselves is theirs, and says so in the type. */
   const mine = by === "person";
   const when = new Intl.DateTimeFormat(locale, { month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false });
+  const day = new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" });
+  const lanes = OS_WORKAPP_COPY[locale].lanes;
+  /* Everything a person wrote is theirs to change until the database draws
+   * the line — approved, finished, or already signed for. The editor is not
+   * offered past the first two, and the third is the database's to refuse. */
+  const editable = !over && item.status !== "approved";
 
   return (
     <article className="os-doc">
       <header className="os-doc-head">
         <p className="mayda-kicker">
-          {item.lane} / {item.kind}
+          {lanes[item.lane] ?? item.lane} / {item.kind}
           {by && copy.draftedBy[by] ? ` · ${copy.draftedBy[by]}` : ""}
         </p>
         <h1 className="os-doc-title">{item.title}</h1>
@@ -98,7 +109,36 @@ export function ItemDocument({ locale, item, events }: { locale: Locale; item: I
               {copy.waitingOn} <code>{item.required_action}</code>
             </span>
           ) : null}
+          {item.due_on && !over ? (
+            <span className="os-doc-due" data-overdue={item.due_in_days !== null && item.due_in_days < 0}>
+              {(item.due_in_days !== null && item.due_in_days < 0 ? copy.overdue : copy.due).replace(
+                "{date}",
+                day.format(new Date(`${item.due_on}T00:00:00`)),
+              )}
+            </span>
+          ) : null}
         </p>
+        {editable ? (
+          <ItemEditor
+            itemId={item.id}
+            title={item.title}
+            lane={item.lane}
+            notes={item.notes ?? ""}
+            dueOn={item.due_on}
+            copy={{
+              edit: copy.edit,
+              editTitle: copy.editTitle,
+              editLane: copy.editLane,
+              editNote: copy.editNote,
+              editDue: copy.editDue,
+              save: copy.save,
+              cancel: copy.cancel,
+              frozen: copy.frozen,
+              editFailed: copy.editFailed,
+              lanes,
+            }}
+          />
+        ) : null}
       </header>
 
       {/* Where it went comes first on finished work: it is the answer to the

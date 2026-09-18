@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { teachMemoryAction } from "@/app/actions/memory";
+import { captureWorkItemAction } from "@/app/actions/cofounder";
 import { documentKey, type OsAppId, type OsWindowKey } from "@/components/os/types";
+import { OS_LANES } from "@/lib/osWork";
 
 /* One input that can do anything.
  *
@@ -22,6 +24,9 @@ export type CommandBarCopy = {
   placeholder: string;
   ask: string;
   tell: string;
+  add: string;
+  lane: string;
+  lanes: Record<string, string>;
   open: string;
   nothing: string;
   hint: string;
@@ -50,6 +55,10 @@ export function OsCommandBar({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [cursor, setCursor] = useState(0);
+  /* A sentence on its way into the work list, waiting to be told which part
+   * of the business it belongs to. The bar's one two-step command: the
+   * alternative — a silent default lane — files everything under "ops". */
+  const [adding, setAdding] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   /* Command-K on a Mac, Control-K elsewhere, and both everywhere — checking
@@ -62,14 +71,20 @@ export function OsCommandBar({
         setOpen((was) => !was);
         setQuery("");
         setCursor(0);
+        setAdding(null);
       } else if (event.key === "Escape") {
-        setOpen(false);
+        // Escape steps back out of the lane question before it closes the bar.
+        setAdding((was) => {
+          if (was === null) setOpen(false);
+          return null;
+        });
       }
     };
     const onOpen = () => {
       setOpen(true);
       setQuery("");
       setCursor(0);
+      setAdding(null);
     };
 
     window.addEventListener("keydown", onKey);
@@ -88,6 +103,24 @@ export function OsCommandBar({
 
   const results = useMemo<Runnable[]>(() => {
     const needle = trimmed.toLowerCase();
+
+    /* The lane step: the list is the five parts of the business, and
+     * choosing one files the sentence and opens the work list it landed in. */
+    if (adding !== null) {
+      return OS_LANES.filter((lane) => !needle || (copy.lanes[lane] ?? lane).toLowerCase().includes(needle)).map(
+        (lane): Runnable => ({
+          key: `lane:${lane}`,
+          label: copy.lanes[lane] ?? lane,
+          hint: "↵",
+          run: () => {
+            const form = new FormData();
+            form.set("title", adding);
+            form.set("lane", lane);
+            void captureWorkItemAction(form).then(() => onOpenApp("work"));
+          },
+        }),
+      );
+    }
 
     const matched = targets
       .filter((target) => !needle || target.label.toLowerCase().includes(needle))
@@ -131,18 +164,32 @@ export function OsCommandBar({
               onOpenApp("memory");
             },
           },
+          {
+            key: "verb:add",
+            label: `${copy.add} ${trimmed}`,
+            hint: "",
+            // Not a finished command: it asks one question first.
+            run: () => setAdding(trimmed),
+          },
         ]
       : [];
 
     return [...matched, ...verbs];
-  }, [copy.ask, copy.tell, onOpenApp, targets, trimmed]);
+  }, [adding, copy.add, copy.ask, copy.lanes, copy.tell, onOpenApp, targets, trimmed]);
 
   const run = useCallback(
     (index: number) => {
       const chosen = results[index];
       if (!chosen) return;
-      setOpen(false);
       setQuery("");
+      setCursor(0);
+      if (chosen.key === "verb:add") {
+        // The bar stays open for the lane question; everything else closes it.
+        chosen.run();
+        return;
+      }
+      setOpen(false);
+      setAdding(null);
       chosen.run();
     },
     [results],
@@ -159,11 +206,16 @@ export function OsCommandBar({
       }}
     >
       <div className="os-command" role="dialog" aria-modal="true" aria-label={copy.placeholder}>
+        {adding !== null ? (
+          <p className="os-command-adding">
+            {copy.add} <strong>{adding}</strong>
+          </p>
+        ) : null}
         <input
           ref={inputRef}
           className="os-command-input"
           value={query}
-          placeholder={copy.placeholder}
+          placeholder={adding !== null ? copy.lane : copy.placeholder}
           onChange={(event) => {
             setQuery(event.target.value);
             setCursor(0);

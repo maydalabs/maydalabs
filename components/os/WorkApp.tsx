@@ -28,16 +28,32 @@ export function WorkApp({ locale, items }: { locale: Locale; items: ItemRecord[]
   // Formatting a stored timestamp is pure; reading the clock would not be.
   const when = new Intl.DateTimeFormat(locale, { month: "short", day: "2-digit" });
 
-  const row = (item: ItemRecord) => (
-    <li key={item.id} className="os-work-row">
-      <span className="os-work-status" data-needs={needsAPerson(item.status)}>
-        {copy.status[item.status] ?? item.status}
-      </span>
-      <OpenItem id={item.id} title={item.title} label={openLabel} />
-      <span className="os-work-kind">{item.kind}</span>
-      <span className="os-work-when">{when.format(new Date(item.updated_at))}</span>
-    </li>
-  );
+  /* The date column says when it is due if it is due, and when it last
+   * moved otherwise — the one date a person wants to see per row. Overdue
+   * and due today are the only two that get colour: they need a person. */
+  const dateOf = (item: ItemRecord) => {
+    if (item.due_on && item.due_in_days !== null && item.status !== "completed") {
+      const date = when.format(new Date(`${item.due_on}T00:00:00`));
+      if (item.due_in_days < 0) return { text: `${date} · ${copy.overdue}`, urgent: true };
+      if (item.due_in_days === 0) return { text: copy.dueToday, urgent: true };
+      return { text: copy.due.replace("{date}", date), urgent: false };
+    }
+    return { text: when.format(new Date(item.updated_at)), urgent: false };
+  };
+
+  const row = (item: ItemRecord) => {
+    const date = dateOf(item);
+    return (
+      <li key={item.id} className="os-work-row">
+        <span className="os-work-status" data-needs={needsAPerson(item.status)}>
+          {copy.status[item.status] ?? item.status}
+        </span>
+        <OpenItem id={item.id} title={item.title} label={openLabel} />
+        <span className="os-work-kind">{item.kind}</span>
+        <span className="os-work-when" data-urgent={date.urgent}>{date.text}</span>
+      </li>
+    );
+  };
 
   return (
     <div className="os-work">
@@ -53,9 +69,10 @@ export function WorkApp({ locale, items }: { locale: Locale; items: ItemRecord[]
         />
         <select name="lane" defaultValue="ops" aria-label={copy.laneLabel}>
           {OS_LANES.map((lane) => (
-            <option key={lane} value={lane}>{lane}</option>
+            <option key={lane} value={lane}>{copy.lanes[lane] ?? lane}</option>
           ))}
         </select>
+        <input name="due_on" type="date" aria-label={copy.dueLabel} title={copy.dueLabel} />
         <button type="submit" className="mayda-button">{copy.add}</button>
       </form>
 
@@ -64,7 +81,7 @@ export function WorkApp({ locale, items }: { locale: Locale; items: ItemRecord[]
       {open.map((group) => (
         <section key={group.lane} className="os-work-group">
           <h2 className="os-work-lane">
-            <span>{group.lane}</span>
+            <span>{copy.lanes[group.lane] ?? group.lane}</span>
             <span className="os-work-count">
               {group.needsYou > 0 ? copy.needYou(group.needsYou) : group.items.length}
             </span>

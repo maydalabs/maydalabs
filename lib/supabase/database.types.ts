@@ -311,6 +311,13 @@ export type Database = {
             referencedRelation: "os_work_items"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "os_approvals_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_work_open"
+            referencedColumns: ["id"]
+          },
         ]
       }
       os_companies: {
@@ -617,6 +624,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "os_runs_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_work_open"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "os_runs_workflow_id_fkey"
             columns: ["workflow_id"]
             isOneToOne: false
@@ -711,6 +725,13 @@ export type Database = {
             referencedRelation: "os_work_items"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "os_work_item_events_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_work_open"
+            referencedColumns: ["id"]
+          },
         ]
       }
       os_work_items: {
@@ -718,6 +739,7 @@ export type Database = {
           artifacts: Json
           company_id: string
           created_at: string
+          due_on: string | null
           id: string
           kind: string
           lane: string
@@ -734,6 +756,7 @@ export type Database = {
           artifacts?: Json
           company_id: string
           created_at?: string
+          due_on?: string | null
           id?: string
           kind: string
           lane: string
@@ -750,6 +773,7 @@ export type Database = {
           artifacts?: Json
           company_id?: string
           created_at?: string
+          due_on?: string | null
           id?: string
           kind?: string
           lane?: string
@@ -1220,6 +1244,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "os_runs_item_id_fkey"
+            columns: ["last_run_item_id"]
+            isOneToOne: false
+            referencedRelation: "os_work_open"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "os_workflows_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
@@ -1239,6 +1270,7 @@ export type Database = {
           artifacts: Json | null
           company_id: string | null
           created_at: string | null
+          due_on: string | null
           id: string | null
           kind: string | null
           lane: string | null
@@ -1255,6 +1287,7 @@ export type Database = {
           artifacts?: Json | null
           company_id?: string | null
           created_at?: string | null
+          due_on?: string | null
           id?: string | null
           kind?: string | null
           lane?: string | null
@@ -1271,6 +1304,7 @@ export type Database = {
           artifacts?: Json | null
           company_id?: string | null
           created_at?: string | null
+          due_on?: string | null
           id?: string | null
           kind?: string | null
           lane?: string | null
@@ -1380,6 +1414,78 @@ export type Database = {
             referencedRelation: "os_work_items"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "os_work_item_events_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "os_work_open"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_work_items_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      os_work_open: {
+        Row: {
+          artifacts: Json | null
+          company_id: string | null
+          created_at: string | null
+          due_in_days: number | null
+          due_on: string | null
+          id: string | null
+          kind: string | null
+          lane: string | null
+          metadata: Json | null
+          notes: string | null
+          required_action: string | null
+          sources: Json | null
+          status: string | null
+          tags: string[] | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          artifacts?: Json | null
+          company_id?: string | null
+          created_at?: string | null
+          due_in_days?: never
+          due_on?: string | null
+          id?: string | null
+          kind?: string | null
+          lane?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          required_action?: string | null
+          sources?: Json | null
+          status?: string | null
+          tags?: string[] | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          artifacts?: Json | null
+          company_id?: string | null
+          created_at?: string | null
+          due_in_days?: never
+          due_on?: string | null
+          id?: string | null
+          kind?: string | null
+          lane?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          required_action?: string | null
+          sources?: Json | null
+          status?: string | null
+          tags?: string[] | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
           {
             foreignKeyName: "os_work_items_company_id_fkey"
             columns: ["company_id"]

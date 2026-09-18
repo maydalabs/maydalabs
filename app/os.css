@@ -658,6 +658,17 @@
 
 .os-command-input::placeholder { color: var(--os-ink-3); }
 
+/* The sentence on its way into the work list, shown above the lane question
+   so the person can see what they are filing while they answer. */
+.os-command-adding {
+  margin: 0;
+  padding: 0.55rem 0.9rem 0;
+  font-size: var(--os-t-small);
+  color: var(--os-ink-3);
+}
+
+.os-command-adding strong { color: var(--os-ink); font-weight: 500; }
+
 .os-command-list { list-style: none; margin: 0; padding: 0.3rem; max-height: 21rem; overflow-y: auto; }
 
 .os-command-item {
@@ -1034,7 +1045,8 @@
 .os-stack .mayda-button-outline:hover { border-color: var(--os-ink-3); opacity: 1; }
 
 .os-window-body .mayda-field-error,
-.os-stack .mayda-field-error { color: var(--os-danger); font-size: var(--os-t-small); }
+.os-stack .mayda-field-error,
+.os-window-body .mayda-field-error { color: var(--os-danger); font-size: var(--os-t-small); margin: 0; }
 
 .os-window-body .mayda-text-link,
 .os-stack .mayda-text-link { color: var(--os-accent); }
@@ -1264,6 +1276,43 @@
 .os-doc-waiting { font-size: var(--os-t-small); color: var(--os-ink-2); }
 .os-doc-waiting code { font-family: var(--os-font-mono); color: var(--os-ink); }
 
+.os-doc-due { font-size: var(--os-t-small); color: var(--os-ink-2); font-variant-numeric: tabular-nums; }
+/* Overdue is the one date that needs a person: it gets the colour that means so. */
+.os-doc-due[data-overdue="true"] { color: var(--os-accent); }
+
+/* Edit looks like a word until you reach it, like the titles in every list.
+   It sits under the header, where the thing it changes is. */
+.os-doc-edit {
+  justify-self: start;
+  margin-top: var(--os-gap-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--os-ink-3);
+  font: inherit;
+  font-size: var(--os-t-small);
+  cursor: pointer;
+  border-radius: 2px;
+  transition: color var(--os-dur) var(--os-ease);
+}
+
+.os-doc-edit:hover { color: var(--os-accent); }
+
+.os-editor {
+  display: grid;
+  gap: var(--os-gap-3);
+  margin-top: var(--os-gap-3);
+  padding-top: var(--os-gap-3);
+  border-top: 1px dashed var(--os-line);
+}
+
+.os-editor .mayda-field { width: 100%; }
+.os-editor-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--os-gap-3); }
+.os-editor-actions { display: flex; gap: var(--os-gap-2); }
+
+/* The note is written, not filled in: a person's own words at reading size. */
+.os-editor textarea { font: inherit; font-size: var(--os-t-body); line-height: 1.5; resize: vertical; }
+
 .os-doc-section { display: grid; gap: var(--os-gap-2); }
 
 .os-doc-label {
@@ -1394,6 +1443,7 @@ a.os-doc-claim-source:hover { color: var(--os-accent); }
 
 .os-work-add { display: flex; gap: var(--os-gap-2); flex-wrap: wrap; }
 .os-work-add input { flex: 1 1 14rem; min-width: 0; }
+.os-work-add input[type="date"] { flex: 0 1 auto; color-scheme: dark; }
 
 .os-work-add input,
 .os-work-add select {
@@ -1489,6 +1539,7 @@ a.os-doc-claim-source:hover { color: var(--os-accent); }
 }
 
 .os-work-when { justify-self: end; }
+.os-work-when[data-urgent="true"] { color: var(--os-accent); }
 .os-work-finished { opacity: 0.6; }
 
 /* A person's own note is not the co-founder's writing, so it does not borrow

@@ -90,6 +90,32 @@ describe("the brief", () => {
     expect(onlyPaused.next).toEqual({ name: "Stuck one", dueInHours: null, paused: true });
   });
 
+  /* Dated work whose day has come, whatever its status: a task nobody has
+   * to approve still needs a person when its day arrives. */
+  it("lists what is overdue, due today and due tomorrow, and nothing further off", () => {
+    const brief = composeBrief({
+      needs: [],
+      needCount: 0,
+      due: [
+        { id: "later", title: "Next week", status: "pending", due_in_days: 6 },
+        { id: "tomorrow", title: "Tomorrow", status: "drafted", due_in_days: 1 },
+        { id: "late", title: "Three days late", status: "pending", due_in_days: -3 },
+        { id: "today", title: "Today", status: "review", due_in_days: 0 },
+        { id: "done", title: "Done but dated", status: "completed", due_in_days: -1 },
+        { id: "undated", title: "No date", status: "pending", due_in_days: null },
+      ],
+      changes: 0,
+      lastChange: null,
+      workflows: [],
+      finishedThisFortnight: 0,
+    });
+    expect(brief.due).toEqual([
+      { id: "late", title: "Three days late", dueInDays: -3 },
+      { id: "today", title: "Today", dueInDays: 0 },
+      { id: "tomorrow", title: "Tomorrow", dueInDays: 1 },
+    ]);
+  });
+
   it("turns a count into a sentence rather than a counter", () => {
     expect(countSentence(0, forms)).toBe("Nothing needs you.");
     expect(countSentence(1, forms)).toBe("One thing needs you.");

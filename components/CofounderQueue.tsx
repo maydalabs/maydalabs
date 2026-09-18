@@ -1,6 +1,6 @@
 import { StartCompanyForm, WorkItemDecision } from "@/components/CofounderPanels";
 import { OpenItem } from "@/components/os/OpenItem";
-import { OS_DOCUMENT_COPY } from "@/components/osCopy";
+import { OS_DOCUMENT_COPY, OS_WORKAPP_COPY } from "@/components/osCopy";
 import { OS_COFOUNDER_COPY } from "@/components/osCopy";
 import Link from "next/link";
 import { localizePath } from "@/lib/i18n";
@@ -86,7 +86,7 @@ export async function CofounderQueue({
           <article key={row.id} className="mayda-card mayda-os-run">
             <div className="mayda-os-run-head">
               <div>
-                <p className="mayda-kicker">{row.lane} / {row.kind}</p>
+                <p className="mayda-kicker">{OS_WORKAPP_COPY[locale].lanes[row.lane ?? ""] ?? row.lane} / {row.kind}</p>
                 {/* On the desk the title opens the item as a document. On the
                     account page there is no desk to open it in, so it stays a
                     title — a button that does nothing is worse than none. */}

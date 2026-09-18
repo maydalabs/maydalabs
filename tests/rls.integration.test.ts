@@ -1651,10 +1651,10 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
           .select("id")
           .single();
 
-        await admin.from("os_work_item_events").insert([
-          { item_id: item!.id, actor: null, event: "prepared", detail: { by: "worker" } },
-          { item_id: item!.id, actor: idA, event: "approved", detail: {} },
-        ]);
+        // Two statements, not one bulk insert: one statement stamps both
+        // rows with the same now(), and then their order is anyone's.
+        await admin.from("os_work_item_events").insert({ item_id: item!.id, actor: null, event: "prepared", detail: { by: "worker" } });
+        await admin.from("os_work_item_events").insert({ item_id: item!.id, actor: idA, event: "approved", detail: {} });
 
         const { data: seen } = await userA
           .from("os_recent_record")
@@ -2083,6 +2083,141 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
      * person can buy. Everything they must NOT be able to do is enforced in
      * the database, because a guarantee that lives only in a form does not
      * survive the next form. */
+    /* Editing work, 18 September. Until this, an item could not be edited
+     * from the desk and could be edited without limit through the API: a
+     * member holds UPDATE on the table, and nothing looked at which columns
+     * changed. The approval was bound to an action and not to the words. */
+    describe("editing work", () => {
+      let companyId: string;
+
+      const make = async (fields: { status: string; required_action?: string; title: string; notes?: string }) => {
+        const { data } = await admin
+          .from("os_work_items")
+          .insert({ company_id: companyId, lane: "ops", kind: "task", notes: "", ...fields })
+          .select("id")
+          .single();
+        return data!.id as string;
+      };
+
+      const approve = async (id: string, action: string) => {
+        await userA.from("os_approvals").insert({
+          item_id: id,
+          action,
+          approved_by: idA,
+          approved_at: new Date().toISOString(),
+        });
+        const { error } = await userA.from("os_work_items").update({ status: "approved" }).eq("id", id);
+        expect(error).toBeNull();
+      };
+
+      beforeAll(async () => {
+        const { data: company } = await admin
+          .from("os_companies")
+          .insert({ name: `Edit Co ${suffix}` })
+          .select("id")
+          .single();
+        companyId = company!.id;
+        await admin.from("os_company_members").insert({ company_id: companyId, user_id: idA, role: "owner" });
+      });
+
+      /* The positive case first: a member changes their own open work, and
+       * the record says what changed and what it said before, under their
+       * own id. Everything below is a refusal, and refusals pass just as well
+       * when nothing can be edited at all. */
+      it("lets a member edit open work, and the record keeps what it said before", async () => {
+        const id = await make({ status: "pending", title: "Call the carrier", notes: "about the contract" });
+
+        const { error } = await userA
+          .from("os_work_items")
+          .update({ title: "Call the Hamburg carrier", notes: "about the revised contract", due_on: "2026-09-25" })
+          .eq("id", id);
+        expect(error).toBeNull();
+
+        const { data: item } = await admin.from("os_work_items").select("title, notes, due_on").eq("id", id).single();
+        expect(item).toEqual({ title: "Call the Hamburg carrier", notes: "about the revised contract", due_on: "2026-09-25" });
+
+        const { data: events } = await admin
+          .from("os_work_item_events")
+          .select("event, actor, detail")
+          .eq("item_id", id)
+          .eq("event", "edited");
+        expect(events).toHaveLength(1);
+        expect(events![0].actor).toBe(idA);
+        const detail = events![0].detail as { fields: string[]; before: Record<string, unknown> };
+        expect(detail.fields.sort()).toEqual(["due_on", "notes", "title"]);
+        expect(detail.before).toEqual({ title: "Call the carrier", notes: "about the contract", due_on: null });
+      });
+
+      it("writes no event when nothing about the content changed", async () => {
+        const id = await make({ status: "drafted", title: "Untouched" });
+        await userA.from("os_work_items").update({ status: "review" }).eq("id", id);
+        const { data: events } = await admin.from("os_work_item_events").select("event").eq("item_id", id);
+        expect((events ?? []).map((e) => e.event)).not.toContain("edited");
+      });
+
+      it("freezes approved work, for a person and for the server alike", async () => {
+        const id = await make({ status: "review", required_action: "send", title: "Reply to Bornova", notes: "Dear all" });
+        await approve(id, "send");
+
+        for (const client of [userA, admin]) {
+          const { error } = await client.from("os_work_items").update({ notes: "Dear all, revised" }).eq("id", id);
+          expect(error).not.toBeNull();
+          expect(error!.message).toContain("approved work is frozen");
+        }
+
+        // The action it was approved for is content too: approve "send", then
+        // quietly become "publish", was the hole this closes.
+        const { error: action } = await userA.from("os_work_items").update({ required_action: "publish" }).eq("id", id);
+        expect(action!.message).toContain("approved work is frozen");
+
+        // Status and artifacts are not content: finishing still works.
+        const { error: finished } = await userA.rpc("os_complete_item", {
+          p_item_id: id,
+          p_url: "https://example.com/sent",
+        });
+        expect(finished).toBeNull();
+
+        const { error: afterwards } = await userA.from("os_work_items").update({ title: "Renamed" }).eq("id", id);
+        expect(afterwards!.message).toContain("finished work is frozen");
+      });
+
+      /* approved -> review is a legal move. Editing there and re-approving
+       * would otherwise reuse the old signature for new words. */
+      it("stays frozen after an approved item is sent back to review", async () => {
+        const id = await make({ status: "review", required_action: "send", title: "Once approved", notes: "v1" });
+        await approve(id, "send");
+        const { error: back } = await userA.from("os_work_items").update({ status: "review" }).eq("id", id);
+        expect(back).toBeNull();
+
+        const { error } = await userA.from("os_work_items").update({ notes: "v2" }).eq("id", id);
+        expect(error!.message).toContain("approved work is frozen");
+
+        // While an unapproved item in review is still theirs to change.
+        const fresh = await make({ status: "review", required_action: "send", title: "Not yet approved", notes: "v1" });
+        const { error: allowed } = await userA.from("os_work_items").update({ notes: "v2" }).eq("id", fresh);
+        expect(allowed).toBeNull();
+      });
+
+      it("shows open work with its due date measured by the database's clock", async () => {
+        const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
+        const due = await make({ status: "pending", title: "Due tomorrow" });
+        await userA.from("os_work_items").update({ due_on: tomorrow }).eq("id", due);
+        const undated = await make({ status: "pending", title: "No date" });
+        const done = await make({ status: "review", title: "Done already" });
+        await userA.from("os_work_items").update({ status: "approved" }).eq("id", done);
+        await userA.rpc("os_complete_item", { p_item_id: done, p_note: "done" });
+
+        const { data: open } = await userA.from("os_work_open").select("id, due_in_days").in("id", [due, undated, done]);
+        const byId = new Map((open ?? []).map((r) => [r.id, r.due_in_days]));
+        expect(byId.get(due)).toBe(1);
+        expect(byId.get(undated)).toBeNull();
+        expect(byId.has(done)).toBe(false);
+
+        const { data: theirs } = await outsider.from("os_work_open").select("id").in("id", [due, undated]);
+        expect(theirs ?? []).toHaveLength(0);
+      });
+    });
+
     describe("a member's own workflows", () => {
       const made: string[] = [];
 

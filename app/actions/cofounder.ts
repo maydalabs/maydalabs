@@ -182,18 +182,29 @@ export async function dismissWorkItemAction(formData: FormData): Promise<void> {
  * a form that says who wrote something is a form that can lie about it.
  */
 export async function addWorkItemAction(formData: FormData): Promise<void> {
-  if (!isSupabaseConfigured()) return;
+  await addWork(formData);
+}
+
+/* The same act from ⌘K, which wants to know whether it happened. A form
+ * submit cannot use a return value; a command bar can. */
+export async function captureWorkItemAction(formData: FormData): Promise<{ id: string } | { error: string }> {
+  return addWork(formData);
+}
+
+async function addWork(formData: FormData): Promise<{ id: string } | { error: string }> {
+  if (!isSupabaseConfigured()) return { error: "not_configured" };
   const claims = await getVerifiedClaims();
-  if (!claims?.sub) return;
+  if (!claims?.sub) return { error: "not_signed_in" };
 
   const title = String(formData.get("title") ?? "").trim().slice(0, 200);
-  if (!title) return;
+  if (!title) return { error: "empty" };
   const laneRaw = String(formData.get("lane") ?? "ops");
   const lane = (OS_LANES as readonly string[]).includes(laneRaw) ? laneRaw : "ops";
+  const dueOn = asDate(formData.get("due_on"));
 
   const supabase = await createSupabaseServerClient();
   const company = await currentCompany(supabase);
-  if (!company) return;
+  if (!company) return { error: "no_company" };
 
   const { data: item, error } = await supabase
     .from("os_work_items")
@@ -204,13 +215,55 @@ export async function addWorkItemAction(formData: FormData): Promise<void> {
       title,
       notes: "",
       status: "pending",
+      due_on: dueOn,
       metadata: { by: "person" },
     })
     .select("id")
     .single();
-  if (error || !item) return;
+  if (error || !item) return { error: error?.message ?? "failed" };
 
   await supabase.rpc("os_record_event", { p_item_id: item.id, p_event: "added", p_detail: {} });
 
   revalidatePath("/os");
+  return { id: item.id };
+}
+
+/* A calendar date or nothing. The input is a date field, but a form is a
+ * form: whatever arrives is checked against the shape a date column takes. */
+function asDate(value: FormDataEntryValue | null): string | null {
+  const text = String(value ?? "").trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : null;
+}
+
+/* `version` counts submissions, so the editor can tell a fresh result from
+ * the one it already showed without comparing clocks. */
+export type EditResult = { error: string | null; version: number };
+
+export async function editWorkItemAction(previous: EditResult, formData: FormData): Promise<EditResult> {
+  const version = previous.version + 1;
+  if (!isSupabaseConfigured()) return { error: "not_configured", version };
+  const claims = await getVerifiedClaims();
+  if (!claims?.sub) return { error: "not_signed_in", version };
+
+  const itemId = String(formData.get("itemId") ?? "");
+  if (!/^[0-9a-f-]{36}$/.test(itemId)) return { error: "bad_item", version };
+
+  const title = String(formData.get("title") ?? "").trim().slice(0, 200);
+  if (!title) return { error: "empty", version };
+  const laneRaw = String(formData.get("lane") ?? "");
+  const lane = (OS_LANES as readonly string[]).includes(laneRaw) ? laneRaw : null;
+  const notes = String(formData.get("notes") ?? "").slice(0, 20_000);
+
+  const supabase = await createSupabaseServerClient();
+  const { error, count } = await supabase
+    .from("os_work_items")
+    .update({ title, notes, due_on: asDate(formData.get("due_on")), ...(lane ? { lane } : {}) }, { count: "exact" })
+    .eq("id", itemId);
+
+  if (error) return { error: error.message, version };
+  // Zero rows is the row policy saying "not yours", silently. Say it.
+  if (count === 0) return { error: "not_yours", version };
+
+  revalidatePath("/os");
+  return { error: null, version };
 }

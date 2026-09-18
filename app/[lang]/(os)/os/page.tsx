@@ -107,13 +107,14 @@ export default async function OsPage(props: LocalePageProps) {
      * contract everything else here rests on. */
     if (company?.id) {
       const COLUMNS =
-        "id, title, lane, kind, status, required_action, notes, sources, artifacts, metadata, updated_at";
+        "id, title, lane, kind, status, required_action, notes, sources, artifacts, metadata, updated_at, due_on";
       const [{ data: open }, { data: finished }, { data: waitingRows }, { data: activity }] = await Promise.all([
+        /* Open work comes through a view that carries how far off each due
+         * date is, by the database's clock: the page never reads its own. */
         supabase
-          .from("os_work_items")
-          .select(COLUMNS)
+          .from("os_work_open")
+          .select(`${COLUMNS}, due_in_days`)
           .eq("company_id", company.id)
-          .not("status", "in", "(completed,canceled)")
           .order("updated_at", { ascending: false })
           .limit(30),
         /* Finished work stays openable for a fortnight — long enough to check
@@ -147,7 +148,10 @@ export default async function OsPage(props: LocalePageProps) {
        * predicate cannot narrow jsonb to `unknown`. So each row is rebuilt
        * field by field: a real item has every one of these, and anything that
        * does not is simply not shown. */
-      const rows: ItemRecord[] = [...(open ?? []), ...(finished ?? [])].flatMap((r) =>
+      const rows: ItemRecord[] = [
+        ...(open ?? []),
+        ...(finished ?? []).map((r) => ({ ...r, due_in_days: null })),
+      ].flatMap((r) =>
         r.id && r.title && r.lane && r.kind && r.status && r.updated_at
           ? [
               {
@@ -162,6 +166,8 @@ export default async function OsPage(props: LocalePageProps) {
                 artifacts: r.artifacts,
                 metadata: r.metadata,
                 updated_at: r.updated_at,
+                due_on: r.due_on,
+                due_in_days: r.due_in_days,
               },
             ]
           : [],
@@ -203,6 +209,7 @@ export default async function OsPage(props: LocalePageProps) {
   const brief: BriefModel = composeBrief({
     needs,
     needCount: waiting,
+    due: workItems.map((item) => ({ id: item.id, title: item.title, status: item.status, due_in_days: item.due_in_days })),
     changes: seenAt ? unread : null,
     lastChange,
     workflows,
@@ -311,6 +318,9 @@ export default async function OsPage(props: LocalePageProps) {
         placeholder: copy.commandPlaceholder,
         ask: copy.commandAsk,
         tell: copy.commandTell,
+        add: copy.commandAdd,
+        lane: copy.commandLane,
+        lanes: OS_WORKAPP_COPY[locale].lanes,
         open: copy.commandOpen,
         nothing: copy.commandNothing,
         hint: copy.commandHint,

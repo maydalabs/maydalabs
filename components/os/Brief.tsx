@@ -70,8 +70,29 @@ export function Brief({ locale, brief, hasCompany }: { locale: Locale; brief: Br
             </li>
           ) : null}
         </ol>
-      ) : hasCompany ? (
+      ) : hasCompany && brief.due.length === 0 ? (
         <p className="os-brief-hint">{copy.emptyHint}</p>
+      ) : null}
+
+      {/* Dated work whose day has come. It sits under the queue in the same
+          shape, because it is the same kind of fact: this needs a person, and
+          here is why. */}
+      {brief.due.length > 0 ? (
+        <ol className="os-brief-needs">
+          {brief.due.map((item) => (
+            <li key={item.id} data-needs={item.dueInDays <= 0}>
+              <span className="os-brief-status">{copy.due}</span>
+              <OpenItem id={item.id} title={item.title} label={OS_DOCUMENT_COPY[locale].open} />
+              <span className="os-brief-waited">
+                {item.dueInDays < 0
+                  ? countSentence(-item.dueInDays, { none: "", ...copy.overdue })
+                  : item.dueInDays === 0
+                    ? copy.dueToday
+                    : copy.dueTomorrow}
+              </span>
+            </li>
+          ))}
+        </ol>
       ) : null}
 
       {hasCompany ? (
