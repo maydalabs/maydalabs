@@ -20,7 +20,8 @@ export type OsIconName =
   | "close"
   | "minimize"
   | "leave"
-  | "new";
+  | "new"
+  | "today";
 
 const PATHS: Record<OsIconName, React.ReactNode> = {
   /* Two overlapping rings: a partnership, not a sparkle.
@@ -92,6 +93,14 @@ const PATHS: Record<OsIconName, React.ReactNode> = {
   ),
   /* Filled, and larger: at size 9 a stroked ring is half a pixel of outline. */
   new: <circle cx="12" cy="12" r="6" fill="currentColor" stroke="none" />,
+  // A single day on a calendar page: the one that is now.
+  today: (
+    <>
+      <rect x="3.5" y="5" width="17" height="15.5" rx="1.5" />
+      <path d="M3.5 9.5h17M8 3v4M16 3v4" />
+      <circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none" />
+    </>
+  ),
 };
 
 /* strokeWidth on a 24 viewBox scales with the icon, so "1.5" rendered 0.94px

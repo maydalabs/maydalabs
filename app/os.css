@@ -219,19 +219,132 @@
 
 .os-surface { position: relative; overflow: hidden; min-width: 0; }
 
-.os-empty {
+/* ------------------------------------------------------------------- brief */
+
+/* The desk's own surface, under the windows. Not a pane: no fill, no border,
+   no shadow — type set directly on the ground, the way a date sits on a lock
+   screen. It owns the left of the desk; default windows keep to the right. */
+.os-brief {
   position: absolute;
-  inset: 0;
-  display: grid;
-  place-content: center;
-  gap: var(--os-gap-2);
-  text-align: center;
-  color: var(--os-ink-3);
-  padding: 2rem;
-  pointer-events: none;
+  left: clamp(1.25rem, 3.2%, 3rem);
+  top: clamp(1.5rem, 7%, 4.5rem);
+  width: min(38%, 34rem);
+  z-index: 0;
 }
 
-.os-empty strong { color: var(--os-ink-2); font-size: var(--os-t-lead); font-weight: 500; }
+.os-brief-inner { display: grid; gap: var(--os-gap-4); }
+
+.os-brief-date {
+  margin: 0;
+  font-family: var(--os-font-mono);
+  font-size: var(--os-t-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--os-ink-3);
+  /* Reserved before the clock has a value, so the headline does not jump
+     down a line the moment the client knows what day it is. */
+  min-height: 1.2em;
+  line-height: 1.2;
+}
+
+/* The count, in the co-founder's voice: these are the desk's words. */
+.os-brief-headline {
+  margin: 0;
+  font-family: var(--os-font-voice);
+  font-size: clamp(1.75rem, 1rem + 2.1vw, 2.75rem);
+  font-weight: 400;
+  letter-spacing: -0.012em;
+  line-height: 1.12;
+  color: var(--os-ink);
+  text-wrap: balance;
+}
+
+.os-brief-needs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--os-gap-2);
+}
+
+.os-brief-needs li {
+  display: grid;
+  grid-template-columns: 4.25rem minmax(0, 1fr) auto;
+  gap: var(--os-gap-3);
+  align-items: baseline;
+}
+
+.os-brief-status {
+  font-family: var(--os-font-mono);
+  font-size: var(--os-t-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--os-ink-3);
+}
+
+/* Colour means "this needs a person", here as everywhere. */
+.os-brief-needs li[data-needs="true"] .os-brief-status { color: var(--os-accent); }
+
+.os-brief-needs .os-open-item { font-weight: 500; }
+
+.os-brief-waited {
+  font-size: var(--os-t-small);
+  color: var(--os-ink-3);
+  white-space: nowrap;
+}
+
+/* Aligned with the titles above it, not with their labels. */
+.os-brief-more { grid-template-columns: 4.25rem minmax(0, 1fr); }
+.os-brief-more > .os-open-app { grid-column: 2; }
+
+.os-open-app {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--os-ink-2);
+  font: inherit;
+  font-size: var(--os-t-small);
+  text-align: left;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: color var(--os-dur) var(--os-ease);
+}
+
+.os-open-app:hover { color: var(--os-accent); }
+
+.os-brief-hint {
+  margin: 0;
+  color: var(--os-ink-3);
+  font-size: var(--os-t-body);
+  max-inline-size: 28rem;
+}
+
+/* The rest of the brief is prose, and is set as prose: the serif at reading
+   size, in the second ink, one sentence a line. */
+.os-brief-rest { display: grid; gap: var(--os-gap-1); }
+
+.os-brief-rest p {
+  margin: 0;
+  font-family: var(--os-font-voice);
+  font-size: var(--os-t-lead);
+  line-height: 1.4;
+  color: var(--os-ink-2);
+  text-wrap: pretty;
+}
+
+.os-brief-last { color: var(--os-ink-3); }
+
+/* ------------------------------------------------------------------- clock */
+
+.os-clock {
+  color: var(--os-ink-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Empty until the client knows the time, but never zero-width: the bar's
+   items would shift when it fills in. */
+.os-clock[data-form="bar"] { display: inline-block; min-width: 8.5em; text-align: right; }
 
 /* ----------------------------------------------------------------- windows */
 
@@ -496,6 +609,11 @@
   border-radius: 999px;
   background: var(--os-accent);
 }
+
+/* An app that can do nothing right now sits in the dock dimmed. Not hidden:
+   a dock that loses items is a dock nobody can learn. */
+.os-dock-item[data-dormant="true"] { color: var(--os-ink-3); }
+.os-dock-item[data-dormant="true"]:hover { color: var(--os-ink-2); }
 
 /* ------------------------------------------------------------ command bar */
 
@@ -811,7 +929,15 @@
 @media (max-width: 767px) {
   .os-bar-email,
   .os-bar-company,
+  .os-clock[data-form="bar"],
   .os-bar-search kbd { display: none; }
+
+  /* On a phone the brief is a pane, reached from the dock like anything else,
+     and it fills the width it has. */
+  .os-stack[data-pane="brief"] { padding-top: calc(var(--os-pad) + 0.5rem); }
+  .os-stack .os-brief-inner { gap: var(--os-gap-4); }
+  .os-brief-needs li { grid-template-columns: 3.75rem minmax(0, 1fr); row-gap: 0; }
+  .os-brief-waited { grid-column: 2; }
 
   .os-bar { gap: var(--os-gap-2); }
   .os-bar-search { flex: 1 1 auto; max-width: none; }

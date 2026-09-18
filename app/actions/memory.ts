@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
+import { currentCompany } from "@/lib/osCompany";
 
 /* Teaching it something, and correcting it.
  *
@@ -26,7 +27,7 @@ export async function teachMemoryAction(formData: FormData): Promise<void> {
   const kind = KINDS.includes(kindRaw) ? kindRaw : "fact";
 
   const supabase = await createSupabaseServerClient();
-  const { data: company } = await supabase.from("os_companies").select("id").limit(1).maybeSingle();
+  const company = await currentCompany(supabase);
   if (!company) return;
 
   // source and created_by are stamped by the trigger, not sent from here: a

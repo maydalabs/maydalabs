@@ -18,6 +18,7 @@ export type OsDocumentKey = `item:${string}`;
 export type OsWindowKey = OsAppId | OsDocumentKey;
 
 export const OS_OPEN_ITEM_EVENT = "maydaos:open-item";
+export const OS_OPEN_APP_EVENT = "maydaos:open-app";
 
 export function documentKey(itemId: string): OsDocumentKey {
   return `item:${itemId}`;
@@ -43,6 +44,11 @@ export type OsApp = {
   /* Opened the first time a person ever arrives. Everything else waits in
    * the dock. */
   openByDefault?: boolean;
+  /* An app that can do nothing right now — the co-founder without a model
+   * behind it. It stays closed when the desk loads, whatever the saved layout
+   * says, and the dock shows it dimmed. It can still be opened, because a
+   * window that says plainly why it is quiet beats one that is missing. */
+  dormant?: boolean;
 };
 
 export type OsRect = { x: number; y: number; w: number; h: number };
@@ -67,8 +73,7 @@ export type OsWindowState = OsRect & {
  * to know what locale it is in. */
 export type OsShellCopy = {
   desktop: string;
-  empty: string;
-  emptyHint: string;
+  today: string;
   waitingLabel: string;
   /* The same fact in the space a phone has. Truncation is not a short
    * form — "Sear" is not a word. */

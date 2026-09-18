@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
+import { currentCompany } from "@/lib/osCompany";
 import { OS_LANES } from "@/lib/osWork";
 
 /*
@@ -191,7 +192,7 @@ export async function addWorkItemAction(formData: FormData): Promise<void> {
   const lane = (OS_LANES as readonly string[]).includes(laneRaw) ? laneRaw : "ops";
 
   const supabase = await createSupabaseServerClient();
-  const { data: company } = await supabase.from("os_companies").select("id").limit(1).maybeSingle();
+  const company = await currentCompany(supabase);
   if (!company) return;
 
   const { data: item, error } = await supabase

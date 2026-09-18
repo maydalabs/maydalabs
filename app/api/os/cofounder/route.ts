@@ -6,6 +6,7 @@ import { buildCompanyContext, openOnThePerson, recentMessages, systemFor } from 
 import { runCofounderTurn } from "@/lib/osCofounderRun";
 import { anthropicTurn, isCofounderConfigured } from "@/lib/osCofounderModel";
 import { formatUsd } from "@/lib/os";
+import { currentCompany } from "@/lib/osCompany";
 
 /* Talking to the co-founder.
  *
@@ -44,7 +45,7 @@ export async function POST(request: Request) {
    * with the service credential, and it may only do so because this returned
    * a row. */
   const supabase = await createSupabaseServerClient();
-  const { data: company } = await supabase.from("os_companies").select("id, monthly_chat_usd").limit(1).maybeSingle();
+  const company = await currentCompany(supabase);
   if (!company) return NextResponse.json({ error: "no_company" }, { status: 409 });
 
   if (!isCofounderConfigured()) {

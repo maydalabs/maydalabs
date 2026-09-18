@@ -56,6 +56,110 @@ function bounded(value: unknown, low: number, high: number, fallback: number): n
   return Math.round(Math.min(Math.max(value, low), high));
 }
 
+/* A stored layout on the way back out of the database, into windows.
+ *
+ * Whatever was saved may be from an older version of the product. Anything
+ * unrecognised is dropped and anything missing gets the app's default — a
+ * desk that half-restores is better than a desk that throws.
+ */
+export type HydratableApp<K extends string> = {
+  id: K;
+  defaultRect: { x: number; y: number; w: number; h: number };
+  openByDefault?: boolean;
+  dormant?: boolean;
+};
+
+export type HydratedWindow<K extends string> = Omit<StoredWindow, "app"> & { app: K };
+
+const DOCUMENT_DEFAULT = { x: 0.12, y: 0.1, w: 0.5, h: 0.72 };
+
+function readNumber(saved: Record<string, unknown> | undefined, key: string): number | null {
+  const value = saved?.[key];
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function wasPlaced(saved: Record<string, unknown> | undefined): boolean {
+  if (!saved) return false;
+  if (typeof saved.placed === "boolean") return saved.placed;
+  // A desk saved before windows had the flag holds pixels and says so only
+  // by their size: a share is never more than 2.
+  return looksLikePixels(saved);
+}
+
+export function hydrateWindows<K extends string>(
+  apps: HydratableApp<K>[],
+  documents: { key: K }[],
+  stored: unknown,
+): HydratedWindow<K>[] {
+  const rows = Array.isArray(stored) ? stored : [];
+  const byApp = new Map<string, Record<string, unknown>>();
+  for (const row of rows) {
+    if (row && typeof row === "object" && typeof (row as { app?: unknown }).app === "string") {
+      byApp.set((row as { app: string }).app, row as Record<string, unknown>);
+    }
+  }
+
+  const windows: HydratedWindow<K>[] = apps.map((app, index) => {
+    const saved = byApp.get(app.id);
+    const placed = wasPlaced(saved);
+
+    /* `placed` is the whole responsive story. A window nobody has moved is
+     * positioned as a share of the surface, so a fresh desk is laid out for
+     * the screen in front of you rather than for the one it was built on.
+     * The moment someone drags it, it becomes pixels — because at that point
+     * they mean *there*, not "44% of the way across".
+     *
+     * And a window nobody has moved takes the app's *current* default rather
+     * than the default that was saved with it: the designer's arrangement may
+     * improve, and a person who never expressed a preference should get the
+     * improvement. */
+    const rect = placed
+      ? {
+          x: readNumber(saved, "x") ?? app.defaultRect.x,
+          y: readNumber(saved, "y") ?? app.defaultRect.y,
+          w: readNumber(saved, "w") ?? app.defaultRect.w,
+          h: readNumber(saved, "h") ?? app.defaultRect.h,
+        }
+      : app.defaultRect;
+
+    const savedOpen = typeof saved?.open === "boolean" ? saved.open : null;
+    return {
+      app: app.id,
+      ...rect,
+      z: readNumber(saved, "z") ?? index + 1,
+      open: app.dormant ? false : (savedOpen ?? Boolean(app.openByDefault)),
+      minimized: saved?.minimized === true,
+      placed,
+    };
+  });
+
+  /* A remembered document window comes back only if its item is still open
+   * work. A window onto finished work would be a window onto nothing, so it
+   * is dropped rather than restored empty. */
+  documents.forEach((doc, index) => {
+    const saved = byApp.get(doc.key);
+    if (!saved || saved.open !== true) return;
+    const placed = wasPlaced(saved);
+    windows.push({
+      app: doc.key,
+      ...(placed
+        ? {
+            x: readNumber(saved, "x") ?? DOCUMENT_DEFAULT.x,
+            y: readNumber(saved, "y") ?? DOCUMENT_DEFAULT.y,
+            w: readNumber(saved, "w") ?? DOCUMENT_DEFAULT.w,
+            h: readNumber(saved, "h") ?? DOCUMENT_DEFAULT.h,
+          }
+        : DOCUMENT_DEFAULT),
+      z: readNumber(saved, "z") ?? apps.length + index + 1,
+      open: true,
+      minimized: saved.minimized === true,
+      placed,
+    });
+  });
+
+  return windows;
+}
+
 export function sanitizeLayout(rows: unknown): StoredWindow[] {
   if (!Array.isArray(rows)) return [];
 

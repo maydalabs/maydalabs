@@ -34,10 +34,15 @@ export function CofounderApp({
   initialMessages,
   copy,
   canTalk,
+  why,
 }: {
   initialMessages: ChatMessage[];
   copy: CofounderCopy;
   canTalk: boolean;
+  /* Why it cannot talk, when it cannot — shown in place of the invitation,
+   * because inviting someone to ask a question nothing will answer is worse
+   * than saying so. */
+  why: string | null;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [draft, setDraft] = useState("");
@@ -156,7 +161,7 @@ export function CofounderApp({
         {messages.length === 0 && !pending ? (
           <div className="os-chat-empty">
             <strong>{copy.empty}</strong>
-            <span>{copy.emptyHint}</span>
+            <span>{why ?? copy.emptyHint}</span>
           </div>
         ) : null}
 
@@ -196,7 +201,7 @@ export function CofounderApp({
           ref={composeRef}
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
-          placeholder={canTalk ? copy.placeholder : copy.noCompany}
+          placeholder={canTalk ? copy.placeholder : (why ?? copy.notConfigured)}
           rows={2}
           maxLength={8000}
           disabled={!canTalk || pending}

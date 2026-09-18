@@ -1,5 +1,6 @@
 import { OsPaneEmpty } from "@/components/os/OsPaneEmpty";
 import { OS_SHELL_COPY } from "@/components/osCopy";
+import { currentCompany } from "@/lib/osCompany";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import type { Locale } from "@/lib/i18n";
@@ -16,11 +17,11 @@ export async function CompanyApp({ locale }: { locale: Locale }) {
   const copy = OS_SHELL_COPY[locale];
   const supabase = await createSupabaseServerClient();
 
-  const { data: company } = await supabase
-    .from("os_companies")
-    .select("id, name, what_we_do, created_at")
-    .limit(1)
-    .maybeSingle();
+  // The same company every other pane is showing, then the rest of its row.
+  const current = await currentCompany(supabase);
+  const { data: company } = current
+    ? await supabase.from("os_companies").select("id, name, what_we_do, created_at").eq("id", current.id).maybeSingle()
+    : { data: null };
 
   if (!company) return <OsPaneEmpty>{copy.companyNothing}</OsPaneEmpty>;
 

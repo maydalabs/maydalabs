@@ -7,6 +7,7 @@ import { CofounderPane } from "@/components/os/CofounderPane";
 import { MemoryApp } from "@/components/os/MemoryApp";
 import { RecordApp } from "@/components/os/RecordApp";
 import { WorkApp } from "@/components/os/WorkApp";
+import { Brief } from "@/components/os/Brief";
 import { ItemDocument, type ItemEvent, type ItemRecord } from "@/components/os/ItemDocument";
 import { OsShell } from "@/components/os/OsShell";
 import {
@@ -19,6 +20,9 @@ import {
 import { documentKey, type OsApp, type OsDocument } from "@/components/os/types";
 import type { CommandTarget } from "@/components/os/OsCommandBar";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
+import { currentCompany } from "@/lib/osCompany";
+import { composeBrief, type Brief as BriefModel, type ChangeRow, type NeedRow, type WorkflowRow } from "@/lib/osBrief";
+import { isCofounderConfigured } from "@/lib/osCofounderModel";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
@@ -52,15 +56,21 @@ export default async function OsPage(props: LocalePageProps) {
   // The same rows the documents are built from, kept for the Work app: one
   // query feeding two views, not two queries that could disagree.
   let workItems: ItemRecord[] = [];
+  let needs: NeedRow[] = [];
+  let lastChange: ChangeRow | null = null;
+  let workflows: WorkflowRow[] = [];
+  let finishedCount = 0;
+  let hasCompany = false;
 
   if (isSupabaseConfigured()) {
     const supabase = await createSupabaseServerClient();
 
-    const [{ data: company }, { count }, { data: desktop }] = await Promise.all([
-      supabase.from("os_companies").select("id, name").limit(1).maybeSingle(),
+    const [company, { count }, { data: desktop }] = await Promise.all([
+      currentCompany(supabase),
       supabase.from("os_needs_you").select("id", { count: "exact", head: true }),
       supabase.from("os_desktops").select("layout, seen_at").eq("user_id", claims.sub).maybeSingle(),
     ]);
+    hasCompany = company !== null;
 
     companyName = company?.name ?? null;
     waiting = count ?? 0;
@@ -71,14 +81,24 @@ export default async function OsPage(props: LocalePageProps) {
      * out loud — an open piece of work, something it knows — rather than
      * everything in the database. A search that returns four hundred rows is
      * a search nobody uses twice. */
-    const [{ count: newCount }, { data: facts }] = await Promise.all([
+    const [{ count: newCount }, { data: facts }, { data: latest }] = await Promise.all([
       seenAt
         ? supabase.from("os_recent_record").select("id", { count: "exact", head: true }).gt("at", seenAt)
         : Promise.resolve({ count: 0 } as { count: number | null }),
       supabase.from("os_company_memory").select("id, fact, kind").is("retired_at", null).limit(20),
+      seenAt
+        ? supabase
+            .from("os_recent_record")
+            .select("title, event, by_a_person")
+            .gt("at", seenAt)
+            .order("at", { ascending: false })
+            .limit(1)
+            .maybeSingle()
+        : Promise.resolve({ data: null as ChangeRow | null }),
     ]);
 
     unread = newCount ?? 0;
+    lastChange = latest ?? null;
 
     /* Every open piece of work, rendered as a document up front and handed to
      * the shell, which shows whichever are opened. Thirty small documents
@@ -88,7 +108,7 @@ export default async function OsPage(props: LocalePageProps) {
     if (company?.id) {
       const COLUMNS =
         "id, title, lane, kind, status, required_action, notes, sources, artifacts, metadata, updated_at";
-      const [{ data: open }, { data: finished }] = await Promise.all([
+      const [{ data: open }, { data: finished }, { data: waitingRows }, { data: activity }] = await Promise.all([
         supabase
           .from("os_work_items")
           .select(COLUMNS)
@@ -105,7 +125,23 @@ export default async function OsPage(props: LocalePageProps) {
           .eq("company_id", company.id)
           .order("updated_at", { ascending: false })
           .limit(15),
+        /* For the brief: the three that have waited longest, by the
+         * database's clock. */
+        supabase
+          .from("os_needs_you")
+          .select("id, title, status, waiting_days")
+          .eq("company_id", company.id)
+          .order("waiting_days", { ascending: false })
+          .limit(3),
+        supabase
+          .from("os_activity")
+          .select("name, active, due_in_hours, paused_reason")
+          .eq("company_id", company.id)
+          .eq("active", true),
       ]);
+      needs = waitingRows ?? [];
+      workflows = activity ?? [];
+      finishedCount = (finished ?? []).length;
 
       /* A view's columns are all nullable to the type generator, and a type
        * predicate cannot narrow jsonb to `unknown`. So each row is rebuilt
@@ -164,36 +200,54 @@ export default async function OsPage(props: LocalePageProps) {
     }
   }
 
+  const brief: BriefModel = composeBrief({
+    needs,
+    needCount: waiting,
+    changes: seenAt ? unread : null,
+    lastChange,
+    workflows,
+    finishedThisFortnight: finishedCount,
+  });
+
+  /* Without a model behind it the co-founder can say nothing, so it does not
+   * greet a person with a window that cannot answer: the brief does, and the
+   * queue. The moment a key exists this flips, and the desk opens on the
+   * conversation instead. */
+  const configured = isCofounderConfigured();
+
+  /* Default windows keep to the right of the brief, which owns the left of
+   * the desk. Shares of the surface, not pixels: see OsWindowState.placed. */
   const apps: OsApp[] = [
     {
       id: "cofounder",
       title: OS_COFOUNDER_CHAT_COPY[locale].title,
       icon: "cofounder",
-      node: <CofounderPane locale={locale} />,
-      defaultRect: { x: 0.025, y: 0.03, w: 0.45, h: 0.9 },
-      openByDefault: true,
+      node: <CofounderPane locale={locale} configured={configured} />,
+      defaultRect: { x: 0.44, y: 0.03, w: 0.535, h: 0.9 },
+      openByDefault: configured,
+      dormant: !configured,
     },
     {
       id: "needs-you",
       title: copy.apps.needsYou,
       icon: "needs-you",
       node: <CofounderQueue locale={locale} userId={claims.sub} bare />,
-      defaultRect: { x: 0.5, y: 0.03, w: 0.475, h: 0.56 },
-      openByDefault: true,
+      defaultRect: { x: 0.44, y: 0.03, w: 0.535, h: 0.56 },
+      openByDefault: !configured,
     },
     {
       id: "work",
       title: OS_WORKAPP_COPY[locale].title,
       icon: "work",
       node: <WorkApp locale={locale} items={workItems} />,
-      defaultRect: { x: 0.1, y: 0.1, w: 0.62, h: 0.74 },
+      defaultRect: { x: 0.3, y: 0.1, w: 0.62, h: 0.74 },
     },
     {
       id: "running",
       title: copy.apps.running,
       icon: "running",
       node: <CofounderActivity locale={locale} bare />,
-      defaultRect: { x: 0.5, y: 0.62, w: 0.475, h: 0.31 },
+      defaultRect: { x: 0.44, y: 0.62, w: 0.535, h: 0.31 },
       openByDefault: false,
     },
     {
@@ -207,21 +261,21 @@ export default async function OsPage(props: LocalePageProps) {
           openable={documents.map((d) => d.key.slice("item:".length))}
         />
       ),
-      defaultRect: { x: 0.14, y: 0.18, w: 0.55, h: 0.6 },
+      defaultRect: { x: 0.34, y: 0.18, w: 0.55, h: 0.6 },
     },
     {
       id: "memory",
       title: OS_MEMORY_COPY[locale].title,
       icon: "memory",
       node: <MemoryApp locale={locale} />,
-      defaultRect: { x: 0.18, y: 0.22, w: 0.58, h: 0.58 },
+      defaultRect: { x: 0.38, y: 0.22, w: 0.58, h: 0.58 },
     },
     {
       id: "company",
       title: copy.apps.company,
       icon: "company",
       node: <CompanyApp locale={locale} />,
-      defaultRect: { x: 0.22, y: 0.28, w: 0.42, h: 0.46 },
+      defaultRect: { x: 0.42, y: 0.28, w: 0.42, h: 0.46 },
     },
   ];
 
@@ -229,10 +283,11 @@ export default async function OsPage(props: LocalePageProps) {
     <OsShell
       apps={apps}
       documents={documents}
+      brief={<Brief locale={locale} brief={brief} hasCompany={hasCompany} />}
+      locale={locale}
       copy={{
         desktop: copy.desktop,
-        empty: copy.empty,
-        emptyHint: copy.emptyHint,
+        today: copy.today,
         waitingLabel: copy.waiting(waiting),
         waitingShort: String(waiting),
         close: copy.close,

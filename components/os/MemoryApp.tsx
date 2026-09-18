@@ -2,6 +2,7 @@ import { OsPaneEmpty } from "@/components/os/OsPaneEmpty";
 import { OS_MEMORY_COPY } from "@/components/osCopy";
 import { teachMemoryAction, retireMemoryAction } from "@/app/actions/memory";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { currentCompany } from "@/lib/osCompany";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import type { Locale } from "@/lib/i18n";
 
@@ -18,7 +19,7 @@ export async function MemoryApp({ locale }: { locale: Locale }) {
   if (!isSupabaseConfigured()) return null;
 
   const supabase = await createSupabaseServerClient();
-  const { data: company } = await supabase.from("os_companies").select("id").limit(1).maybeSingle();
+  const company = await currentCompany(supabase);
   if (!company) return <OsPaneEmpty>{copy.noCompany}</OsPaneEmpty>;
 
   const { data: live } = await supabase

@@ -21,6 +21,7 @@ import {
   type ModelTurn,
 } from "@/lib/osCofounder";
 import { runCofounderTurn } from "@/lib/osCofounderRun";
+import { currentCompany } from "@/lib/osCompany";
 
 /* A model that says exactly what a test needs it to say, one scripted round
  * at a time. The loop above it — tool calls, capping, accounting — is the
@@ -1825,6 +1826,50 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
      * and the function they call adds no approval rule of its own. It simply
      * cannot get past the gate that is already there, and neither can the
      * server. */
+    /* One answer to "which company", 18 September. Six panes had each asked
+     * for the first company the database felt like returning, and for a
+     * person in two companies they could disagree with each other. Now it is
+     * the oldest one they belong to, everywhere. A fresh person, because the
+     * users above already belong to companies earlier tests could not delete. */
+    describe("which company", () => {
+      it("is the oldest one the person belongs to, and nothing for an outsider", async () => {
+        const created = await admin.auth.admin.createUser({
+          email: `rls-two-companies-${suffix}@example.com`,
+          password: "rls-test-password-1",
+          email_confirm: true,
+        });
+        const personId = created.data.user!.id;
+        const person = anonClient();
+        await person.auth.signInWithPassword({
+          email: `rls-two-companies-${suffix}@example.com`,
+          password: "rls-test-password-1",
+        });
+
+        const { data: older } = await admin
+          .from("os_companies")
+          .insert({ name: `Older ${suffix}`, what_we_do: "first" })
+          .select("id")
+          .single();
+        const { data: newer } = await admin
+          .from("os_companies")
+          .insert({ name: `Newer ${suffix}`, what_we_do: "second" })
+          .select("id")
+          .single();
+        // Joined newest first, so membership order cannot be what decides.
+        await admin.from("os_company_members").insert({ company_id: newer!.id, user_id: personId, role: "owner" });
+        await admin.from("os_company_members").insert({ company_id: older!.id, user_id: personId, role: "member" });
+
+        const chosen = await currentCompany(person);
+        expect(chosen?.id).toBe(older!.id);
+        expect(chosen?.name).toBe(`Older ${suffix}`);
+        expect(chosen?.monthly_chat_usd).toBe(5);
+
+        expect(await currentCompany(outsider)).toBeNull();
+
+        await admin.from("os_companies").delete().in("id", [older!.id, newer!.id]);
+      });
+    });
+
     describe("finishing work", () => {
       let companyId: string;
 

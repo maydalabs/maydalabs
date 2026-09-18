@@ -380,6 +380,7 @@ export type OsActivityCopy = (typeof OS_ACTIVITY_COPY)[Locale];
 export const OS_SHELL_COPY = {
   en: {
     desktop: "Desktop",
+    today: "Today",
     empty: "Nothing open.",
     emptyHint: "Pick something from the dock below.",
     waiting: (count: number) =>
@@ -413,6 +414,7 @@ export const OS_SHELL_COPY = {
   },
   tr: {
     desktop: "Masaüstü",
+    today: "Bugün",
     empty: "Açık bir şey yok.",
     emptyHint: "Aşağıdaki çubuktan birini seçin.",
     waiting: (count: number) =>
@@ -446,6 +448,7 @@ export const OS_SHELL_COPY = {
   },
   fr: {
     desktop: "Bureau",
+    today: "Aujourd'hui",
     empty: "Rien d'ouvert.",
     emptyHint: "Choisissez quelque chose dans la barre ci-dessous.",
     waiting: (count: number) =>
@@ -480,6 +483,73 @@ export const OS_SHELL_COPY = {
 } as const;
 
 export type OsShellCopyStrings = (typeof OS_SHELL_COPY)[Locale];
+
+/* The brief. The desk's first words, computed from the record rather than
+ * written by anyone — so every sentence here has a count or a name in it, and
+ * none of them promises more than the database can show. Plain strings; the
+ * counts are filled in on the server. */
+export const OS_BRIEF_COPY = {
+  en: {
+    needs: { none: "Nothing needs you.", one: "One thing needs you.", many: "{n} things need you." },
+    changes: {
+      none: "Nothing has changed since you last looked.",
+      one: "One thing changed since you last looked.",
+      many: "{n} things changed since you last looked.",
+    },
+    lastChange: "Last: {who} {event} “{title}”.",
+    nextNone: "Nothing runs on its own yet.",
+    nextDue: "{name} runs {when}.",
+    nextSoon: "{name} runs within the hour.",
+    nextPaused: "{name} is paused.",
+    finished: {
+      none: "Nothing finished this fortnight.",
+      one: "One thing finished this fortnight.",
+      many: "{n} things finished this fortnight.",
+    },
+    more: "and {n} more in {app}",
+    emptyHint: "Add something in Work, or tell it what to look into.",
+  },
+  tr: {
+    needs: { none: "Sizi bekleyen bir şey yok.", one: "Bir şey sizi bekliyor.", many: "{n} şey sizi bekliyor." },
+    changes: {
+      none: "Son baktığınızdan beri bir şey değişmedi.",
+      one: "Son baktığınızdan beri bir şey değişti.",
+      many: "Son baktığınızdan beri {n} şey değişti.",
+    },
+    lastChange: "Son: {who} “{title}” {event}.",
+    nextNone: "Henüz kendi başına çalışan bir şey yok.",
+    nextDue: "{name} {when} çalışacak.",
+    nextSoon: "{name} bir saat içinde çalışacak.",
+    nextPaused: "{name} duraklatıldı.",
+    finished: {
+      none: "Bu iki haftada biten bir şey yok.",
+      one: "Bu iki haftada bir şey bitti.",
+      many: "Bu iki haftada {n} şey bitti.",
+    },
+    more: "ve {app} içinde {n} tane daha",
+    emptyHint: "İş'e bir şey ekleyin ya da ona neye bakacağını söyleyin.",
+  },
+  fr: {
+    needs: { none: "Rien ne vous attend.", one: "Une chose vous attend.", many: "{n} choses vous attendent." },
+    changes: {
+      none: "Rien n'a changé depuis votre dernier passage.",
+      one: "Une chose a changé depuis votre dernier passage.",
+      many: "{n} choses ont changé depuis votre dernier passage.",
+    },
+    lastChange: "Dernier : {who} {event} « {title} ».",
+    nextNone: "Rien ne tourne encore tout seul.",
+    nextDue: "{name} tourne {when}.",
+    nextSoon: "{name} tourne dans l'heure.",
+    nextPaused: "{name} est en pause.",
+    finished: {
+      none: "Rien de terminé ces deux dernières semaines.",
+      one: "Une chose terminée ces deux dernières semaines.",
+      many: "{n} choses terminées ces deux dernières semaines.",
+    },
+    more: "et {n} de plus dans {app}",
+    emptyHint: "Ajoutez quelque chose dans Travail, ou dites-lui quoi regarder.",
+  },
+} as const;
 
 /* The conversation's own words. Plain strings only: this copy crosses into a
  * client component. */
@@ -615,11 +685,15 @@ export const OS_RECORD_COPY = {
     bySystem: "the system",
     newSince: "New since you last looked",
     events: {
+      added: "added",
       prepared: "prepared",
       approved: "approved",
       sent_back: "sent back",
+      reopened: "reopened",
+      resubmitted: "resubmitted",
       blocked: "blocked",
       completed: "completed",
+      dismissed: "dismissed",
     } as Record<string, string>,
     markSeen: "Mark as seen",
     unread: (count: number) => (count === 1 ? "1 new" : `${count} new`),
@@ -632,11 +706,15 @@ export const OS_RECORD_COPY = {
     bySystem: "sistem",
     newSince: "Son baktığınızdan beri yeni",
     events: {
+      added: "ekledi",
       prepared: "hazırladı",
       approved: "onayladı",
       sent_back: "geri gönderdi",
+      reopened: "yeniden açtı",
+      resubmitted: "yeniden sundu",
       blocked: "durdurdu",
       completed: "tamamladı",
+      dismissed: "kaldırdı",
     } as Record<string, string>,
     markSeen: "Görüldü olarak işaretle",
     unread: (count: number) => `${count} yeni`,
@@ -649,11 +727,15 @@ export const OS_RECORD_COPY = {
     bySystem: "le système",
     newSince: "Nouveau depuis votre dernier passage",
     events: {
+      added: "a ajouté",
       prepared: "a préparé",
       approved: "a approuvé",
       sent_back: "a renvoyé",
+      reopened: "a rouvert",
+      resubmitted: "a resoumis",
       blocked: "a bloqué",
       completed: "a terminé",
+      dismissed: "a écarté",
     } as Record<string, string>,
     markSeen: "Marquer comme vu",
     unread: (count: number) => (count === 1 ? "1 nouveau" : `${count} nouveaux`),

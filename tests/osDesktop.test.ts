@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sanitizeLayout } from "@/lib/osDesktop";
+import { hydrateWindows, sanitizeLayout } from "@/lib/osDesktop";
 
 /* A window a person has dragged is stored in pixels; one they have never
  * touched is stored as a share of the surface, so that a fresh desk fits the
@@ -122,5 +122,74 @@ describe("a desk on its way into the database", () => {
   it("will not accept more windows than there are apps to fill", () => {
     const many = Array.from({ length: 500 }, (_, i) => ({ app: `app-${i}` }));
     expect(sanitizeLayout(many)).toEqual([]);
+  });
+});
+
+/* The same layout on its way back out: into windows the shell can show. */
+describe("a desk on its way out of the database", () => {
+  const apps = [
+    { id: "cofounder", defaultRect: { x: 0.44, y: 0.03, w: 0.535, h: 0.9 }, openByDefault: true },
+    { id: "needs-you", defaultRect: { x: 0.44, y: 0.03, w: 0.535, h: 0.56 }, openByDefault: false },
+  ];
+
+  it("gives a fresh desk the defaults, with nothing placed", () => {
+    const windows = hydrateWindows(apps, [], null);
+    expect(windows).toEqual([
+      { app: "cofounder", x: 0.44, y: 0.03, w: 0.535, h: 0.9, z: 1, open: true, minimized: false, placed: false },
+      { app: "needs-you", x: 0.44, y: 0.03, w: 0.535, h: 0.56, z: 2, open: false, minimized: false, placed: false },
+    ]);
+  });
+
+  it("restores a window where a person left it", () => {
+    const [win] = hydrateWindows(
+      apps,
+      [],
+      [{ app: "cofounder", x: 120, y: 64, w: 500, h: 400, z: 7, open: true, minimized: true, placed: true }],
+    );
+    expect(win).toEqual({ app: "cofounder", x: 120, y: 64, w: 500, h: 400, z: 7, open: true, minimized: true, placed: true });
+  });
+
+  /* A window nobody has moved carried its old default in the saved layout.
+   * The designer's arrangement can improve, and a person who never expressed
+   * a preference should get the improvement — so the saved shares are
+   * ignored and the app's current default wins. */
+  it("moves an untouched window to the app's current default, not the default it was saved with", () => {
+    const [win] = hydrateWindows(
+      apps,
+      [],
+      [{ app: "cofounder", x: 0.025, y: 0.03, w: 0.45, h: 0.9, z: 3, open: false, minimized: false, placed: false }],
+    );
+    expect(win).toMatchObject({ x: 0.44, w: 0.535, placed: false, open: false, z: 3 });
+  });
+
+  it("recognises pixels saved before the flag existed as a placed window", () => {
+    const [win] = hydrateWindows(apps, [], [{ app: "cofounder", x: 300, y: 40, w: 640, h: 480, open: true }]);
+    expect(win).toMatchObject({ x: 300, w: 640, placed: true });
+  });
+
+  /* The co-founder without a model behind it. It loads closed whatever the
+   * saved desk says, because a window that cannot answer should not be the
+   * first thing on the desk — and it can still be opened from the dock. */
+  it("loads a dormant app closed even when the saved desk had it open", () => {
+    const [win] = hydrateWindows(
+      [{ ...apps[0], dormant: true }],
+      [],
+      [{ app: "cofounder", x: 0.025, y: 0.03, w: 0.45, h: 0.9, open: true, placed: false }],
+    );
+    expect(win.open).toBe(false);
+  });
+
+  it("brings back a remembered document only while it is still open work", () => {
+    const stored = [
+      { app: "item:11111111-1111-4111-8111-111111111111", x: 0.2, y: 0.2, w: 0.5, h: 0.6, open: true, placed: false },
+      { app: "item:22222222-2222-4222-8222-222222222222", x: 0.2, y: 0.2, w: 0.5, h: 0.6, open: true, placed: false },
+    ];
+    const windows = hydrateWindows(apps, [{ key: "item:11111111-1111-4111-8111-111111111111" }], stored);
+    expect(windows.map((w) => w.app)).toEqual(["cofounder", "needs-you", "item:11111111-1111-4111-8111-111111111111"]);
+    expect(windows[2]).toMatchObject({ open: true, placed: false, z: 3 });
+  });
+
+  it("ignores rows that are not windows at all", () => {
+    expect(hydrateWindows(apps, [], [null, 42, "cofounder", { x: 1 }]).map((w) => w.app)).toEqual(["cofounder", "needs-you"]);
   });
 });

@@ -2,15 +2,19 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  OS_OPEN_APP_EVENT,
   OS_OPEN_ITEM_EVENT,
   documentKey,
   type OsApp,
+  type OsAppId,
   type OsDocument,
   type OsShellCopy,
   type OsWindowKey,
   type OsWindowState,
 } from "@/components/os/types";
+import { hydrateWindows } from "@/lib/osDesktop";
 import { saveDesktopAction, markSeenAction } from "@/app/actions/desktop";
+import { OsClock } from "@/components/os/OsClock";
 import { OsCommandBar, OS_COMMAND_EVENT, type CommandBarCopy, type CommandTarget } from "@/components/os/OsCommandBar";
 import { OsBackdrop } from "@/components/os/OsBackdrop";
 import { OsIcon } from "@/components/os/OsIcon";
@@ -47,73 +51,16 @@ function clamp(value: number, low: number, high: number) {
   return Math.min(Math.max(value, low), high);
 }
 
-/* A stored layout is whatever was in the database, which is to say it may be
- * from an older version of the product. Anything unrecognised is dropped and
- * anything missing gets the app's default — a desk that half-restores is
- * better than a desk that throws. */
-function hydrate(apps: OsApp[], documents: OsDocument[], stored: unknown): OsWindowState[] {
-  const rows = Array.isArray(stored) ? stored : [];
-  const byApp = new Map<string, Record<string, unknown>>();
-  for (const row of rows) {
-    if (row && typeof row === "object" && typeof (row as { app?: unknown }).app === "string") {
-      byApp.set((row as { app: string }).app, row as Record<string, unknown>);
-    }
-  }
-
-  /* A remembered document window comes back only if its item is still open
-   * work. A window onto finished work would be a window onto nothing, so it
-   * is dropped rather than restored empty. */
-  const remembered: OsWindowState[] = documents.flatMap((doc, index) => {
-    const saved = byApp.get(doc.key);
-    if (!saved || saved.open !== true) return [];
-    const num = (key: string, fallback: number) =>
-      typeof saved[key] === "number" && Number.isFinite(saved[key]) ? (saved[key] as number) : fallback;
-    return [{
-      app: doc.key,
-      x: num("x", 0.12), y: num("y", 0.1), w: num("w", 0.5), h: num("h", 0.72),
-      z: num("z", apps.length + index + 1),
-      open: true,
-      minimized: saved.minimized === true,
-      placed: saved.placed === true || ["x", "y", "w", "h"].some((k) => typeof saved[k] === "number" && Math.abs(saved[k] as number) > 2),
-    }];
-  });
-
-  return [...apps.map((app, index) => {
-    const saved = byApp.get(app.id);
-    const num = (key: string, fallback: number) =>
-      typeof saved?.[key] === "number" && Number.isFinite(saved[key]) ? (saved[key] as number) : fallback;
-    const bool = (key: string, fallback: boolean) =>
-      typeof saved?.[key] === "boolean" ? (saved[key] as boolean) : fallback;
-
-    /* `placed` is the whole responsive story. A window nobody has moved is
-     * positioned as a share of the surface, so a fresh desk is laid out for
-     * the screen in front of you rather than for the 1280px one I happened to
-     * build on. The moment someone drags it, it becomes pixels — because at
-     * that point they mean *there*, not "44% of the way across". */
-    return {
-      app: app.id,
-      x: num("x", app.defaultRect.x),
-      y: num("y", app.defaultRect.y),
-      w: num("w", app.defaultRect.w),
-      h: num("h", app.defaultRect.h),
-      z: num("z", index + 1),
-      open: bool("open", Boolean(app.openByDefault)),
-      minimized: bool("minimized", false),
-      /* A desk saved before windows had this flag holds pixels and says so
-       * only by their size: a share is never more than 2. */
-      placed: bool(
-        "placed",
-        ["x", "y", "w", "h"].some(
-          (key) => typeof saved?.[key] === "number" && Math.abs(saved[key] as number) > 2,
-        ),
-      ),
-    };
-  }), ...remembered];
-}
+/* On a phone the brief is a pane of its own rather than the surface under
+ * the windows, because there is no "under" on a phone. */
+const BRIEF_PANE = "brief";
+type Pane = OsWindowKey | typeof BRIEF_PANE;
 
 export function OsShell({
   apps,
   documents,
+  brief,
+  locale,
   copy,
   storedLayout,
   companyName,
@@ -126,6 +73,9 @@ export function OsShell({
 }: {
   apps: OsApp[];
   documents: OsDocument[];
+  /* The desk's own surface, under the windows. See components/os/Brief.tsx. */
+  brief: React.ReactNode;
+  locale: string;
   copy: OsShellCopy;
   storedLayout: unknown;
   companyName: string | null;
@@ -136,10 +86,10 @@ export function OsShell({
   commandCopy: CommandBarCopy;
   unreadCount: number;
 }) {
-  const [windows, setWindows] = useState<OsWindowState[]>(() => hydrate(apps, documents, storedLayout));
+  const [windows, setWindows] = useState<OsWindowState[]>(() => hydrateWindows(apps, documents, storedLayout));
   const [gesture, setGesture] = useState<Gesture | null>(null);
   const [narrow, setNarrow] = useState(false);
-  const [phoneApp, setPhoneApp] = useState<OsWindowKey>(apps[0]?.id ?? "cofounder");
+  const [phoneApp, setPhoneApp] = useState<Pane>(BRIEF_PANE);
 
   /* One lookup for both kinds of window. */
   const surfaces = useMemo<Map<OsWindowKey, Surface>>(() => {
@@ -266,6 +216,17 @@ export function OsShell({
     window.addEventListener(OS_OPEN_ITEM_EVENT, onOpen);
     return () => window.removeEventListener(OS_OPEN_ITEM_EVENT, onOpen);
   }, [openDocument]);
+
+  useEffect(() => {
+    const onOpenApp = (event: Event) => {
+      const id = (event as CustomEvent<string>).detail;
+      if (typeof id !== "string" || !apps.some((app) => app.id === id)) return;
+      if (narrow) setPhoneApp(id as OsAppId);
+      else focus(id as OsAppId);
+    };
+    window.addEventListener(OS_OPEN_APP_EVENT, onOpenApp);
+    return () => window.removeEventListener(OS_OPEN_APP_EVENT, onOpenApp);
+  }, [apps, focus, narrow]);
 
   // ------------------------------------------------------------- gestures
 
@@ -407,6 +368,7 @@ export function OsShell({
           <kbd>⌘K</kbd>
         </button>
         <span className="os-bar-right">
+          <OsClock locale={locale} form="bar" />
           {/* What happened while you were away, and the means to stop being
               told about it. The count is of the record, not of the queue:
               those are different questions and conflating them is how a badge
@@ -440,24 +402,31 @@ export function OsShell({
         onPointerCancel={endGesture}
       >
         {narrow ? (
-          <div className="os-stack">
-            {/* A document carries its own heading. On the desk the window's
-                title bar is chrome and the heading is content, which is how
-                every document window works; in a single-pane stack the two
-                sit one above the other and read as a stammer. */}
-            {appFor(phoneApp)?.isDocument ? null : (
-              <h1 className="os-stack-title">{appFor(phoneApp)?.title ?? copy.desktop}</h1>
+          <div className="os-stack" data-pane={phoneApp === BRIEF_PANE ? "brief" : "app"}>
+            {/* A document carries its own heading, and so does the brief. On
+                the desk the window's title bar is chrome and the heading is
+                content, which is how every document window works; in a
+                single-pane stack the two sit one above the other and read as
+                a stammer. */}
+            {phoneApp === BRIEF_PANE ? (
+              brief
+            ) : (
+              <>
+                {appFor(phoneApp)?.isDocument ? null : (
+                  <h1 className="os-stack-title">{appFor(phoneApp)?.title ?? copy.desktop}</h1>
+                )}
+                {nodeFor(phoneApp)}
+              </>
             )}
-            {nodeFor(phoneApp)}
           </div>
         ) : (
           <>
-            {visible.length === 0 ? (
-              <div className="os-empty">
-                <strong>{copy.empty}</strong>
-                <span>{copy.emptyHint}</span>
-              </div>
-            ) : null}
+            {/* The ground the windows sit on. It is not a window: no title
+                bar, nothing to close, and it never comes to the front — a
+                desk is what is left when everything is put away. */}
+            <aside className="os-brief" aria-label={copy.today}>
+              {brief}
+            </aside>
 
             {visible.map((state) => {
               const app = appFor(state.app);
@@ -536,6 +505,18 @@ export function OsShell({
         {/* The tray is what makes this a dock rather than six buttons that
             happen to sit near each other. */}
         <div className="os-dock-tray">
+        {narrow ? (
+          <button
+            type="button"
+            className="os-dock-item"
+            data-open={phoneApp === BRIEF_PANE}
+            aria-pressed={phoneApp === BRIEF_PANE}
+            onClick={() => setPhoneApp(BRIEF_PANE)}
+          >
+            <OsIcon name="today" size={15} />
+            {copy.today}
+          </button>
+        ) : null}
         {apps.map((app) => {
           const state = windows.find((w) => w.app === app.id);
           const open = narrow ? phoneApp === app.id : Boolean(state?.open && !state.minimized);
@@ -545,6 +526,7 @@ export function OsShell({
               type="button"
               className="os-dock-item"
               data-open={open}
+              data-dormant={app.dormant ? "true" : undefined}
               aria-pressed={open}
               onClick={() => toggle(app.id)}
             >
