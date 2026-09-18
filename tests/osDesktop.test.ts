@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hydrateWindows, sanitizeLayout } from "@/lib/osDesktop";
+import { DEFAULT_PREFS, hydrateWindows, sanitizeLayout, sanitizePrefs } from "@/lib/osDesktop";
 
 /* A window a person has dragged is stored in pixels; one they have never
  * touched is stored as a share of the surface, so that a fresh desk fits the
@@ -191,5 +191,24 @@ describe("a desk on its way out of the database", () => {
 
   it("ignores rows that are not windows at all", () => {
     expect(hydrateWindows(apps, [], [null, 42, "cofounder", { x: 1 }]).map((w) => w.app)).toEqual(["cofounder", "needs-you"]);
+  });
+});
+
+/* Preferences are one of a few named choices each. Anything else is not
+ * stored, so a colour typed by hand or a key nobody defined never reaches
+ * the column. */
+describe("a person's preferences on their way into the database", () => {
+  it("keeps a real choice", () => {
+    expect(sanitizePrefs({ accent: "amber", mood: "sea" })).toEqual({ accent: "amber", mood: "sea" });
+  });
+
+  it("falls back to the desk as it ships for anything it does not know", () => {
+    expect(sanitizePrefs({ accent: "#ff0000", mood: "disco", extra: true })).toEqual(DEFAULT_PREFS);
+    expect(sanitizePrefs(null)).toEqual(DEFAULT_PREFS);
+    expect(sanitizePrefs("amber")).toEqual(DEFAULT_PREFS);
+  });
+
+  it("keeps one choice when the other is nonsense", () => {
+    expect(sanitizePrefs({ accent: "rose", mood: 42 })).toEqual({ accent: "rose", mood: "lamp" });
   });
 });

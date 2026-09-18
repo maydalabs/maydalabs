@@ -32,6 +32,7 @@ out vec4 fragColor;
 uniform vec2 uSize;
 uniform float uTime;
 uniform float uActivity;
+uniform vec3 uTint;
 
 float hash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -70,7 +71,8 @@ void main() {
   // #050507, matching --os-bg. This was #0b0b0d — six points LIGHTER
   // than the token it covers, so the canvas was quietly undoing the palette.
   vec3 base = vec3(0.0196, 0.0196, 0.0275);
-  vec3 cool = vec3(0.114, 0.125, 0.235);
+  // The colour of the light, chosen in Settings; the lamp itself does not move.
+  vec3 cool = uTint;
 
   // The light sits off the top-left corner, matching where every window's
   // shadow says it is.
@@ -112,14 +114,25 @@ function compile(gl: WebGL2RenderingContext, type: number, source: string) {
   return shader;
 }
 
-export function OsBackdrop({ activity = 0 }: { activity?: number }) {
+/* The wallpapers, as the colour of the lamp. Linear RGB, the values the
+ * shader adds to a near-black ground; "plain" has no lamp and no canvas. */
+const TINTS: Record<string, [number, number, number]> = {
+  lamp: [0.114, 0.125, 0.235],
+  ember: [0.3, 0.15, 0.06],
+  sea: [0.06, 0.2, 0.19],
+};
+
+export function OsBackdrop({ activity = 0, mood = "lamp" }: { activity?: number; mood?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const activityRef = useRef(activity);
   activityRef.current = activity;
+  const tintRef = useRef(TINTS[mood] ?? TINTS.lamp);
+  tintRef.current = TINTS[mood] ?? TINTS.lamp;
+  const painted = mood !== "plain";
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !painted) return;
 
     /* Anyone who has asked for less motion gets the flat token background
      * underneath instead. The canvas simply never paints. */
@@ -157,6 +170,7 @@ export function OsBackdrop({ activity = 0 }: { activity?: number }) {
     const uSize = gl.getUniformLocation(program, "uSize");
     const uTime = gl.getUniformLocation(program, "uTime");
     const uActivity = gl.getUniformLocation(program, "uActivity");
+    const uTint = gl.getUniformLocation(program, "uTint");
 
     /* Rendered at three quarters of a CSS pixel. It is an out-of-focus
      * surface behind everything; paying for retina here would cost four times
@@ -189,6 +203,7 @@ export function OsBackdrop({ activity = 0 }: { activity?: number }) {
       if (!running) return;
       gl.uniform1f(uTime, (now - started) / 1000);
       gl.uniform1f(uActivity, activityRef.current);
+      gl.uniform3f(uTint, tintRef.current[0], tintRef.current[1], tintRef.current[2]);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       frame = requestAnimationFrame(draw);
     };
@@ -224,7 +239,8 @@ export function OsBackdrop({ activity = 0 }: { activity?: number }) {
       gl.deleteShader(vs);
       gl.deleteShader(fs);
     };
-  }, []);
+  }, [painted]);
 
+  if (!painted) return null;
   return <canvas ref={canvasRef} className="os-backdrop" aria-hidden="true" />;
 }

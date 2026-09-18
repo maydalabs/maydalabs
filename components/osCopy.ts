@@ -505,6 +505,68 @@ export const OS_SHELL_COPY = {
 
 export type OsShellCopyStrings = (typeof OS_SHELL_COPY)[Locale];
 
+/* Settings. The choices are named things, never values: a person picks
+ * "Ember", not a hex code, so what is stored is one of a few words. */
+export const OS_SETTINGS_COPY = {
+  en: {
+    title: "Settings",
+    wallpaper: "Wallpaper",
+    moods: { lamp: "Lamp", ember: "Ember", sea: "Sea", plain: "Plain" } as Record<string, string>,
+    accent: "Accent",
+    accents: { periwinkle: "Periwinkle", amber: "Amber", mint: "Mint", rose: "Rose" } as Record<string, string>,
+    language: "Language",
+    languages: { en: "English", tr: "Türkçe", fr: "Français" } as Record<string, string>,
+    desk: "The desk",
+    resetLayout: "Put every window back where it started",
+    install: "On your Mac",
+    installBody: "MaydaOS can live in your Dock as an app of its own, in its own window, without the browser around it.",
+    installButton: "Install MaydaOS",
+    installHint: "In Safari: File → Add to Dock. In Chrome: the install icon at the right of the address bar.",
+    installed: "Installed. It is in your Dock.",
+    account: "Account",
+    signedInAs: "Signed in as {email}",
+    signOut: "Sign out",
+  },
+  tr: {
+    title: "Ayarlar",
+    wallpaper: "Duvar kağıdı",
+    moods: { lamp: "Lamba", ember: "Kor", sea: "Deniz", plain: "Sade" } as Record<string, string>,
+    accent: "Vurgu rengi",
+    accents: { periwinkle: "Mor-mavi", amber: "Kehribar", mint: "Nane", rose: "Gül" } as Record<string, string>,
+    language: "Dil",
+    languages: { en: "English", tr: "Türkçe", fr: "Français" } as Record<string, string>,
+    desk: "Masa",
+    resetLayout: "Bütün pencereleri başlangıç yerine koy",
+    install: "Mac'inizde",
+    installBody: "MaydaOS, tarayıcı olmadan, kendi penceresinde, Dock'unuzda ayrı bir uygulama olarak durabilir.",
+    installButton: "MaydaOS'u kur",
+    installHint: "Safari'de: Dosya → Dock'a Ekle. Chrome'da: adres çubuğunun sağındaki kurulum simgesi.",
+    installed: "Kuruldu. Dock'unuzda.",
+    account: "Hesap",
+    signedInAs: "{email} olarak giriş yapıldı",
+    signOut: "Çıkış yap",
+  },
+  fr: {
+    title: "Réglages",
+    wallpaper: "Fond d'écran",
+    moods: { lamp: "Lampe", ember: "Braise", sea: "Mer", plain: "Uni" } as Record<string, string>,
+    accent: "Couleur d'accent",
+    accents: { periwinkle: "Pervenche", amber: "Ambre", mint: "Menthe", rose: "Rose" } as Record<string, string>,
+    language: "Langue",
+    languages: { en: "English", tr: "Türkçe", fr: "Français" } as Record<string, string>,
+    desk: "Le bureau",
+    resetLayout: "Remettre chaque fenêtre à sa place d'origine",
+    install: "Sur votre Mac",
+    installBody: "MaydaOS peut vivre dans votre Dock comme une application à part entière, dans sa propre fenêtre, sans le navigateur autour.",
+    installButton: "Installer MaydaOS",
+    installHint: "Dans Safari : Fichier → Ajouter au Dock. Dans Chrome : l'icône d'installation à droite de la barre d'adresse.",
+    installed: "Installé. C'est dans votre Dock.",
+    account: "Compte",
+    signedInAs: "Connecté en tant que {email}",
+    signOut: "Se déconnecter",
+  },
+} as const;
+
 /* The brief. The desk's first words, computed from the record rather than
  * written by anyone — so every sentence here has a count or a name in it, and
  * none of them promises more than the database can show. Plain strings; the

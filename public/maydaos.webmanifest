@@ -1,0 +1,17 @@
+{
+  "name": "MaydaOS",
+  "short_name": "MaydaOS",
+  "description": "Your co-founder's desk.",
+  "id": "/os",
+  "start_url": "/os",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#050507",
+  "theme_color": "#050507",
+  "lang": "en",
+  "icons": [
+    { "src": "/maydaos-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/maydaos-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/maydaos-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

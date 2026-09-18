@@ -8,6 +8,7 @@ import { MemoryApp } from "@/components/os/MemoryApp";
 import { RecordApp } from "@/components/os/RecordApp";
 import { WorkApp } from "@/components/os/WorkApp";
 import { Brief } from "@/components/os/Brief";
+import { SettingsApp } from "@/components/os/SettingsApp";
 import { ItemDocument, type ItemEvent, type ItemRecord } from "@/components/os/ItemDocument";
 import { OsShell } from "@/components/os/OsShell";
 import {
@@ -15,12 +16,14 @@ import {
   OS_COFOUNDER_CHAT_COPY,
   OS_MEMORY_COPY,
   OS_RECORD_COPY,
+  OS_SETTINGS_COPY,
   OS_WORKAPP_COPY,
 } from "@/components/osCopy";
 import { documentKey, type OsApp, type OsDocument } from "@/components/os/types";
 import type { CommandTarget } from "@/components/os/OsCommandBar";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { currentCompany } from "@/lib/osCompany";
+import { DEFAULT_PREFS, sanitizePrefs, type OsPrefs } from "@/lib/osDesktop";
 import { composeBrief, type Brief as BriefModel, type ChangeRow, type NeedRow, type WorkflowRow } from "@/lib/osBrief";
 import { isCofounderConfigured } from "@/lib/osCofounderModel";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -49,6 +52,7 @@ export default async function OsPage(props: LocalePageProps) {
   let companyName: string | null = null;
   let waiting = 0;
   let storedLayout: unknown = [];
+  let prefs: OsPrefs = DEFAULT_PREFS;
   let seenAt: string | null = null;
   let unread = 0;
   const targets: CommandTarget[] = [];
@@ -68,9 +72,10 @@ export default async function OsPage(props: LocalePageProps) {
     const [company, { count }, { data: desktop }] = await Promise.all([
       currentCompany(supabase),
       supabase.from("os_needs_you").select("id", { count: "exact", head: true }),
-      supabase.from("os_desktops").select("layout, seen_at").eq("user_id", claims.sub).maybeSingle(),
+      supabase.from("os_desktops").select("layout, seen_at, prefs").eq("user_id", claims.sub).maybeSingle(),
     ]);
     hasCompany = company !== null;
+    prefs = sanitizePrefs(desktop?.prefs);
 
     companyName = company?.name ?? null;
     waiting = count ?? 0;
@@ -284,6 +289,15 @@ export default async function OsPage(props: LocalePageProps) {
       node: <CompanyApp locale={locale} />,
       defaultRect: { x: 0.42, y: 0.28, w: 0.42, h: 0.46 },
     },
+    {
+      id: "settings",
+      title: OS_SETTINGS_COPY[locale].title,
+      icon: "settings",
+      node: (
+        <SettingsApp locale={locale} prefs={prefs} email={typeof claims.email === "string" ? claims.email : null} />
+      ),
+      defaultRect: { x: 0.46, y: 0.16, w: 0.42, h: 0.7 },
+    },
   ];
 
   return (
@@ -292,6 +306,7 @@ export default async function OsPage(props: LocalePageProps) {
       documents={documents}
       brief={<Brief locale={locale} brief={brief} hasCompany={hasCompany} />}
       locale={locale}
+      prefs={prefs}
       copy={{
         desktop: copy.desktop,
         today: copy.today,

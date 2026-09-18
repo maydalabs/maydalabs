@@ -450,18 +450,21 @@ export type Database = {
       os_desktops: {
         Row: {
           layout: Json
+          prefs: Json
           seen_at: string
           updated_at: string
           user_id: string
         }
         Insert: {
           layout?: Json
+          prefs?: Json
           seen_at?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           layout?: Json
+          prefs?: Json
           seen_at?: string
           updated_at?: string
           user_id?: string

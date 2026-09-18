@@ -1,7 +1,26 @@
+import type { Metadata, Viewport } from "next";
 import { Source_Serif_4 } from "next/font/google";
 import "../../os.css";
 import { isLocale } from "@/lib/i18n";
 import { notFound } from "next/navigation";
+
+/* Installable, from here only.
+ *
+ * The manifest makes MaydaOS an app of its own in the Dock — its own window,
+ * its own icon, no browser around it. It is linked from this layout and not
+ * from the site's, so nothing public points at the desk; the file itself is
+ * fetchable, like robots.txt, and says no more than the sign-in redirect
+ * already does. */
+export const metadata: Metadata = {
+  manifest: "/maydaos.webmanifest",
+  appleWebApp: { capable: true, title: "MaydaOS", statusBarStyle: "black-translucent" },
+  icons: { apple: "/maydaos-192.png" },
+};
+
+export const viewport: Viewport = {
+  colorScheme: "dark",
+  themeColor: "#050507",
+};
 
 /* A serif, loaded only here.
  *

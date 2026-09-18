@@ -12,8 +12,9 @@ import {
   type OsWindowKey,
   type OsWindowState,
 } from "@/components/os/types";
-import { hydrateWindows } from "@/lib/osDesktop";
-import { saveDesktopAction, markSeenAction } from "@/app/actions/desktop";
+import { hydrateWindows, sanitizePrefs, type OsPrefs } from "@/lib/osDesktop";
+import { saveDesktopAction, markSeenAction, savePrefsAction } from "@/app/actions/desktop";
+import { OS_PREFS_EVENT } from "@/components/os/SettingsPanel";
 import { OsClock } from "@/components/os/OsClock";
 import { OsCommandBar, OS_COMMAND_EVENT, type CommandBarCopy, type CommandTarget } from "@/components/os/OsCommandBar";
 import { OsBackdrop } from "@/components/os/OsBackdrop";
@@ -76,6 +77,7 @@ export function OsShell({
   documents,
   brief,
   locale,
+  prefs: storedPrefs,
   copy,
   storedLayout,
   companyName,
@@ -91,6 +93,8 @@ export function OsShell({
   /* The desk's own surface, under the windows. See components/os/Brief.tsx. */
   brief: React.ReactNode;
   locale: string;
+  /* How the person likes the desk; see lib/osDesktop.ts. */
+  prefs: OsPrefs;
   copy: OsShellCopy;
   storedLayout: unknown;
   companyName: string | null;
@@ -105,6 +109,24 @@ export function OsShell({
   const [gesture, setGesture] = useState<Gesture | null>(null);
   /* Windows on their way out, still drawn while they go. */
   const [leaving, setLeaving] = useState<Map<OsWindowKey, "close" | "away">>(() => new Map());
+  const [prefs, setPrefs] = useState<OsPrefs>(storedPrefs);
+
+  /* Settings announces a choice; the shell wears it at once and remembers
+   * it a moment later, the way it remembers where a window came to rest. */
+  useEffect(() => {
+    let pendingSave: ReturnType<typeof setTimeout> | null = null;
+    const onPrefs = (event: Event) => {
+      const next = sanitizePrefs((event as CustomEvent<unknown>).detail);
+      setPrefs(next);
+      if (pendingSave) clearTimeout(pendingSave);
+      pendingSave = setTimeout(() => void savePrefsAction(next), 400);
+    };
+    window.addEventListener(OS_PREFS_EVENT, onPrefs);
+    return () => {
+      window.removeEventListener(OS_PREFS_EVENT, onPrefs);
+      if (pendingSave) clearTimeout(pendingSave);
+    };
+  }, []);
   const [narrow, setNarrow] = useState(false);
   const [phoneApp, setPhoneApp] = useState<Pane>(BRIEF_PANE);
 
@@ -455,8 +477,13 @@ export function OsShell({
   const openDocuments = windows.filter((w) => w.open && surfaces.get(w.app)?.isDocument);
 
   return (
-    <div className="os-root" data-gesturing={gesture ? "true" : "false"}>
-      <OsBackdrop activity={Math.min(waitingCount / 5, 1)} />
+    <div
+      className="os-root"
+      data-gesturing={gesture ? "true" : "false"}
+      data-accent={prefs.accent}
+      data-mood={prefs.mood}
+    >
+      <OsBackdrop activity={Math.min(waitingCount / 5, 1)} mood={prefs.mood} />
       <OsCommandBar
         targets={[
           ...commandTargets,

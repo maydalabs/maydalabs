@@ -6,7 +6,7 @@
  * place to put arbitrary things.
  */
 
-export const OS_APP_IDS = ["cofounder", "needs-you", "work", "running", "record", "memory", "company"] as const;
+export const OS_APP_IDS = ["cofounder", "needs-you", "work", "running", "record", "memory", "company", "settings"] as const;
 export type OsKnownAppId = (typeof OS_APP_IDS)[number];
 
 const KNOWN = new Set<string>(OS_APP_IDS);
@@ -196,4 +196,31 @@ export function sanitizeLayout(rows: unknown): StoredWindow[] {
   }
 
   return out;
+}
+
+/* A person's preferences, on the way into the database.
+ *
+ * Allowlists, not schemas: a preference is one of a few named choices, and
+ * anything else — a colour typed by hand, a key nobody defined — is dropped
+ * rather than stored. The defaults are the desk as it ships.
+ */
+export const OS_ACCENTS = ["periwinkle", "amber", "mint", "rose"] as const;
+export const OS_MOODS = ["lamp", "ember", "sea", "plain"] as const;
+
+export type OsAccent = (typeof OS_ACCENTS)[number];
+export type OsMood = (typeof OS_MOODS)[number];
+export type OsPrefs = { accent: OsAccent; mood: OsMood };
+
+export const DEFAULT_PREFS: OsPrefs = { accent: "periwinkle", mood: "lamp" };
+
+function oneOf<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
+  return typeof value === "string" && (allowed as readonly string[]).includes(value) ? (value as T) : fallback;
+}
+
+export function sanitizePrefs(value: unknown): OsPrefs {
+  const item = (value && typeof value === "object" ? value : {}) as Record<string, unknown>;
+  return {
+    accent: oneOf(item.accent, OS_ACCENTS, DEFAULT_PREFS.accent),
+    mood: oneOf(item.mood, OS_MOODS, DEFAULT_PREFS.mood),
+  };
 }

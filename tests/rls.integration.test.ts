@@ -1715,6 +1715,28 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         expect(data!.layout).toEqual(layout);
       });
 
+      /* Preferences ride on the same row as the layout, under the same
+       * column grants: a person may write them, and still may not write
+       * when they last looked. */
+      it("lets a person save how they like their desk, and nothing else on the row", async () => {
+        const { error } = await userA
+          .from("os_desktops")
+          .upsert({ user_id: idA, prefs: { accent: "amber", mood: "sea" } }, { onConflict: "user_id" });
+        expect(error).toBeNull();
+
+        const { data } = await userA.from("os_desktops").select("prefs").eq("user_id", idA).single();
+        expect(data!.prefs).toEqual({ accent: "amber", mood: "sea" });
+
+        const { error: shape } = await userA.from("os_desktops").update({ prefs: "not an object" as unknown as Record<string, never> }).eq("user_id", idA);
+        expect(shape).not.toBeNull();
+
+        const { error: seen } = await userA
+          .from("os_desktops")
+          .update({ seen_at: "2000-01-01T00:00:00Z" })
+          .eq("user_id", idA);
+        expect(seen).not.toBeNull();
+      });
+
       it("keeps one company's memory out of another's", async () => {
         const { data: mine } = await userA.from("os_company_memory").select("id").eq("company_id", companyId);
         expect((mine ?? []).length).toBeGreaterThan(0);
