@@ -10,7 +10,11 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 import { OS_EFFORT, OS_MODEL } from "@/lib/os";
+import { localDraftClient, localModelSettings } from "@/lib/osCofounderLocal";
 import type { FetchedSource } from "@/lib/osSources";
+
+/* Whatever the environment holds; process.env is one of these. */
+type Env = Record<string, string | undefined>;
 
 const DraftSchema = z.object({
   draft: z.string(),
@@ -54,8 +58,8 @@ Sources:
 ${rendered}`;
 }
 
-export function isOsConfigured(): boolean {
-  return Boolean(process.env.MAYDAOS_ANTHROPIC_API_KEY);
+export function isOsConfigured(env: Env = process.env): boolean {
+  return Boolean(env.MAYDAOS_ANTHROPIC_API_KEY) || localModelSettings(env) !== null;
 }
 
 /* The one call the tests need to stand in for. */
@@ -78,9 +82,13 @@ export async function draftFromSources(
   injected?: DraftClient,
 ): Promise<OsDraft | { error: string }> {
   const apiKey = process.env.MAYDAOS_ANTHROPIC_API_KEY;
-  if (!injected && !apiKey) return { error: "MaydaOS is not configured." };
+  const local = localModelSettings();
+  if (!injected && !apiKey && !local) return { error: "MaydaOS is not configured." };
 
-  const client: DraftClient = injected ?? (new Anthropic({ apiKey }) as unknown as DraftClient);
+  // A model on this machine wins off Vercel, for the same reason the
+  // conversation's does: it costs nothing.
+  const client: DraftClient =
+    injected ?? (local ? localDraftClient(local) : (new Anthropic({ apiKey }) as unknown as DraftClient));
   try {
     const response = await client.messages.parse({
       model: OS_MODEL,

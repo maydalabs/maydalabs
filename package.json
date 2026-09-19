@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "scenarios": "vitest run tests/cofounder.scenarios.test.ts --reporter=dot",
     "smoke:live": "node scripts/smoke.mjs",
     "brand:build": "node scripts/build-brand-assets.mjs"
   },

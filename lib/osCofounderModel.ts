@@ -1,14 +1,30 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { FILE_WORK_TOOL, REMEMBER_TOOL, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
+import { localModelSettings, localTurn } from "@/lib/osCofounderLocal";
 import { OS_MODEL } from "@/lib/os";
+
+/* Whatever the environment holds; process.env is one of these. */
+type Env = Record<string, string | undefined>;
 
 /* The SDK side of the seam, and the only part of the co-founder that costs
  * money. Everything above it — the loop, the tool, the context — is
  * exercised in tests against a fake that implements this same signature.
  */
 
-export function isCofounderConfigured(): boolean {
-  return Boolean(process.env.MAYDAOS_ANTHROPIC_API_KEY);
+export type PickedTurn = { turn: ModelTurn; priced: boolean; label: string };
+
+/* Which model speaks. A local model wins off Vercel, because the point of
+ * having one is not to spend; on Vercel it is never considered, whatever
+ * the environment says. */
+export function pickTurn(env: Env = process.env): PickedTurn | null {
+  const local = localModelSettings(env);
+  if (local) return { turn: localTurn(local), priced: false, label: `local:${local.model}` };
+  if (env.MAYDAOS_ANTHROPIC_API_KEY) return { turn: anthropicTurn(), priced: true, label: OS_MODEL };
+  return null;
+}
+
+export function isCofounderConfigured(env: Env = process.env): boolean {
+  return Boolean(env.MAYDAOS_ANTHROPIC_API_KEY) || localModelSettings(env) !== null;
 }
 
 export function anthropicTurn(): ModelTurn {

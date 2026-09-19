@@ -45,6 +45,9 @@ export async function* runCofounderTurn(options: {
   system: string;
   history: CofounderMessage[];
   turn: ModelTurn;
+  /* False for a model on this machine: tokens are still counted, so the
+   * transcript says what a turn would have cost, but nothing is charged. */
+  priced?: boolean;
 }): AsyncGenerator<TurnEvent> {
   const messages: { role: "user" | "assistant"; content: unknown }[] = toModelMessages(options.history);
 
@@ -131,6 +134,6 @@ export async function* runCofounderTurn(options: {
     text: spoken,
     inputTokens,
     outputTokens,
-    costUsd: runCostUsd(inputTokens, outputTokens),
+    costUsd: options.priced === false ? 0 : runCostUsd(inputTokens, outputTokens),
   };
 }

@@ -4,7 +4,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { buildCompanyContext, openOnThePerson, recentMessages, systemFor } from "@/lib/osCofounder";
 import { runCofounderTurn } from "@/lib/osCofounderRun";
-import { anthropicTurn, isCofounderConfigured } from "@/lib/osCofounderModel";
+import { pickTurn } from "@/lib/osCofounderModel";
 import { formatUsd } from "@/lib/os";
 import { currentCompany } from "@/lib/osCompany";
 
@@ -48,7 +48,8 @@ export async function POST(request: Request) {
   const company = await currentCompany(supabase);
   if (!company) return NextResponse.json({ error: "no_company" }, { status: 409 });
 
-  if (!isCofounderConfigured()) {
+  const picked = pickTurn();
+  if (!picked) {
     return NextResponse.json({ error: "not_configured" }, { status: 503 });
   }
 
@@ -98,7 +99,6 @@ export async function POST(request: Request) {
 
   const context = await buildCompanyContext(supabase, company.id);
   const system = systemFor(context);
-  const turn = anthropicTurn();
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
@@ -111,7 +111,8 @@ export async function POST(request: Request) {
             ...history.map((m) => ({ role: m.role, body: m.body })),
             { role: "person" as const, body: said },
           ],
-          turn,
+          turn: picked.turn,
+          priced: picked.priced,
         })) {
           if (event.type === "done") {
             /* Written after the stream rather than during it: a half-finished
