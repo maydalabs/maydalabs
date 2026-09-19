@@ -41,7 +41,12 @@ describe.skipIf(!isLocalStack || !picked)("the co-founder, for real", () => {
   });
   const suffix = Date.now().toString(36);
   const companies: string[] = [];
-  const verdicts: { key: string; ok: boolean; ms: number; inputTokens: number; outputTokens: number }[] = [];
+  /* Seeded with every scenario, so one that never finishes is counted as
+   * one that never finished rather than dropped from the denominator. The
+   * first run said "4/5" of six for exactly that reason. */
+  const verdicts = new Map<string, { ok: boolean | null; ms: number; inputTokens: number; outputTokens: number }>(
+    SCENARIOS.map((s) => [s.key, { ok: null, ms: 0, inputTokens: 0, outputTokens: 0 }]),
+  );
 
   beforeAll(() => {
     console.log(`\nscenarios against ${picked!.label}\n`);
@@ -49,9 +54,15 @@ describe.skipIf(!isLocalStack || !picked)("the co-founder, for real", () => {
 
   afterAll(async () => {
     for (const id of companies) await admin.from("os_companies").delete().eq("id", id);
-    const passed = verdicts.filter((v) => v.ok).length;
-    const tokens = verdicts.reduce((sum, v) => sum + v.inputTokens + v.outputTokens, 0);
-    console.log(`\n${passed}/${verdicts.length} scenarios passed against ${picked!.label}; ${tokens} tokens, ${verdicts.reduce((s, v) => s + v.ms, 0)}ms\n`);
+    const all = [...verdicts.values()];
+    const passed = all.filter((v) => v.ok === true).length;
+    const unfinished = all.filter((v) => v.ok === null).length;
+    const tokens = all.reduce((sum, v) => sum + v.inputTokens + v.outputTokens, 0);
+    console.log(
+      `\n${passed}/${all.length} scenarios passed against ${picked!.label}` +
+        (unfinished ? `, ${unfinished} did not finish` : "") +
+        `; ${tokens} tokens, ${Math.round(all.reduce((s, v) => s + v.ms, 0) / 1000)}s\n`,
+    );
   });
 
   async function run(scenario: Scenario): Promise<{ outcome: Outcome; transcript: string[]; tokens: [number, number] }> {
@@ -137,7 +148,7 @@ describe.skipIf(!isLocalStack || !picked)("the co-founder, for real", () => {
       const { outcome, transcript, tokens } = await run(scenario);
       const failures = judge(scenario, outcome);
       const ok = failures.length === 0;
-      verdicts.push({ key: scenario.key, ok, ms: Date.now() - started, inputTokens: tokens[0], outputTokens: tokens[1] });
+      verdicts.set(scenario.key, { ok, ms: Date.now() - started, inputTokens: tokens[0], outputTokens: tokens[1] });
 
       console.log(`${ok ? "PASS" : "FAIL"}  ${scenario.key}  (${tokens[0]}+${tokens[1]} tokens, ${Date.now() - started}ms)`);
       if (!ok || process.env.MAYDAOS_SCENARIO_VERBOSE) {
@@ -145,6 +156,6 @@ describe.skipIf(!isLocalStack || !picked)("the co-founder, for real", () => {
         for (const failure of failures) console.log(`      ! ${failure}`);
       }
       expect(failures).toEqual([]);
-    }, 300_000);
+    }, 600_000);
   }
 });
