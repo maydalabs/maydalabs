@@ -290,3 +290,41 @@ export async function connectSiteLeadsAction(formData: FormData): Promise<void> 
 
   revalidatePath("/os");
 }
+
+/*
+ * Correcting the company.
+ *
+ * A person types the name and what they do once, when they start, and until
+ * now neither could be changed — a typo in the first sentence the co-founder
+ * reads was permanent. The owner policy decides who may, and the column
+ * grant decides what: name and what_we_do, never the budget. A rename is
+ * written into what the co-founder knows by a trigger, so it does not go on
+ * calling the company by a name nobody uses.
+ */
+export async function editCompanyAction(previous: EditResult, formData: FormData): Promise<EditResult> {
+  const version = previous.version + 1;
+  if (!isSupabaseConfigured()) return { error: "not_configured", version };
+  const claims = await getVerifiedClaims();
+  if (!claims?.sub) return { error: "not_signed_in", version };
+
+  const companyId = String(formData.get("companyId") ?? "");
+  if (!/^[0-9a-f-]{36}$/.test(companyId)) return { error: "bad_company", version };
+
+  const name = String(formData.get("name") ?? "").trim().slice(0, 160);
+  if (!name) return { error: "empty", version };
+  const whatWeDo = String(formData.get("whatWeDo") ?? "").trim().slice(0, 2000);
+
+  const supabase = await createSupabaseServerClient();
+  const { error, count } = await supabase
+    .from("os_companies")
+    .update({ name, what_we_do: whatWeDo }, { count: "exact" })
+    .eq("id", companyId);
+
+  if (error) return { error: error.message, version };
+  // Zero rows is the owner policy saying no, silently. Say it.
+  if (count === 0) return { error: "not_yours", version };
+
+  revalidatePath("/os");
+  revalidatePath("/portal");
+  return { error: null, version };
+}

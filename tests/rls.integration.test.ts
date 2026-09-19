@@ -2240,6 +2240,66 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       });
     });
 
+    /* Correcting the company, 19 September. A person types the name and what
+     * they do once, when they start, and nothing let them change either —
+     * while the table-level update grant let an owner raise their own
+     * conversation budget through the API. Column grants fix both. */
+    describe("correcting the company", () => {
+      let companyId: string;
+
+      beforeAll(async () => {
+        const { data: company } = await admin
+          .from("os_companies")
+          .insert({ name: `Typo Co ${suffix}`, what_we_do: "We are a corner show." })
+          .select("id")
+          .single();
+        companyId = company!.id;
+        await admin.from("os_company_members").insert({ company_id: companyId, user_id: idA, role: "owner" });
+        await admin.from("os_company_members").insert({ company_id: companyId, user_id: idB, role: "member" });
+      });
+
+      afterAll(async () => {
+        if (companyId) await admin.from("os_companies").delete().eq("id", companyId);
+      });
+
+      it("lets the owner fix a typo, and writes the rename into what it knows", async () => {
+        const { error } = await userA
+          .from("os_companies")
+          .update({ name: `Bizim Büfe ${suffix}`, what_we_do: "We are a corner shop." })
+          .eq("id", companyId);
+        expect(error).toBeNull();
+
+        const { data: company } = await admin.from("os_companies").select("name, what_we_do").eq("id", companyId).single();
+        expect(company).toEqual({ name: `Bizim Büfe ${suffix}`, what_we_do: "We are a corner shop." });
+
+        // The co-founder should not go on calling it by a name nobody uses.
+        const { data: memory } = await admin.from("os_company_memory").select("fact").eq("company_id", companyId);
+        expect((memory ?? []).some((m) => m.fact.includes("renamed") && m.fact.includes(`Typo Co ${suffix}`))).toBe(true);
+      });
+
+      it("does not let anyone raise their own conversation budget", async () => {
+        const { error } = await userA.from("os_companies").update({ monthly_chat_usd: 500 }).eq("id", companyId);
+        expect(error).not.toBeNull();
+        expect(error!.message).toMatch(/permission denied|column/i);
+
+        const { data } = await admin.from("os_companies").select("monthly_chat_usd").eq("id", companyId).single();
+        expect(Number(data!.monthly_chat_usd)).toBe(5);
+      });
+
+      it("refuses a member who is not the owner, and an outsider", async () => {
+        const { error: member } = await userB.from("os_companies").update({ name: "Mine now" }).eq("id", companyId);
+        expect(member).toBeNull(); // the policy hides the row rather than erroring
+        const { data: unchanged } = await admin.from("os_companies").select("name").eq("id", companyId).single();
+        expect(unchanged!.name).toBe(`Bizim Büfe ${suffix}`);
+
+        const { count } = await outsider
+          .from("os_companies")
+          .update({ name: "Theirs" }, { count: "exact" })
+          .eq("id", companyId);
+        expect(count).toBe(0);
+      });
+    });
+
     /* The first input, 18 September. A lead from the site's own form becomes
      * a piece of sales work for the one company connected to the site — no
      * model, a rule — and the record says the system filed it. */
