@@ -1,5 +1,6 @@
 import type { CofounderMessage, ModelTurn } from "@/lib/osCofounder";
 import { runCostUsd } from "@/lib/os";
+import { costUsdAt, type ModelPrice } from "@/lib/osModelSettings";
 import type { ProposalPayload } from "@/lib/osReviewBoundary";
 import { reviewProposalGuard, REVIEW_REFUSAL_MESSAGES, type ReviewProposalRefusal } from "@/lib/osReviewGuard";
 import { reviewToolsForIntent, reviewIntentGuard, parseReviewRequestIntent, type ReviewRequestMode, type ReviewRequestIntent } from "@/lib/osReviewIntent";
@@ -27,6 +28,8 @@ export type ReviewedTurnOptions = {
   history: CofounderMessage[];
   turn: ModelTurn;
   priced?: boolean;
+  /** The company's own rates; absent means the platform model's. */
+  price?: ModelPrice;
   signal?: AbortSignal;
   propose: (payload: ProposalPayload) => Promise<{ id: string } | ReviewProposalRefusal>;
 };
@@ -85,7 +88,7 @@ export async function* runReviewedTurn(options: ReviewedTurnOptions): AsyncGener
   const warnings = new Set<string>();
   const refusals: ReviewReceiptRefusal[] = [];
   let rejectedBatches = 0;
-  const cost = () => options.priced === false ? 0 : runCostUsd(inputTokens, outputTokens);
+  const cost = () => options.priced === false ? 0 : options.price ? costUsdAt(options.price, inputTokens, outputTokens) : runCostUsd(inputTokens, outputTokens);
   const summary = (fatalWarnings: string[] = []) => [buildReviewReceipt({
     staged: {
       work: [...proposals.values()].filter((type) => type === "work").length,

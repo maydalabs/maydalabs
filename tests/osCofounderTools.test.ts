@@ -132,7 +132,7 @@ describe("local adapter tool availability", () => {
 describe("paid adapter tool availability through a mocked SDK", () => {
   it.each(selections)("sends $label and forwards the same abort signal", async ({ tools, expected }) => {
     const controller = new AbortController();
-    await collect(anthropicTurn(), { system: "Company context", messages, tools, signal: controller.signal });
+    await collect(anthropicTurn({ apiKey: "sk-test-0123456789abcdef", model: OS_MODEL }), { system: "Company context", messages, tools, signal: controller.signal });
     expect(sdk.stream).toHaveBeenCalledTimes(1);
     const [params, options] = sdk.stream.mock.calls[0];
     expect(params).toMatchObject({ model: OS_MODEL, max_tokens: 2000, system: "Company context", messages });
@@ -150,7 +150,7 @@ describe("paid adapter tool availability through a mocked SDK", () => {
   });
 
   it("takes availability from each call without inferring permission from user text", async () => {
-    const turn = anthropicTurn();
+    const turn = anthropicTurn({ apiKey: "sk-test-0123456789abcdef", model: OS_MODEL });
     for (const tools of [undefined, ["remember"] as const, [] as const, undefined]) {
       await collect(turn, {
         system: "s",
@@ -166,7 +166,7 @@ describe("paid adapter tool availability through a mocked SDK", () => {
   it("preserves text, assembled tool inputs, stop reason and token accounting with a filtered tool set", async () => {
     const stream = sdkStream(true);
     sdk.stream.mockReturnValueOnce(stream);
-    expect(await collect(anthropicTurn(), { system: "s", messages, tools: ["remember"] })).toEqual([
+    expect(await collect(anthropicTurn({ apiKey: "sk-test-0123456789abcdef", model: OS_MODEL }), { system: "s", messages, tools: ["remember"] })).toEqual([
       { type: "text", text: "Draft " },
       { type: "text", text: "ready." },
       { type: "tool", id: "remember-1", name: "remember", input: { fact: "Invoices use Net 30." } },

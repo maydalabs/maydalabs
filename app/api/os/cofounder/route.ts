@@ -6,6 +6,8 @@ import { buildCompanyContext, openOnThePerson, reviewedSystemFor } from "@/lib/o
 import { runReviewedTurn, ReviewedTurnError } from "@/lib/osReviewedTurn";
 import { beginReviewTurn, finishReviewTurn, proposeReview, hasReviewAccess } from "@/lib/osReviewStore";
 import { pickTurn } from "@/lib/osCofounderModel";
+import { companyHasModelSettings, readSealedModelSettings, type ModelChoice } from "@/lib/osModelSettings";
+import { openKey } from "@/lib/osKeyVault";
 import { currentCompany } from "@/lib/osCompany";
 import { isReviewRequestMode, parseReviewRequestIntent, reviewIntentGuard, reviewSourceForIntent } from "@/lib/osReviewIntent";
 import { rejectUnavailableCurrentMessageCitation } from "@/lib/osReviewCitation";
@@ -43,7 +45,21 @@ export async function POST(request: Request) {
   if (!company) return json({ error: "no_company" }, 409);
   if (body.expectedCompanyId !== company.id) return json({ error: "identity_changed" }, 409);
   if (!await hasReviewAccess(supabase, company.id, claims.sub)) return json({ error: "review_access_denied" }, 403);
-  const picked = pickTurn();
+  // A company that brought its own key is answered by the model it chose.
+  // The key is opened here and nowhere else; a vault that cannot open it is
+  // a definite refusal, not a lost response. The service role is touched
+  // only when the signed-in read says there is something to open.
+  let choice: ModelChoice | null = null;
+  try {
+    const sealed = await companyHasModelSettings(supabase, company.id) ? await readSealedModelSettings(createSupabaseAdminClient(), company.id) : null;
+    if (sealed) {
+      const apiKey = openKey(sealed.keyCiphertext);
+      if (!apiKey) return json({ error: "key_unavailable" }, 503);
+      choice = { provider: sealed.provider, model: sealed.model, baseUrl: sealed.baseUrl, apiKey, price: sealed.price };
+    }
+  } catch { return json({ error: "model_settings_unavailable" }, 503); }
+  let picked;
+  try { picked = pickTurn(process.env, choice); } catch { return json({ error: "model_settings_invalid" }, 503); }
   if (!picked) return json({ error: "not_configured" }, 503);
   const { data: spent, error: budgetError } = await supabase.rpc("os_chat_spent_this_month", { p_company_id: company.id });
   if (budgetError || spent === null) return json({ error: "budget_unavailable" }, 500);
@@ -87,7 +103,7 @@ export async function POST(request: Request) {
           system: reviewedSystemFor(context, stored.mode, stored.intent),
           history: [...openOnThePerson(stored.history)
             .map((m) => ({ role: m.role, body: m.body })), { role: "person", body: stored.question }],
-          turn: picked.turn, priced: picked.priced, signal: abort.signal,
+          turn: picked.turn, priced: picked.priced, price: picked.price, signal: abort.signal,
           propose: async (payload) => {
             const intentReason = reviewIntentGuard(payload, stored.intent);
             if (intentReason) return { rejected: intentReason };

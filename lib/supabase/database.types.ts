@@ -7,6 +7,31 @@ export type Json =
   | Json[]
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       company_prospects: {
@@ -543,6 +568,56 @@ export type Database = {
             columns: ["thread_id"]
             isOneToOne: false
             referencedRelation: "os_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      os_model_settings: {
+        Row: {
+          base_url: string | null
+          company_id: string
+          created_at: string
+          input_usd_per_million: number
+          key_ciphertext: string
+          key_last4: string
+          model: string
+          output_usd_per_million: number
+          provider: string
+          set_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          base_url?: string | null
+          company_id: string
+          created_at?: string
+          input_usd_per_million?: number
+          key_ciphertext: string
+          key_last4: string
+          model: string
+          output_usd_per_million?: number
+          provider: string
+          set_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          base_url?: string | null
+          company_id?: string
+          created_at?: string
+          input_usd_per_million?: number
+          key_ciphertext?: string
+          key_last4?: string
+          model?: string
+          output_usd_per_million?: number
+          provider?: string
+          set_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_model_settings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "os_companies"
             referencedColumns: ["id"]
           },
         ]
@@ -2071,6 +2146,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

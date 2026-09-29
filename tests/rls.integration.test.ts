@@ -2531,4 +2531,82 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       expect(theirCredits ?? []).toHaveLength(0);
     });
   });
+
+  /* Bringing your own key. The ciphertext is the one column nobody signed in
+   * may read, not even the owner who typed the key; everything else about the
+   * setting is a member's to see and nobody's to write except the service
+   * role from a verified server action. */
+  describe("a company's own key", () => {
+    let companyId: string;
+
+    beforeAll(async () => {
+      const { data: company } = await admin
+        .from("os_companies")
+        .insert({ name: `Key Co ${suffix}`, what_we_do: "We test key storage." })
+        .select("id")
+        .single();
+      companyId = company!.id;
+      await admin.from("os_company_members").insert({ company_id: companyId, user_id: idA, role: "owner" });
+      const { error } = await admin.from("os_model_settings").insert({
+        company_id: companyId, provider: "anthropic", model: "claude-sonnet-5", base_url: null,
+        key_ciphertext: "v1:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", key_last4: "wxyz",
+        input_usd_per_million: 2, output_usd_per_million: 10, set_by: idA,
+      });
+      expect(error).toBeNull();
+    });
+
+    afterAll(async () => {
+      if (companyId) await admin.from("os_companies").delete().eq("id", companyId);
+    });
+
+    it("lets a member see which model answers and the last four of the key, and nothing of the ciphertext", async () => {
+      const { data, error } = await userA.from("os_model_settings").select("provider, model, key_last4, input_usd_per_million").eq("company_id", companyId).maybeSingle();
+      expect(error).toBeNull();
+      expect(data).toMatchObject({ provider: "anthropic", model: "claude-sonnet-5", key_last4: "wxyz" });
+      const sealed = await userA.from("os_model_settings").select("key_ciphertext").eq("company_id", companyId);
+      expect(sealed.error?.code).toBe("42501");
+      const star = await userA.from("os_model_settings").select("*").eq("company_id", companyId);
+      expect(star.error?.code).toBe("42501");
+    });
+
+    it("shows a non-member nothing at all", async () => {
+      const { data, error } = await userB.from("os_model_settings").select("provider, model").eq("company_id", companyId);
+      expect(error).toBeNull();
+      expect(data).toEqual([]);
+    });
+
+    it("lets no signed-in user write the setting, owner included", async () => {
+      const insert = await userA.from("os_model_settings").insert({
+        company_id: companyId, provider: "anthropic", model: "claude-opus-5", key_ciphertext: "v1:BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB", key_last4: "abcd",
+      });
+      expect(insert.error?.code).toBe("42501");
+      const update = await userA.from("os_model_settings").update({ model: "claude-opus-5" }).eq("company_id", companyId).select("model");
+      expect(update.error?.code).toBe("42501");
+      const remove = await userA.from("os_model_settings").delete().eq("company_id", companyId).select("company_id");
+      expect(remove.error?.code).toBe("42501");
+    });
+
+    it("keeps the monthly ceiling out of the owner's hands through the API even with their own key", async () => {
+      const result = await userA.from("os_companies").update({ monthly_chat_usd: 400 }).eq("id", companyId).select("monthly_chat_usd");
+      expect(result.error?.code).toBe("42501");
+    });
+
+    it("refuses a compatible provider without an endpoint, and an endpoint that is not https", async () => {
+      const noUrl = await admin.from("os_model_settings").update({ provider: "openai_compatible", model: "grok-4", base_url: null }).eq("company_id", companyId);
+      expect(noUrl.error?.code).toBe("23514");
+      const plain = await admin.from("os_model_settings").update({ provider: "openai_compatible", model: "grok-4", base_url: "http://api.x.ai/v1" }).eq("company_id", companyId);
+      expect(plain.error?.code).toBe("23514");
+      const secure = await admin.from("os_model_settings").update({ provider: "openai_compatible", model: "grok-4", base_url: "https://api.x.ai/v1" }).eq("company_id", companyId).select("model").single();
+      expect(secure.error).toBeNull();
+      expect(secure.data?.model).toBe("grok-4");
+    });
+
+    it("cannot be upserted by the service role, which is why the action updates then inserts", async () => {
+      const upsert = await admin.from("os_model_settings").upsert({
+        company_id: companyId, provider: "anthropic", model: "claude-opus-5", base_url: null,
+        key_ciphertext: "v1:DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD", key_last4: "9999",
+      }, { onConflict: "company_id" });
+      expect(upsert.error?.code).toBe("42501");
+    });
+  });
 });

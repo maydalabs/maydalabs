@@ -7,6 +7,7 @@ import {
   type WorkBatchResult,
 } from "@/lib/osCofounder";
 import { runCostUsd } from "@/lib/os";
+import { costUsdAt, type ModelPrice } from "@/lib/osModelSettings";
 
 /* One turn, including whatever the co-founder decides to do during it.
  *
@@ -49,6 +50,7 @@ export async function* runCofounderTurn(options: {
   /* False for a model on this machine: tokens are still counted, so the
    * transcript says what a turn would have cost, but nothing is charged. */
   priced?: boolean;
+  price?: ModelPrice;
   signal?: AbortSignal;
 }): AsyncGenerator<TurnEvent> {
   const messages: { role: "user" | "assistant"; content: unknown }[] = toModelMessages(options.history);
@@ -216,6 +218,6 @@ export async function* runCofounderTurn(options: {
     text: spoken,
     inputTokens,
     outputTokens,
-    costUsd: options.priced === false ? 0 : runCostUsd(inputTokens, outputTokens),
+    costUsd: options.priced === false ? 0 : options.price ? costUsdAt(options.price, inputTokens, outputTokens) : runCostUsd(inputTokens, outputTokens),
   };
 }

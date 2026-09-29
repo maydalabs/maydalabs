@@ -82,7 +82,7 @@ export async function sendReviewQuestion(question: PendingQuestion, identity: Pi
 /** The route answers these before a turn exists, so nothing was recorded and
  * there is nothing to reconcile. A 409 turn_unconfirmed, a lost response or
  * an unreadable body may follow a begun turn and stays uncertain. */
-const REFUSED_BEFORE_BEGIN = new Set(["not_configured", "origin", "content_type", "not_signed_in", "invalid_message", "invalid_intent", "no_company", "review_access_denied", "budget", "budget_unavailable", "context_unavailable"]);
+const REFUSED_BEFORE_BEGIN = new Set(["not_configured", "origin", "content_type", "not_signed_in", "invalid_message", "invalid_intent", "no_company", "review_access_denied", "budget", "budget_unavailable", "context_unavailable", "key_unavailable", "model_settings_unavailable", "model_settings_invalid"]);
 export async function refusedBeforeBegin(response: Response): Promise<string | null> {
   const value: unknown = await response.clone().json().catch(() => null);
   const error = value && typeof value === "object" && "error" in value ? value.error : null;

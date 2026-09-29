@@ -4,12 +4,15 @@ vi.mock("server-only", () => ({}));
 const mocks = vi.hoisted(() => ({
   context: vi.fn(), admin: vi.fn(), picked: vi.fn(), run: vi.fn(), configured: vi.fn(), claims: vi.fn(), server: vi.fn(), company: vi.fn(),
   budget: vi.fn(), begin: vi.fn(), finish: vi.fn(), propose: vi.fn(), history: vi.fn(), access: vi.fn(),
+  sealed: vi.fn(), openKey: vi.fn(), hasOwn: vi.fn(),
 }));
 vi.mock("@/lib/supabase/config", () => ({ isSupabaseConfigured: mocks.configured }));
 vi.mock("@/lib/supabase/server", () => ({ getVerifiedClaims: mocks.claims, createSupabaseServerClient: mocks.server }));
 vi.mock("@/lib/supabase/admin", () => ({ createSupabaseAdminClient: mocks.admin }));
 vi.mock("@/lib/osCompany", () => ({ currentCompany: mocks.company }));
 vi.mock("@/lib/osCofounderModel", () => ({ pickTurn: mocks.picked }));
+vi.mock("@/lib/osModelSettings", async (importOriginal) => ({ ...await importOriginal<typeof import("@/lib/osModelSettings")>(), readSealedModelSettings: mocks.sealed, companyHasModelSettings: mocks.hasOwn }));
+vi.mock("@/lib/osKeyVault", () => ({ openKey: mocks.openKey }));
 vi.mock("@/lib/osReviewedTurn", async (importOriginal) => ({ ...await importOriginal<typeof import("@/lib/osReviewedTurn")>(), runReviewedTurn: mocks.run }));
 vi.mock("@/lib/osReviewStore", () => ({ beginReviewTurn: mocks.begin, finishReviewTurn: mocks.finish, proposeReview: mocks.propose, hasReviewAccess: mocks.access }));
 vi.mock("@/lib/osCofounder", async (importOriginal) => ({ ...await importOriginal<typeof import("@/lib/osCofounder")>(), buildCompanyContext: mocks.context }));
@@ -34,6 +37,8 @@ function events(value: string) { return value.trim().split("\n").map((line) => J
 beforeEach(() => {
   vi.resetAllMocks();
   mocks.configured.mockReturnValue(true);
+  mocks.sealed.mockResolvedValue(null);
+  mocks.hasOwn.mockResolvedValue(false);
   mocks.claims.mockResolvedValue({ sub: actorId });
   const workQuery = { select: () => workQuery, eq: () => workQuery, not: () => workQuery, limit: mocks.history };
   mocks.server.mockResolvedValue({ rpc: mocks.budget, from: () => workQuery });
@@ -417,5 +422,49 @@ describe("durable cofounder turns and recovery", () => {
     expect(streamed.some((event) => event.type === "done")).toBe(false);
     expect(mocks.run).toHaveBeenCalledTimes(1);
     expect(mocks.finish.mock.calls[0][4]).toBe("failed");
+  });
+});
+
+describe("a company that brought its own key", () => {
+  const sealed = { provider: "anthropic" as const, model: "claude-sonnet-5", baseUrl: null, keyCiphertext: "v1:sealed", price: { inputUsdPerMillion: 2, outputUsdPerMillion: 10 } };
+  it("is answered by the model it chose, priced at its own rates, and the key is opened only on the server", async () => {
+    mocks.hasOwn.mockResolvedValue(true);
+    mocks.sealed.mockResolvedValue(sealed);
+    mocks.openKey.mockReturnValue("sk-ant-0123456789abcdefghij");
+    mocks.picked.mockReturnValue({ turn: vi.fn(), priced: true, label: "anthropic:claude-sonnet-5", price: sealed.price });
+    mocks.run.mockImplementation(async function* () { yield { type: "done" }; });
+    await POST(request());
+    expect(mocks.sealed).toHaveBeenCalledWith(expect.anything(), companyId);
+    expect(mocks.picked).toHaveBeenCalledWith(process.env, { provider: "anthropic", model: "claude-sonnet-5", baseUrl: null, apiKey: "sk-ant-0123456789abcdefghij", price: sealed.price });
+    expect(mocks.run.mock.calls[0][0]).toMatchObject({ priced: true, price: sealed.price });
+  });
+
+  it("refuses definitely, before any turn exists, when the vault cannot open the stored key", async () => {
+    mocks.hasOwn.mockResolvedValue(true);
+    mocks.sealed.mockResolvedValue(sealed);
+    mocks.openKey.mockReturnValue(null);
+    const response = await POST(request());
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: "key_unavailable" });
+    expect(mocks.picked).not.toHaveBeenCalled();
+    expect(mocks.begin).not.toHaveBeenCalled();
+  });
+
+  it("falls back to the platform's choice when the company has none, without touching the service role", async () => {
+    mocks.hasOwn.mockResolvedValue(false);
+    mocks.picked.mockReturnValue(null);
+    expect((await POST(request())).status).toBe(503);
+    expect(mocks.picked).toHaveBeenCalledWith(process.env, null);
+    expect(mocks.sealed).not.toHaveBeenCalled();
+    expect(mocks.openKey).not.toHaveBeenCalled();
+    expect(mocks.admin).not.toHaveBeenCalled();
+  });
+
+  it("refuses definitely when the setting itself cannot be read, rather than answering on the wrong key", async () => {
+    mocks.hasOwn.mockRejectedValue(new Error("model_settings_unavailable"));
+    const response = await POST(request());
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: "model_settings_unavailable" });
+    expect(mocks.picked).not.toHaveBeenCalled();
   });
 });

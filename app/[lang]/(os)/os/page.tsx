@@ -26,6 +26,7 @@ import { currentCompany } from "@/lib/osCompany";
 import { DEFAULT_PREFS, sanitizePrefs, type OsPrefs } from "@/lib/osDesktop";
 import { composeBrief, type Brief as BriefModel, type ChangeRow, type NeedRow, type WorkflowRow } from "@/lib/osBrief";
 import { isCofounderConfigured } from "@/lib/osCofounderModel";
+import { readModelSettingsSummary } from "@/lib/osModelSettings";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
@@ -66,6 +67,7 @@ export default async function OsPage(props: LocalePageProps) {
   let workflows: WorkflowRow[] = [];
   let finishedCount = 0;
   let hasCompany = false;
+  let companyHasModel = false;
 
   if (isSupabaseConfigured()) {
     const supabase = await createSupabaseServerClient();
@@ -77,6 +79,8 @@ export default async function OsPage(props: LocalePageProps) {
     ]);
     hasCompany = company !== null;
     prefs = sanitizePrefs(desktop?.prefs);
+    // Its own key means it can be answered even when the platform holds none.
+    companyHasModel = company ? (await readModelSettingsSummary(supabase, company.id)) !== null : false;
 
     companyName = company?.name ?? null;
     waiting = count ?? 0;
@@ -232,7 +236,7 @@ export default async function OsPage(props: LocalePageProps) {
    * greet a person with a window that cannot answer: the brief does, and the
    * queue. The moment a key exists this flips, and the desk opens on the
    * conversation instead. */
-  const configured = isCofounderConfigured();
+  const configured = isCofounderConfigured(process.env, companyHasModel);
 
   /* Default windows keep to the right of the brief, which owns the left of
    * the desk. Shares of the surface, not pixels: see OsWindowState.placed. */
