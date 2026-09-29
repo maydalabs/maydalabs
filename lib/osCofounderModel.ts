@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { FILE_WORK_TOOL, REMEMBER_TOOL, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
+import { cofounderTools, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
 import { localModelSettings, localTurn } from "@/lib/osCofounderLocal";
 import { OS_MODEL } from "@/lib/os";
 
@@ -30,14 +30,14 @@ export function isCofounderConfigured(env: Env = process.env): boolean {
 export function anthropicTurn(): ModelTurn {
   const client = new Anthropic({ apiKey: process.env.MAYDAOS_ANTHROPIC_API_KEY });
 
-  return async function* turn({ system, messages }): AsyncIterable<ModelEvent> {
+  return async function* turn({ system, messages, tools, signal }): AsyncIterable<ModelEvent> {
     const stream = client.messages.stream({
       model: OS_MODEL,
       max_tokens: 2000,
       system,
-      tools: [FILE_WORK_TOOL, REMEMBER_TOOL],
+      tools: cofounderTools(tools),
       messages: messages as Anthropic.MessageParam[],
-    });
+    }, { signal });
 
     for await (const event of stream) {
       if (event.type === "content_block_delta" && event.delta.type === "text_delta") {

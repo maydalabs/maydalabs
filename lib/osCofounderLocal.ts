@@ -1,4 +1,4 @@
-import { FILE_WORK_TOOL, REMEMBER_TOOL, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
+import { cofounderTools, type CofounderToolName, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
 
 /* Whatever the environment holds; process.env is one of these. */
 type Env = Record<string, string | undefined>;
@@ -75,8 +75,8 @@ export function toOllamaMessages(
   return out;
 }
 
-export function toOllamaTools() {
-  return [FILE_WORK_TOOL, REMEMBER_TOOL].map((tool) => ({
+export function toOllamaTools(names?: readonly CofounderToolName[]) {
+  return cofounderTools(names).map((tool) => ({
     type: "function" as const,
     function: { name: tool.name, description: tool.description, parameters: tool.input_schema },
   }));
@@ -85,6 +85,7 @@ export function toOllamaTools() {
 type Chunk = {
   message?: { content?: string; tool_calls?: { function: { name: string; arguments: Record<string, unknown> | string } }[] };
   done?: boolean;
+  done_reason?: string;
   prompt_eval_count?: number;
   eval_count?: number;
   error?: string;
@@ -106,14 +107,18 @@ function asInput(value: Record<string, unknown> | string): Record<string, unknow
 }
 
 export function localTurn(settings: { url: string; model: string }, fetcher: typeof fetch = fetch): ModelTurn {
-  return async function* turn({ system, messages }): AsyncIterable<ModelEvent> {
+  return async function* turn({ system, messages, signal, tools }): AsyncIterable<ModelEvent> {
+    signal?.throwIfAborted();
     const response = await fetcher(`${settings.url}/api/chat`, {
       method: "POST",
+      signal,
+      redirect: "error",
+      credentials: "omit",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         model: settings.model,
         messages: toOllamaMessages(system, messages),
-        tools: toOllamaTools(),
+        tools: toOllamaTools(tools),
         stream: true,
         options: { num_predict: 2000 },
       }),
@@ -129,13 +134,16 @@ export function localTurn(settings: { url: string; model: string }, fetcher: typ
     let calls = 0;
     let inputTokens = 0;
     let outputTokens = 0;
+    let completed = false;
+    let doneReason: string | null = null;
 
     const handle = function* (line: string): Generator<ModelEvent> {
+      if (completed) throw new Error("local model: data received after completion");
       let chunk: Chunk;
       try {
         chunk = JSON.parse(line) as Chunk;
       } catch {
-        return;
+        throw new Error("local model: malformed streaming response");
       }
       if (chunk.error) throw new Error(`local model: ${chunk.error}`);
       if (chunk.message?.content) yield { type: "text", text: chunk.message.content };
@@ -144,25 +152,38 @@ export function localTurn(settings: { url: string; model: string }, fetcher: typ
         yield { type: "tool", id: `local-${calls}`, name: call.function.name, input: asInput(call.function.arguments) };
       }
       if (chunk.done) {
+        completed = true;
+        doneReason = typeof chunk.done_reason === "string" ? chunk.done_reason : null;
         inputTokens = chunk.prompt_eval_count ?? 0;
         outputTokens = chunk.eval_count ?? 0;
       }
     };
 
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop() ?? "";
-      for (const line of lines) if (line.trim()) yield* handle(line);
+    try {
+      for (;;) {
+        signal?.throwIfAborted();
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) if (line.trim()) yield* handle(line);
+      }
+      if (buffer.trim()) yield* handle(buffer);
+      signal?.throwIfAborted();
+      if (!completed) throw new Error("local model: stream ended without a completion record");
+    } finally {
+      // Also runs when a consumer abandons the generator. Do not leave a
+      // local generation occupying Ollama while the next scenario starts.
+      try { await reader.cancel(); } finally { reader.releaseLock(); }
     }
-    if (buffer.trim()) yield* handle(buffer);
 
     yield {
       type: "done",
-      // The loop continues only on "tool_use", as the SDK names it.
-      stopReason: calls > 0 ? "tool_use" : "end_turn",
+      // A completed HTTP stream is not necessarily a completed answer. A
+      // token-limit stop must remain interrupted, even if it included a tool
+      // call. Unknown/missing reasons fail closed in the reviewed loop.
+      stopReason: doneReason === "stop" ? (calls > 0 ? "tool_use" : "end_turn") : doneReason === "length" ? "max_tokens" : doneReason,
       inputTokens,
       outputTokens,
     };

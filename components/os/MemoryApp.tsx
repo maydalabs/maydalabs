@@ -6,6 +6,34 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { currentCompany } from "@/lib/osCompany";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import type { Locale } from "@/lib/i18n";
+import { MEMORY_REVIEW_COLUMNS, inspectMemoryReview, memoryRows, type MemoryRecord } from "@/lib/osReviewedMemory";
+
+const REVIEW_COPY = {
+  en: { model: "Model-authored · human confirmation recorded", unverified: "Not independently verified. Source attribution is not proof.", company: "Company", project: "Project", customer: "Customer", untilChanged: "Until changed or retired", until: "Valid through", expired: "Expired — excluded from current company knowledge", invalid: "Incomplete review details — excluded from current company knowledge", legacy: "Scope and validity were not recorded for this entry.", sources: "Review sources", source: "Captured source", confirmed: "Confirmed", unavailable: "Company knowledge could not be loaded. Reload before assuming it is empty." },
+  tr: { model: "Modelin yazdığı bilgi · insan onayı kayıtlı", unverified: "Bağımsız olarak doğrulanmadı. Kaynak alıntısı, doğruluk kanıtı değildir.", company: "Şirket", project: "Proje", customer: "Müşteri", untilChanged: "Değiştirilene veya kaldırılana kadar", until: "Son geçerli tarih", expired: "Süresi doldu — güncel şirket bilgisine dahil edilmez", invalid: "İnceleme ayrıntıları eksik — güncel şirket bilgisine dahil edilmez", legacy: "Bu kayıt için kapsam ve geçerlilik süresi belirtilmemiş.", sources: "İnceleme kaynakları", source: "Kaydedilen kaynak", confirmed: "Onay tarihi", unavailable: "Şirket bilgisi yüklenemedi. Boş olduğunu varsaymadan önce sayfayı yenileyin." },
+  fr: { model: "Rédigée par le modèle · confirmation humaine enregistrée", unverified: "Non vérifiée indépendamment. Une source citée n’est pas une preuve.", company: "Entreprise", project: "Projet", customer: "Client", untilChanged: "Jusqu’à modification ou retrait", until: "Valable jusqu’au", expired: "Expirée — exclue des connaissances actuelles", invalid: "Vérification incomplète — exclue des connaissances actuelles", legacy: "Aucun périmètre ni durée de validité n’a été enregistré pour cette entrée.", sources: "Sources de la vérification", source: "Source conservée", confirmed: "Confirmation", unavailable: "Impossible de charger les connaissances. Rechargez avant de supposer qu’elles sont vides." },
+};
+
+export function MemoryReviewDetails({ row, today, locale }: { row: MemoryRecord; today: string; locale: Locale }) {
+  const review = inspectMemoryReview(row, today);
+  const copy = REVIEW_COPY[locale];
+  const oldCopy = OS_MEMORY_COPY[locale];
+  const style = { margin: 0, whiteSpace: "pre-wrap" as const, overflowWrap: "anywhere" as const };
+  if (review.state === "legacy") return <div className="os-memory-source"><p style={style}>{row.source === "person" ? oldCopy.fromYou : oldCopy.fromIt}</p><p style={style}>{copy.legacy}</p></div>;
+  if (review.state === "invalid") return <p className="os-memory-source" style={style}>{copy.invalid}</p>;
+  return <div className="os-memory-source" style={{ display: "grid", gap: ".35rem", minWidth: 0 }}>
+    <p style={style}>{copy.model}</p>
+    <p style={style}>{copy[review.scope.type]}: {review.scope.label}</p>
+    <p style={style}>{review.duration.type === "until_date" ? `${copy.until}: ${review.duration.date} (UTC)` : copy.untilChanged}</p>
+    {review.expired ? <p style={{ ...style, color: "var(--os-danger)" }}>{copy.expired}</p> : null}
+    <p style={style}>{copy.confirmed}: {review.confirmedAt}</p>
+    <p style={style}>{copy.unverified}</p>
+    <details><summary style={{ cursor: "pointer" }}>{copy.sources}</summary>
+      {review.citations.map((citation, index) => <blockquote key={`${citation.sourceId}:${index}`} style={{ ...style, borderLeft: "2px solid var(--os-line)", paddingLeft: ".6rem", marginTop: ".5rem" }}>{citation.quote}</blockquote>)}
+      {review.sources.map((source) => <details key={source.id} style={{ marginTop: ".5rem" }}><summary>{copy.source}: {source.id}</summary><p style={style}>{source.text}</p></details>)}
+    </details>
+  </div>;
+}
 
 /* What it has learned, in full, and the means to correct it.
  *
@@ -23,20 +51,23 @@ export async function MemoryApp({ locale }: { locale: Locale }) {
   const company = await currentCompany(supabase);
   if (!company) return <OsPaneEmpty>{copy.noCompany}</OsPaneEmpty>;
 
-  const { data: live } = await supabase
+  const { data: live, error: liveError } = await supabase
     .from("os_company_memory")
-    .select("id, fact, kind, source, created_at")
+    .select(MEMORY_REVIEW_COLUMNS)
     .eq("company_id", company.id)
     .is("retired_at", null)
     .order("created_at", { ascending: false });
 
-  const { data: retired } = await supabase
+  const { data: retired, error: retiredError } = await supabase
     .from("os_company_memory")
-    .select("id, fact, retired_reason")
+    .select(`${MEMORY_REVIEW_COLUMNS}, retired_reason`)
     .eq("company_id", company.id)
     .not("retired_at", "is", null)
     .order("retired_at", { ascending: false })
     .limit(10);
+  const today = new Date().toISOString().slice(0, 10);
+  const liveRows = memoryRows(live);
+  const retiredRows = memoryRows(retired);
 
   return (
     <div className="mayda-stack" style={{ gap: "1rem" }}>
@@ -52,18 +83,16 @@ export async function MemoryApp({ locale }: { locale: Locale }) {
         <button type="submit" className="mayda-button">{copy.teach}</button>
       </ActionForm>
 
-      {(live ?? []).length === 0 ? (
+      {liveError ? <p role="alert" className="mayda-field-error">{REVIEW_COPY[locale].unavailable}</p> : liveRows.length === 0 ? (
         <OsPaneEmpty>{copy.empty}</OsPaneEmpty>
       ) : (
         <ul className="os-memory-list">
-          {(live ?? []).map((row) => (
+          {liveRows.map((row) => (
             <li key={row.id} className="os-memory-item">
               <div>
                 <span className="mayda-kicker">{copy.kinds[row.kind as keyof typeof copy.kinds] ?? row.kind}</span>
                 <p className="os-memory-fact">{row.fact}</p>
-                <span className="os-memory-source">
-                  {row.source === "person" ? copy.fromYou : copy.fromIt}
-                </span>
+                <MemoryReviewDetails row={row} today={today} locale={locale} />
               </div>
               <ActionForm action={retireMemoryAction} done={copy.retired} className="os-memory-retire">
                 <input type="hidden" name="memoryId" value={row.id} />
@@ -75,14 +104,16 @@ export async function MemoryApp({ locale }: { locale: Locale }) {
         </ul>
       )}
 
-      {(retired ?? []).length > 0 ? (
+      {retiredError ? <p role="alert" className="mayda-field-error">{REVIEW_COPY[locale].unavailable}</p> : null}
+      {retiredRows.length > 0 ? (
         <details className="mayda-details">
           <summary>{copy.retiredHeading}</summary>
           <ul className="os-memory-list" style={{ marginTop: "0.6rem" }}>
-            {(retired ?? []).map((row) => (
+            {retiredRows.map((row) => (
               <li key={row.id} className="os-memory-item is-retired">
                 <div>
                   <p className="os-memory-fact">{row.fact}</p>
+                  <MemoryReviewDetails row={row} today={today} locale={locale} />
                   {row.retired_reason ? (
                     <span className="os-memory-source">{copy.because} {row.retired_reason}</span>
                   ) : null}

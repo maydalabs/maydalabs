@@ -44,6 +44,7 @@ export type ItemEvent = {
 };
 
 type Source = { url?: string; title?: string; chars?: number };
+type CapturedSource = { id: string; companyId: string; revision: string; text: string; origin: "founder"; quotes: string[] };
 type Outcome = { kind?: string; url?: string; note?: string; at?: string };
 
 function asOutcomes(value: unknown): Outcome[] {
@@ -54,7 +55,35 @@ function asOutcomes(value: unknown): Outcome[] {
 type Claim = { text?: string; source_url?: string | null };
 
 function asSources(value: unknown): Source[] {
-  return Array.isArray(value) ? value.filter((v): v is Source => Boolean(v) && typeof v === "object") : [];
+  return Array.isArray(value) ? value.flatMap((source): Source[] => {
+    // Captured-message records are not URLs, even if a malformed record also
+    // carries a url field. They have their own text-only presentation below.
+    if (!record(source) || "origin" in source || "companyId" in source || typeof source.url !== "string" || !source.url) return [];
+    return [{ url: source.url, ...(typeof source.title === "string" ? { title: source.title } : {}),
+      ...(typeof source.chars === "number" ? { chars: source.chars } : {}) }];
+  }) : [];
+}
+
+function record(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+function capturedSources(value: unknown, metadata: unknown): CapturedSource[] {
+  if (!Array.isArray(value)) return [];
+  const review = record(metadata) && record(metadata.review) ? metadata.review : null;
+  const citations = review?.authorship === "model" && review.externallyVerified === false && Array.isArray(review.citations) ? review.citations : [];
+  const uuid = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i;
+  return value.flatMap((source): CapturedSource[] => {
+    if (!record(source) || Object.keys(source).length !== 5 || source.origin !== "founder" ||
+      typeof source.id !== "string" || !uuid.test(source.id) ||
+      typeof source.companyId !== "string" || !uuid.test(source.companyId) ||
+      typeof source.revision !== "string" || !/^[\da-f]{64}$/i.test(source.revision) ||
+      typeof source.text !== "string" || !source.text.trim() || source.text.length > 40000) return [];
+    const text = source.text;
+    const quotes = citations.flatMap((citation): string[] => record(citation) && citation.sourceId === source.id &&
+      typeof citation.quote === "string" && !!citation.quote.trim() && text.includes(citation.quote) ? [citation.quote] : []);
+    return [{ id: source.id, companyId: source.companyId, revision: source.revision, text, origin: "founder", quotes: [...new Set(quotes)] }];
+  });
 }
 
 function asClaims(value: unknown): Claim[] {
@@ -70,6 +99,7 @@ function author(value: unknown): string | null {
 export function ItemDocument({ locale, item, events }: { locale: Locale; item: ItemRecord; events: ItemEvent[] }) {
   const copy = OS_DOCUMENT_COPY[locale];
   const sources = asSources(item.sources);
+  const captured = capturedSources(item.sources, item.metadata);
   const outcomes = asOutcomes(item.artifacts);
   const over = item.status === "completed" || item.status === "canceled";
   const claims = asClaims(item.metadata);
@@ -193,10 +223,24 @@ export function ItemDocument({ locale, item, events }: { locale: Locale; item: I
         </section>
       ) : null}
 
-      {sources.length > 0 ? (
+      {sources.length > 0 || captured.length > 0 ? (
         <section className="os-doc-section">
           <h2 className="os-doc-label">{copy.sources}</h2>
           <ul className="os-doc-sources">
+            {captured.map((source, index) => (
+              <li key={`captured:${source.id}:${index}`} style={{ display: "grid", gap: ".55rem", minWidth: 0, overflowWrap: "anywhere" }}>
+                <strong>{copy.founderSource}</strong>
+                <p className="os-doc-quiet" style={{ margin: 0 }}>{copy.sourceAttribution}</p>
+                {(source.quotes.length ? source.quotes : [source.text]).map((quote, quoteIndex) => (
+                  <blockquote key={quoteIndex} style={{ margin: 0, paddingLeft: ".75rem", borderLeft: "2px solid var(--os-line)", whiteSpace: "pre-wrap" }}>{quote}</blockquote>
+                ))}
+                <details>
+                  <summary>{copy.capturedSource}</summary>
+                  <p className="os-doc-quiet" style={{ overflowWrap: "anywhere" }}>{copy.sourceRevision}: {source.revision}</p>
+                  <p style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{source.text}</p>
+                </details>
+              </li>
+            ))}
             {sources.map((source, index) =>
               source.url ? (
                 <li key={index}>

@@ -1474,7 +1474,7 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
           history: [{ role: "person", body: "note the pricing idea" }],
           turn: fakeTurn([
             [
-              { type: "tool", id: "t1", name: "file_work", input: { title: "Pricing idea", lane: "ops", kind: "note" } },
+              { type: "tool", id: "t1", name: "file_work", input: { title: "Pricing idea", lane: "ops", kind: "note", notes: "Compare a flat handling fee with the current per-pallet price before changing any quote." } },
               { type: "done", stopReason: "tool_use", inputTokens: 10, outputTokens: 5 },
             ],
             [{ type: "done", stopReason: "end_turn", inputTokens: 5, outputTokens: 5 }],
@@ -1521,7 +1521,7 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         let rounds = 0;
         const endless: ModelTurn = async function* () {
           rounds += 1;
-          yield { type: "tool", id: `t${rounds}`, name: "file_work", input: { title: `Loop ${rounds}`, lane: "ops", kind: "note" } };
+          yield { type: "tool", id: `t${rounds}`, name: "file_work", input: { title: `Loop ${rounds}`, lane: "ops", kind: "note", notes: `Synthetic loop artifact ${rounds}.` } };
           yield { type: "done", stopReason: "tool_use", inputTokens: 1, outputTokens: 1 };
         };
 

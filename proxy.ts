@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient, parseCookieHeader } from "@supabase/ssr";
+import { createServerClient, parseCookieHeader, type SetAllCookies } from "@supabase/ssr";
 import { getSupabasePublishableKey, getSupabaseUrl, isSupabaseConfigured } from "@/lib/supabase/config";
 import {
   DEFAULT_LOCALE,
@@ -59,7 +59,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const response = resolveRouteResponse(request);
+  const refreshedCookies: Parameters<SetAllCookies>[0] = [];
+  const refreshHeaders = new Headers();
 
   // Session refresh only — never the authorization boundary. Pages, server
   // actions, and route handlers verify identity themselves via getClaims().
@@ -76,10 +77,14 @@ export async function proxy(request: NextRequest) {
               ({ name, value }) => ({ name, value: value ?? "" }),
             );
           },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options);
+          setAll(cookiesToSet, headers) {
+            cookiesToSet.forEach(({ name, value }) => {
+              // Server Components in this request need the refreshed session,
+              // not just the browser on its next request.
+              request.cookies.set(name, value);
             });
+            refreshedCookies.push(...cookiesToSet);
+            Object.entries(headers).forEach(([name, value]) => refreshHeaders.set(name, value));
           },
         },
       },
@@ -88,6 +93,12 @@ export async function proxy(request: NextRequest) {
     await supabase.auth.getClaims();
   }
 
+  // Build the locale response after refresh: Next snapshots the forwarded
+  // request headers when next()/rewrite() is created. Keep all cookie batches
+  // and the SDK's anti-cache headers on redirects as well as rendered pages.
+  const response = resolveRouteResponse(request);
+  refreshedCookies.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+  refreshHeaders.forEach((value, name) => response.headers.set(name, value));
   return response;
 }
 

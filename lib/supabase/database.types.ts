@@ -7,31 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       company_prospects: {
@@ -379,6 +354,8 @@ export type Database = {
       os_company_memory: {
         Row: {
           company_id: string
+          confirmed_at: string | null
+          confirmed_by: string | null
           created_at: string
           created_by: string | null
           fact: string
@@ -387,10 +364,16 @@ export type Database = {
           retired_at: string | null
           retired_by: string | null
           retired_reason: string | null
+          review_duration: Json | null
+          review_proposal_id: string | null
+          review_provenance: Json | null
+          review_scope: Json | null
           source: string
         }
         Insert: {
           company_id: string
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           created_at?: string
           created_by?: string | null
           fact: string
@@ -399,10 +382,16 @@ export type Database = {
           retired_at?: string | null
           retired_by?: string | null
           retired_reason?: string | null
+          review_duration?: Json | null
+          review_proposal_id?: string | null
+          review_provenance?: Json | null
+          review_scope?: Json | null
           source?: string
         }
         Update: {
           company_id?: string
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           created_at?: string
           created_by?: string | null
           fact?: string
@@ -411,6 +400,10 @@ export type Database = {
           retired_at?: string | null
           retired_by?: string | null
           retired_reason?: string | null
+          review_duration?: Json | null
+          review_proposal_id?: string | null
+          review_provenance?: Json | null
+          review_scope?: Json | null
           source?: string
         }
         Relationships: [
@@ -419,6 +412,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_company_memory_review_proposal_id_fkey"
+            columns: ["review_proposal_id"]
+            isOneToOne: true
+            referencedRelation: "os_review_proposals"
             referencedColumns: ["id"]
           },
         ]
@@ -540,6 +540,234 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "os_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "os_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      os_review_proposal_revisions: {
+        Row: {
+          created_at: string
+          editor: string | null
+          fingerprint: string
+          payload: Json
+          proposal_id: string
+          revision: number
+          sources: Json
+        }
+        Insert: {
+          created_at?: string
+          editor?: string | null
+          fingerprint: string
+          payload: Json
+          proposal_id: string
+          revision: number
+          sources: Json
+        }
+        Update: {
+          created_at?: string
+          editor?: string | null
+          fingerprint?: string
+          payload?: Json
+          proposal_id?: string
+          revision?: number
+          sources?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_review_proposal_revisions_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "os_review_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      os_review_proposals: {
+        Row: {
+          actor_id: string
+          company_id: string
+          confirmed_by: string | null
+          created_at: string
+          fingerprint: string
+          id: string
+          last_edited_by: string | null
+          memory_id: string | null
+          payload: Json
+          record_id: string | null
+          revision: number
+          saved_at: string | null
+          sources: Json
+          status: string
+          turn_id: string
+          updated_at: string
+          work_item_id: string | null
+        }
+        Insert: {
+          actor_id: string
+          company_id: string
+          confirmed_by?: string | null
+          created_at?: string
+          fingerprint: string
+          id: string
+          last_edited_by?: string | null
+          memory_id?: string | null
+          payload: Json
+          record_id?: string | null
+          revision?: number
+          saved_at?: string | null
+          sources: Json
+          status?: string
+          turn_id: string
+          updated_at?: string
+          work_item_id?: string | null
+        }
+        Update: {
+          actor_id?: string
+          company_id?: string
+          confirmed_by?: string | null
+          created_at?: string
+          fingerprint?: string
+          id?: string
+          last_edited_by?: string | null
+          memory_id?: string | null
+          payload?: Json
+          record_id?: string | null
+          revision?: number
+          saved_at?: string | null
+          sources?: Json
+          status?: string
+          turn_id?: string
+          updated_at?: string
+          work_item_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_review_proposals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_review_proposals_memory_id_fkey"
+            columns: ["memory_id"]
+            isOneToOne: true
+            referencedRelation: "os_company_memory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_review_proposals_turn_id_fkey"
+            columns: ["turn_id"]
+            isOneToOne: false
+            referencedRelation: "os_review_turns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_review_proposals_work_item_id_fkey"
+            columns: ["work_item_id"]
+            isOneToOne: true
+            referencedRelation: "os_finished_lately"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_review_proposals_work_item_id_fkey"
+            columns: ["work_item_id"]
+            isOneToOne: true
+            referencedRelation: "os_needs_you"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_review_proposals_work_item_id_fkey"
+            columns: ["work_item_id"]
+            isOneToOne: true
+            referencedRelation: "os_work_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_review_proposals_work_item_id_fkey"
+            columns: ["work_item_id"]
+            isOneToOne: true
+            referencedRelation: "os_work_open"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      os_review_turns: {
+        Row: {
+          actor_id: string
+          company_id: string
+          created_at: string
+          history: Json
+          id: string
+          person_message_id: string
+          question: string
+          reply: string | null
+          reply_message_id: string | null
+          request_intent: Json | null
+          request_mode: string
+          status: string
+          thread_id: string
+          updated_at: string
+        }
+        Insert: {
+          actor_id: string
+          company_id: string
+          created_at?: string
+          history?: Json
+          id: string
+          person_message_id: string
+          question: string
+          reply?: string | null
+          reply_message_id?: string | null
+          request_intent?: Json | null
+          request_mode: string
+          status?: string
+          thread_id: string
+          updated_at?: string
+        }
+        Update: {
+          actor_id?: string
+          company_id?: string
+          created_at?: string
+          history?: Json
+          id?: string
+          person_message_id?: string
+          question?: string
+          reply?: string | null
+          reply_message_id?: string | null
+          request_intent?: Json | null
+          request_mode?: string
+          status?: string
+          thread_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_review_turns_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_review_turns_person_message_id_fkey"
+            columns: ["person_message_id"]
+            isOneToOne: true
+            referencedRelation: "os_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_review_turns_reply_message_id_fkey"
+            columns: ["reply_message_id"]
+            isOneToOne: true
+            referencedRelation: "os_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_review_turns_thread_id_fkey"
             columns: ["thread_id"]
             isOneToOne: false
             referencedRelation: "os_threads"
@@ -1663,6 +1891,57 @@ export type Database = {
         Args: { p_id: string; p_reason?: string }
         Returns: undefined
       }
+      os_review_begin: {
+        Args: {
+          p_actor: string
+          p_company: string
+          p_id: string
+          p_intent: Json
+          p_mode: string
+          p_question: string
+        }
+        Returns: Json
+      }
+      os_review_decide: {
+        Args: {
+          p_action: string
+          p_actor: string
+          p_company: string
+          p_fingerprint: string
+          p_id: string
+          p_knowledge_approved: boolean
+          p_payload: Json
+          p_revision: number
+        }
+        Returns: Json
+      }
+      os_review_finish: {
+        Args: {
+          p_actor: string
+          p_company: string
+          p_cost: number
+          p_id: string
+          p_input_tokens: number
+          p_output_tokens: number
+          p_reply: string
+          p_status: string
+        }
+        Returns: Json
+      }
+      os_review_interrupt: {
+        Args: { p_actor: string; p_company: string; p_id: string }
+        Returns: Json
+      }
+      os_review_propose: {
+        Args: {
+          p_actor: string
+          p_company: string
+          p_id: string
+          p_payload: Json
+          p_turn: string
+        }
+        Returns: Json
+      }
       os_spend_credit: { Args: { p_user_id: string }; Returns: number }
     }
     Enums: {
@@ -1792,9 +2071,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },

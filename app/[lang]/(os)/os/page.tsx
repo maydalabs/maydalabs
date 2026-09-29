@@ -29,6 +29,7 @@ import { isCofounderConfigured } from "@/lib/osCofounderModel";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { localizePath } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
+import { MEMORY_REVIEW_COLUMNS, inspectMemoryReview, memoryCandidateFilter, memoryIsCurrent, memoryRows } from "@/lib/osReviewedMemory";
 
 export const metadata: Metadata = {
   title: "MaydaOS",
@@ -86,11 +87,14 @@ export default async function OsPage(props: LocalePageProps) {
      * out loud — an open piece of work, something it knows — rather than
      * everything in the database. A search that returns four hundred rows is
      * a search nobody uses twice. */
+    const memoryReadDate = new Date().toISOString().slice(0, 10);
     const [{ count: newCount }, { data: facts }, { data: latest }] = await Promise.all([
       seenAt
         ? supabase.from("os_recent_record").select("id", { count: "exact", head: true }).gt("at", seenAt)
         : Promise.resolve({ count: 0 } as { count: number | null }),
-      supabase.from("os_company_memory").select("id, fact, kind").is("retired_at", null).limit(20),
+      company?.id
+        ? supabase.from("os_company_memory").select(MEMORY_REVIEW_COLUMNS).eq("company_id", company.id).is("retired_at", null).or(memoryCandidateFilter(memoryReadDate)).order("created_at", { ascending: false }).limit(20)
+        : Promise.resolve({ data: [] }),
       seenAt
         ? supabase
             .from("os_recent_record")
@@ -206,8 +210,11 @@ export default async function OsPage(props: LocalePageProps) {
         });
       }
     }
-    for (const fact of facts ?? []) {
-      targets.push({ kind: "memory", id: fact.id, label: fact.fact, hint: fact.kind });
+    for (const fact of memoryRows(facts).filter((row) => memoryIsCurrent(row, memoryReadDate))) {
+      const review = inspectMemoryReview(fact, memoryReadDate);
+      const scopeNames = { en: { company: "Company", project: "Project", customer: "Customer" }, tr: { company: "Şirket", project: "Proje", customer: "Müşteri" }, fr: { company: "Entreprise", project: "Projet", customer: "Client" } };
+      const hint = review.state === "reviewed" ? `${fact.kind} · ${scopeNames[locale][review.scope.type]}: ${review.scope.label}` : fact.kind;
+      targets.push({ kind: "memory", id: fact.id, label: fact.fact, hint });
     }
   }
 
