@@ -67,8 +67,13 @@ function proposalReceipt(value: unknown, who: Identity, id?: string): DurablePro
     status: value.status, record_id: value.record_id,
   };
 }
-export async function hasReviewAccess(db: Db, actorId: string) {
-  const { data, error } = await db.from("os_beta_status").select("user_id").eq("user_id", actorId).maybeSingle();
+/* Belonging to the company is the entitlement — the same rule as
+ * lib/osBetaAccess.ts, and the same one internal.os_review_access enforces
+ * under a lock. A founder who came in through the front door is a member and
+ * is not on any beta list; the list was already the wrong question once. */
+export async function hasReviewAccess(db: Db, companyId: string, actorId: string) {
+  const { data, error } = await db.from("os_company_members").select("user_id")
+    .eq("company_id", companyId).eq("user_id", actorId).maybeSingle();
   return !error && !!data;
 }
 async function rpc<Name extends ReviewRpc>(db: Db, name: Name, args: Functions[Name]["Args"]) {
@@ -143,7 +148,7 @@ export async function decideReview(db: Db, who: Identity, input: {
 
 // All reads use the signed-in client's RLS, never an admin broad snapshot.
 export async function loadReviewSnapshot(db: Db, companyId: string, actorId: string, requestId?: string): Promise<ReviewSnapshot> {
-  if (!await hasReviewAccess(db, actorId)) throw new Error("review_access_denied");
+  if (!await hasReviewAccess(db, companyId, actorId)) throw new Error("review_access_denied");
   const { data: thread, error: threadError } = await db.from("os_threads").select("id")
     .eq("company_id", companyId).order("updated_at", { ascending: false }).limit(1).maybeSingle();
   if (threadError) throw new Error("review_read_unavailable");

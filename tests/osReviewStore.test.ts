@@ -49,7 +49,7 @@ function database(overrides: Record<string, Result[]> = {}) {
   const logs: QueryLog[] = [];
   const counts = new Map<string, number>();
   const defaults: Record<string, Result[]> = {
-    os_beta_status: [ok({ user_id: "founder" })],
+    os_company_members: [ok({ user_id: "founder" })],
     os_threads: [ok({ id: "company-thread" })],
     os_messages: [ok([{ id: "answer", role: "cofounder", body: "Answer" }, { id: "question", role: "person", body: "Question" }])],
     os_review_proposals: [ok([proposal()])],
@@ -248,18 +248,19 @@ describe("RLS-scoped durable snapshots", () => {
     const fixture = database({ os_review_turns: [ok([turn({ intent: null })])] });
     expect((await loadReviewSnapshot(fixture.db, "company-a", "founder")).turns[0].intent).toBeNull();
   });
-  it("checks the exact actor's beta access and fails closed on missing or errored status", async () => {
+  it("checks the exact actor's membership of the exact company and fails closed on missing or errored rows", async () => {
     for (const result of [ok(null), failed(), { data: { user_id: "founder" }, error: { message: "failed read" } }]) {
-      const fixture = database({ os_beta_status: [result] });
-      expect(await hasReviewAccess(fixture.db, "founder")).toBe(false);
-      expect(queryFor(fixture.logs, "os_beta_status")).toContainEqual({ name: "eq", args: ["user_id", "founder"] });
+      const fixture = database({ os_company_members: [result] });
+      expect(await hasReviewAccess(fixture.db, "company-a", "founder")).toBe(false);
+      expect(queryFor(fixture.logs, "os_company_members")).toContainEqual({ name: "eq", args: ["company_id", "company-a"] });
+      expect(queryFor(fixture.logs, "os_company_members")).toContainEqual({ name: "eq", args: ["user_id", "founder"] });
       expect(fixture.rpc).not.toHaveBeenCalled();
     }
   });
-  it("does not read any transcript if beta access is denied", async () => {
-    const fixture = database({ os_beta_status: [ok(null)] });
+  it("does not read any transcript if the person is not a member of the company", async () => {
+    const fixture = database({ os_company_members: [ok(null)] });
     await expect(loadReviewSnapshot(fixture.db, "company-a", "founder")).rejects.toThrow("review_access_denied");
-    expect(fixture.from.mock.calls).toEqual([["os_beta_status"]]);
+    expect(fixture.from.mock.calls).toEqual([["os_company_members"]]);
   });
   it("uses the supplied signed-in client and includes company/actor filters and bounded windows", async () => {
     const fixture = database();

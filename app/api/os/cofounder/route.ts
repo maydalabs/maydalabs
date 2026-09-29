@@ -42,7 +42,7 @@ export async function POST(request: Request) {
   const company = await currentCompany(supabase);
   if (!company) return json({ error: "no_company" }, 409);
   if (body.expectedCompanyId !== company.id) return json({ error: "identity_changed" }, 409);
-  if (!await hasReviewAccess(supabase, claims.sub)) return json({ error: "review_access_denied" }, 403);
+  if (!await hasReviewAccess(supabase, company.id, claims.sub)) return json({ error: "review_access_denied" }, 403);
   const picked = pickTurn();
   if (!picked) return json({ error: "not_configured" }, 503);
   const { data: spent, error: budgetError } = await supabase.rpc("os_chat_spent_this_month", { p_company_id: company.id });

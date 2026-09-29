@@ -1398,7 +1398,8 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         const context = await buildCompanyContext(admin, companyId);
         expect(context).toContain("We move freight out of Izmir.");
         expect(context).toContain("Reply to the Bornova enquiry");
-        expect(context).toContain("waiting-on: send");
+        // The state line is JSON now; the fact a person is waiting on a send is still in it.
+        expect(context).toContain('"required_action":"send"');
 
         await admin.from("os_work_items").delete().eq("id", item!.id);
       });
@@ -1575,14 +1576,21 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       });
 
       it("marks what a person told it apart from what it worked out", async () => {
+        // Both of these are lies the form could tell. The grant is now
+        // column-scoped, so the lie is refused outright rather than corrected.
+        const { error: refused } = await userA.from("os_company_memory").insert({
+          company_id: companyId,
+          fact: "Hamburg is our best lane.",
+          kind: "fact",
+          source: "cofounder",
+          created_by: null,
+        });
+        expect(refused?.code).toBe("42501");
+
         const { error } = await userA.from("os_company_memory").insert({
           company_id: companyId,
           fact: "Hamburg is our best lane.",
           kind: "fact",
-          // Both of these are lies the form could tell, and the trigger
-          // overwrites them rather than trusting them.
-          source: "cofounder",
-          created_by: null,
         });
         expect(error).toBeNull();
 

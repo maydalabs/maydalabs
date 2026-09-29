@@ -16,7 +16,7 @@ export async function GET(request?: Request) {
     const db = await createSupabaseServerClient();
     const company = await currentCompany(db);
     if (!company) return json({ error: "no_company" }, 403);
-    if (!await hasReviewAccess(db, claims.sub)) return json({ error: "review_access_denied" }, 403);
+    if (!await hasReviewAccess(db, company.id, claims.sub)) return json({ error: "review_access_denied" }, 403);
     const requestId = request ? new URL(request.url).searchParams.get("requestId") ?? undefined : undefined;
     if (requestId && !uuid.test(requestId)) return json({ error: "invalid_request" }, 400);
     return json(await loadReviewSnapshot(db, company.id, claims.sub, requestId));
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     const db = await createSupabaseServerClient();
     const company = await currentCompany(db);
     if (!company) return json({ error: "no_company" }, 403);
-    if (!await hasReviewAccess(db, claims.sub)) return json({ error: "review_access_denied" }, 403);
+    if (!await hasReviewAccess(db, company.id, claims.sub)) return json({ error: "review_access_denied" }, 403);
     const proposal = await decideReview(createSupabaseAdminClient(), { companyId: company.id, actorId: claims.sub }, {
       proposalId: body.proposalId, revision: body.revision, fingerprint: body.fingerprint,
       action: body.action, ...(body.knowledgeApproved === true ? { knowledgeApproved: true } : {}), ...(payload ? { payload } : {}),

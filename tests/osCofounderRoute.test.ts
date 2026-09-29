@@ -89,7 +89,7 @@ describe("context and access checks before conversation side effects", () => {
     expect((await POST(request())).status).toBe(409);
     expect(mocks.begin).not.toHaveBeenCalled();
   });
-  it("denies a non-beta member before company context, transcript or model reads", async () => {
+  it("denies a non-member before company context, transcript or model reads", async () => {
     mocks.access.mockResolvedValue(false);
     const response = await POST(request());
     expect(response.status).toBe(403);
@@ -181,13 +181,13 @@ describe("a stale tab cannot move a question to a changed identity", () => {
     expectNoConversationEffects();
   });
 
-  it("matching preconditions do not bypass verified sign-in or private-beta access", async () => {
+  it("matching preconditions do not bypass verified sign-in or company membership", async () => {
     mocks.claims.mockResolvedValue(null);
     expect((await POST(request())).status).toBe(401);
     mocks.claims.mockResolvedValue({ sub: actorId });
     mocks.access.mockResolvedValue(false);
     expect((await POST(request())).status).toBe(403);
-    expect(mocks.access).toHaveBeenCalledWith(expect.anything(), actorId);
+    expect(mocks.access).toHaveBeenCalledWith(expect.anything(), companyId, actorId);
     expect(mocks.begin).not.toHaveBeenCalled();
     expect(mocks.run).not.toHaveBeenCalled();
   });

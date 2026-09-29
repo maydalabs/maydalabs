@@ -39,7 +39,7 @@ describe("explicit interrupted-turn recovery", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(await response.json()).toEqual({ turn: receipt });
-    expect(mocks.access).toHaveBeenCalledWith(serverDb, "founder");
+    expect(mocks.access).toHaveBeenCalledWith(serverDb, "selected-company", "founder");
     expect(mocks.interrupt).toHaveBeenCalledExactlyOnceWith(adminDb, { actorId: "founder", companyId: "selected-company" }, turnId);
     expect(mocks.access.mock.invocationCallOrder[0]).toBeLessThan(mocks.admin.mock.invocationCallOrder[0]);
   });
@@ -48,7 +48,7 @@ describe("explicit interrupted-turn recovery", () => {
     mocks.claims.mockResolvedValue({ sub: "second-person" });
     mocks.company.mockResolvedValue({ id: "second-company" });
     expect((await POST(request())).status).toBe(200);
-    expect(mocks.access).toHaveBeenCalledWith(serverDb, "second-person");
+    expect(mocks.access).toHaveBeenCalledWith(serverDb, "second-company", "second-person");
     expect(mocks.interrupt).toHaveBeenCalledWith(adminDb, { actorId: "second-person", companyId: "second-company" }, turnId);
   });
 
@@ -67,7 +67,7 @@ describe("explicit interrupted-turn recovery", () => {
     noWriter();
   });
 
-  it("denies a non-beta company member before accessing the writer", async () => {
+  it("denies a non-member before accessing the writer", async () => {
     mocks.access.mockResolvedValue(false);
     const response = await POST(request());
     expect(response.status).toBe(403);

@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   try {
     const db = await createSupabaseServerClient();
     const company = await currentCompany(db);
-    if (!company || !await hasReviewAccess(db, claims.sub)) return json({ error: "review_access_denied" }, 403);
+    if (!company || !await hasReviewAccess(db, company.id, claims.sub)) return json({ error: "review_access_denied" }, 403);
     return json({ turn: await interruptReviewTurn(createSupabaseAdminClient(), { actorId: claims.sub, companyId: company.id }, body.turnId) });
   } catch {
     return json({ error: "interrupt_unconfirmed", message: "An answer must have been waiting at least three minutes. Check stored progress before trying again." }, 409);

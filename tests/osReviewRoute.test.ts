@@ -55,7 +55,7 @@ describe("durable review reads", () => {
     expect((await GET()).status).toBe(403);
     expect(mocks.snapshot).not.toHaveBeenCalled();
   });
-  it("denies non-beta members without reading their company transcript", async () => {
+  it("denies non-members without reading their company transcript", async () => {
     mocks.access.mockResolvedValue(false);
     const response = await GET();
     expect(response.status).toBe(403);
@@ -106,7 +106,7 @@ describe("explicit review actions", () => {
     expect(mocks.decide).not.toHaveBeenCalled();
     expect(mocks.admin).not.toHaveBeenCalled();
   });
-  it("denies non-beta members without attempting a proposal mutation", async () => {
+  it("denies non-members without attempting a proposal mutation", async () => {
     mocks.access.mockResolvedValue(false);
     const response = await POST(request());
     expect(response.status).toBe(403);
