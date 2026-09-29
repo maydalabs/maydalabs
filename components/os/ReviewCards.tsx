@@ -42,6 +42,7 @@ const COPY = {
       draft_format: "This draft does not match your chosen format. Dismiss it and ask again with the format you want.",
       knowledge_assertion: "This suggestion does not match the exact company statement you provided. Dismiss it and enter the statement you stand behind in a new request.",
       knowledge_approval: "Company knowledge needs your explicit approval of the exact statement, scope and validity. Review it and confirm the checkbox before saving.",
+      refused: "This attempt was refused and nothing was saved: the record rejected it as it stood. Edit the preview and try again, or reload to check the saved state.",
     },
   },
   tr: {
@@ -70,6 +71,7 @@ const COPY = {
       draft_format: "Taslak seçtiğiniz biçimle uyuşmuyor. Reddedip istediğiniz biçimle yeniden isteyin.",
       knowledge_assertion: "Öneri, yazdığınız şirket bilgisiyle aynen uyuşmuyor. Reddedip yeni istekte arkasında durduğunuz ifadeyi yazın.",
       knowledge_approval: "Şirket bilgisi için bu ifadenin, kapsamın ve geçerliliğin açık onayınız gerekir. İnceleyip kaydetmeden önce kutuyu işaretleyin.",
+      refused: "Bu deneme reddedildi ve hiçbir şey kaydedilmedi: kayıt, bu haliyle kabul etmedi. Önizlemeyi düzenleyip yeniden deneyin veya kayıtlı durumu görmek için yenileyin.",
       duplicate_work: "Bu işlem reddedildi: açık bir işte aynı taslak zaten var. İşleri kontrol edin; başka bir kopya oluşturmayın.",
       calendar_date: "Bu işlem reddedildi: tarih geçersiz veya haftanın günüyle uyuşmuyor. Kaynağı kontrol edip kaydetmeden önce önizlemeyi düzenleyin.",
       work_kind: "Bu işlem reddedildi: taslağın türü desteklenmiyor. Öneriyi reddedip istediğiniz biçimde yeni bir taslak isteyin.",
@@ -102,6 +104,7 @@ const COPY = {
       draft_format: "Ce brouillon ne correspond pas au format choisi. Écartez-le et demandez le format souhaité.",
       knowledge_assertion: "Cette proposition ne reprend pas exactement votre énoncé. Écartez-la et saisissez l’énoncé que vous assumez dans une nouvelle demande.",
       knowledge_approval: "Votre approbation explicite de cet énoncé, de son périmètre et de sa validité est nécessaire. Relisez et cochez la case avant l’enregistrement.",
+      refused: "Cette tentative a été refusée et rien n’a été enregistré : le dossier l’a rejetée telle quelle. Modifiez l’aperçu et réessayez, ou rechargez pour vérifier l’état enregistré.",
       duplicate_work: "Cette tentative a été refusée : un travail ouvert contient déjà ce brouillon exact. Vérifiez le travail ; ne créez pas de copie.",
       calendar_date: "Cette tentative a été refusée : une date est invalide ou son jour ne correspond pas. Vérifiez la source et modifiez l’aperçu avant d’enregistrer.",
       work_kind: "Cette tentative a été refusée : le type du brouillon n’est pas pris en charge. Écartez-le et demandez le format voulu.",

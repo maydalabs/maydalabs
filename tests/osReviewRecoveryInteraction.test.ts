@@ -292,4 +292,40 @@ describe("explicit draft format and company assertion", () => {
     submit(invalid);
     expect(fetcher).not.toHaveBeenCalled();
   });
+
+  it("puts a request refused before it began back in the person's hands instead of locking the desk", async () => {
+    const storage = browserStorage(null);
+    const response = deferred<Response>();
+    const fetcher = vi.fn<typeof fetch>().mockReturnValue(response.promise);
+    vi.stubGlobal("fetch", fetcher);
+    change(find(render(), "textarea", () => true), "What should I test first?");
+    submit(render());
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(storage.values.has(key)).toBe(true);
+    response.resolve(Response.json({ error: "review_access_denied" }, { status: 403 }));
+    await tick();
+    const view = render();
+    expect(storage.values.has(key)).toBe(false);
+    expect(find(view, "textarea", () => true).props.value).toBe("What should I test first?");
+    expect(find(view, "textarea", () => true).props.disabled).toBe(false);
+    expect(words(view)).toContain("refused before anything started");
+    expect(words(view)).toContain("review_access_denied");
+    expect(words(view)).not.toContain("The result is unconfirmed");
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps a 409 the route could not confirm uncertain, because a turn may already exist", async () => {
+    const storage = browserStorage(null);
+    const response = deferred<Response>();
+    const fetcher = vi.fn<typeof fetch>().mockReturnValue(response.promise);
+    vi.stubGlobal("fetch", fetcher);
+    change(find(render(), "textarea", () => true), "Draft me nothing yet.");
+    submit(render());
+    response.resolve(Response.json({ error: "turn_unconfirmed" }, { status: 409 }));
+    await tick();
+    const view = render();
+    expect(storage.values.has(key)).toBe(true);
+    expect(find(view, "textarea", () => true).props.disabled).toBe(true);
+    expect(words(view)).toContain("The result is unconfirmed");
+  });
 });

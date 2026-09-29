@@ -194,9 +194,22 @@ describe("narrow durable review RPC adapter", () => {
     expect(fixture.rpc).toHaveBeenCalledTimes(1);
   });
   it.each([
-    { message: "review_duplicate_work" }, { code: "503", message: "review_duplicate_work" },
     { code: "P0001", message: "unrecognized guard" }, { code: "P0001", message: "review_duplicate_work PRIVATE DETAIL" },
-  ])("does not infer rollback from an untrusted or unknown error %j", async (error) => {
+    { code: "23514", message: "a decided review proposal is frozen" }, { code: "42501", message: "review access denied" },
+    { code: "22P02", message: "invalid input syntax for type uuid" },
+  ])("treats any raise inside the RPC as a confirmed refusal without forwarding its message %j", async (error) => {
+    const fixture = database();
+    fixture.rpc.mockResolvedValue({ data: null, error });
+    const result = await proposeReview(fixture.db, identity, "turn", payload).catch((failure) => failure);
+    expect(result).toBeInstanceOf(ConfirmedReviewRejection);
+    expect(result.reason).toBe("refused");
+    expect(result.message).not.toContain("PRIVATE");
+  });
+  it.each([
+    { message: "review_duplicate_work" }, { code: "503", message: "review_duplicate_work" },
+    { code: "08006", message: "connection failure" }, { code: "57014", message: "canceling statement" },
+    { code: "XX000", message: "internal error" }, { code: "PGRST116", message: "no rows" },
+  ])("does not infer rollback from an untrusted, connection or unknown error %j", async (error) => {
     const fixture = database();
     fixture.rpc.mockResolvedValue({ data: null, error });
     const result = await proposeReview(fixture.db, identity, "turn", payload).catch((failure) => failure);

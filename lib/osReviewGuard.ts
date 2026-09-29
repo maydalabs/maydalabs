@@ -9,7 +9,7 @@ export type ReviewWorkKind = (typeof REVIEW_WORK_KINDS)[number];
 export const REVIEW_WORK_ACTIONS: Record<ReviewWorkKind, "send" | "publish" | null> = {
   email: "send", reply: "send", post: "publish", note: null, research: null, decision: null,
 };
-export const REVIEW_GUARD_REASONS = ["work_kind", "work_action", "calendar_date", "duplicate_work", "intent_required", "draft_format", "knowledge_assertion", "knowledge_approval"] as const;
+export const REVIEW_GUARD_REASONS = ["work_kind", "work_action", "calendar_date", "duplicate_work", "intent_required", "draft_format", "knowledge_assertion", "knowledge_approval", "refused"] as const;
 export type ReviewGuardReason = (typeof REVIEW_GUARD_REASONS)[number];
 export type ReviewProposalRefusal = { rejected: "current_message_citation" | ReviewGuardReason };
 export function isReviewGuardReason(value: unknown): value is ReviewGuardReason {
@@ -25,6 +25,7 @@ export const REVIEW_REFUSAL_MESSAGES: Record<ReviewProposalRefusal["rejected"], 
   work_action: "This draft attempt was not staged because its type and later action disagree. Email/reply require send; post requires publish; note/research/decision require null. Saving never performs that later action. Do not relabel the artifact to bypass this check.",
   calendar_date: "This suggestion attempt was not staged because it contains an invalid date or a weekday that disagrees with its date. Check the supplied calendar details; ask the founder if they conflict. Do not silently change a supplied date.",
   duplicate_work: "An open Work item already contains this exact draft body. No duplicate was staged or saved, and the existing item was not approved, sent, or changed. Do not reword it merely to create a replacement. You can still prepare a separately requested new artifact.",
+  refused: "Storage refused this proposal as it stood and nothing was staged. Do not repeat it unchanged; discuss the problem or ask for corrected details.",
 };
 
 export function reviewProposalGuard(payload: ProposalPayload): ReviewGuardReason | null {

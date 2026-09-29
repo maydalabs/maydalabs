@@ -88,6 +88,13 @@ async function rpc<Name extends ReviewRpc>(db: Db, name: Name, args: Functions[N
     if (error.message === "review_knowledge_assertion") throw new ConfirmedReviewRejection("knowledge_assertion");
     if (error.message === "review_knowledge_approval") throw new ConfirmedReviewRejection("knowledge_approval");
   }
+  // Any other error PostgreSQL raised inside these two RPCs rolled the whole
+  // statement back: data (22), constraint (23), access (42) and plpgsql (P0)
+  // classes cannot follow a commit. Connection, resource and internal classes
+  // can, and stay unconfirmed. The message is not forwarded.
+  if ((name === "os_review_propose" || name === "os_review_decide") && typeof error?.code === "string" && /^(22|23|42|P0)[0-9A-Z]{3}$/.test(error.code)) {
+    throw new ConfirmedReviewRejection("refused");
+  }
   if (error || !data) throw new Error("review_storage_unconfirmed");
   return data;
 }
