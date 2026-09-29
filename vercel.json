@@ -4,6 +4,10 @@
     {
       "path": "/api/os/tick",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/keepalive",
+      "schedule": "30 7 * * *"
     }
   ]
 }
