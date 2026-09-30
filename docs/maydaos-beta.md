@@ -76,6 +76,13 @@ from stopping Abidin's drafting.
 
 ## To switch it on
 
+> **Retired 30 September 2026.** Step 3's platform key was found still set in
+> Vercel from this procedure and removed. A company now brings its own key
+> through Company → Choose your AI, sealed on our server
+> ([your own AI](maydaos-your-own-ai-2026-09-29.md)). Do not re-add
+> `MAYDAOS_ANTHROPIC_API_KEY`; the steps below are kept as the record of what
+> was done on 4 September.
+
 1. Console, new workspace (keep it away from Abidin's), create a key named
    something like `maydaos-beta`. Set a spend limit on the workspace.
 2. Top up to $20 and leave auto-reload off.

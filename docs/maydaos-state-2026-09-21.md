@@ -207,9 +207,14 @@ All of it is deployed. Migrations are applied to production through
 
 ## Rules that are not negotiable
 
-- **No model key in production.** `MAYDAOS_ANTHROPIC_API_KEY` and
-  `CRON_SECRET` are unset on purpose, so the co-founder answers 503 and the
-  worker 401 — honestly, and at no cost. Build, train, price, then open.
+- **No platform model key in production.** `MAYDAOS_ANTHROPIC_API_KEY` is
+  unset, so a company with no key of its own gets `not_configured` — honestly,
+  and at no cost to us; `CRON_SECRET` is unset, so the worker answers 401. A
+  company that wants the co-founder brings its own key through Company →
+  Choose your AI, sealed under `MAYDAOS_KEY_SECRET` (30 September). The
+  platform variable had in fact sat in Vercel since 4 September, left by the
+  beta procedure and unnoticed until 30 September, when it was removed; this
+  line was not true until then. Build, train, price, then open.
 - **Nothing public leads into MaydaOS.** No link on the site reaches sign-in,
   the portal or `/os`; `npm run smoke:live` keeps all seven public pages
   honest. `robots.txt` deliberately does not disallow them: that file is

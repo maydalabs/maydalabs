@@ -44,7 +44,10 @@ if one exists.
   behind the same `ModelTurn` seam; the loop does not know which spoke.
 - **Choice** (`pickTurn(env, choice)`): the company's own choice first, then
   a local model off Vercel, then the platform's key. `priced: true` and the
-  company's own rates for the ledger (`costUsdAt`).
+  company's own rates for the ledger (`costUsdAt`). Production holds no
+  platform key: the one left in Vercel by the 4 September beta procedure was
+  found and removed on 30 September, so a company without a key of its own
+  gets `not_configured`, and nothing bills us.
 - **Route**: the signed-in read checks whether a choice exists (a failed
   read is a definite refusal — falling back to the platform's model would
   spend the wrong money); only then does the service role read and open the
@@ -78,7 +81,8 @@ if one exists.
 2. Run the one-migration bundle in the SQL editor.
 3. After the deploy, open Company → *Choose your AI*, paste your own
    Anthropic key, save. The production co-founder answers on your key under
-   your ceiling. No platform key is needed, then or later.
+   your ceiling. No platform key is needed, then or later — the one from
+   4 September was removed on 30 September.
 
 ## Not in this slice
 
