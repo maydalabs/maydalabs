@@ -322,6 +322,9 @@ export type Database = {
       }
       os_companies: {
         Row: {
+          cofounder_name: string | null
+          cofounder_note: string | null
+          cofounder_voice: string
           created_at: string
           id: string
           monthly_chat_usd: number
@@ -330,6 +333,9 @@ export type Database = {
           what_we_do: string | null
         }
         Insert: {
+          cofounder_name?: string | null
+          cofounder_note?: string | null
+          cofounder_voice?: string
           created_at?: string
           id?: string
           monthly_chat_usd?: number
@@ -338,6 +344,9 @@ export type Database = {
           what_we_do?: string | null
         }
         Update: {
+          cofounder_name?: string | null
+          cofounder_note?: string | null
+          cofounder_voice?: string
           created_at?: string
           id?: string
           monthly_chat_usd?: number
@@ -349,18 +358,21 @@ export type Database = {
       }
       os_company_members: {
         Row: {
+          address_as: string | null
           company_id: string
           created_at: string
           role: string
           user_id: string
         }
         Insert: {
+          address_as?: string | null
           company_id: string
           created_at?: string
           role?: string
           user_id: string
         }
         Update: {
+          address_as?: string | null
           company_id?: string
           created_at?: string
           role?: string

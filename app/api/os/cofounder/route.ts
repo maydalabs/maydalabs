@@ -3,6 +3,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { buildCompanyContext, openOnThePerson, reviewedSystemFor } from "@/lib/osCofounder";
+import { personaFromCompany } from "@/lib/osPersona";
 import { runReviewedTurn, ReviewedTurnError } from "@/lib/osReviewedTurn";
 import { beginReviewTurn, finishReviewTurn, proposeReview, hasReviewAccess } from "@/lib/osReviewStore";
 import { pickTurn } from "@/lib/osCofounderModel";
@@ -67,6 +68,15 @@ export async function POST(request: Request) {
   let context: string;
   try { context = await buildCompanyContext(supabase, company.id); }
   catch { return json({ error: "context_unavailable" }, 500); }
+  /* How it sounds and what it is called, read at turn time and stored on no
+   * turn. A failed read of the person's own row is a plain "you", not a
+   * refusal: an address changes wording only. */
+  let addressAs: string | null = null;
+  try {
+    const { data: member } = await supabase.from("os_company_members").select("address_as").eq("company_id", company.id).eq("user_id", claims.sub).maybeSingle();
+    addressAs = member?.address_as ?? null;
+  } catch { addressAs = null; }
+  const persona = personaFromCompany(company, addressAs);
 
   const admin = createSupabaseAdminClient();
   const who = { companyId: company.id, actorId: claims.sub };
@@ -100,7 +110,7 @@ export async function POST(request: Request) {
           mode: stored.mode,
           intent: stored.intent!,
           source: { id: stored.person_message_id, text: stored.question },
-          system: reviewedSystemFor(context, stored.mode, stored.intent),
+          system: reviewedSystemFor(context, stored.mode, stored.intent, persona),
           history: [...openOnThePerson(stored.history)
             .map((m) => ({ role: m.role, body: m.body })), { role: "person", body: stored.question }],
           turn: picked.turn, priced: picked.priced, price: picked.price, signal: abort.signal,

@@ -68,6 +68,8 @@ export default async function OsPage(props: LocalePageProps) {
   let finishedCount = 0;
   let hasCompany = false;
   let companyId: string | null = null;
+  let cofounderName: string | null = null;
+  let addressAs: string | null = null;
   let companyHasModel = false;
   let dueRows: DueRow[] = [];
   let dueCount = 0;
@@ -86,6 +88,12 @@ export default async function OsPage(props: LocalePageProps) {
     ]);
     hasCompany = company !== null;
     companyId = company?.id ?? null;
+    cofounderName = company?.cofounder_name ?? null;
+    /* How this person wants to be addressed here; a failed read is plain "you". */
+    if (company) {
+      const { data: member } = await supabase.from("os_company_members").select("address_as").eq("company_id", company.id).eq("user_id", claims.sub).maybeSingle();
+      addressAs = member?.address_as ?? null;
+    }
     prefs = sanitizePrefs(desktop?.prefs);
     companyName = company?.name ?? null;
     storedLayout = desktop?.layout ?? [];
@@ -304,9 +312,11 @@ export default async function OsPage(props: LocalePageProps) {
   const apps: OsApp[] = [
     {
       id: "cofounder",
-      title: OS_COFOUNDER_CHAT_COPY[locale].title,
+      // One value feeds the title bar, the dock, the phone heading and the
+      // aria-labels; the layout stays keyed by the id, so a rename loses nothing.
+      title: cofounderName ?? OS_COFOUNDER_CHAT_COPY[locale].title,
       icon: "cofounder",
-      node: <CofounderPane locale={locale} configured={configured} />,
+      node: <CofounderPane locale={locale} configured={configured} cofounderName={cofounderName} />,
       defaultRect: { x: 0.44, y: 0.03, w: 0.535, h: 0.9 },
       openByDefault: configured,
       dormant: !configured,
@@ -366,7 +376,7 @@ export default async function OsPage(props: LocalePageProps) {
       title: OS_SETTINGS_COPY[locale].title,
       icon: "settings",
       node: (
-        <SettingsApp locale={locale} prefs={prefs} email={typeof claims.email === "string" ? claims.email : null} />
+        <SettingsApp locale={locale} prefs={prefs} email={typeof claims.email === "string" ? claims.email : null} companyId={companyId} address={addressAs} cofounderName={cofounderName} />
       ),
       defaultRect: { x: 0.46, y: 0.16, w: 0.42, h: 0.7 },
     },
@@ -381,7 +391,7 @@ export default async function OsPage(props: LocalePageProps) {
       key={`${claims.sub}:${companyId ?? ""}`}
       apps={apps}
       documents={documents}
-      brief={<Brief locale={locale} brief={brief} hasCompany={hasCompany} companyName={companyName} configured={configured} />}
+      brief={<Brief locale={locale} brief={brief} hasCompany={hasCompany} companyName={companyName} configured={configured} cofounderName={cofounderName} />}
       locale={locale}
       prefs={prefs}
       copy={{
@@ -412,8 +422,8 @@ export default async function OsPage(props: LocalePageProps) {
       ]}
       commandCopy={{
         placeholder: copy.commandPlaceholder,
-        ask: copy.commandAsk,
-        tell: copy.commandTell,
+        ask: cofounderName ? copy.commandAskNamed.replace("{name}", cofounderName) : copy.commandAsk,
+        tell: cofounderName ? copy.commandTellNamed.replace("{name}", cofounderName) : copy.commandTell,
         add: copy.commandAdd,
         lane: copy.commandLane,
         lanes: OS_WORKAPP_COPY[locale].lanes,

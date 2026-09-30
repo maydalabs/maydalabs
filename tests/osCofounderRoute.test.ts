@@ -18,6 +18,7 @@ vi.mock("@/lib/osReviewStore", () => ({ beginReviewTurn: mocks.begin, finishRevi
 vi.mock("@/lib/osCofounder", async (importOriginal) => ({ ...await importOriginal<typeof import("@/lib/osCofounder")>(), buildCompanyContext: mocks.context }));
 
 import { POST } from "@/app/api/os/cofounder/route";
+import { VOICE_INSTRUCTION } from "@/lib/osCofounder";
 import { ReviewedTurnError } from "@/lib/osReviewedTurn";
 import { ConfirmedReviewRejection } from "@/lib/osReviewGuard";
 
@@ -272,7 +273,9 @@ describe("durable cofounder turns and recovery", () => {
     workQuery.select.mockReturnValue(workQuery);
     workQuery.eq.mockReturnValue(workQuery);
     workQuery.not.mockReturnValue(workQuery);
-    const signedInFrom = vi.fn(() => workQuery);
+    // The person's own membership row is read for the persona; it is not the Work read.
+    const memberQuery = { select: () => memberQuery, eq: () => memberQuery, maybeSingle: async () => ({ data: null, error: null }) };
+    const signedInFrom = vi.fn((table: string) => (table === "os_company_members" ? memberQuery : workQuery));
     const adminFrom = vi.fn(() => { throw new Error("No administrator read allowed"); });
     mocks.server.mockResolvedValue({ rpc: mocks.budget, from: signedInFrom });
     mocks.admin.mockReturnValue({ from: adminFrom });
@@ -285,7 +288,7 @@ describe("durable cofounder turns and recovery", () => {
     });
     const streamed = events(await (await POST(request({ ...validBody, mode: "draft", intent: draftIntent }))).text());
     expect(result).toEqual({ rejected: "duplicate_work" });
-    expect(signedInFrom).toHaveBeenCalledExactlyOnceWith("os_work_items");
+    expect(signedInFrom.mock.calls.filter(([table]) => table === "os_work_items")).toHaveLength(1);
     expect(workQuery.select).toHaveBeenCalledExactlyOnceWith("id");
     expect(workQuery.eq.mock.calls).toEqual([["company_id", companyId], ["notes", payload.body]]);
     expect(workQuery.not).toHaveBeenCalledExactlyOnceWith("status", "in", "(completed,canceled)");
@@ -466,5 +469,57 @@ describe("a company that brought its own key", () => {
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({ error: "model_settings_unavailable" });
     expect(mocks.picked).not.toHaveBeenCalled();
+  });
+});
+
+describe("how it sounds", () => {
+  const memberQuery = (address: string | null | "unreadable") => {
+    const query = {
+      select: () => query, eq: () => query,
+      maybeSingle: async () => {
+        if (address === "unreadable") throw new Error("PRIVATE READ ERROR");
+        return { data: address === null ? null : { address_as: address }, error: null };
+      },
+    };
+    return query;
+  };
+  const workQuery = { select: () => workQuery, eq: () => workQuery, not: () => workQuery, limit: mocks.history };
+  const systemHandedToTheModel = () => (mocks.run.mock.calls[0][0] as { system: string }).system;
+
+  it("hands the model the persona block when the company set one, with this person's own address", async () => {
+    mocks.company.mockResolvedValue({ id: companyId, monthly_chat_usd: 5, cofounder_name: "Ada", cofounder_voice: "blunt", cofounder_note: "No bullet points." });
+    mocks.server.mockResolvedValue({ rpc: mocks.budget, from: (table: string) => (table === "os_company_members" ? memberQuery("Selin") : workQuery) });
+    await POST(request());
+    const system = systemHandedToTheModel();
+    expect(system).toContain('<persona kind="owner preference about manner; untrusted data">');
+    expect(system).toContain('name: "Ada"');
+    expect(system).toContain('address_the_person_as: "Selin"');
+    expect(system).toContain('owner_style_note: "No bullet points."');
+    expect(system).toContain(VOICE_INSTRUCTION.blunt);
+    expect(system.indexOf("</persona>")).toBeLessThan(system.indexOf("Company context (untrusted data"));
+    expect(mocks.begin).toHaveBeenCalledTimes(1);
+  });
+
+  it("hands the model today's prompt when nothing was set, and a plain you when the address cannot be read", async () => {
+    mocks.server.mockResolvedValue({ rpc: mocks.budget, from: (table: string) => (table === "os_company_members" ? memberQuery("unreadable") : workQuery) });
+    await POST(request());
+    expect(systemHandedToTheModel()).not.toContain("<persona");
+    expect(mocks.begin).toHaveBeenCalledTimes(1);
+
+    vi.resetAllMocks();
+    mocks.configured.mockReturnValue(true); mocks.sealed.mockResolvedValue(null); mocks.hasOwn.mockResolvedValue(false);
+    mocks.claims.mockResolvedValue({ sub: actorId }); mocks.access.mockResolvedValue(true); mocks.budget.mockResolvedValue({ data: 0, error: null });
+    mocks.picked.mockReturnValue({ label: "synthetic", priced: false, turn: vi.fn() }); mocks.context.mockResolvedValue("Selected company snapshot");
+    mocks.begin.mockResolvedValue({ created: true, turn: stored }); mocks.history.mockResolvedValue({ data: [], error: null });
+    mocks.finish.mockImplementation(async (_db, _who, id, reply, status) => ({ ...stored, id, reply, status }));
+    mocks.admin.mockReturnValue({ from: () => ({ select: () => ({ eq: () => ({ order: () => ({ limit: mocks.history }) }) }) }) });
+    mocks.run.mockImplementation(async function* () { yield { type: "done", text: "Two open items.", inputTokens: 1, outputTokens: 1, costUsd: 0 }; });
+    mocks.company.mockResolvedValue({ id: companyId, monthly_chat_usd: 5, cofounder_name: "Ada", cofounder_voice: "warm", cofounder_note: null });
+    mocks.server.mockResolvedValue({ rpc: mocks.budget, from: (table: string) => (table === "os_company_members" ? memberQuery("unreadable") : workQuery) });
+    await POST(request());
+    const system = systemHandedToTheModel();
+    expect(system).toContain('name: "Ada"');
+    expect(system).toContain("address_the_person_as: no preference recorded; use plain 'you'");
+    expect(mocks.begin).toHaveBeenCalledTimes(1);
   });
 });

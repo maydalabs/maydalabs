@@ -22,8 +22,10 @@ import type { Locale } from "@/lib/i18n";
 
 const MAX_SENTENCES = 5;
 
-export function Brief({ locale, brief, hasCompany, companyName, configured }: {
+export function Brief({ locale, brief, hasCompany, companyName, configured, cofounderName = null }: {
   locale: Locale; brief: BriefModel; hasCompany: boolean; companyName?: string | null; configured?: boolean;
+  /* What the company calls it; the brief says the name where it speaks of it. */
+  cofounderName?: string | null;
 }) {
   const copy = OS_BRIEF_COPY[locale];
   const status = OS_WORKAPP_COPY[locale].status;
@@ -31,6 +33,11 @@ export function Brief({ locale, brief, hasCompany, companyName, configured }: {
   const fill = (template: string, values: Record<string, string>) =>
     Object.entries(values).reduce((s, [k, v]) => s.replaceAll(`{${k}}`, v), template);
   const company = companyName ?? "";
+  const knowsForms = {
+    none: copy.knows.none,
+    one: copy.knows.one,
+    many: cofounderName ? fill(copy.knows.manyNamed, { name: cofounderName, company }) : fill(copy.knows.many, { company }),
+  };
 
   if (!hasCompany) {
     return (
@@ -48,9 +55,11 @@ export function Brief({ locale, brief, hasCompany, companyName, configured }: {
         <p className="os-brief-date"><OsClock locale={locale} form="date" /></p>
         <h1 className="os-brief-headline">{fill(copy.firstDay.title, { company })}</h1>
         <div className="os-brief-rest">
-          <p>{countSentence(brief.knows, { none: copy.knows.none, one: copy.knows.one, many: fill(copy.knows.many, { company }) })}</p>
-          <p>{configured === false ? copy.firstDay.hintDormant : copy.firstDay.hint}</p>
+          <p>{countSentence(brief.knows, knowsForms)}</p>
+          <p>{configured === false ? copy.firstDay.hintDormant : cofounderName ? fill(copy.firstDay.hintNamed, { name: cofounderName }) : copy.firstDay.hint}</p>
           <p>{configured === false ? copy.firstDay.recordDormant : copy.firstDay.record}</p>
+          {/* Once, on the first day, and gone the moment it has a name. */}
+          {configured !== false && !cofounderName ? <p>{copy.firstDay.unnamed}</p> : null}
         </div>
       </div>
     );
@@ -115,7 +124,7 @@ export function Brief({ locale, brief, hasCompany, companyName, configured }: {
    * knows. The budget below still cuts the brief before it becomes the Record. */
   const quiet = brief.needs.length === 0 && brief.due.length === 0;
   if (quiet && brief.openCount > 0) sentences.unshift({ key: "flight", text: countSentence(brief.openCount, copy.inFlight) });
-  if (quiet) sentences.push({ key: "knows", text: countSentence(brief.knows, { none: copy.knows.none, one: copy.knows.one, many: fill(copy.knows.many, { company }) }) });
+  if (quiet) sentences.push({ key: "knows", text: countSentence(brief.knows, knowsForms) });
 
   return (
     <div className="os-brief-inner">

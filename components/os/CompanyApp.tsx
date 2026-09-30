@@ -1,6 +1,8 @@
 import { connectSiteLeadsAction } from "@/app/actions/cofounder";
 import { ActionForm } from "@/components/os/ActionForm";
 import { CompanyEditor } from "@/components/os/CompanyEditor";
+import { CofounderPersonaEditor } from "@/components/os/CofounderPersonaEditor";
+import { personaFromCompany } from "@/lib/osPersona";
 import { ModelSettingsEditor } from "@/components/os/ModelSettingsEditor";
 import { readModelSettingsSummary } from "@/lib/osModelSettings";
 import { vaultSecret } from "@/lib/osKeyVault";
@@ -26,7 +28,7 @@ export async function CompanyApp({ locale }: { locale: Locale }) {
   // The same company every other pane is showing, then the rest of its row.
   const current = await currentCompany(supabase);
   const { data: company } = current
-    ? await supabase.from("os_companies").select("id, name, what_we_do, created_at, monthly_chat_usd").eq("id", current.id).maybeSingle()
+    ? await supabase.from("os_companies").select("id, name, what_we_do, created_at, monthly_chat_usd, cofounder_name, cofounder_voice, cofounder_note").eq("id", current.id).maybeSingle()
     : { data: null };
 
   if (!company) return <OsPaneEmpty>{copy.companyNothing}</OsPaneEmpty>;
@@ -44,6 +46,7 @@ export async function CompanyApp({ locale }: { locale: Locale }) {
   /* Correcting the company is the owner's, because the policy admits only an
    * owner and a control that is always refused is a trap. */
   const isOwner = (members ?? []).some((m) => m.user_id === claims?.sub && m.role === "owner");
+  const persona = personaFromCompany(company, null);
 
   return (
     <div className="mayda-stack" style={{ gap: "0.9rem" }}>
@@ -80,6 +83,34 @@ export async function CompanyApp({ locale }: { locale: Locale }) {
           }}
         />
       ) : null}
+
+      {/* What it is called and how it sounds. Read by every member — a hidden
+          instruction to the co-founder would be the opposite of the product —
+          and changed by the owner. */}
+      <div className="mayda-stack" style={{ gap: "0.4rem" }}>
+        <p className="mayda-kicker">{copy.companyCofounder}</p>
+        <p className="mayda-body" style={{ margin: 0 }}>
+          {persona.name ? <strong>{persona.name}</strong> : copy.companyCofounderUnnamed}
+        </p>
+        <p className="mayda-note" style={{ margin: 0 }}>
+          {copy.companyCofounderVoices[persona.voice].label}
+          {persona.note ? ` · “${persona.note}”` : ""}
+        </p>
+        {isOwner ? (
+          <CofounderPersonaEditor
+            companyId={company.id}
+            name={persona.name}
+            voice={persona.voice}
+            note={persona.note}
+            copy={{
+              nameIt: copy.companyCofounderNameIt, change: copy.companyCofounderChange, name: copy.companyCofounderName,
+              voice: copy.companyCofounderVoice, voices: copy.companyCofounderVoices, note: copy.companyCofounderNote,
+              noteHint: copy.companyCofounderNoteHint, saved: copy.companyCofounderSaved, failed: copy.companyCofounderFailed,
+              reasons: copy.companyCofounderReasons, save: OS_DOCUMENT_COPY[locale].save, cancel: OS_DOCUMENT_COPY[locale].cancel,
+            }}
+          />
+        ) : null}
+      </div>
 
       {/* Which AI answers, and on whose key. Read by every member; changed by
           the owner, who is the one paying. */}

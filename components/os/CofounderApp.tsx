@@ -14,7 +14,7 @@ import { pendingQuestionKey, parseLegacyPendingQuestion, parsePendingQuestion, s
 
 export type ChatMessage = { id: string; role: "person" | "cofounder"; body: string };
 export type CofounderCopy = {
-  placeholder: string; modeLabel: string;
+  placeholder: string; modeLabel: string; who: string;
   modes: Record<ReviewRequestMode, { label: string; help: string; submit: string }>;
   sending: string; empty: string; emptyHint: string;
   filed: string; learned: string; failed: string; budget: string; notConfigured: string; noCompany: string;
@@ -310,7 +310,7 @@ export function CofounderApp({ initialSnapshot, locale, copy, canTalk, why }: {
       <div className="os-chat-log">
         {!messages.length && !pending ? <div className="os-chat-empty"><strong>{copy.empty}</strong><span>{why ?? copy.emptyHint}</span></div> : null}
         {messages.map((message) => <div key={message.id} className="os-chat-turn" data-role={message.role}>
-          <span className="os-chat-who">{message.role === "person" ? (locale === "tr" ? "siz" : locale === "fr" ? "vous" : "you") : "co-founder"}</span>
+          <span className="os-chat-who">{message.role === "person" ? (locale === "tr" ? "siz" : locale === "fr" ? "vous" : "you") : copy.who}</span>
           <p className="os-chat-body">{message.body || (pending ? "…" : "")}</p>
         </div>)}
         <div ref={endRef} />

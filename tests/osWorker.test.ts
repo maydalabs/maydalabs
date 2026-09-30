@@ -198,7 +198,7 @@ describe("the worker on the company's own key", () => {
   });
 
   it("drafts through a compatible provider end to end: the real picker, a scripted server", async () => {
-    const fetcher = vi.fn(async (_input: string | URL | Request, _init?: RequestInit) => new Response(JSON.stringify({
+    const fetcher = vi.fn<(input: string | URL | Request, init?: RequestInit) => Promise<Response>>(async () => new Response(JSON.stringify({
       choices: [{ message: { content: JSON.stringify({ draft: "Freight rates rose 4% in August.", claims: [{ text: "Freight rates rose 4% in August.", source_url: "https://example.com/a" }] }) }, finish_reason: "stop" }],
       usage: { prompt_tokens: 120, completion_tokens: 40 },
     }), { status: 200, headers: { "content-type": "application/json" } }));
