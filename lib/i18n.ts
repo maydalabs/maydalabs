@@ -156,3 +156,10 @@ export function getLocalizedUrls(path: string) {
     "x-default": localizePath(path, "en"),
   };
 }
+
+/* A template with {slots}, filled literally. A function replacer, because a
+ * plain string replacement reads $&, $' and $` as patterns, and a co-founder
+ * named "$&" would otherwise be shown its own template. */
+export function fill(template: string, values: Record<string, string>): string {
+  return Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, () => value), template);
+}

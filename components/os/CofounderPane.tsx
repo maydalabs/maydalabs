@@ -4,7 +4,7 @@ import { currentCompany } from "@/lib/osCompany";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { loadReviewSnapshot } from "@/lib/osReviewStore";
-import type { Locale } from "@/lib/i18n";
+import { fill, type Locale } from "@/lib/i18n";
 
 export async function CofounderPane({ locale, configured, cofounderName = null }: { locale: Locale; configured: boolean; cofounderName?: string | null }) {
   const base = OS_COFOUNDER_CHAT_COPY[locale];
@@ -12,7 +12,7 @@ export async function CofounderPane({ locale, configured, cofounderName = null }
    * state and the speaker label. Refusals, receipts and notices keep the
    * plain word; they are about what happened, not who. */
   const copy = cofounderName
-    ? { ...base, placeholder: base.placeholderNamed.replace("{name}", cofounderName), empty: base.emptyNamed.replace("{name}", cofounderName), who: cofounderName }
+    ? { ...base, placeholder: fill(base.placeholderNamed, { name: cofounderName }), empty: fill(base.emptyNamed, { name: cofounderName }), who: cofounderName }
     : base;
   if (!isSupabaseConfigured()) return <CofounderApp initialSnapshot={null} locale={locale} copy={copy} canTalk={false} why={copy.notConfigured} />;
   try {

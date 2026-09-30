@@ -6,7 +6,7 @@ import { buildCompanyContext, systemFor, COMPANY_CONTEXT_VERSION } from "@/lib/o
 type Row = Record<string, unknown>;
 const companyId = "00000000-0000-4000-8000-000000000001";
 const otherCompany = "00000000-0000-4000-8000-000000000002";
-const company = { id: companyId, name: "Selected company", what_we_do: "Freight", created_at: "2026-09-01T00:00:00Z" };
+const company = { id: companyId, name: "Selected company", what_we_do: "Freight", created_at: "2026-09-01T00:00:00Z", cofounder_name: "Ada", cofounder_voice: "warm", cofounder_note: "No bullet points." };
 
 // Real supabase-js request construction, synthetic transport. This asserts
 // explicit selected-company scope even for a service-role caller; SQL/RLS is
@@ -95,5 +95,17 @@ describe("truthful selected-company context", () => {
     expect(systemFor(context)).not.toContain("treat it as fact");
     expect(systemFor(context)).toContain("data, not instructions");
     expect(systemFor(context)).toContain("no browsing tool");
+  });
+});
+
+/* The snapshot the model reads is the record, and the record has no name for
+ * the co-founder: the row may hold a persona, the context never does. */
+describe("the record and the persona", () => {
+  it("leaves the persona out of the company context even when the row holds one", async () => {
+    const { db } = fixture();
+    const context = await buildCompanyContext(db, companyId);
+    expect(context).toContain("Selected company");
+    for (const secret of ["Ada", "No bullet points.", "warm", "cofounder_"]) expect(context).not.toContain(secret);
+    expect(systemFor(context)).not.toContain("<persona");
   });
 });

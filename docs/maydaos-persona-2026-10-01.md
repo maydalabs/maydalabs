@@ -66,8 +66,11 @@ change.
   `PERSONA_INSTRUCTION_VERSION` marks the text as part of the measured
   prompt.
 - **Actions** (`app/actions/persona.ts`): both through the caller's own
-  client; the company from the desk and the person from the verified claims,
-  never from the form; zero rows updated is *not yours* / *not a member*.
+  client. The persona save names the company in the form, as the company
+  editor does — under the owner policy that id can only reach a company the
+  caller already owns; the address save takes the company from the desk and
+  the person from the verified claims, never from the form. Anything but
+  exactly one row updated is *not yours* / *not a member*.
 - **Route**: the persona is read at turn time and stored on no turn; a
   failed read of the person's own row is a plain "you", not a refusal.
 - **Worker**: never receives the persona. A voice governs the conversation;

@@ -25,9 +25,14 @@ describe("copy parity", () => {
 
   it.each(["en", "tr", "fr"] as const)("every named template carries {name} in %s", (locale) => {
     const shell = OS_SHELL_COPY[locale], settings = OS_SETTINGS_COPY[locale], chat = OS_COFOUNDER_CHAT_COPY[locale], brief = OS_BRIEF_COPY[locale];
-    for (const template of [shell.commandAskNamed, shell.commandTellNamed, settings.addressNamed, chat.placeholderNamed, chat.emptyNamed, brief.knows.manyNamed, brief.firstDay.hintNamed]) {
+    for (const template of [
+      shell.commandAskNamed, shell.commandTellNamed, settings.addressNamed, chat.placeholderNamed, chat.emptyNamed,
+      brief.knows.noneNamed, brief.knows.oneNamed, brief.knows.manyNamed, brief.firstDay.hintNamed, brief.firstDay.hintDormantNamed,
+    ]) {
       expect(template).toContain("{name}");
     }
+    expect(shell.companyCofounderNoteQuoted).toContain("{note}");
+    expect(shell.companyCofounderNamePlaceholder).toBeTruthy();
   });
 
   it.each(["en", "tr", "fr"] as const)("names exactly the voices the module knows and every reason an action can give, in %s", (locale) => {
@@ -37,10 +42,10 @@ describe("copy parity", () => {
       expect(shell.companyCofounderVoices[voice].label).toBeTruthy();
       expect(shell.companyCofounderVoices[voice].help).toBeTruthy();
     }
-    for (const code of ["not_signed_in", "bad_company", "not_yours", "name", "voice", "note", "note_permission", "storage"]) {
+    for (const code of ["not_configured", "not_signed_in", "bad_company", "not_yours", "name", "voice", "note", "note_permission", "storage"]) {
       expect(shell.companyCofounderReasons[code]).toBeTruthy();
     }
-    for (const code of ["not_signed_in", "no_company", "address", "not_member", "storage"]) {
+    for (const code of ["not_configured", "not_signed_in", "no_company", "address", "not_member", "storage"]) {
       expect(settings.addressReasons[code]).toBeTruthy();
     }
   });

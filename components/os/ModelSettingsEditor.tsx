@@ -54,7 +54,7 @@ export function ModelSettingsEditor({ companyId, summary, monthlyCap, vaultReady
   const open = openedFor !== null && (openedFor === saveState.version || saveState.error !== null);
   const refusal = (state: EditResult) => state.error ? (copy.reasons[state.error] ?? state.error) : null;
 
-  const fill = (template: string, values: Record<string, string>) => Object.entries(values).reduce((s, [k, v]) => s.replaceAll(`{${k}}`, v), template);
+  const fill = (template: string, values: Record<string, string>) => Object.entries(values).reduce((s, [k, v]) => s.replaceAll(`{${k}}`, () => v), template);
 
   return (
     <div className="mayda-stack" style={{ gap: "0.5rem" }}>

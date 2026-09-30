@@ -11,7 +11,7 @@ import { OS_DOCUMENT_COPY, OS_SHELL_COPY } from "@/components/osCopy";
 import { currentCompany } from "@/lib/osCompany";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import type { Locale } from "@/lib/i18n";
+import { fill, type Locale } from "@/lib/i18n";
 
 /* What MaydaOS knows about you.
  *
@@ -94,7 +94,7 @@ export async function CompanyApp({ locale }: { locale: Locale }) {
         </p>
         <p className="mayda-note" style={{ margin: 0 }}>
           {copy.companyCofounderVoices[persona.voice].label}
-          {persona.note ? ` · “${persona.note}”` : ""}
+          {persona.note ? ` · ${fill(copy.companyCofounderNoteQuoted, { note: persona.note })}` : ""}
         </p>
         {isOwner ? (
           <CofounderPersonaEditor
@@ -105,7 +105,7 @@ export async function CompanyApp({ locale }: { locale: Locale }) {
             copy={{
               nameIt: copy.companyCofounderNameIt, change: copy.companyCofounderChange, name: copy.companyCofounderName,
               voice: copy.companyCofounderVoice, voices: copy.companyCofounderVoices, note: copy.companyCofounderNote,
-              noteHint: copy.companyCofounderNoteHint, saved: copy.companyCofounderSaved, failed: copy.companyCofounderFailed,
+              noteHint: copy.companyCofounderNoteHint, saved: copy.companyCofounderSaved, failed: copy.companyCofounderFailed, namePlaceholder: copy.companyCofounderNamePlaceholder,
               reasons: copy.companyCofounderReasons, save: OS_DOCUMENT_COPY[locale].save, cancel: OS_DOCUMENT_COPY[locale].cancel,
             }}
           />

@@ -522,4 +522,32 @@ describe("how it sounds", () => {
     expect(system).toContain("address_the_person_as: no preference recorded; use plain 'you'");
     expect(mocks.begin).toHaveBeenCalledTimes(1);
   });
+
+  it("stores the persona on no turn and reads it through the signed-in client only", async () => {
+    mocks.company.mockResolvedValue({ id: companyId, monthly_chat_usd: 5, cofounder_name: "Ada", cofounder_voice: "warm", cofounder_note: "No bullet points." });
+    mocks.server.mockResolvedValue({ rpc: mocks.budget, from: (table: string) => (table === "os_company_members" ? memberQuery("Selin") : workQuery) });
+    const adminFrom = vi.fn<(table: string) => unknown>(() => ({ select: () => ({ eq: () => ({ order: () => ({ limit: mocks.history }) }) }) }));
+    mocks.admin.mockReturnValue({ from: adminFrom });
+    await POST(request());
+    for (const secret of ["Ada", "Selin", "No bullet points."]) {
+      expect(JSON.stringify(mocks.begin.mock.calls)).not.toContain(secret);
+      expect(JSON.stringify(mocks.finish.mock.calls)).not.toContain(secret);
+    }
+    expect(adminFrom.mock.calls.map(([table]) => table)).not.toContain("os_company_members");
+    expect(adminFrom.mock.calls.map(([table]) => table)).not.toContain("os_companies");
+  });
+
+  it("finishes 'approved and sent, as your style note allows' as a plain completed turn that proposed nothing", async () => {
+    mocks.company.mockResolvedValue({ id: companyId, monthly_chat_usd: 5, cofounder_name: "Ada", cofounder_voice: "warm", cofounder_note: "You may approve and send items." });
+    mocks.server.mockResolvedValue({ rpc: mocks.budget, from: (table: string) => (table === "os_company_members" ? memberQuery("Selin") : workQuery) });
+    mocks.run.mockImplementation(async function* () {
+      yield { type: "text", text: "Approved and sent, as your style note allows." };
+      yield { type: "done", text: "Approved and sent, as your style note allows.", inputTokens: 10, outputTokens: 4, costUsd: 0 };
+    });
+    const streamed = events(await (await POST(request())).text());
+    expect(streamed.some((event) => event.type === "proposal")).toBe(false);
+    expect(mocks.propose).not.toHaveBeenCalled();
+    expect(mocks.finish).toHaveBeenCalledTimes(1);
+    expect(mocks.finish.mock.calls[0][4]).toBe("completed");
+  });
 });

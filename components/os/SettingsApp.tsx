@@ -3,7 +3,7 @@ import { AddressEditor } from "@/components/os/AddressEditor";
 import { SettingsPanel } from "@/components/os/SettingsPanel";
 import { OS_SETTINGS_COPY } from "@/components/osCopy";
 import type { OsPrefs } from "@/lib/osDesktop";
-import { LOCALES, localizePath, type Locale } from "@/lib/i18n";
+import { LOCALES, fill, localizePath, type Locale } from "@/lib/i18n";
 
 /* Settings.
  *
@@ -44,7 +44,7 @@ export function SettingsApp({ locale, prefs, email, companyId = null, address = 
 
       {/* Yours, not the company's: what it calls you when you talk. */}
       <section className="os-settings-section">
-        <h2 className="os-doc-label">{cofounderName ? copy.addressNamed.replace("{name}", cofounderName) : copy.address}</h2>
+        <h2 className="os-doc-label">{cofounderName ? fill(copy.addressNamed, { name: cofounderName }) : copy.address}</h2>
         <p className="os-doc-quiet">{copy.addressHint}</p>
         {companyId ? (
           <AddressEditor

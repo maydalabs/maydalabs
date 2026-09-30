@@ -78,6 +78,9 @@ describe("naming the co-founder", () => {
     expect(await savePersonaAction(START, form({ companyId, name: "Ada", voice: "plain", note: "" }))).toEqual({ error: "storage", version: 4 });
     mocks.server.mockResolvedValueOnce(client({ error: null, count: 0 }).db);
     expect(await savePersonaAction(START, form({ companyId, name: "Ada", voice: "plain", note: "" }))).toEqual({ error: "not_yours", version: 4 });
+    // A count that never arrived is not a confirmed write either.
+    mocks.server.mockResolvedValueOnce(client({ error: null, count: null }).db);
+    expect(await savePersonaAction(START, form({ companyId, name: "Ada", voice: "plain", note: "" }))).toEqual({ error: "not_yours", version: 4 });
     expect(mocks.revalidate).not.toHaveBeenCalled();
   });
 });
@@ -108,6 +111,8 @@ describe("how it addresses you", () => {
     await setAddressAction(START, form({ address: "" }));
     expect(calls[0].payload).toEqual({ address_as: null });
     mocks.server.mockResolvedValueOnce(client({ error: null, count: 0 }).db);
+    expect(await setAddressAction(START, form({ address: "Selin" }))).toEqual({ error: "not_member", version: 4 });
+    mocks.server.mockResolvedValueOnce(client({ error: null, count: null }).db);
     expect(await setAddressAction(START, form({ address: "Selin" }))).toEqual({ error: "not_member", version: 4 });
   });
 });

@@ -36,6 +36,15 @@ describe("the brief, named", () => {
     expect(render(quiet, null)).toBe(render(quiet, undefined as unknown as null));
   });
 
+  it("names it in the none, one and dormant lines too", () => {
+    const firstDay = composeBrief({ ...base, knows: 1 });
+    expect(render(firstDay, "Ada")).toContain("Ada knows one thing so far: what you do.");
+    expect(render(composeBrief({ ...base, knows: 0 }), "Ada")).toContain("Ada does not know what you do yet.");
+    const dormant = renderToStaticMarkup(createElement(Brief, { locale: "en", brief: firstDay, hasCompany: true, companyName: "Lantern Bakery", configured: false, cofounderName: "Ada" }));
+    expect(dormant).toContain("Ada is not switched on");
+    expect(dormant).not.toContain("It has no name yet");
+  });
+
   it("never puts an address in the brief", () => {
     const quiet = composeBrief({ ...base, knows: 3, openCount: 1, changes: 0 });
     expect(render(quiet, "Ada")).not.toContain("Selin");

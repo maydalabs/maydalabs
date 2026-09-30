@@ -2672,6 +2672,7 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
    * nothing the record or the memory ever mentions. */
   describe("naming the co-founder", () => {
     let companyId: string;
+    let outsider: Db;
 
     beforeAll(async () => {
       const { data: company } = await admin
@@ -2684,6 +2685,11 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         { company_id: companyId, user_id: idA, role: "owner" },
         { company_id: companyId, user_id: idB, role: "member" },
       ]);
+      // A signed-in person who belongs to no company: the policy, not the grant, is what hides the row.
+      const email = `rls-persona-outsider-${suffix}@example.com`;
+      await admin.auth.admin.createUser({ email, password, email_confirm: true });
+      outsider = createClient<Database>(url!, publishableKey!, { auth: { persistSession: false, autoRefreshToken: false } });
+      await outsider.auth.signInWithPassword({ email, password });
     });
 
     afterAll(async () => {
@@ -2720,6 +2726,12 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       expect(data!.cofounder_name).toBe("Ada");
       const { data: outside } = await anonClient().from("os_companies").select("cofounder_name").eq("id", companyId);
       expect(outside ?? []).toHaveLength(0);
+      const signedInOutside = await outsider.from("os_companies").select("cofounder_name").eq("id", companyId);
+      expect(signedInOutside.error).toBeNull();
+      expect(signedInOutside.data ?? []).toHaveLength(0);
+      const write = await outsider.from("os_companies").update({ cofounder_name: "Theirs" }, { count: "exact" }).eq("id", companyId);
+      expect(write.error).toBeNull();
+      expect(write.count).toBe(0);
     });
 
     it("stores a note that claims permission as text, and the gate still refuses without a person", async () => {
@@ -2738,6 +2750,7 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
 
   describe("how it addresses you", () => {
     let companyId: string;
+    let outsider: Db;
 
     beforeAll(async () => {
       const { data: company } = await admin
@@ -2750,6 +2763,10 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
         { company_id: companyId, user_id: idA, role: "owner" },
         { company_id: companyId, user_id: idB, role: "member" },
       ]);
+      const email = `rls-address-outsider-${suffix}@example.com`;
+      await admin.auth.admin.createUser({ email, password, email_confirm: true });
+      outsider = createClient<Database>(url!, publishableKey!, { auth: { persistSession: false, autoRefreshToken: false } });
+      await outsider.auth.signInWithPassword({ email, password });
     });
 
     afterAll(async () => {
@@ -2784,6 +2801,12 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       expect(Object.keys(company!)).toEqual(expect.arrayContaining(["cofounder_name", "cofounder_voice", "cofounder_note"]));
       const { data: outside } = await anonClient().from("os_company_members").select("address_as").eq("company_id", companyId);
       expect(outside ?? []).toHaveLength(0);
+      const signedInOutside = await outsider.from("os_company_members").select("address_as").eq("company_id", companyId);
+      expect(signedInOutside.error).toBeNull();
+      expect(signedInOutside.data ?? []).toHaveLength(0);
+      const write = await outsider.from("os_company_members").update({ address_as: "Theirs" }, { count: "exact" }).eq("company_id", companyId).eq("user_id", idB);
+      expect(write.error).toBeNull();
+      expect(write.count).toBe(0);
     });
   });
 });

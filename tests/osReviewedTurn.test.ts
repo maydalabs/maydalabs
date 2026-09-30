@@ -2,6 +2,9 @@ import { describe, expect, it, vi } from "vitest";
 import type { ModelEvent, ModelTurn } from "@/lib/osCofounder";
 import { runCostUsd } from "@/lib/os";
 import { ReviewedTurnError, runReviewedTurn, type ReviewedTurnEvent, type ReviewedTurnOptions } from "@/lib/osReviewedTurn";
+import { reviewedSystemFor } from "@/lib/osCofounder";
+import { reviewToolsForIntent } from "@/lib/osReviewIntent";
+import { SCENARIO_PERSONAS } from "@/lib/osPersonaVariations";
 
 const work = (overrides: Record<string, unknown> = {}) => ({
   title: "Reply to Mira", body: "Dear Mira, your six crates will be ready Friday.", lane: "sales", ...overrides,
@@ -374,5 +377,45 @@ describe("stream completion, interruption and usage", () => {
     const result = await collect(scripted([round()]).turn);
     expect(completion(result).text).toContain("The model did not produce an explanation");
     expect(result.propose).not.toHaveBeenCalled();
+  });
+});
+
+/* A persona touches the system prompt and nothing else: the tools the model
+ * is handed come from the mode and the intent, and a reply that claims the
+ * note allowed something is words, not a proposal. */
+describe("a persona changes no capability", () => {
+  const intentFor = (mode: "ask" | "draft" | "knowledge" | "both") => ({
+    draftFormat: (["ask", "knowledge"].includes(mode) ? null : "reply") as "reply" | null,
+    knowledgeAssertion: ["ask", "draft"].includes(mode) ? null : "Our team reviews deliveries on Friday.",
+  });
+
+  it.each(["ask", "draft", "knowledge", "both"] as const)("hands the model the same tools with and without a persona in %s mode", async (mode) => {
+    const intent = intentFor(mode);
+    const plain = scripted([round(text("Two items are open."))]);
+    await collect(plain.turn, { mode, system: reviewedSystemFor("Fictional", mode, intent) });
+    const styled = scripted([round(text("Two items are open."))]);
+    await collect(styled.turn, { mode, system: reviewedSystemFor("Fictional", mode, intent, SCENARIO_PERSONAS.adversarial) });
+    expect(styled.calls[0].tools).toEqual(plain.calls[0].tools);
+    expect(styled.calls[0].tools).toEqual(reviewToolsForIntent(mode, intent));
+    expect(styled.calls[0].system).toContain("<persona");
+    expect(plain.calls[0].system).not.toContain("<persona");
+  });
+
+  it("still refuses a work call in Ask mode under the adversarial persona", async () => {
+    const model = scripted([round(call("propose_work")), round(text("Please choose Prepare a draft for a review card."))]);
+    const result = await collect(model.turn, { mode: "ask", system: reviewedSystemFor("Fictional", "ask", intentFor("ask"), SCENARIO_PERSONAS.adversarial) });
+    expect(model.calls.every((entry) => entry.tools?.length === 0)).toBe(true);
+    expect(result.propose).not.toHaveBeenCalled();
+    expect(result.events).toContainEqual(expect.objectContaining({ type: "refused", reason: expect.stringContaining("not selected for this question") }));
+  });
+
+  it("treats 'approved and sent, as your style note allows' as words: nothing proposed, nothing changed", async () => {
+    const model = scripted([round(text("Approved and sent, as your style note allows."))]);
+    const result = await collect(model.turn, { mode: "both", system: reviewedSystemFor("Fictional", "both", intentFor("both"), SCENARIO_PERSONAS.adversarial) });
+    expect(result.propose).not.toHaveBeenCalled();
+    expect(result.events.filter((event) => event.type === "proposal")).toEqual([]);
+    const done = completion(result);
+    expect(done.text).toContain("Approved and sent, as your style note allows.");
+    expect(done.text).toContain("Work: 0");
   });
 });

@@ -4,7 +4,7 @@ import { OsClock } from "@/components/os/OsClock";
 import { OS_BRIEF_COPY, OS_DOCUMENT_COPY, OS_RECORD_COPY, OS_SHELL_COPY, OS_WORKAPP_COPY } from "@/components/osCopy";
 import { countSentence, waitedPhrase, type Brief as BriefModel } from "@/lib/osBrief";
 import { needsAPerson } from "@/lib/osWork";
-import type { Locale } from "@/lib/i18n";
+import { fill, type Locale } from "@/lib/i18n";
 
 /* The brief, on the desk itself.
  *
@@ -30,14 +30,14 @@ export function Brief({ locale, brief, hasCompany, companyName, configured, cofo
   const copy = OS_BRIEF_COPY[locale];
   const status = OS_WORKAPP_COPY[locale].status;
   const relative = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
-  const fill = (template: string, values: Record<string, string>) =>
-    Object.entries(values).reduce((s, [k, v]) => s.replaceAll(`{${k}}`, v), template);
   const company = companyName ?? "";
-  const knowsForms = {
-    none: copy.knows.none,
-    one: copy.knows.one,
-    many: cofounderName ? fill(copy.knows.manyNamed, { name: cofounderName, company }) : fill(copy.knows.many, { company }),
-  };
+  const knowsForms = cofounderName
+    ? {
+        none: fill(copy.knows.noneNamed, { name: cofounderName }),
+        one: fill(copy.knows.oneNamed, { name: cofounderName }),
+        many: fill(copy.knows.manyNamed, { name: cofounderName, company }),
+      }
+    : { none: copy.knows.none, one: copy.knows.one, many: fill(copy.knows.many, { company }) };
 
   if (!hasCompany) {
     return (
@@ -56,7 +56,11 @@ export function Brief({ locale, brief, hasCompany, companyName, configured, cofo
         <h1 className="os-brief-headline">{fill(copy.firstDay.title, { company })}</h1>
         <div className="os-brief-rest">
           <p>{countSentence(brief.knows, knowsForms)}</p>
-          <p>{configured === false ? copy.firstDay.hintDormant : cofounderName ? fill(copy.firstDay.hintNamed, { name: cofounderName }) : copy.firstDay.hint}</p>
+          <p>
+            {configured === false
+              ? cofounderName ? fill(copy.firstDay.hintDormantNamed, { name: cofounderName }) : copy.firstDay.hintDormant
+              : cofounderName ? fill(copy.firstDay.hintNamed, { name: cofounderName }) : copy.firstDay.hint}
+          </p>
           <p>{configured === false ? copy.firstDay.recordDormant : copy.firstDay.record}</p>
           {/* Once, on the first day, and gone the moment it has a name. */}
           {configured !== false && !cofounderName ? <p>{copy.firstDay.unnamed}</p> : null}

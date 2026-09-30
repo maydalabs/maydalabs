@@ -5,6 +5,7 @@ import { setAddressAction } from "@/app/actions/persona";
 import type { EditResult } from "@/app/actions/cofounder";
 import { PERSONA_LIMITS } from "@/lib/osPersona";
 import { notify } from "@/components/os/notice";
+import { fill } from "@/lib/i18n";
 
 /* How the co-founder addresses you, in conversation.
  *
@@ -40,7 +41,7 @@ export function AddressEditor({ address, copy }: { address: string | null; copy:
       <button type="submit" className="mayda-button mayda-button-outline" disabled={pending}>{copy.save}</button>
       {state.error ? (
         <p className="mayda-field-error" role="alert">
-          {copy.failed.replace("{reason}", copy.reasons[state.error] ?? state.error)}
+          {fill(copy.failed, { reason: copy.reasons[state.error] ?? state.error })}
         </p>
       ) : null}
     </form>

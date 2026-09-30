@@ -28,7 +28,7 @@ import { composeBrief, type Brief as BriefModel, type ChangeRow, type DueRow, ty
 import { isCofounderConfigured } from "@/lib/osCofounderModel";
 import { readModelSettingsSummary } from "@/lib/osModelSettings";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { localizePath } from "@/lib/i18n";
+import { localizePath, fill } from "@/lib/i18n";
 import { getPageLocale, type LocalePageProps } from "@/lib/localePage";
 import { MEMORY_REVIEW_COLUMNS, inspectMemoryReview, memoryCandidateFilter, memoryIsCurrent, memoryRows } from "@/lib/osReviewedMemory";
 
@@ -89,11 +89,6 @@ export default async function OsPage(props: LocalePageProps) {
     hasCompany = company !== null;
     companyId = company?.id ?? null;
     cofounderName = company?.cofounder_name ?? null;
-    /* How this person wants to be addressed here; a failed read is plain "you". */
-    if (company) {
-      const { data: member } = await supabase.from("os_company_members").select("address_as").eq("company_id", company.id).eq("user_id", claims.sub).maybeSingle();
-      addressAs = member?.address_as ?? null;
-    }
     prefs = sanitizePrefs(desktop?.prefs);
     companyName = company?.name ?? null;
     storedLayout = desktop?.layout ?? [];
@@ -102,13 +97,16 @@ export default async function OsPage(props: LocalePageProps) {
     /* One company, one filter, on every read below. A person can belong to
      * several companies; a headline counted across all of them over a list
      * from one is a desk that contradicts itself. */
-    const [{ count: waitingCount }, modelSummary] = company
+    const [{ count: waitingCount }, modelSummary, { data: member }] = company
       ? await Promise.all([
           supabase.from("os_needs_you").select("id", { count: "exact", head: true }).eq("company_id", company.id),
           // Its own key means it can be answered even when the platform holds none.
           readModelSettingsSummary(supabase, company.id),
+          // How this person wants to be addressed here; a failed read is plain "you".
+          supabase.from("os_company_members").select("address_as").eq("company_id", company.id).eq("user_id", claims.sub).maybeSingle(),
         ])
-      : [{ count: 0 }, null];
+      : [{ count: 0 }, null, { data: null }];
+    addressAs = member?.address_as ?? null;
     waiting = waitingCount ?? 0;
     companyHasModel = modelSummary !== null;
 
@@ -422,8 +420,8 @@ export default async function OsPage(props: LocalePageProps) {
       ]}
       commandCopy={{
         placeholder: copy.commandPlaceholder,
-        ask: cofounderName ? copy.commandAskNamed.replace("{name}", cofounderName) : copy.commandAsk,
-        tell: cofounderName ? copy.commandTellNamed.replace("{name}", cofounderName) : copy.commandTell,
+        ask: cofounderName ? fill(copy.commandAskNamed, { name: cofounderName }) : copy.commandAsk,
+        tell: cofounderName ? fill(copy.commandTellNamed, { name: cofounderName }) : copy.commandTell,
         add: copy.commandAdd,
         lane: copy.commandLane,
         lanes: OS_WORKAPP_COPY[locale].lanes,

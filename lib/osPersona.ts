@@ -41,7 +41,7 @@ export function personaFromCompany(
   row: { cofounder_name?: unknown; cofounder_voice?: unknown; cofounder_note?: unknown } | null | undefined,
   addressAs: unknown,
 ): CofounderPersona {
-  const text = (value: unknown, limit: number) => (typeof value === "string" && value.trim() ? value.trim().slice(0, limit) : null);
+  const text = (value: unknown, limit: number) => (typeof value === "string" && value.trim() ? [...value.trim()].slice(0, limit).join("") : null);
   return {
     name: text(row?.cofounder_name, PERSONA_LIMITS.name),
     voice: isCofounderVoice(row?.cofounder_voice) ? row.cofounder_voice : "plain",
@@ -50,20 +50,28 @@ export function personaFromCompany(
   };
 }
 
-/* One line: trimmed, inner whitespace and line breaks collapsed to a space. */
+/* One line: compatibility forms folded (a full-width angle bracket becomes
+ * the plain one and is then refused), inner whitespace and line breaks
+ * collapsed to a space, trimmed. */
 function oneLine(raw: unknown): string {
-  return typeof raw === "string" ? raw.replace(/\s+/g, " ").trim() : "";
+  return typeof raw === "string" ? raw.normalize("NFKC").replace(/\s+/g, " ").trim() : "";
 }
 
-/* No control characters, and neither of the two characters that could forge
- * a tag inside the fence the prompt wraps these values in. The table check
- * says the same; this is the form's and the action's copy of it. */
-const FORBIDDEN = /[\p{Cc}<>]/u;
+/* No control or format characters (no zero-width or direction marks), and
+ * neither of the two characters that could forge a tag inside the fence the
+ * prompt wraps these values in. The table check refuses the control
+ * characters and the brackets; this is stricter, on purpose. */
+const FORBIDDEN = /[\p{Cc}\p{Cf}<>]/u;
+
+/* Characters, as the table counts them, not UTF-16 units. */
+function length(value: string): number {
+  return [...value].length;
+}
 
 function bounded(raw: unknown, limit: number): { ok: true; value: string | null } | { ok: false } {
   const value = oneLine(raw);
   if (!value) return { ok: true, value: null };
-  if (value.length > limit || FORBIDDEN.test(value)) return { ok: false };
+  if (length(value) > limit || FORBIDDEN.test(value)) return { ok: false };
   return { ok: true, value };
 }
 
@@ -71,7 +79,7 @@ function bounded(raw: unknown, limit: number): { ok: true; value: string | null 
  * at save time, not the boundary: the prompt's fence and the standing rules
  * are what hold, and the scenarios measure them. The form should still not
  * accept a setting the product will not honour. */
-const PERMISSION = /\byou\s+(?:may|can|are\s+(?:allowed|permitted|authori[sz]ed)\s+to|have\s+permission\s+to)\s+(?:now\s+|also\s+|always\s+)?(?:approve|send|publish|finish|complete|execute|deliver)\b/i;
+const PERMISSION = /\b(?:you\s+(?:may|can|are\s+(?:allowed|permitted|authori[sz]ed)\s+to|have\s+permission\s+to)|you(?:'|\u2019)re\s+(?:allowed|permitted|authori[sz]ed)\s+to)\s+(?:now\s+|also\s+|always\s+)?(?:approve|send|publish|finish|complete|execute|deliver)\b|\bgo\s+ahead\s+and\s+(?:approve|send|publish|deliver)\b|^\s*(?:approve|send|publish|deliver)\b[^.]{0,30}\b(?:yourself|everything|without\s+asking)\b/i;
 const OVERRIDE = /\b(?:ignore|disregard|override|forget)\b[^.]{0,30}?\b(?:rules?|instructions?|system|above|previous)\b/i;
 
 export function personaNoteGuard(note: string | null): "note_permission" | null {

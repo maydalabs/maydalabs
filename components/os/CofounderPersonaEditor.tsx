@@ -5,6 +5,7 @@ import { savePersonaAction } from "@/app/actions/persona";
 import type { EditResult } from "@/app/actions/cofounder";
 import { COFOUNDER_VOICES, PERSONA_LIMITS, type CofounderVoice } from "@/lib/osPersona";
 import { notify } from "@/components/os/notice";
+import { fill } from "@/lib/i18n";
 
 /* Giving the co-founder a name and a manner.
  *
@@ -18,7 +19,7 @@ import { notify } from "@/components/os/notice";
 export type CofounderPersonaCopy = {
   nameIt: string; change: string; name: string; voice: string;
   voices: Record<CofounderVoice, { label: string; help: string }>;
-  note: string; noteHint: string; saved: string; failed: string;
+  note: string; noteHint: string; saved: string; failed: string; namePlaceholder: string;
   reasons: Record<string, string>; save: string; cancel: string;
 };
 
@@ -54,7 +55,7 @@ export function CofounderPersonaEditor({ companyId, name, voice, note, copy }: {
       <input type="hidden" name="companyId" value={companyId} />
       <label className="mayda-field">
         <span>{copy.name}</span>
-        <input name="name" defaultValue={name ?? ""} maxLength={PERSONA_LIMITS.name} placeholder="Ada" autoFocus />
+        <input name="name" defaultValue={name ?? ""} maxLength={PERSONA_LIMITS.name} placeholder={copy.namePlaceholder} autoFocus />
       </label>
 
       <fieldset className="mayda-field" style={{ border: 0, padding: 0, margin: 0 }}>
@@ -79,7 +80,7 @@ export function CofounderPersonaEditor({ companyId, name, voice, note, copy }: {
 
       {refusal ? (
         <p className="mayda-field-error" role="alert">
-          {copy.failed.replace("{reason}", copy.reasons[state.error ?? ""] ?? state.error ?? "")}
+          {fill(copy.failed, { reason: copy.reasons[state.error ?? ""] ?? state.error ?? "" })}
         </p>
       ) : null}
 

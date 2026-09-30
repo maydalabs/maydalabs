@@ -35,8 +35,9 @@ export async function savePersonaAction(previous: EditResult, formData: FormData
     .update({ cofounder_name: parsed.name, cofounder_voice: parsed.voice, cofounder_note: parsed.note }, { count: "exact" })
     .eq("id", companyId);
   if (error) return { error: "storage", version };
-  // Zero rows is the owner policy saying no, silently. Say it.
-  if (count === 0) return { error: "not_yours", version };
+  // Anything but one row is the owner policy saying no, silently, or a
+  // count that never arrived; neither is a confirmed write. Say it.
+  if (count !== 1) return { error: "not_yours", version };
 
   revalidatePath("/os");
   revalidatePath("/portal");
@@ -64,7 +65,7 @@ export async function setAddressAction(previous: EditResult, formData: FormData)
     .eq("company_id", company.id)
     .eq("user_id", claims.sub);
   if (error) return { error: "storage", version };
-  if (count === 0) return { error: "not_member", version };
+  if (count !== 1) return { error: "not_member", version };
 
   revalidatePath("/os");
   return { error: null, version };

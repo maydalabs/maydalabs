@@ -5,6 +5,17 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { BASELINE_SOURCE_PATHS, rescoreBaseline, snapshotBaselineManifest, validateManifest } from "@/lib/osScenarioRescore";
+
+/* Two hand-maintained lists of hashed sources are one list only while a test
+ * says so: the persona module was missing from both until the persona slice. */
+describe("the hashed sources", () => {
+  it("are the same list in the runner and in the rescorer", () => {
+    const runner = readFileSync("tests/cofounder.scenarios.test.ts", "utf8");
+    for (const path of BASELINE_SOURCE_PATHS) expect(runner, path).toContain(`"${path}"`);
+    expect(runner).toContain('"lib/osPersonaVariations.ts"');
+    expect(BASELINE_SOURCE_PATHS).toContain("lib/osPersona.ts");
+  });
+});
 import { JUDGE_VERSION, SCENARIOS, type Outcome } from "@/lib/osScenarios";
 
 const hashText = (text: string) => createHash("sha256").update(text).digest("hex");
