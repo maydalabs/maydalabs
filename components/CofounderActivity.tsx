@@ -4,7 +4,7 @@ import { DeleteWorkflowButton, MemberWorkflowForm } from "@/components/MemberWor
 import { OS_ACTIVITY_COPY, OS_DESK_COPY, OS_WORKFLOW_COPY } from "@/components/osCopy";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { OS_MAX_WORKFLOWS_PER_MEMBER, formatUsd, toOsWorkflows } from "@/lib/os";
+import { OS_MAX_WORKFLOWS_PER_MEMBER, formatUsd, toOsWorkflows, isPauseReason } from "@/lib/os";
 import { localizePath, type Locale } from "@/lib/i18n";
 
 /* The process surface.
@@ -113,7 +113,9 @@ export async function CofounderActivity({ locale, bare = false }: { locale: Loca
                   the word "paused" is how something goes quiet for a week
                   before anyone finds out why. */}
               {row.paused_reason ? (
-                <p className="mayda-field-error" style={{ margin: 0 }}>{row.paused_reason}</p>
+                <p className="mayda-field-error" style={{ margin: 0 }}>
+                  {isPauseReason(row.paused_reason) ? copy.pausedReasons[row.paused_reason] : row.paused_reason}
+                </p>
               ) : null}
 
               {row.id && own.has(row.id) ? (

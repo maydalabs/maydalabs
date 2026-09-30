@@ -80,6 +80,10 @@ export async function draftFromSources(
   brief: string,
   sources: FetchedSource[],
   injected?: DraftClient,
+  /* Which model the injected client speaks for. Omitted, the platform's
+   * model and effort, as before; effort null means the field is not sent,
+   * because only Anthropic takes it. */
+  options?: { model?: string; effort?: string | null },
 ): Promise<OsDraft | { error: string }> {
   const apiKey = process.env.MAYDAOS_ANTHROPIC_API_KEY;
   const local = localModelSettings();
@@ -90,11 +94,12 @@ export async function draftFromSources(
   const client: DraftClient =
     injected ?? (local ? localDraftClient(local) : (new Anthropic({ apiKey }) as unknown as DraftClient));
   try {
+    const effort = options?.effort === undefined ? OS_EFFORT : options.effort;
     const response = await client.messages.parse({
-      model: OS_MODEL,
+      model: options?.model ?? OS_MODEL,
       max_tokens: 4000,
       system: SYSTEM,
-      output_config: { effort: OS_EFFORT, format: zodOutputFormat(DraftSchema) },
+      output_config: { ...(effort ? { effort } : {}), format: zodOutputFormat(DraftSchema) },
       messages: [{ role: "user", content: buildUserMessage(topic, brief, sources) }],
     });
 
@@ -117,8 +122,10 @@ export async function draftFromSources(
     };
   } catch (error) {
     if (error instanceof Anthropic.RateLimitError) return { error: "The model is rate limited. Try again in a moment." };
-    if (error instanceof Anthropic.AuthenticationError) return { error: "MaydaOS is not configured correctly." };
+    if (error instanceof Anthropic.AuthenticationError) return { error: "The key was refused by the provider." };
     if (error instanceof Anthropic.APIError) return { error: `The model call failed (${error.status}).` };
+    // A compatible provider answers the same way, by status.
+    if (error instanceof Error && /^model provider: 40[13]$/.test(error.message)) return { error: "The key was refused by the provider." };
     return { error: "The model call failed." };
   }
 }

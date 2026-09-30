@@ -1,4 +1,5 @@
 import { cofounderTools, type CofounderToolName, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
+import { DRAFT_JSON_SCHEMA, parseDraftJson } from "@/lib/osDraftSchema";
 
 /* Whatever the environment holds; process.env is one of these. */
 type Env = Record<string, string | undefined>;
@@ -194,21 +195,6 @@ export function localTurn(settings: { url: string; model: string }, fetcher: typ
  * schema when asked, which is the same promise the SDK's structured output
  * makes: every claim comes back with its source or with null. The shape
  * matches DraftClient, so the worker does not know which it was given. */
-const DRAFT_SCHEMA = {
-  type: "object",
-  properties: {
-    draft: { type: "string" },
-    claims: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: { text: { type: "string" }, source_url: { type: ["string", "null"] } },
-        required: ["text", "source_url"],
-      },
-    },
-  },
-  required: ["draft", "claims"],
-};
 
 export function localDraftClient(settings: { url: string; model: string }, fetcher: typeof fetch = fetch) {
   return {
@@ -227,25 +213,12 @@ export function localDraftClient(settings: { url: string; model: string }, fetch
         const response = await fetcher(`${settings.url}/api/chat`, {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ model: settings.model, messages, stream: false, format: DRAFT_SCHEMA, options: { num_predict: 4000 } }),
+          body: JSON.stringify({ model: settings.model, messages, stream: false, format: DRAFT_JSON_SCHEMA, options: { num_predict: 4000 } }),
         });
         if (!response.ok) throw new Error(`local model: ${response.status}`);
 
         const body = (await response.json()) as Chunk;
-        let parsed: { draft: string; claims: { text: string; source_url: string | null }[] } | null = null;
-        try {
-          const candidate = JSON.parse(body.message?.content ?? "") as { draft?: unknown; claims?: unknown };
-          if (typeof candidate.draft === "string" && Array.isArray(candidate.claims)) {
-            parsed = {
-              draft: candidate.draft,
-              claims: candidate.claims
-                .filter((c): c is { text: string; source_url?: unknown } => Boolean(c) && typeof (c as { text?: unknown }).text === "string")
-                .map((c) => ({ text: c.text, source_url: typeof c.source_url === "string" ? c.source_url : null })),
-            };
-          }
-        } catch {
-          parsed = null;
-        }
+        const parsed = parseDraftJson(body.message?.content);
 
         return {
           parsed_output: parsed,

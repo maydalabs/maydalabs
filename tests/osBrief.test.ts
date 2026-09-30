@@ -158,4 +158,9 @@ describe("the brief", () => {
     expect(waitedPhrase(12, "2026-09-18T12:00:00Z", "en", { since: "since {date}" })).toBe("since September 18");
     expect(waitedPhrase(12, null, "en", { since: "since {date}" })).toBe("12 days ago");
   });
+
+  it("treats a pause code like any pause: the news is that it stopped", () => {
+    const brief = composeBrief({ ...base, workflows: [{ name: "Digest", active: true, due_in_hours: 5, paused_reason: "no_key" }] });
+    expect(brief.next).toEqual({ name: "Digest", dueInHours: null, paused: true });
+  });
 });

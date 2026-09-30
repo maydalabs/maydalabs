@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { isOsConfigured } from "@/lib/osDraft";
+import { isWorkerConfigured } from "@/lib/osDraftModel";
 import { runDueWorkflows } from "@/lib/osWorker";
 import { isCronAuthorized } from "@/lib/cronAuth";
 
@@ -20,7 +20,10 @@ async function tick(request: Request) {
   if (!isCronAuthorized(request.headers.get("authorization"), process.env.CRON_SECRET)) {
     return NextResponse.json({ error: "not authorized" }, { status: 401 });
   }
-  if (!isSupabaseConfigured() || !isOsConfigured()) {
+  /* The platform holds no key of its own in production; what the worker
+   * spends is each company's sealed key, and the vault secret is what makes
+   * that possible. Refused before anything is claimed. */
+  if (!isSupabaseConfigured() || !isWorkerConfigured()) {
     return NextResponse.json({ error: "not configured" }, { status: 503 });
   }
 

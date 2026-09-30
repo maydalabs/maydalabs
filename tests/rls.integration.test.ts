@@ -9,10 +9,14 @@
  */
 
 import { execFileSync } from "node:child_process";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+
+// The worker opens sealed keys, and the vault is server-only.
+vi.mock("server-only", () => ({}));
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 import { runDueWorkflows } from "@/lib/osWorker";
+import { sealKey } from "@/lib/osKeyVault";
 import {
   buildCompanyContext,
   openOnThePerson,
@@ -1180,6 +1184,59 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
           .eq("id", itemId!);
         expect(selfApproved).not.toBeNull();
         expect(selfApproved!.message).toContain('needs an approved "publish"');
+      });
+
+      /* Property three on the company's own money: the same run, but the
+       * company stored a key, so the draft is the model it chose and the run
+       * carries that model and the company's own price. */
+      it("drafts on the company's own key at its recorded price, and says which model", async () => {
+        const vault = { MAYDAOS_KEY_SECRET: "a-long-enough-secret-for-the-vault-0123456789" };
+        const sealed = sealKey("sk-ant-test-0123456789abcdefghij", vault);
+        const { error: stored } = await admin.from("os_model_settings").insert({
+          company_id: companyId, provider: "anthropic", model: "claude-sonnet-5", base_url: null,
+          key_ciphertext: sealed.ciphertext, key_last4: sealed.last4, input_usd_per_million: 2, output_usd_per_million: 10, set_by: idA,
+        });
+        expect(stored).toBeNull();
+        await admin.from("os_workflows").update({ next_run_at: new Date().toISOString(), paused_reason: null }).eq("id", workflowId);
+
+        const report = await runDueWorkflows(admin, 5, {
+          env: vault,
+          gather: async () => ({ sources: [{ url: "https://example.com/a", title: "A", text: "Freight rates rose 4% in August.", chars: 31 }], failures: [] }),
+          draft: { messages: { parse: async () => ({
+            parsed_output: { draft: "Freight rates rose 4% in August.", claims: [{ text: "Freight rates rose 4% in August.", source_url: "https://example.com/a" }] },
+            stop_reason: "end_turn", usage: { input_tokens: 100, output_tokens: 50 },
+          }) } },
+        });
+        const mine = report.outcomes.find((o) => o.workflow === "Weekly market note");
+        expect(mine).toMatchObject({ result: "drafted", costUsd: 0.0007 });
+        const itemId = mine && "itemId" in mine ? mine.itemId : null;
+        const { data: run } = await admin.from("os_runs").select("model, effort, cost_usd").eq("item_id", itemId!).single();
+        expect(run!.model).toBe("anthropic:claude-sonnet-5");
+        expect(run!.effort).toBe("low");
+        expect(Number(run!.cost_usd)).toBeCloseTo(0.0007, 6);
+
+        await admin.from("os_model_settings").delete().eq("company_id", companyId);
+      });
+
+      /* A company with no key is told, once, in a code the owner's own save
+       * lifts; until then the claim leaves it alone. */
+      it("pauses a company without a key and lets a saved key resume it", async () => {
+        await admin.from("os_workflows").update({ next_run_at: new Date().toISOString(), paused_reason: null }).eq("id", workflowId);
+        const report = await runDueWorkflows(admin, 5, {
+          env: {},
+          gather: async () => ({ sources: [], failures: [] }),
+        });
+        expect(report.outcomes.find((o) => o.workflow === "Weekly market note")).toEqual({ workflow: "Weekly market note", result: "skipped", reason: "no key" });
+        const { data: paused } = await admin.from("os_workflows").select("paused_reason").eq("id", workflowId).single();
+        expect(paused!.paused_reason).toBe("no_key");
+        const again = await admin.rpc("os_claim_due_workflows", { p_limit: 20 });
+        expect((again.data ?? []).map((row) => row.id)).not.toContain(workflowId);
+
+        // The statement the owner's save runs, and nothing broader.
+        const { error } = await admin.from("os_workflows").update({ paused_reason: null }).eq("company_id", companyId).eq("paused_reason", "no_key");
+        expect(error).toBeNull();
+        const { data: resumed } = await admin.from("os_workflows").select("paused_reason").eq("id", workflowId).single();
+        expect(resumed!.paused_reason).toBeNull();
       });
 
       /* The companion to the refusal above. Trusted server code must be able

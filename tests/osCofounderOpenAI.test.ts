@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { isAllowedBaseUrl, openAiCompatibleTurn, toOpenAiMessages, toOpenAiTools } from "@/lib/osCofounderOpenAI";
+import { isAllowedBaseUrl, openAiCompatibleDraftClient, openAiCompatibleTurn, toOpenAiMessages, toOpenAiTools } from "@/lib/osCofounderOpenAI";
 import type { ModelEvent } from "@/lib/osCofounder";
 
 /* The OpenAI-compatible adapter against a scripted server. Plumbing only:
@@ -88,5 +88,47 @@ describe("an OpenAI-compatible provider", () => {
     await expect(collect(errored)).rejects.not.toThrow(new RegExp(settings.apiKey));
     const cutOff = openAiCompatibleTurn(settings, vi.fn<typeof fetch>().mockResolvedValue(sse([{ choices: [{ delta: { content: "half" } }] }])));
     await expect(collect(cutOff)).rejects.toThrow(/without a completion record/);
+  });
+});
+
+describe("an OpenAI-compatible provider drafting for the worker", () => {
+  const body = { draft: "Freight rates rose 4% in August.", claims: [{ text: "Freight rates rose 4% in August.", source_url: "https://example.com/a" }] };
+  function completion(content: string | null, finish = "stop", extra: Record<string, unknown> = {}) {
+    return new Response(
+      JSON.stringify({ choices: [{ message: { content, ...extra }, finish_reason: finish }], usage: { prompt_tokens: 120, completion_tokens: 40 } }),
+      { status: 200, headers: { "content-type": "application/json" } },
+    );
+  }
+  const parse = (response: Response) =>
+    openAiCompatibleDraftClient(settings, (async () => response) as unknown as typeof fetch).messages.parse({ system: "s", messages: [] });
+
+  it("asks for one JSON object, once, and returns it parsed with its usage", async () => {
+    const fetcher = vi.fn(async () => completion(JSON.stringify(body)));
+    const client = openAiCompatibleDraftClient(settings, fetcher as unknown as typeof fetch);
+    const result = await client.messages.parse({ system: "draft", messages: [{ role: "user", content: "Topic: x" }] });
+    expect(result).toEqual({ parsed_output: body, stop_reason: "end_turn", usage: { input_tokens: 120, output_tokens: 40 } });
+
+    const [url, init] = fetcher.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe("https://api.example.test/v1/chat/completions");
+    expect(init.redirect).toBe("error");
+    expect((init.headers as Record<string, string>).authorization).toBe(`Bearer ${settings.apiKey}`);
+    const sent = JSON.parse(String(init.body));
+    expect(sent.stream).toBe(false);
+    expect(sent.response_format).toMatchObject({ type: "json_schema", json_schema: { name: "maydaos_draft", strict: true } });
+    expect(sent.messages[0].role).toBe("system");
+    expect(sent.messages[0].content).toContain("draft");
+    expect(sent.messages[1]).toEqual({ role: "user", content: "Topic: x" });
+  });
+
+  it("reports a schema miss, a refusal and a token-limit stop as themselves", async () => {
+    expect(await parse(completion("not json"))).toMatchObject({ parsed_output: null, stop_reason: "schema_miss" });
+    expect(await parse(completion(null, "stop", { refusal: "no" }))).toMatchObject({ parsed_output: null, stop_reason: "refusal" });
+    expect(await parse(completion(null, "content_filter"))).toMatchObject({ stop_reason: "refusal" });
+    expect(await parse(completion(JSON.stringify(body), "length"))).toMatchObject({ stop_reason: "max_tokens" });
+  });
+
+  it("throws the status and nothing else when refused, and never drafts over plain http", async () => {
+    await expect(parse(new Response('{"error":"bad key sk-secret-0123456789abcdef"}', { status: 401 }))).rejects.toThrow(/^model provider: 401$/);
+    expect(() => openAiCompatibleDraftClient({ ...settings, baseUrl: "http://api.x.ai/v1" })).toThrow("https");
   });
 });

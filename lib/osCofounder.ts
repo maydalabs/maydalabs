@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { pauseReasonText } from "@/lib/os";
 import type { Database } from "@/lib/supabase/database.types";
 import { MEMORY_REVIEW_COLUMNS, memoryCandidateFilter, memoryRows, inspectMemoryReview } from "@/lib/osReviewedMemory";
 import type { ReviewRequestMode, ReviewRequestIntent } from "@/lib/osReviewIntent";
@@ -321,7 +322,7 @@ export async function buildCompanyContext(supabase: Db, companyId: string): Prom
     lines.push("nothing scheduled");
   } else {
     for (const w of workflows.data) {
-      const paused = w.paused_reason ? ` PAUSED: ${contextText(w.paused_reason, 200)}` : "";
+      const paused = w.paused_reason ? ` PAUSED: ${contextText(pauseReasonText(w.paused_reason) ?? "", 200)}` : "";
       lines.push(`- ${contextText(w.name, 200)} (${contextText(w.cadence)}, next ${contextText(w.next_run_at) || "n/a"}): ${contextText(w.brief, 200)}${paused}`);
       lines.push(`  record: ${contextJson({ id: w.id })}`);
     }

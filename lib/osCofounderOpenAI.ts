@@ -1,4 +1,6 @@
 import { cofounderTools, type CofounderToolName, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
+import type { DraftClient } from "@/lib/osDraft";
+import { DRAFT_JSON_SCHEMA, parseDraftJson } from "@/lib/osDraftSchema";
 
 /* The OpenAI-compatible side of the seam.
  *
@@ -172,5 +174,57 @@ export function openAiCompatibleTurn(settings: OpenAiCompatibleSettings, fetcher
       inputTokens,
       outputTokens,
     };
+  };
+}
+
+type Completion = {
+  choices?: { message?: { content?: string | null; refusal?: string | null }; finish_reason?: string | null }[];
+  usage?: { prompt_tokens?: number; completion_tokens?: number } | null;
+};
+
+/* The worker's one call, through a compatible provider. Not the streaming
+ * turn above: a draft is one JSON object, a finish reason and a usage count,
+ * which a single completion returns in one body. The schema rides in
+ * response_format, and the system message states the shape as well, for a
+ * provider that ignores the field. Same hygiene: the status is the whole
+ * diagnosis, never the body, never the key. */
+export function openAiCompatibleDraftClient(settings: OpenAiCompatibleSettings, fetcher: typeof fetch = fetch): DraftClient {
+  if (!isAllowedBaseUrl(settings.baseUrl)) throw new Error("model provider: base URL must be https");
+  const endpoint = `${settings.baseUrl.replace(/\/+$/, "")}/chat/completions`;
+
+  return {
+    messages: {
+      parse: async (params) => {
+        const system = typeof params.system === "string" ? params.system : "";
+        const given = Array.isArray(params.messages) ? (params.messages as { role: string; content: unknown }[]) : [];
+        const response = await fetcher(endpoint, {
+          method: "POST",
+          redirect: "error",
+          credentials: "omit",
+          headers: { "content-type": "application/json", authorization: `Bearer ${settings.apiKey}` },
+          body: JSON.stringify({
+            model: settings.model,
+            messages: [
+              { role: "system", content: `${system}\n\nAnswer with one JSON object of the form {"draft": string, "claims": [{"text": string, "source_url": string | null}]} and nothing else.` },
+              ...given.map((m) => ({ role: m.role === "assistant" ? "assistant" : "user", content: typeof m.content === "string" ? m.content : JSON.stringify(m.content) })),
+            ],
+            response_format: { type: "json_schema", json_schema: { name: "maydaos_draft", strict: true, schema: DRAFT_JSON_SCHEMA } },
+            max_tokens: 4000,
+            stream: false,
+          }),
+        });
+        if (!response.ok) throw new Error(`model provider: ${response.status}`);
+
+        const body = (await response.json()) as Completion;
+        const choice = body.choices?.[0];
+        const parsed = parseDraftJson(choice?.message?.content);
+        const finish = choice?.finish_reason ?? null;
+        return {
+          parsed_output: parsed,
+          stop_reason: choice?.message?.refusal || finish === "content_filter" ? "refusal" : finish === "length" ? "max_tokens" : parsed ? "end_turn" : "schema_miss",
+          usage: { input_tokens: body.usage?.prompt_tokens ?? 0, output_tokens: body.usage?.completion_tokens ?? 0 },
+        };
+      },
+    },
   };
 }

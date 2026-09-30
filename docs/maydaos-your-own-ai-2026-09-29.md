@@ -83,11 +83,49 @@ if one exists.
    Anthropic key, save. The production co-founder answers on your key under
    your ceiling. No platform key is needed, then or later — the one from
    4 September was removed on 30 September.
+4. For the worker (30 September): generate a second secret the same way and
+   set it in Vercel as `CRON_SECRET`, Production, then redeploy. Vercel's
+   cron sends it as a bearer token to `/api/os/tick` once a day; without it
+   the tick refuses everyone, by design.
 
 ## Not in this slice
 
 - A "test the key" button: the first real question is the test, and a
   refused key shows as a refusal.
-- The worker (`DraftClient`) still uses the platform's model only; the
-  scheduled workflows do not yet run on a company's key.
+- ~~The worker still uses the platform's model only.~~ Done 30 September:
+  see *The worker, on your key* below.
 - Per-person choices; the choice is the company's.
+
+## The worker, on your key — 30 September
+
+"It works while you are gone" was dead in production: the scheduled worker
+drafted only on the platform's key, which is gone, behind a cron secret that
+was never set. It now makes the same decision the co-founder makes, one seam
+over (`lib/osDraftModel.ts`, `pickDraft`): once per company per tick it reads
+the sealed setting with the service role, opens the key in memory, and drafts
+with the model the company chose — Anthropic through the SDK, or any
+OpenAI-compatible endpoint through a new one-shot draft client that asks for
+the JSON shape in `response_format` (`lib/osCofounderOpenAI.ts`,
+`openAiCompatibleDraftClient`). The run row records the model as
+`provider:model` and the cost at the company's own recorded rates
+(`costUsdAt`, the same expression the co-founder's turns use); a local model
+costs nothing and says so; the platform's key, if one were ever set, is
+priced as before.
+
+What changes for a person:
+
+- A company with no key is **paused** with the reason `no_key`, shown in the
+  Running window in their language as *No AI key is set for this company…*,
+  and the daily claim leaves it alone. Saving a key in *Choose your AI*
+  lifts exactly that pause for exactly that company.
+- A key the vault cannot open (secret missing or rotated) is a **failed
+  run** the person sees as *could not finish*, every day until it is fixed.
+  Nothing is charged for it.
+- The daily ceiling (`MAYDAOS_DAILY_USD_CAP`, default $2) applies **per
+  company** when the company pays. The per-workflow monthly budget is
+  unchanged. The company's monthly chat ceiling does not cover the worker;
+  that is one ceiling for two ledgers, and it is deferred, on purpose,
+  rather than pretended.
+
+No schema change. The tick answers 503 until either the vault secret or a
+platform key exists, and 401 until `CRON_SECRET` does.

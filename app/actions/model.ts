@@ -72,6 +72,11 @@ export async function saveModelSettingsAction(previous: EditResult, formData: Fo
     if (count === 0) return { error: "key", version };
   }
 
+  /* A schedule that stopped for want of a key resumes on the owner's own
+   * save — only that pause, only this company. Other pauses keep their
+   * reasons. */
+  await admin.from("os_workflows").update({ paused_reason: null }).eq("company_id", companyId).eq("paused_reason", "no_key");
+
   revalidatePath("/os");
   return { error: null, version };
 }

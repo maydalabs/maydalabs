@@ -337,6 +337,10 @@ export const OS_ACTIVITY_COPY = {
     ranFailed: "could not finish",
     spend: (spent: string, budget: string) => `${spent} of ${budget} this month`,
     manage: "Set up workflows",
+    pausedReasons: {
+      no_sources: "No standing sources, so there is nothing to read on a schedule.",
+      no_key: "No AI key is set for this company, so nothing can draft. Add one in Company, Choose your AI; saving a key resumes the schedule.",
+    },
   },
   tr: {
     kicker: "Çalışıyor",
@@ -355,6 +359,10 @@ export const OS_ACTIVITY_COPY = {
     ranFailed: "tamamlayamadı",
     spend: (spent: string, budget: string) => `Bu ay ${budget} bütçenin ${spent} kadarı`,
     manage: "İş akışlarını düzenle",
+    pausedReasons: {
+      no_sources: "Sabit kaynak yok, bu yüzden programda okunacak bir şey yok.",
+      no_key: "Bu şirket için bir yapay zeka anahtarı ayarlı değil, bu yüzden taslak üretilemiyor. Şirket, Yapay zekanızı seçin altından bir anahtar ekleyin; anahtarı kaydetmek programı yeniden başlatır.",
+    },
   },
   fr: {
     kicker: "En cours",
@@ -373,6 +381,10 @@ export const OS_ACTIVITY_COPY = {
     ranFailed: "n'a pas pu terminer",
     spend: (spent: string, budget: string) => `${spent} sur ${budget} ce mois-ci`,
     manage: "Configurer les tâches",
+    pausedReasons: {
+      no_sources: "Aucune source permanente, donc rien à lire selon le calendrier.",
+      no_key: "Aucune clé d'IA n'est définie pour cette entreprise, donc rien ne peut être rédigé. Ajoutez-en une dans Entreprise, Choisir votre IA ; enregistrer une clé relance le calendrier.",
+    },
   },
 } as const;
 

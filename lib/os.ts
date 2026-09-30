@@ -21,6 +21,25 @@ export type OsDecision = (typeof OS_DECISIONS)[number];
  * in the first week, not at the end of the month. */
 export const OS_DEFAULT_MONTHLY_BUDGET_USD = 5;
 
+/* Why a schedule went quiet. Stored as a code, so the Running window can say
+ * it in the viewer's language and a key saved later can lift exactly the
+ * pause it caused. An older row may still carry a sentence; it is shown as
+ * it is. */
+export const OS_PAUSE_REASONS = {
+  no_sources: "No standing sources, so there is nothing to read on a schedule.",
+  no_key: "No AI key is set for this company, so nothing can draft. Add one in Company, Choose your AI; saving a key resumes the schedule.",
+} as const;
+export type OsPauseReason = keyof typeof OS_PAUSE_REASONS;
+
+export function isPauseReason(value: string | null | undefined): value is OsPauseReason {
+  return typeof value === "string" && Object.hasOwn(OS_PAUSE_REASONS, value);
+}
+
+export function pauseReasonText(reason: string | null | undefined): string | null {
+  if (!reason) return null;
+  return isPauseReason(reason) ? OS_PAUSE_REASONS[reason] : reason;
+}
+
 /* Guards that keep one person from emptying the budget. */
 export const OS_MAX_SOURCES = 5;
 export const OS_MIN_SOURCES = 1;

@@ -209,9 +209,11 @@ All of it is deployed. Migrations are applied to production through
 
 - **No platform model key in production.** `MAYDAOS_ANTHROPIC_API_KEY` is
   unset, so a company with no key of its own gets `not_configured` — honestly,
-  and at no cost to us; `CRON_SECRET` is unset, so the worker answers 401. A
-  company that wants the co-founder brings its own key through Company →
-  Choose your AI, sealed under `MAYDAOS_KEY_SECRET` (30 September). The
+  and at no cost to us. The worker drafts on each company's own sealed key
+  too (30 September) and pauses a company that has none; it runs only once
+  `CRON_SECRET` is set, and answers 401 until then. A company that wants the
+  co-founder brings its own key through Company → Choose your AI, sealed
+  under `MAYDAOS_KEY_SECRET` (30 September). The
   platform variable had in fact sat in Vercel since 4 September, left by the
   beta procedure and unnoticed until 30 September, when it was removed; this
   line was not true until then. Build, train, price, then open.
