@@ -127,5 +127,15 @@ What changes for a person:
   that is one ceiling for two ledgers, and it is deferred, on purpose,
   rather than pretended.
 
+Limits, stated rather than hidden: a compatible provider or model that does
+not support `json_schema` in `response_format`, or that rejects `max_tokens`,
+answers 400, which the run records as *The model call failed (400)* — there
+is no second attempt in another mode in this slice. Every hosted call is
+bounded to sixty seconds so one company's hanging endpoint cannot take the
+daily tick from every other company; a call that runs out is recorded as
+*The model did not answer in time*. A pause for want of a key is lifted by
+the owner's save and, failing that, by the next tick, which resumes every
+`no_key` pause whose company now holds a key.
+
 No schema change. The tick answers 503 until either the vault secret or a
 platform key exists, and 401 until `CRON_SECRET` does.

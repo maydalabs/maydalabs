@@ -127,6 +127,13 @@ describe("an OpenAI-compatible provider drafting for the worker", () => {
     expect(await parse(completion(JSON.stringify(body), "length"))).toMatchObject({ stop_reason: "max_tokens" });
   });
 
+  it("gives up on a server that never answers, within its bound", async () => {
+    const silent = ((_url: string, init: RequestInit) =>
+      new Promise((_resolve, reject) => init.signal?.addEventListener("abort", () => reject(init.signal?.reason)))) as unknown as typeof fetch;
+    const client = openAiCompatibleDraftClient(settings, silent, 20);
+    await expect(client.messages.parse({ system: "s", messages: [] })).rejects.toMatchObject({ name: "TimeoutError" });
+  });
+
   it("throws the status and nothing else when refused, and never drafts over plain http", async () => {
     await expect(parse(new Response('{"error":"bad key sk-secret-0123456789abcdef"}', { status: 401 }))).rejects.toThrow(/^model provider: 401$/);
     expect(() => openAiCompatibleDraftClient({ ...settings, baseUrl: "http://api.x.ai/v1" })).toThrow("https");

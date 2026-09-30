@@ -1,6 +1,6 @@
 import { cofounderTools, type CofounderToolName, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
 import type { DraftClient } from "@/lib/osDraft";
-import { DRAFT_JSON_SCHEMA, parseDraftJson } from "@/lib/osDraftSchema";
+import { DRAFT_JSON_SCHEMA, DRAFT_TIMEOUT_MS, parseDraftJson } from "@/lib/osDraftSchema";
 
 /* The OpenAI-compatible side of the seam.
  *
@@ -188,7 +188,7 @@ type Completion = {
  * response_format, and the system message states the shape as well, for a
  * provider that ignores the field. Same hygiene: the status is the whole
  * diagnosis, never the body, never the key. */
-export function openAiCompatibleDraftClient(settings: OpenAiCompatibleSettings, fetcher: typeof fetch = fetch): DraftClient {
+export function openAiCompatibleDraftClient(settings: OpenAiCompatibleSettings, fetcher: typeof fetch = fetch, timeoutMs = DRAFT_TIMEOUT_MS): DraftClient {
   if (!isAllowedBaseUrl(settings.baseUrl)) throw new Error("model provider: base URL must be https");
   const endpoint = `${settings.baseUrl.replace(/\/+$/, "")}/chat/completions`;
 
@@ -201,6 +201,7 @@ export function openAiCompatibleDraftClient(settings: OpenAiCompatibleSettings, 
           method: "POST",
           redirect: "error",
           credentials: "omit",
+          signal: AbortSignal.timeout(timeoutMs),
           headers: { "content-type": "application/json", authorization: `Bearer ${settings.apiKey}` },
           body: JSON.stringify({
             model: settings.model,

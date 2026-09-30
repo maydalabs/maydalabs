@@ -1,5 +1,5 @@
 import { cofounderTools, type CofounderToolName, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
-import { DRAFT_JSON_SCHEMA, parseDraftJson } from "@/lib/osDraftSchema";
+import { DRAFT_JSON_SCHEMA, LOCAL_DRAFT_TIMEOUT_MS, parseDraftJson } from "@/lib/osDraftSchema";
 
 /* Whatever the environment holds; process.env is one of these. */
 type Env = Record<string, string | undefined>;
@@ -212,6 +212,7 @@ export function localDraftClient(settings: { url: string; model: string }, fetch
 
         const response = await fetcher(`${settings.url}/api/chat`, {
           method: "POST",
+          signal: AbortSignal.timeout(LOCAL_DRAFT_TIMEOUT_MS),
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ model: settings.model, messages, stream: false, format: DRAFT_JSON_SCHEMA, options: { num_predict: 4000 } }),
         });

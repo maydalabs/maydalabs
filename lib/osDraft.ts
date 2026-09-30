@@ -11,6 +11,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 import { OS_EFFORT, OS_MODEL } from "@/lib/os";
 import { localDraftClient, localModelSettings } from "@/lib/osCofounderLocal";
+import { DRAFT_TIMEOUT_MS } from "@/lib/osDraftSchema";
 import type { FetchedSource } from "@/lib/osSources";
 
 /* Whatever the environment holds; process.env is one of these. */
@@ -92,7 +93,7 @@ export async function draftFromSources(
   // A model on this machine wins off Vercel, for the same reason the
   // conversation's does: it costs nothing.
   const client: DraftClient =
-    injected ?? (local ? localDraftClient(local) : (new Anthropic({ apiKey }) as unknown as DraftClient));
+    injected ?? (local ? localDraftClient(local) : (new Anthropic({ apiKey, timeout: DRAFT_TIMEOUT_MS, maxRetries: 1 }) as unknown as DraftClient));
   try {
     const effort = options?.effort === undefined ? OS_EFFORT : options.effort;
     const response = await client.messages.parse({
@@ -123,9 +124,18 @@ export async function draftFromSources(
   } catch (error) {
     if (error instanceof Anthropic.RateLimitError) return { error: "The model is rate limited. Try again in a moment." };
     if (error instanceof Anthropic.AuthenticationError) return { error: "The key was refused by the provider." };
-    if (error instanceof Anthropic.APIError) return { error: `The model call failed (${error.status}).` };
-    // A compatible provider answers the same way, by status.
-    if (error instanceof Error && /^model provider: 40[13]$/.test(error.message)) return { error: "The key was refused by the provider." };
+    if (error instanceof Anthropic.APIConnectionTimeoutError) return { error: "The model did not answer in time." };
+    if (error instanceof Anthropic.APIError) return { error: `The model call failed (${error.status ?? "network"}).` };
+    // A compatible provider answers the same way, by status; the status is
+    // the whole diagnosis a person can act on, so it is kept.
+    const provider = error instanceof Error ? /^model provider: (\d{3})$/.exec(error.message) : null;
+    if (provider) {
+      const status = Number(provider[1]);
+      if (status === 401 || status === 403) return { error: "The key was refused by the provider." };
+      if (status === 429) return { error: "The model is rate limited. Try again in a moment." };
+      return { error: `The model call failed (${status}).` };
+    }
+    if (error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError")) return { error: "The model did not answer in time." };
     return { error: "The model call failed." };
   }
 }

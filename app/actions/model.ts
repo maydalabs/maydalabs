@@ -74,7 +74,8 @@ export async function saveModelSettingsAction(previous: EditResult, formData: Fo
 
   /* A schedule that stopped for want of a key resumes on the owner's own
    * save — only that pause, only this company. Other pauses keep their
-   * reasons. */
+   * reasons. Should this write fail, the next tick makes the same repair
+   * (lib/osWorker.ts, resumeKeyed), so the save itself is not refused. */
   await admin.from("os_workflows").update({ paused_reason: null }).eq("company_id", companyId).eq("paused_reason", "no_key");
 
   revalidatePath("/os");

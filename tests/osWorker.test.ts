@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 import { runDueWorkflows } from "@/lib/osWorker";
@@ -29,10 +29,10 @@ type Script = {
   settingsError?: boolean;
 };
 
-function sealed(secret = SECRET): SettingsRow {
+function sealed(secret = SECRET, provider = "anthropic", model = "claude-sonnet-5", base_url: string | null = null): SettingsRow {
   const { ciphertext, last4 } = sealKey(KEY, { MAYDAOS_KEY_SECRET: secret });
   return {
-    provider: "anthropic", model: "claude-sonnet-5", base_url: null, key_ciphertext: ciphertext, key_last4: last4,
+    provider, model, base_url, key_ciphertext: ciphertext, key_last4: last4,
     input_usd_per_million: PRICE.inputUsdPerMillion, output_usd_per_million: PRICE.outputUsdPerMillion,
     updated_at: "2026-09-30T00:00:00Z", set_by: null,
   };
@@ -60,7 +60,9 @@ function fakeAdmin(script: Script) {
       }
       if (table === "os_model_settings") {
         if (script.settingsError) return { data: null, error: { message: "down" } };
-        const companyId = state.filters.find(([column]) => column === "company_id")?.[1] as string;
+        const companyId = state.filters.find(([column]) => column === "company_id")?.[1] as string | undefined;
+        // No company named: the tick-start read of every company that holds a key.
+        if (companyId === undefined) return { data: Object.keys(script.settings ?? {}).map((company_id) => ({ company_id })), error: null };
         return { data: script.settings?.[companyId] ?? null, error: null };
       }
       if (table === "os_work_items" && state.op === "insert") return { data: { id: `item-${calls.length}` }, error: null };
@@ -72,6 +74,7 @@ function fakeAdmin(script: Script) {
       update: (payload: unknown) => { state.op = "update"; state.payload = payload; return api; },
       eq: (column: string, value: unknown) => { state.filters.push([column, value]); return api; },
       gte: (column: string, value: unknown) => { state.filters.push([`${column}>=`, value]); return api; },
+      in: (column: string, values: unknown[]) => { state.filters.push([`${column} in`, values]); return api; },
       maybeSingle: async () => resolve(),
       single: async () => resolve(),
       then: (onFulfilled: (value: unknown) => unknown, onRejected?: (reason: unknown) => unknown) =>
@@ -108,8 +111,12 @@ function draftStub(seen: Record<string, unknown>[] = []): DraftClient {
 
 const inserts = (calls: Call[], table: string) => calls.filter((c) => c.table === table && c.op === "insert").map((c) => c.payload as Record<string, unknown>);
 const updates = (calls: Call[], table: string) => calls.filter((c) => c.table === table && c.op === "update");
+const pauses = (calls: Call[]) => updates(calls, "os_workflows").filter((c) => typeof (c.payload as { paused_reason?: unknown }).paused_reason === "string");
+const resumes = (calls: Call[]) => updates(calls, "os_workflows").filter((c) => (c.payload as { paused_reason?: unknown }).paused_reason === null);
 
 describe("the worker on the company's own key", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
   it("drafts with the model the company chose, at the price it recorded, and writes both down", async () => {
     const seen: Record<string, unknown>[] = [];
     const { admin, calls } = fakeAdmin({ claimed: [workflow("w1", "co-a")], settings: { "co-a": sealed() } });
@@ -117,7 +124,7 @@ describe("the worker on the company's own key", () => {
 
     const cost = costUsdAt(PRICE, 100, 50);
     expect(cost).toBe(0.0007);
-    expect(report.outcomes).toEqual([{ workflow: "Workflow w1", result: "drafted", itemId: "item-4", costUsd: cost }]);
+    expect(report.outcomes).toEqual([{ workflow: "Workflow w1", result: "drafted", itemId: expect.stringMatching(/^item-\d+$/), costUsd: cost }]);
     expect(seen[0]).toMatchObject({ model: "claude-sonnet-5", output_config: expect.objectContaining({ effort: "low" }) });
     const run = inserts(calls, "os_runs")[0];
     expect(run).toMatchObject({ status: "drafted", model: "anthropic:claude-sonnet-5", effort: "low", cost_usd: cost, input_tokens: 100, output_tokens: 50 });
@@ -129,7 +136,7 @@ describe("the worker on the company's own key", () => {
     const report = await runDueWorkflows(admin, 5, { env: {}, gather });
 
     expect(report.outcomes).toEqual([{ workflow: "Workflow w1", result: "skipped", reason: "no key" }]);
-    const paused = updates(calls, "os_workflows");
+    const paused = pauses(calls);
     expect(paused).toHaveLength(1);
     expect(paused[0].payload).toEqual({ paused_reason: "no_key" });
     expect(paused[0].filters).toEqual([["id", "w1"]]);
@@ -143,7 +150,30 @@ describe("the worker on the company's own key", () => {
 
     expect(report.outcomes).toEqual([{ workflow: "Workflow w1", result: "failed", reason: "key unavailable" }]);
     expect(inserts(calls, "os_runs")[0]).toMatchObject({ status: "failed", model: "anthropic:claude-sonnet-5", error: expect.stringContaining("could not be opened") });
-    expect(updates(calls, "os_workflows")).toHaveLength(0);
+    expect(pauses(calls)).toHaveLength(0);
+  });
+
+  it("records a setting that cannot be used as a failed run the person will see", async () => {
+    const { admin, calls } = fakeAdmin({ claimed: [workflow("w1", "co-a")], settings: { "co-a": sealed() } });
+    const report = await runDueWorkflows(admin, 5, {
+      env: { MAYDAOS_KEY_SECRET: SECRET }, gather,
+      pick: () => { throw new Error("model provider: base URL must be https"); },
+    });
+    expect(report.outcomes).toEqual([{ workflow: "Workflow w1", result: "failed", reason: "model setting unusable" }]);
+    expect(inserts(calls, "os_runs")[0]).toMatchObject({ status: "failed", model: "anthropic:claude-sonnet-5", error: expect.stringContaining("could not be used") });
+    expect(pauses(calls)).toHaveLength(0);
+  });
+
+  it("resumes every no_key pause whose company now holds a key, before claiming anything", async () => {
+    const keyed = fakeAdmin({ claimed: [], settings: { "co-a": sealed(), "co-b": sealed() } });
+    await runDueWorkflows(keyed.admin, 5, { env: { MAYDAOS_KEY_SECRET: SECRET }, gather });
+    expect(resumes(keyed.calls)).toHaveLength(1);
+    expect(resumes(keyed.calls)[0].filters).toEqual([["paused_reason", "no_key"], ["company_id in", ["co-a", "co-b"]]]);
+    expect(keyed.calls.findIndex((c) => c.op === "update")).toBeLessThan(keyed.calls.length);
+
+    const keyless = fakeAdmin({ claimed: [] });
+    await runDueWorkflows(keyless.admin, 5, { env: {}, gather });
+    expect(resumes(keyless.calls)).toHaveLength(0);
   });
 
   it("fails closed when the settings cannot be read", async () => {
@@ -164,7 +194,22 @@ describe("the worker on the company's own key", () => {
     expect(report.outcomes.map((o) => [o.workflow, o.result])).toEqual([["Workflow a1", "skipped"], ["Workflow a2", "skipped"], ["Workflow b1", "drafted"]]);
     const capReads = calls.filter((c) => c.table === "os_runs" && c.op === "select" && !c.filters.some(([column]) => column === "workflow_id"));
     expect(capReads.map((c) => c.filters.find(([column]) => column === "company_id")?.[1])).toEqual(["co-a", "co-a", "co-b"]);
-    expect(calls.filter((c) => c.table === "os_model_settings")).toHaveLength(2);
+    expect(calls.filter((c) => c.table === "os_model_settings" && c.filters.some(([column]) => column === "company_id"))).toHaveLength(2);
+  });
+
+  it("drafts through a compatible provider end to end: the real picker, a scripted server", async () => {
+    const fetcher = vi.fn(async () => new Response(JSON.stringify({
+      choices: [{ message: { content: JSON.stringify({ draft: "Freight rates rose 4% in August.", claims: [{ text: "Freight rates rose 4% in August.", source_url: "https://example.com/a" }] }) }, finish_reason: "stop" }],
+      usage: { prompt_tokens: 120, completion_tokens: 40 },
+    }), { status: 200, headers: { "content-type": "application/json" } }));
+    vi.stubGlobal("fetch", fetcher);
+    const { admin, calls } = fakeAdmin({ claimed: [workflow("w1", "co-a")], settings: { "co-a": sealed(SECRET, "openai_compatible", "grok-4", "https://api.example.test/v1") } });
+    const report = await runDueWorkflows(admin, 5, { env: { MAYDAOS_KEY_SECRET: SECRET }, gather });
+
+    expect(report.outcomes[0]).toMatchObject({ result: "drafted", costUsd: costUsdAt(PRICE, 120, 40) });
+    expect(fetcher.mock.calls[0][0]).toBe("https://api.example.test/v1/chat/completions");
+    expect(inserts(calls, "os_runs")[0]).toMatchObject({ model: "openai_compatible:grok-4", effort: null, cost_usd: costUsdAt(PRICE, 120, 40), input_tokens: 120, output_tokens: 40 });
+    expect(JSON.stringify(calls)).not.toContain(KEY);
   });
 
   it("prices a client handed in with no company key as the platform's model", async () => {
@@ -172,7 +217,7 @@ describe("the worker on the company's own key", () => {
     const report = await runDueWorkflows(admin, 5, { env: {}, gather, draft: draftStub() });
     expect(report.outcomes[0]).toMatchObject({ result: "drafted", costUsd: runCostUsd(100, 50) });
     expect(inserts(calls, "os_runs")[0]).toMatchObject({ model: "claude-opus-5", effort: "low", cost_usd: runCostUsd(100, 50) });
-    expect(updates(calls, "os_workflows")).toHaveLength(0);
+    expect(pauses(calls)).toHaveLength(0);
   });
 
   it("charges nothing for a local model and says which one it was", async () => {

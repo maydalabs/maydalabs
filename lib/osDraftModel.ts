@@ -5,6 +5,7 @@ import { isOsConfigured, type DraftClient } from "@/lib/osDraft";
 import { vaultSecret } from "@/lib/osKeyVault";
 import type { ModelChoice, ModelPrice } from "@/lib/osModelSettings";
 import { OS_EFFORT, OS_MODEL } from "@/lib/os";
+import { DRAFT_TIMEOUT_MS } from "@/lib/osDraftSchema";
 
 /* Whatever the environment holds; process.env is one of these. */
 type Env = Record<string, string | undefined>;
@@ -30,7 +31,7 @@ export function pickDraft(env: Env = process.env, choice: ModelChoice | null = n
   if (choice) {
     if (choice.provider === "anthropic") {
       return {
-        client: new Anthropic({ apiKey: choice.apiKey }) as unknown as DraftClient,
+        client: new Anthropic({ apiKey: choice.apiKey, timeout: DRAFT_TIMEOUT_MS, maxRetries: 1 }) as unknown as DraftClient,
         model: choice.model, effort: OS_EFFORT, priced: true, label: `anthropic:${choice.model}`, price: choice.price,
       };
     }
@@ -43,7 +44,7 @@ export function pickDraft(env: Env = process.env, choice: ModelChoice | null = n
   if (local) return { client: localDraftClient(local), model: local.model, effort: null, priced: false, label: `local:${local.model}` };
   if (env.MAYDAOS_ANTHROPIC_API_KEY) {
     return {
-      client: new Anthropic({ apiKey: env.MAYDAOS_ANTHROPIC_API_KEY }) as unknown as DraftClient,
+      client: new Anthropic({ apiKey: env.MAYDAOS_ANTHROPIC_API_KEY, timeout: DRAFT_TIMEOUT_MS, maxRetries: 1 }) as unknown as DraftClient,
       model: OS_MODEL, effort: OS_EFFORT, priced: true, label: OS_MODEL,
     };
   }

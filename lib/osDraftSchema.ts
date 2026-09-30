@@ -7,6 +7,13 @@
  * imports, so any adapter may use it without a cycle.
  */
 
+/* How long one draft may take. Hosted providers get a minute: the daily tick
+ * makes five calls in sequence inside a 300-second function, and one company
+ * whose endpoint hangs must not take the day from every other company. A
+ * model on this machine gets ten, because it is slow and never on Vercel. */
+export const DRAFT_TIMEOUT_MS = 60_000;
+export const LOCAL_DRAFT_TIMEOUT_MS = 600_000;
+
 export const DRAFT_JSON_SCHEMA = {
   type: "object",
   properties: {

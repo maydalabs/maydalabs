@@ -44,7 +44,8 @@ type Env = Record<string, string | undefined>;
  * when the company pays, across everything when the platform does. A
  * schedule is exactly the thing that turns a small per-run cost into a large
  * monthly one, so the ceiling matters more here. */
-const DAILY_USD_CAP = Number(process.env.MAYDAOS_DAILY_USD_CAP ?? "2");
+const configuredCap = Number(process.env.MAYDAOS_DAILY_USD_CAP);
+const DAILY_USD_CAP = Number.isFinite(configuredCap) && configuredCap >= 0 ? configuredCap : 2;
 
 /* How many workflows one tick will take. The claim is atomic, so this is a
  * throughput choice rather than a correctness one: a tick that tries to do
@@ -79,6 +80,7 @@ type Payer =
   | { kind: "picked"; picked: PickedDraft }
   | { kind: "none" }
   | { kind: "locked"; label: string }
+  | { kind: "invalid"; label: string }
   | { kind: "unavailable" };
 
 async function payerFor(admin: Admin, companyId: string, env: Env, pick: typeof pickDraft, injected: DraftClient | undefined): Promise<Payer> {
@@ -95,7 +97,7 @@ async function payerFor(admin: Admin, companyId: string, env: Env, pick: typeof 
       const picked = pick(env, { provider: sealed.provider, model: sealed.model, baseUrl: sealed.baseUrl, apiKey, price: sealed.price });
       return picked ? { kind: "picked", picked } : { kind: "none" };
     } catch {
-      return { kind: "unavailable" };
+      return { kind: "invalid", label: `${sealed.provider}:${sealed.model}` };
     }
   }
   /* A client handed in by a test stands for the platform's model and is
@@ -117,6 +119,20 @@ async function pause(admin: Admin, workflowId: string, reason: OsPauseReason) {
     .eq("id", workflowId);
 }
 
+/* A company that stored a key after its schedule was paused for want of one
+ * gets it back at the next tick, whatever happened to the save's own resume:
+ * the pause and the key are decided at different moments, and this is the
+ * moment that settles them. Only that pause, only companies with a key. */
+async function resumeKeyed(admin: Admin) {
+  const { data, error } = await admin.from("os_model_settings").select("company_id");
+  if (error || !data?.length) return;
+  await admin
+    .from("os_workflows")
+    .update({ paused_reason: null })
+    .eq("paused_reason", "no_key")
+    .in("company_id", data.map((row) => row.company_id));
+}
+
 async function spentSince(admin: Admin, since: Date, scope: { workflowId?: string; companyId?: string } = {}): Promise<number | null> {
   let query = admin.from("os_runs").select("cost_usd").gte("created_at", since.toISOString());
   if (scope.workflowId) query = query.eq("workflow_id", scope.workflowId);
@@ -134,6 +150,7 @@ export async function runDueWorkflows(
   const gather = deps.gather ?? gatherSources;
   const env = deps.env ?? process.env;
   const pick = deps.pick ?? pickDraft;
+  await resumeKeyed(admin);
   const { data: claimed, error } = await admin.rpc("os_claim_due_workflows", { p_limit: limit });
   if (error || !claimed) return { claimed: 0, drafted: 0, outcomes: [] };
 
@@ -182,7 +199,37 @@ export async function runDueWorkflows(
       outcomes.push({ workflow: label, result: "failed", reason: "key unavailable" });
       continue;
     }
+    if (payer.kind === "invalid") {
+      await admin.from("os_runs").insert({
+        user_id: null,
+        company_id: companyId,
+        workflow_id: workflow.id,
+        shape: workflow.shape,
+        topic: workflow.name,
+        sources: [],
+        status: "failed",
+        model: payer.label,
+        effort: null,
+        error: "The company's model setting could not be used. Check it in Company, Choose your AI.",
+      });
+      outcomes.push({ workflow: label, result: "failed", reason: "model setting unusable" });
+      continue;
+    }
     if (payer.kind === "none") {
+      /* One more look before pausing: the owner may have saved a key while
+       * this tick was running, and a pause that outlives its reason is the
+       * silence this code exists to end. */
+      let arrived = false;
+      try {
+        arrived = (await readSealedModelSettings(admin, companyId)) !== null;
+      } catch {
+        arrived = false;
+      }
+      if (arrived) {
+        payers.delete(companyId);
+        outcomes.push({ workflow: label, result: "skipped", reason: "key arrived" });
+        continue;
+      }
       await pause(admin, workflow.id, "no_key");
       outcomes.push({ workflow: label, result: "skipped", reason: "no key" });
       continue;

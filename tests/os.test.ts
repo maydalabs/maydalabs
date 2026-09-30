@@ -175,6 +175,33 @@ describe("draftFromSources", () => {
     const empty = await draftFromSources("Topic", "note", SOURCES, stubClient({ draft: "   ", claims: [] }));
     expect("error" in empty).toBe(true);
   });
+
+  it("calls the model it was told to, and sends effort only when there is one", async () => {
+    const seen: Record<string, unknown>[] = [];
+    const capturing: DraftClient = { messages: { parse: async (params) => { seen.push(params); return stubClient(null).messages.parse(params); } } };
+    await draftFromSources("Topic", "note", SOURCES, capturing, { model: "grok-4", effort: null });
+    await draftFromSources("Topic", "note", SOURCES, capturing, { model: "claude-sonnet-5" });
+    await draftFromSources("Topic", "note", SOURCES, capturing);
+    expect(seen[0].model).toBe("grok-4");
+    expect(seen[0].output_config).not.toHaveProperty("effort");
+    expect(seen[1]).toMatchObject({ model: "claude-sonnet-5", output_config: expect.objectContaining({ effort: "low" }) });
+    expect(seen[2]).toMatchObject({ model: "claude-opus-5", output_config: expect.objectContaining({ effort: "low" }) });
+  });
+
+  it("keeps the provider's status on the error, and names a timeout as one", async () => {
+    const failing = (error: Error): DraftClient => ({ messages: { parse: async () => { throw error; } } });
+    const message = async (error: Error) => {
+      const result = await draftFromSources("Topic", "note", SOURCES, failing(error));
+      return "error" in result ? result.error : "no error";
+    };
+    expect(await message(new Error("model provider: 401"))).toBe("The key was refused by the provider.");
+    expect(await message(new Error("model provider: 403"))).toBe("The key was refused by the provider.");
+    expect(await message(new Error("model provider: 429"))).toBe("The model is rate limited. Try again in a moment.");
+    expect(await message(new Error("model provider: 400"))).toBe("The model call failed (400).");
+    expect(await message(new Error("model provider: 502"))).toBe("The model call failed (502).");
+    expect(await message(new DOMException("timed out", "TimeoutError"))).toBe("The model did not answer in time.");
+    expect(await message(new Error("something else"))).toBe("The model call failed.");
+  });
 });
 
 /* Feeds are how a workflow starts reading on its own. */
