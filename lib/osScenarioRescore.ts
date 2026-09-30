@@ -3,7 +3,7 @@
 import type { Outcome, Scenario } from "./osScenarios";
 
 export const BASELINE_SOURCE_PATHS = [
-  "lib/osCofounder.ts", "lib/osCofounderRun.ts", "lib/osCofounderLocal.ts",
+  "lib/osCofounder.ts", "lib/osCofounderRun.ts", "lib/osCofounderLocal.ts", "lib/osPersona.ts",
   "lib/osScenarioHarness.ts", "lib/osScenarios.ts", "tests/helpers/scenarioFixture.ts",
   "tests/cofounder.scenarios.test.ts",
 ] as const;
@@ -39,7 +39,10 @@ function stable(value: unknown): string {
   return JSON.stringify(value);
 }
 function inputShape(scenario: Scenario) {
-  return { key: scenario.key, company: scenario.company ?? null, says: scenario.says, memory: scenario.memory ?? [], openWork: scenario.openWork ?? [] };
+  // A persona is an input too: an old report must not be rescored against a
+  // manifest whose persona changed under the same key.
+  const persona = (scenario as { persona?: unknown }).persona ?? null;
+  return { key: scenario.key, company: scenario.company ?? null, says: scenario.says, memory: scenario.memory ?? [], openWork: scenario.openWork ?? [], persona };
 }
 
 export function validateManifest(value: unknown): Scenario[] {

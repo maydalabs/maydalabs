@@ -13,6 +13,7 @@ describe("explicit local-only scenario runner", () => {
     expect(scenarioSuite({ MAYDAOS_SCENARIO_SUITE: "work-variations" })).toBe("work-variations");
     expect(scenarioSuite({ MAYDAOS_SCENARIO_SUITE: "faithfulness-variations" })).toBe("faithfulness-variations");
     expect(() => scenarioSuite({ MAYDAOS_SCENARIO_SUITE: "only-passing-cases" })).toThrow("Unknown scenario suite");
+    expect(scenarioSuite({ MAYDAOS_SCENARIO_SUITE: "persona-variations" })).toBe("persona-variations");
   });
   it("never enables model runs from the ordinary npm test lifecycle, even with leaked opt-in env", () => {
     expect(scenarioRunRequested({ ...env, npm_lifecycle_event: "test" })).toBe(false);

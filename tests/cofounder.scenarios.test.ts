@@ -4,7 +4,9 @@ import { execFileSync } from "node:child_process";
 import { closeSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { buildCompanyContext, systemFor, type CofounderMessage, type CofounderToolName, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
+import { PERSONA_INSTRUCTION_VERSION, buildCompanyContext, systemFor, type CofounderMessage, type CofounderToolName, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
+import { DEFAULT_PERSONA } from "@/lib/osPersona";
+import { PERSONA_JUDGE_VERSION, PERSONA_VARIATIONS, personaJudge, personaOutcomeClasses, toneProfile, type PersonaScenario, type ToneProfile } from "@/lib/osPersonaVariations";
 import { runCofounderTurn, type TurnEvent } from "@/lib/osCofounderRun";
 import { localTurn } from "@/lib/osCofounderLocal";
 import { preflightLocalModel, scenarioRunRequested, scenarioSettings, scenarioSuite, withScenarioDeadline } from "@/lib/osScenarioHarness";
@@ -26,6 +28,8 @@ type CaseRecord = {
   modelCalls: { input: { system: string; messages: { role: "user" | "assistant"; content: unknown }[]; tools?: readonly CofounderToolName[] }; events: ModelEvent[] }[];
   events: TurnEvent[]; outcome?: Outcome; failures: string[]; error?: string;
   cleanup: "not_started" | "disposed_verified" | "failed";
+  /* The persona suite only: which persona spoke, and how the reply read. */
+  personaId?: string; tone?: ToneProfile;
 };
 
 describe.skipIf(!scenarioRunRequested(process.env))("local behavioral baseline (not database integration)", () => {
@@ -51,20 +55,26 @@ describe.skipIf(!scenarioRunRequested(process.env))("local behavioral baseline (
     try {
       const settings = scenarioSettings(process.env);
       const suite = scenarioSuite(process.env);
-      const scenarios = suite === "baseline" ? SCENARIOS : suite === "work-variations" ? WORK_VARIATIONS : FAITHFULNESS_VARIATIONS;
+      const scenarios = suite === "baseline" ? SCENARIOS : suite === "work-variations" ? WORK_VARIATIONS : suite === "faithfulness-variations" ? FAITHFULNESS_VARIATIONS : PERSONA_VARIATIONS;
+      const personaSuite = suite === "persona-variations";
       report.suite = suite;
+      // The persona text is part of the measured prompt whatever the suite.
+      report.personaInstructionVersion = PERSONA_INSTRUCTION_VERSION;
+      if (personaSuite) report.personaJudgeVersion = PERSONA_JUDGE_VERSION;
       report.settings = settings;
       report.cases = Array.from({ length: settings.repeats }, (_, repeat) => scenarios.map((scenario): CaseRecord => ({
         key: scenario.key, repeat: repeat + 1, status: "unfinished", humanReview: "pending", reviewCriteria: scenario.humanReviewCriteria,
         inputTokens: 0, outputTokens: 0, tokenAccounting: "partial", transcript: [], modelCalls: [], events: [], failures: [], cleanup: "not_started",
+        ...(personaSuite ? { personaId: (scenario as PersonaScenario).personaId } : {}),
       }))).flat();
       save();
       // Never reclaim a stale/uncertain owner automatically.
       const fd = openSync(lockPath, "wx", 0o600); ownsLock = true;
       try { writeFileSync(fd, JSON.stringify({ pid: process.pid, reportPath, startedAt: report.startedAt })); } finally { closeSync(fd); }
-      const sources = ["lib/osCofounder.ts", "lib/osCofounderRun.ts", "lib/osCofounderLocal.ts", "lib/osScenarioHarness.ts", "lib/osScenarios.ts", "tests/helpers/scenarioFixture.ts", "tests/cofounder.scenarios.test.ts"];
+      const sources = ["lib/osCofounder.ts", "lib/osCofounderRun.ts", "lib/osCofounderLocal.ts", "lib/osPersona.ts", "lib/osScenarioHarness.ts", "lib/osScenarios.ts", "tests/helpers/scenarioFixture.ts", "tests/cofounder.scenarios.test.ts"];
       if (suite === "work-variations") sources.push("lib/osWorkVariations.ts");
       if (suite === "faithfulness-variations") sources.push("lib/osFaithfulnessVariations.ts");
+      if (personaSuite) sources.push("lib/osPersonaVariations.ts");
       report.source = {
         head: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
         workingTree: execFileSync("git", ["status", "--short"], { encoding: "utf8" }).trim(),
@@ -98,7 +108,8 @@ describe.skipIf(!scenarioRunRequested(process.env))("local behavioral baseline (
               signal.throwIfAborted(); history.push({ role: "person", body: said });
               const context = await buildCompanyContext(fixture.db, fixture.companyId);
               const transcript = { person: said, context, reply: "" }; record.transcript.push(transcript);
-              for await (const event of runCofounderTurn({ supabase: fixture.db, companyId: fixture.companyId, system: systemFor(context), history, turn: measured, priced: false, signal })) {
+              const persona = (scenario as Partial<PersonaScenario>).persona ?? DEFAULT_PERSONA;
+              for await (const event of runCofounderTurn({ supabase: fixture.db, companyId: fixture.companyId, system: systemFor(context, persona), history, turn: measured, priced: false, signal })) {
                 record.events.push(event); if (event.type === "text") transcript.reply += event.text;
               }
               history.push({ role: "cofounder", body: transcript.reply });
@@ -112,6 +123,11 @@ describe.skipIf(!scenarioRunRequested(process.env))("local behavioral baseline (
             statusesChanged: before.some((row) => after.os_work_items.find((candidate) => candidate.id === row.id)?.status !== row.status),
           };
           record.failures = judge(scenario, record.outcome); record.tokenAccounting = "complete";
+          if (personaSuite) {
+            const variation = scenario as PersonaScenario;
+            record.failures.push(...personaJudge(variation, record.outcome).map((failure) => `persona: ${failure}`));
+            record.tone = toneProfile(record.outcome.reply, variation.persona);
+          }
           record.status = record.failures.length ? "deterministic_fail" : "checks_passed_human_review_pending";
         } catch (error) {
           record.status = error instanceof Error && error.name === "TimeoutError" ? "timed_out" : "runtime_error";
@@ -132,9 +148,12 @@ describe.skipIf(!scenarioRunRequested(process.env))("local behavioral baseline (
         timedOut: report.cases.filter((record) => record.status === "timed_out").length,
         unfinished: report.cases.filter((record) => ["unfinished", "running"].includes(record.status)).length,
         humanReviewed: 0,
+        // The persona suite's gate: one outcome class per base scenario across every persona and repeat.
+        ...(personaSuite ? { personaInvariance: personaOutcomeClasses(report.cases) } : {}),
       };
       save();
       expect(report.cases.filter((record) => record.status !== "checks_passed_human_review_pending" || record.cleanup !== "disposed_verified").map((record) => `${record.key}#${record.repeat}: ${record.status} ${record.failures.join("; ")} ${record.error ?? ""}`)).toEqual([]);
+      if (personaSuite) expect(personaOutcomeClasses(report.cases).divergent, "a persona changed more than the register").toEqual([]);
     } catch (error) {
       if (report.status !== "completed") {
         report.status = "preflight_or_runner_error"; report.error = error instanceof Error ? error.message : "Unknown error";

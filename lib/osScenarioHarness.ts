@@ -7,10 +7,13 @@ export function scenarioRunRequested(env: ScenarioEnv): boolean {
   return env.MAYDAOS_SCENARIO_RUN === "1" && env.npm_lifecycle_event === "scenarios";
 }
 
-export function scenarioSuite(env: ScenarioEnv): "baseline" | "work-variations" | "faithfulness-variations" {
+export type ScenarioSuiteName = "baseline" | "work-variations" | "faithfulness-variations" | "persona-variations";
+const SUITES: readonly ScenarioSuiteName[] = ["baseline", "work-variations", "faithfulness-variations", "persona-variations"];
+
+export function scenarioSuite(env: ScenarioEnv): ScenarioSuiteName {
   const suite = env.MAYDAOS_SCENARIO_SUITE ?? "baseline";
-  if (suite !== "baseline" && suite !== "work-variations" && suite !== "faithfulness-variations") throw new Error("Unknown scenario suite; use baseline, work-variations or faithfulness-variations.");
-  return suite;
+  if (!(SUITES as readonly string[]).includes(suite)) throw new Error(`Unknown scenario suite; use ${SUITES.join(", ")}.`);
+  return suite as ScenarioSuiteName;
 }
 
 export function loopbackOrigin(value: string): string {
