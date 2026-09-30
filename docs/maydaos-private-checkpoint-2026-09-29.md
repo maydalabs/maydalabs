@@ -75,9 +75,9 @@ the latency as the product's — it is the local model's.
 - The last measured judgment run scored 3 pass, 7 needs revision, 2 fail of
   12. Expect a draft to sometimes soften, over-promise, or leave internal
   notes in customer copy. That is what this trial is for.
-- If you put the window away after an *Ask* answer and nothing has been saved
-  since, the answer may not be shown again until you reload the page. It is
-  stored; this is a display gap that is written down and not yet fixed.
+- Putting the window away and bringing it back keeps the answer, the draft
+  you were typing, and any card you had not decided (fixed 30 September). If
+  anything is missing after that, say so — it is stored either way.
 - Anything you save is in the local database only. Production has none of it.
 
 ## When you are done

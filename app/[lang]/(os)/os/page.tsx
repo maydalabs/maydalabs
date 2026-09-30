@@ -67,6 +67,7 @@ export default async function OsPage(props: LocalePageProps) {
   let workflows: WorkflowRow[] = [];
   let finishedCount = 0;
   let hasCompany = false;
+  let companyId: string | null = null;
   let companyHasModel = false;
   let dueRows: DueRow[] = [];
   let dueCount = 0;
@@ -84,6 +85,7 @@ export default async function OsPage(props: LocalePageProps) {
       supabase.from("os_desktops").select("layout, seen_at, prefs").eq("user_id", claims.sub).maybeSingle(),
     ]);
     hasCompany = company !== null;
+    companyId = company?.id ?? null;
     prefs = sanitizePrefs(desktop?.prefs);
     companyName = company?.name ?? null;
     storedLayout = desktop?.layout ?? [];
@@ -371,7 +373,12 @@ export default async function OsPage(props: LocalePageProps) {
   ];
 
   return (
+    /* Keyed by who is looking and at which company: a refresh that changes
+       either remounts the whole desk, so no window keeps another person's
+       state. Windows now stay mounted while put away, which makes this
+       matter. */
     <OsShell
+      key={`${claims.sub}:${companyId ?? ""}`}
       apps={apps}
       documents={documents}
       brief={<Brief locale={locale} brief={brief} hasCompany={hasCompany} companyName={companyName} configured={configured} />}

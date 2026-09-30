@@ -250,13 +250,18 @@ from variance; repeats are the next improvement.
 
 ## Open, unexplained, not fixed
 
-- A chat reply vanished from the window after arriving and returned on reload;
-  it was in the database throughout. Seen once, never reproduced.
 - Enter did not submit the composer under a browser tool, though the handler
-  checks `event.key === "Enter"` correctly.
+  checks `event.key === "Enter"` correctly. The 29 September dry-run showed
+  Enter submitting; the 19 September observation was the tool's, not the
+  product's. Kept here until a person confirms it by hand.
 
-Both are in `maydaos-it-spoke-2026-09-19.md`. Do not report either as resolved
-without evidence.
+Explained and fixed, 30 September: the reply that vanished after arriving.
+Putting the Co-founder window away unmounted it; bringing it back mounted a
+fresh one seeded from the page-load snapshot, which only a save refreshed —
+hence "reproduced only when nothing was saved". Windows now stay mounted while
+put away, and dock apps while closed (`components/os/OsShell.tsx`, React's
+`Activity`; `tests/osShellPutAway.test.ts`), so what a window shows is kept:
+a reply, a half-typed draft, a card not yet decided.
 
 ## Waiting for Mehmet in the live desk
 

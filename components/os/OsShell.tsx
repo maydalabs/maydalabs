@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Activity, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   OS_OPEN_APP_EVENT,
   OS_OPEN_ITEM_EVENT,
@@ -469,9 +469,17 @@ export function OsShell({
 
   // ---------------------------------------------------------------- render
 
-  const nodeFor = useCallback((id: OsWindowKey) => surfaces.get(id)?.node ?? null, [surfaces]);
   const appFor = useCallback((id: OsWindowKey) => surfaces.get(id), [surfaces]);
-  const visible = windows.filter((w) => w.open && !w.minimized && surfaces.has(w.app));
+  /* What is in the tree, as against what is on screen. A window that is put
+   * away, and a dock app that is closed, stay mounted and hidden: what they
+   * show — a reply that arrived, a draft half typed, a card not yet decided —
+   * is their own state, and a person who puts a window aside is not asking
+   * it to forget. A closed document is gone: a window onto finished work is
+   * a window onto nothing. */
+  const mounted = windows.filter((w) => {
+    const surface = surfaces.get(w.app);
+    return surface !== undefined && (w.open || !surface.isDocument || w.app === phoneApp);
+  });
   /* Documents join the dock only while they are open, so a put-away document
    * stays reachable and a closed one leaves no trace. */
   const openDocuments = windows.filter((w) => w.open && surfaces.get(w.app)?.isDocument);
@@ -559,16 +567,21 @@ export function OsShell({
                 content, which is how every document window works; in a
                 single-pane stack the two sit one above the other and read as
                 a stammer. */}
-            {phoneApp === BRIEF_PANE ? (
-              brief
-            ) : (
-              <>
-                {appFor(phoneApp)?.isDocument ? null : (
-                  <h1 className="os-stack-title">{appFor(phoneApp)?.title ?? copy.desktop}</h1>
-                )}
-                {nodeFor(phoneApp)}
-              </>
-            )}
+            {/* Every pane stays mounted; only one is shown. Switching to the
+                brief and back must not cost the co-founder its reply. */}
+            <Activity key={BRIEF_PANE} mode={phoneApp === BRIEF_PANE ? "visible" : "hidden"}>
+              {brief}
+            </Activity>
+            {mounted.map((state) => {
+              const app = appFor(state.app);
+              if (!app) return null;
+              return (
+                <Activity key={state.app} mode={phoneApp === state.app ? "visible" : "hidden"}>
+                  {app.isDocument ? null : <h1 className="os-stack-title">{app.title}</h1>}
+                  {app.node}
+                </Activity>
+              );
+            })}
           </div>
         ) : (
           <>
@@ -579,7 +592,7 @@ export function OsShell({
               {brief}
             </aside>
 
-            {visible.map((state) => {
+            {mounted.map((state) => {
               const app = appFor(state.app);
               if (!app) return null;
 
@@ -603,50 +616,53 @@ export function OsShell({
                   };
 
               return (
-                <section
-                  key={state.app}
-                  className="os-window"
-                  data-focused={state.z === topZ}
-                  data-leaving={leaving.get(state.app)}
-                  style={style}
-                  onPointerDown={() => focus(state.app)}
-                  aria-label={app.title}
-                >
-                  <header className="os-window-title" onPointerDown={(e) => startMove(e, state)}>
-                    <span className="os-window-name">
-                      <OsIcon name={app.icon} size={14} /> {app.title}
-                    </span>
-                    <button
-                      type="button"
-                      className="os-window-dot"
-                      data-kind="close"
-                      aria-label={`${copy.close}: ${app.title}`}
-                      onPointerDown={(e) => e.stopPropagation()}
-                      onClick={() => close(state.app)}
-                    >
-                      <OsIcon name="close" size={12} />
-                    </button>
-                    <button
-                      type="button"
-                      className="os-window-dot"
-                      data-kind="minimize"
-                      aria-label={`${copy.minimize}: ${app.title}`}
-                      onPointerDown={(e) => e.stopPropagation()}
-                      onClick={() => toggle(state.app)}
-                    >
-                      <OsIcon name="minimize" size={12} />
-                    </button>
-                  </header>
+                /* Hidden, not gone: React keeps the window's state while it is
+                   away, and shows it again where it left off. */
+                <Activity key={state.app} mode={state.open && !state.minimized ? "visible" : "hidden"}>
+                  <section
+                    className="os-window"
+                    data-focused={state.z === topZ}
+                    data-leaving={leaving.get(state.app)}
+                    style={style}
+                    onPointerDown={() => focus(state.app)}
+                    aria-label={app.title}
+                  >
+                    <header className="os-window-title" onPointerDown={(e) => startMove(e, state)}>
+                      <span className="os-window-name">
+                        <OsIcon name={app.icon} size={14} /> {app.title}
+                      </span>
+                      <button
+                        type="button"
+                        className="os-window-dot"
+                        data-kind="close"
+                        aria-label={`${copy.close}: ${app.title}`}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={() => close(state.app)}
+                      >
+                        <OsIcon name="close" size={12} />
+                      </button>
+                      <button
+                        type="button"
+                        className="os-window-dot"
+                        data-kind="minimize"
+                        aria-label={`${copy.minimize}: ${app.title}`}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={() => toggle(state.app)}
+                      >
+                        <OsIcon name="minimize" size={12} />
+                      </button>
+                    </header>
 
-                  <div className="os-window-body">{app.node}</div>
+                    <div className="os-window-body">{app.node}</div>
 
-                  <div
-                    className="os-resize"
-                    role="separator"
-                    aria-label={`${copy.resize}: ${app.title}`}
-                    onPointerDown={(e) => startResize(e, state)}
-                  />
-                </section>
+                    <div
+                      className="os-resize"
+                      role="separator"
+                      aria-label={`${copy.resize}: ${app.title}`}
+                      onPointerDown={(e) => startResize(e, state)}
+                    />
+                  </section>
+                </Activity>
               );
             })}
           </>
