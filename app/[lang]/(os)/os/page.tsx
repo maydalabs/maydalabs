@@ -24,7 +24,7 @@ import type { CommandTarget } from "@/components/os/OsCommandBar";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { currentCompany } from "@/lib/osCompany";
 import { DEFAULT_PREFS, sanitizePrefs, type OsPrefs } from "@/lib/osDesktop";
-import { composeBrief, type Brief as BriefModel, type ChangeRow, type NeedRow, type WorkflowRow } from "@/lib/osBrief";
+import { composeBrief, type Brief as BriefModel, type ChangeRow, type DueRow, type LeadRow, type NeedRow, type WorkflowRow } from "@/lib/osBrief";
 import { isCofounderConfigured } from "@/lib/osCofounderModel";
 import { readModelSettingsSummary } from "@/lib/osModelSettings";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -68,24 +68,39 @@ export default async function OsPage(props: LocalePageProps) {
   let finishedCount = 0;
   let hasCompany = false;
   let companyHasModel = false;
+  let dueRows: DueRow[] = [];
+  let dueCount = 0;
+  let leadRows: LeadRow[] = [];
+  let leadCount = 0;
+  let proposed = { count: 0, oldestAt: null as string | null };
+  let knows = 0;
+  let openCount = 0;
 
   if (isSupabaseConfigured()) {
     const supabase = await createSupabaseServerClient();
 
-    const [company, { count }, { data: desktop }] = await Promise.all([
+    const [company, { data: desktop }] = await Promise.all([
       currentCompany(supabase),
-      supabase.from("os_needs_you").select("id", { count: "exact", head: true }),
       supabase.from("os_desktops").select("layout, seen_at, prefs").eq("user_id", claims.sub).maybeSingle(),
     ]);
     hasCompany = company !== null;
     prefs = sanitizePrefs(desktop?.prefs);
-    // Its own key means it can be answered even when the platform holds none.
-    companyHasModel = company ? (await readModelSettingsSummary(supabase, company.id)) !== null : false;
-
     companyName = company?.name ?? null;
-    waiting = count ?? 0;
     storedLayout = desktop?.layout ?? [];
     seenAt = desktop?.seen_at ?? null;
+
+    /* One company, one filter, on every read below. A person can belong to
+     * several companies; a headline counted across all of them over a list
+     * from one is a desk that contradicts itself. */
+    const [{ count: waitingCount }, modelSummary] = company
+      ? await Promise.all([
+          supabase.from("os_needs_you").select("id", { count: "exact", head: true }).eq("company_id", company.id),
+          // Its own key means it can be answered even when the platform holds none.
+          readModelSettingsSummary(supabase, company.id),
+        ])
+      : [{ count: 0 }, null];
+    waiting = waitingCount ?? 0;
+    companyHasModel = modelSummary !== null;
 
     /* What the command bar can find. Deliberately the things a person names
      * out loud — an open piece of work, something it knows — rather than
@@ -93,16 +108,17 @@ export default async function OsPage(props: LocalePageProps) {
      * a search nobody uses twice. */
     const memoryReadDate = new Date().toISOString().slice(0, 10);
     const [{ count: newCount }, { data: facts }, { data: latest }] = await Promise.all([
-      seenAt
-        ? supabase.from("os_recent_record").select("id", { count: "exact", head: true }).gt("at", seenAt)
+      seenAt && company
+        ? supabase.from("os_recent_record").select("id", { count: "exact", head: true }).eq("company_id", company.id).gt("at", seenAt)
         : Promise.resolve({ count: 0 } as { count: number | null }),
       company?.id
         ? supabase.from("os_company_memory").select(MEMORY_REVIEW_COLUMNS).eq("company_id", company.id).is("retired_at", null).or(memoryCandidateFilter(memoryReadDate)).order("created_at", { ascending: false }).limit(20)
         : Promise.resolve({ data: [] }),
-      seenAt
+      seenAt && company
         ? supabase
             .from("os_recent_record")
             .select("title, event, by_a_person")
+            .eq("company_id", company.id)
             .gt("at", seenAt)
             .order("at", { ascending: false })
             .limit(1)
@@ -121,7 +137,11 @@ export default async function OsPage(props: LocalePageProps) {
     if (company?.id) {
       const COLUMNS =
         "id, title, lane, kind, status, required_action, notes, sources, artifacts, metadata, updated_at, due_on";
-      const [{ data: open }, { data: finished }, { data: waitingRows }, { data: activity }] = await Promise.all([
+      const [
+        { data: open }, { data: finished }, { data: waitingRows }, { data: activity },
+        { data: dueSoon }, { count: dueTotal }, { count: finishedTotal }, { data: leads }, { count: leadTotal },
+        { data: proposedRows }, { count: proposedTotal }, { count: knowsTotal }, { count: openTotal },
+      ] = await Promise.all([
         /* Open work comes through a view that carries how far off each due
          * date is, by the database's clock: the page never reads its own. */
         supabase
@@ -143,19 +163,51 @@ export default async function OsPage(props: LocalePageProps) {
          * database's clock. */
         supabase
           .from("os_needs_you")
-          .select("id, title, status, waiting_days")
+          .select("id, title, status, route, required_action, waiting_days, updated_at")
           .eq("company_id", company.id)
           .order("waiting_days", { ascending: false })
-          .limit(3),
+          .limit(50),
         supabase
           .from("os_activity")
-          .select("name, active, due_in_hours, paused_reason")
+          .select("name, active, due_in_hours, paused_reason, last_run_at, last_run_days, last_run_status, last_run_item_id")
           .eq("company_id", company.id)
           .eq("active", true),
+        /* Dated work whose day has come, read on its own: the thirty most
+         * recently touched items are exactly the window an untouched overdue
+         * item falls out of. */
+        supabase
+          .from("os_work_open")
+          .select("id, title, status, due_in_days")
+          .eq("company_id", company.id)
+          .lte("due_in_days", 1)
+          .order("due_on", { ascending: true })
+          .limit(3),
+        supabase.from("os_work_open").select("id", { count: "exact", head: true }).eq("company_id", company.id).lte("due_in_days", 1),
+        /* Counted, not measured by the length of a fifteen-row read. */
+        supabase.from("os_finished_lately").select("id", { count: "exact", head: true }).eq("company_id", company.id),
+        /* Leads that arrived since the person last looked. */
+        seenAt
+          ? supabase.from("os_signals").select("item_id, payload, received_at").eq("company_id", company.id).eq("kind", "lead").gt("received_at", seenAt).order("received_at", { ascending: false }).limit(3)
+          : Promise.resolve({ data: [] as LeadRow[] }),
+        seenAt
+          ? supabase.from("os_signals").select("id", { count: "exact", head: true }).eq("company_id", company.id).eq("kind", "lead").gt("received_at", seenAt)
+          : Promise.resolve({ count: 0 } as { count: number | null }),
+        /* Cards the co-founder proposed to this person that nobody decided. */
+        supabase.from("os_review_proposals").select("created_at").eq("company_id", company.id).eq("actor_id", claims.sub).eq("status", "proposed").order("created_at", { ascending: true }).limit(1),
+        supabase.from("os_review_proposals").select("id", { count: "exact", head: true }).eq("company_id", company.id).eq("actor_id", claims.sub).eq("status", "proposed"),
+        supabase.from("os_company_memory").select("id", { count: "exact", head: true }).eq("company_id", company.id).is("retired_at", null),
+        supabase.from("os_work_open").select("id", { count: "exact", head: true }).eq("company_id", company.id),
       ]);
       needs = waitingRows ?? [];
       workflows = activity ?? [];
-      finishedCount = (finished ?? []).length;
+      finishedCount = finishedTotal ?? (finished ?? []).length;
+      dueRows = (dueSoon ?? []).flatMap((r) => (r.id && r.title && r.status ? [{ id: r.id, title: r.title, status: r.status, due_in_days: r.due_in_days }] : []));
+      dueCount = dueTotal ?? dueRows.length;
+      leadRows = leads ?? [];
+      leadCount = leadTotal ?? leadRows.length;
+      proposed = { count: proposedTotal ?? 0, oldestAt: proposedRows?.[0]?.created_at ?? null };
+      knows = (knowsTotal ?? 0) + (company.what_we_do ? 1 : 0);
+      openCount = openTotal ?? (open ?? []).length;
 
       /* A view's columns are all nullable to the type generator, and a type
        * predicate cannot narrow jsonb to `unknown`. So each row is rebuilt
@@ -225,11 +277,18 @@ export default async function OsPage(props: LocalePageProps) {
   const brief: BriefModel = composeBrief({
     needs,
     needCount: waiting,
-    due: workItems.map((item) => ({ id: item.id, title: item.title, status: item.status, due_in_days: item.due_in_days })),
+    due: dueRows,
+    dueCount,
+    leads: leadRows,
+    leadCount,
+    proposed,
     changes: seenAt ? unread : null,
     lastChange,
     workflows,
+    seenAt,
     finishedThisFortnight: finishedCount,
+    knows,
+    openCount,
   });
 
   /* Without a model behind it the co-founder can say nothing, so it does not
@@ -315,7 +374,7 @@ export default async function OsPage(props: LocalePageProps) {
     <OsShell
       apps={apps}
       documents={documents}
-      brief={<Brief locale={locale} brief={brief} hasCompany={hasCompany} />}
+      brief={<Brief locale={locale} brief={brief} hasCompany={hasCompany} companyName={companyName} configured={configured} />}
       locale={locale}
       prefs={prefs}
       copy={{
