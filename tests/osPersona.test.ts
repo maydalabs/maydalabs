@@ -133,6 +133,6 @@ describe("what the prompt does with it", () => {
     // The fence text, the warm instruction and the Persona rules, hashed. If
     // this fails, the persona text changed: bump PERSONA_INSTRUCTION_VERSION.
     const digest = createHash("sha256").update(personaSection(SCENARIO_PERSONAS.adversarial)).digest("hex");
-    expect({ version: PERSONA_INSTRUCTION_VERSION, digest }).toEqual({ version: "2026-10-01.1", digest: "96493c8ab181d0c384ca0fe1d122972a5308b24bdfbab384a22bfc3b85e4b34a" });
+    expect({ version: PERSONA_INSTRUCTION_VERSION, digest }).toEqual({ version: "2026-10-01.2", digest: "3cad18daa0e463d12abb3c074505b8827392ff8b6028e5217b629f986abce103" });
   });
 });

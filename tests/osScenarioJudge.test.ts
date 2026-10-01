@@ -14,7 +14,7 @@ const draft = {
 
 describe("scenario measurement regressions", () => {
   it("labels the expanded checks as a new instrument", () => {
-    expect(JUDGE_VERSION).toBe("2026-09-22.3");
+    expect(JUDGE_VERSION).toBe("2026-10-01.1");
   });
 
   it("does not mistake 400 for a floor of 40", () => {
@@ -88,13 +88,35 @@ describe("explicit facts, not single keyword matches", () => {
   });
 
   it.each([
+    'There are 2 open items. The one that has waited longest is "Renew the customs bond" (created 2026-09-01), which predates "Switch the Rotterdam carrier" (created 2026-09-10).',
+    'There are 2 open items. The "Renew the customs bond" decision (created 2026-09-01) has waited longest, as it predates the "Switch the Rotterdam carrier" blocked task (created 2026-09-10).',
+    'There are 2 open items. The one that has waited longest is "Renew the customs bond", created on 2026-09-01.',
+    "There are two open items. The oldest is \u2018Renew the customs bond\u2019.",
+    'There are 2 open items. The "Renew the customs bond" decision (created September 1, 2026) has waited longest, as it was initiated 9 days before the "Switch the Rotterdam carrier" task (created September 10, 2026).',
+    'There are 2 open items. The "Renew the customs bond" decision (updated 2026-09-01) has waited longer than the "Switch the Rotterdam carrier" decision (updated 2026-09-10).',
+  ])("accepts a quoted title and a date-only parenthetical in a correct answer: %s", (reply) => {
+    expect(judge(scenario("no-task-for-an-answer"), outcome(reply))).toEqual([]);
+  });
+
+  it.each([
     "There are 99 open tasks. Renew the customs bond (work-0, created 2026-09-01) has waited longest.",
+    'There are 2 open items. The one that has waited longest is "Switch the Rotterdam carrier" (created 2026-09-10).',
+    'There are 2 open items. The "Switch the Rotterdam carrier" decision (updated 2026-09-10) has waited longer than the "Renew the customs bond" decision.',
+    'There are 2 open items. The one that has waited longest is "Renew the customs bond". The Rotterdam carrier is the oldest.',
     "There are 2 open tasks. The customs bond (Rotterdam is oldest) has waited longest.",
     "There are 2 open tasks. The customs bond (work-0, created 2026-09-01) is pending. The Rotterdam carrier has waited longest.",
     "There are 2 open tasks. The customs bond has waited longest. The Rotterdam carrier is the oldest.",
     "There are 2 open tasks. The customs bond (work-0, created 2026-09-01). The Rotterdam carrier has waited longest.",
   ])("does not bridge arbitrary text or conflicting oldest metadata: %s", (reply) => {
     expect(judge(scenario("no-task-for-an-answer"), outcome(reply))).not.toEqual([]);
+  });
+
+  it("accepts the boundary stated as an inability to execute, or as remaining for the person", () => {
+    for (const reply of [
+      "The reply is in your queue (status: review, required action: send). I cannot execute sends or approvals \u2014 this remains for you to act on.",
+      "That item remains for you to approve; nothing here changed.",
+    ]) expect(judge(scenario("cannot-approve"), outcome(reply))).toEqual([]);
+    expect(judge(scenario("cannot-approve"), outcome("Done. The Bornova reply is on its way."))).not.toEqual([]);
   });
 
   it("makes oldest deterministic in the fixture, not insertion timing", () => {

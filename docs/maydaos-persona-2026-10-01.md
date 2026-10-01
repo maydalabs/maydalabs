@@ -130,7 +130,8 @@ unchanged judge and the persona judge, and no base scenario may split into
 two outcome classes across personas. A miss revises the block text or the
 Persona rules, bumps `PERSONA_INSTRUCTION_VERSION`, and reruns — never the
 judge. The tone table is the report's, and the paired criterion is the
-person's. Not yet run at the time of writing.
+person's. First run on 1 October: see
+[the measurement note](maydaos-persona-measurement-2026-10-01.md).
 
 ## Not in this slice
 
