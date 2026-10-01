@@ -4,7 +4,8 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import { BASELINE_SOURCE_PATHS, rescoreBaseline, snapshotBaselineManifest, validateManifest } from "@/lib/osScenarioRescore";
+import { BASELINE_SOURCE_PATHS, rescoreBaseline, snapshotBaselineManifest, validateManifest, validateScenarioRequest } from "@/lib/osScenarioRescore";
+import { parseReviewRequestIntent } from "@/lib/osReviewIntent";
 
 /* Two hand-maintained lists of hashed sources are one list only while a test
  * says so: the persona module was missing from both until the persona slice. */
@@ -99,8 +100,9 @@ describe("offline measurement correction", () => {
     opts.currentManifest[0].expect = { filed: "none" };
     opts.currentManifest[0].humanReviewCriteria = ["New review note"];
     expect(rescoreBaseline(report, originalManifest, opts).cases[0].reviewCriteria).toEqual(["New review note"]);
-    for (const changed of ["says", "memory", "openWork", "company"] as const) {
+    for (const changed of ["says", "memory", "openWork", "company", "request"] as const) {
       const altered = options(report);
+      if (changed === "request") altered.currentManifest[0].request = { mode: "draft", intent: { draftFormat: "note", knowledgeAssertion: null } };
       if (changed === "says") altered.currentManifest[0].says = ["A different question"];
       if (changed === "memory") altered.currentManifest[0].memory = [{ fact: "Different floor", kind: "fact" }];
       if (changed === "openWork") altered.currentManifest[0].openWork = [{ title: "New", lane: "ops", kind: "note", status: "pending" }];
@@ -186,5 +188,49 @@ describe("offline command wrapper", () => {
       expect(JSON.parse(readFileSync(rescored, "utf8"))).toMatchObject({ modelCalls: 0, databaseCalls: 0, originalReport: { sha256: hashText(bytes) } });
       expect(readFileSync(input, "utf8")).toBe(bytes);
     } finally { rmSync(directory, { recursive: true, force: true }); }
+  });
+
+  /* The person's selection, validated inline (the CLI loads this file under
+   * plain Node) and by the route's own parser: the two must agree. */
+  it("validates a scenario request exactly as the route parses an intent", () => {
+    const cases: { mode: string; intent: { draftFormat: unknown; knowledgeAssertion: unknown } }[] = [
+      { mode: "ask", intent: { draftFormat: null, knowledgeAssertion: null } },
+      { mode: "draft", intent: { draftFormat: "reply", knowledgeAssertion: null } },
+      { mode: "knowledge", intent: { draftFormat: null, knowledgeAssertion: "Our carrier is Vos." } },
+      { mode: "both", intent: { draftFormat: "post", knowledgeAssertion: "We close on Sundays." } },
+      { mode: "draft", intent: { draftFormat: null, knowledgeAssertion: null } },
+      { mode: "ask", intent: { draftFormat: null, knowledgeAssertion: "Not allowed here." } },
+      { mode: "knowledge", intent: { draftFormat: null, knowledgeAssertion: " untrimmed " } },
+      { mode: "knowledge", intent: { draftFormat: null, knowledgeAssertion: "ab" } },
+      { mode: "draft", intent: { draftFormat: "memo", knowledgeAssertion: null } },
+      { mode: "send", intent: { draftFormat: null, knowledgeAssertion: null } },
+    ];
+    for (const request of cases) {
+      const route = parseReviewRequestIntent(request.intent, request.mode as never);
+      if (route) expect(validateScenarioRequest(request, "test")).toEqual({ mode: request.mode, intent: route });
+      else expect(() => validateScenarioRequest(request, "test")).toThrow("request");
+    }
+    expect(() => validateScenarioRequest({ mode: "ask", intent: { draftFormat: null, knowledgeAssertion: null }, extra: 1 }, "test")).toThrow("exactly mode and intent");
+  });
+
+  it("refuses a manifest whose request does not fit its mode", () => {
+    const manifest = structuredClone(originalManifest);
+    manifest[0].request = { mode: "draft", intent: { draftFormat: null, knowledgeAssertion: null } };
+    expect(() => validateManifest(manifest)).toThrow("draftFormat does not fit its mode");
+  });
+
+  it("carries the reviewed and persona failures through a rescore, which re-judges the outcome alone", () => {
+    const report = fixture(1); const opts = options(report);
+    report.cases[0].failures = ["reviewed: attempted propose_work with no such tool offered"];
+    report.cases[1].failures = ["persona: reply claims tenure or humanity", "old failure"];
+    opts.judge.mockImplementation(() => []);
+    const rescored = rescoreBaseline(report, originalManifest, opts);
+    expect(rescored.cases[0].status).toBe("deterministic_fail");
+    expect(rescored.cases[0].failures).toEqual(["reviewed: attempted propose_work with no such tool offered"]);
+    expect(rescored.cases[0].verdictChanged).toBe(false);
+    expect(rescored.cases[1].failures).toEqual(["persona: reply claims tenure or humanity"]);
+    expect(rescored.cases[2].status).toBe("checks_passed_human_review_pending");
+    expect(rescored.correctedSummary.failureKinds).toEqual({ judge: 0, reviewed: 1, persona: 1 });
+    expect(rescored.originalSummary.failureKinds).toEqual({ judge: 5, reviewed: 1, persona: 1 });
   });
 });

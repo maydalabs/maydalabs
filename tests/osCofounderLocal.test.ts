@@ -257,7 +257,7 @@ describe("the scenario judgement", () => {
   it("accepts a reply filed for sending", () => {
     expect(
       judge(filesReply, {
-        filed: [{ title: "Reply to Mr Aksoy", lane: "sales", required_action: "send", kind: "reply", status: "review", notes: "Dear Mr Aksoy, we can take 12 pallets per week to Hamburg from October at 48 euros per pallet, collecting on Tuesdays." }],
+        filed: [{ title: "Reply to Mr Aksoy", lane: "sales", required_action: "send", kind: "reply", status: "drafted", notes: "Dear Mr Aksoy, we can take 12 pallets per week to Hamburg from October at 48 euros per pallet, collecting on Tuesdays." }],
         remembered: [],
         reply: "Filed for you.",
         statusesChanged: false,

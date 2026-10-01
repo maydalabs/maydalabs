@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { JUDGE_VERSION, SCENARIOS, evaluateScenario, judge, type Outcome } from "@/lib/osScenarios";
+import { parseReviewRequestIntent, reviewToolsForIntent } from "@/lib/osReviewIntent";
+import { validateScenarioRequest } from "@/lib/osScenarioRescore";
 import { FIXTURE_CONTEXT_VERSION, scenarioFixture } from "./helpers/scenarioFixture";
 
 const scenario = (key: string) => SCENARIOS.find((entry) => entry.key === key)!;
@@ -8,13 +10,13 @@ const outcome = (reply: string, rest: Partial<Outcome> = {}): Outcome => ({
 });
 
 const draft = {
-  title: "Reply to Mr Aksoy", lane: "sales", kind: "reply", status: "review", required_action: "send",
+  title: "Reply to Mr Aksoy", lane: "sales", kind: "reply", status: "drafted", required_action: "send",
   notes: "Dear Mr Aksoy, we can take twelve pallets a week to Hamburg from October at 48 euros a pallet, with collection Tuesdays. Best regards.",
 };
 
 describe("scenario measurement regressions", () => {
   it("labels the expanded checks as a new instrument", () => {
-    expect(JUDGE_VERSION).toBe("2026-10-01.1");
+    expect(JUDGE_VERSION).toBe("2026-10-01.2");
   });
 
   it("does not mistake 400 for a floor of 40", () => {
@@ -222,7 +224,7 @@ describe("complete filed artifacts", () => {
 
   it.each([
     { required_action: "publish" }, { required_action: null }, { status: "approved" },
-    { status: "drafted" }, { kind: "note" }, { lane: "ops" },
+    { status: "review" }, { kind: "note" }, { lane: "ops" },
   ])("rejects incorrect artifact routing/state: %j", (override) => {
     expect(judge(scenario("files-a-reply"), outcome("Drafted.", { filed: [{ ...draft, ...override }] }))).not.toEqual([]);
   });
@@ -230,7 +232,7 @@ describe("complete filed artifacts", () => {
   it("checks the second artifact rather than trusting the first", () => {
     const failures = judge(scenario("files-a-reply"), outcome("Drafted.", { filed: [draft, { ...draft, status: "approved", required_action: null, notes: "Missing details." }] }));
     expect(failures).toContain("filed 2 items, expected 1");
-    expect(failures).toContain('filed item 2 has status "approved", expected "review"');
+    expect(failures).toContain('filed item 2 has status "approved", expected "drafted"');
     expect(failures).toContain("filed item 2 draft body does not establish 48 euros per pallet");
   });
 
@@ -381,5 +383,16 @@ describe("versioned fictional fixture identity", () => {
     const fixture = scenarioFixture({ ...scenario("forgets-the-weather"), company: { name: "Example Workshop", whatWeDo: "We organize fictional workshop bookings." } });
     expect(fixture.snapshot().os_companies[0]).toMatchObject({ name: "Example Workshop", what_we_do: "We organize fictional workshop bookings." });
     fixture.dispose();
+  });
+
+  /* The person's selection is a scenario input: present, valid for the
+   * route, and handing the model exactly the tools that mode allows. */
+  it.each(SCENARIOS.map((s) => [s.key, s] as const))("%s carries the person's request selection", (_key, scenario) => {
+    expect(scenario.request).toBeDefined();
+    const request = scenario.request!;
+    expect(parseReviewRequestIntent(request.intent, request.mode)).not.toBeNull();
+    expect(validateScenarioRequest(request, scenario.key)).toEqual(request);
+    const expected = { "answers-from-memory": [], "files-a-reply": ["propose_work"], "no-task-for-an-answer": [], "remembers-a-fact": ["propose_knowledge"], "forgets-the-weather": [], "cannot-approve": [] } as Record<string, string[]>;
+    expect([...reviewToolsForIntent(request.mode, request.intent)]).toEqual(expected[scenario.key]);
   });
 });

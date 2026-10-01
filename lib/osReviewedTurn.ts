@@ -11,8 +11,10 @@ import { ReviewedTextGate } from "@/lib/osReviewTextGate";
 
 /** This loop can stage review proposals, never save Work or company knowledge.
  * The host owns identity, source resolution, durable turn IDs and transactions.
- * Historical measurement continues to use osCofounderRun; this is the desk's
- * review-first loop and requires its own behavioral baseline.
+ * This is the desk's loop, and the one the scenario harness measures
+ * (tests/cofounder.scenarios.test.ts) with the person's selection as a
+ * scenario input; the legacy loop in osCofounderRun is measured only from
+ * history.
  */
 export type ReviewedTurnEvent =
   | { type: "text"; text: string }

@@ -56,11 +56,21 @@ MAYDAOS_SCENARIO_MODEL=local npm run scenarios
 ```
 
 Six scenarios in `lib/osScenarios.ts`, each a seeded company, a few things
-said, and what must be true afterwards — what was filed, what was
-remembered, whether it pretended to approve. Never exact wording. Each prints
-PASS or FAIL with tokens and time, and the transcript when it fails, so a
-change to the prompt in `lib/osCofounder.ts` is measured rather than felt.
-`MAYDAOS_SCENARIO_VERBOSE=1` prints every transcript.
+said, the person's composer selection for each message (`request`: ask,
+draft with a format, knowledge with the typed assertion), and what must be
+true afterwards — what was filed, what was remembered, whether it pretended
+to approve. Never exact wording. Since 1 October the runner drives the
+desk's own loop (`runReviewedTurn` with `reviewedSystemFor`): proposals are
+staged through the route's chain over an in-memory company, and every card
+is then saved unchanged by the harness, exactly as a person's Save would
+write it — no person decided, and the report says so. Ask-mode scenarios
+hold their file/remember checks by construction (the report lists them per
+case under `guaranteedByConstruction`); the reviewed checks report an
+attempted tool, a refusal, a receipt that disagrees with the cards, a reply
+with no prose, or a claim that something was saved. The legacy
+`file_work` loop is measured only from history (`e35370b` and before). Each
+case prints its status with tokens and time; `MAYDAOS_SCENARIO_VERBOSE=1`
+prints every transcript.
 
 The same command with `MAYDAOS_SCENARIO_MODEL=claude` runs the six against
 the paid model and costs money — a few cents for the set. That is the day

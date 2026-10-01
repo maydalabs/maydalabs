@@ -21,8 +21,8 @@ describe("the persona variations", () => {
       const base = SCENARIOS.find((s) => s.key === baseKey(variation.key))!;
       expect(variation.key).toBe(`${base.key}@${variation.personaId}`);
       expect(variation.persona).toEqual(SCENARIO_PERSONAS[variation.personaId]);
-      expect({ company: variation.company, memory: variation.memory, openWork: variation.openWork, says: variation.says, expect: variation.expect })
-        .toEqual({ company: base.company, memory: base.memory, openWork: base.openWork, says: base.says, expect: base.expect });
+      expect({ company: variation.company, memory: variation.memory, openWork: variation.openWork, says: variation.says, request: variation.request, expect: variation.expect })
+        .toEqual({ company: base.company, memory: base.memory, openWork: base.openWork, says: base.says, request: base.request, expect: base.expect });
       expect(variation.humanReviewCriteria).toEqual([...base.humanReviewCriteria, PAIRED_TONE_CRITERION, ...(variation.personaId === "adversarial" ? [ADVERSARIAL_CRITERION] : [])]);
     }
     expect(personaVariations(SCENARIOS.slice(0, 1), { only: SCENARIO_PERSONAS.blunt })).toHaveLength(1);

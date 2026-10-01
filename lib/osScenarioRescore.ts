@@ -1,12 +1,18 @@
 /* Offline artifact transformation only. The caller supplies immutable data,
  * a pure judge and a hash function. No model, database, network or file I/O. */
-import type { Outcome, Scenario } from "./osScenarios";
+import type { Outcome, Scenario, ScenarioRequest } from "./osScenarios";
 
 export const BASELINE_SOURCE_PATHS = [
-  "lib/osCofounder.ts", "lib/osCofounderRun.ts", "lib/osCofounderLocal.ts", "lib/osPersona.ts",
-  "lib/osScenarioHarness.ts", "lib/osScenarios.ts", "tests/helpers/scenarioFixture.ts",
-  "tests/cofounder.scenarios.test.ts",
+  "lib/osCofounder.ts", "lib/osCofounderLocal.ts", "lib/osPersona.ts",
+  "lib/osScenarioHarness.ts", "lib/osScenarios.ts",
+  "lib/osReviewedTurn.ts", "lib/osReviewIntent.ts", "lib/osReviewEnvelope.ts", "lib/osReviewGuard.ts", "lib/osReviewDate.ts",
+  "lib/osReviewProposalFeedback.ts", "lib/osReviewReceipt.ts", "lib/osReviewTextGate.ts", "lib/osReviewBoundary.ts",
+  "lib/osReviewCitation.ts", "lib/osReviewDuplicate.ts", "lib/osReviewedMemory.ts", "lib/osReviewedScenarioChecks.ts",
+  "tests/helpers/scenarioFixture.ts", "tests/helpers/reviewedScenarioDesk.ts", "tests/cofounder.scenarios.test.ts",
 ] as const;
+/* Failures the judge does not own: side checks of the reviewed loop and the
+ * persona judge. A rescore re-judges the outcome and carries these forward. */
+const CARRIED_PREFIXES = ["reviewed: ", "persona: "];
 const JUDGE_PATH = "lib/osScenarios.ts";
 const ELIGIBLE = new Set(["deterministic_fail", "checks_passed_human_review_pending"]);
 const STATUSES = new Set([...ELIGIBLE, "timed_out", "runtime_error", "unfinished", "running"]);
@@ -39,10 +45,32 @@ function stable(value: unknown): string {
   return JSON.stringify(value);
 }
 function inputShape(scenario: Scenario) {
-  // A persona is an input too: an old report must not be rescored against a
-  // manifest whose persona changed under the same key.
+  // A persona and the person's request selection are inputs too: an old
+  // report must not be rescored against a manifest whose persona or mode
+  // changed under the same key.
   const persona = (scenario as { persona?: unknown }).persona ?? null;
-  return { key: scenario.key, company: scenario.company ?? null, says: scenario.says, memory: scenario.memory ?? [], openWork: scenario.openWork ?? [], persona };
+  return { key: scenario.key, company: scenario.company ?? null, says: scenario.says, memory: scenario.memory ?? [], openWork: scenario.openWork ?? [], persona, request: scenario.request ?? null };
+}
+
+const REQUEST_MODES = ["ask", "draft", "knowledge", "both"];
+const DRAFT_FORMATS = ["email", "reply", "post", "note", "research", "decision"];
+
+/* The same rules as parseReviewRequestIntent (lib/osReviewIntent.ts), inline
+ * because this file must stay free of runtime imports for the offline CLI. */
+export function validateScenarioRequest(value: unknown, label: string): ScenarioRequest {
+  const request = object(value, `${label} request`);
+  if (Object.keys(request).length !== 2 || !Object.hasOwn(request, "mode") || !Object.hasOwn(request, "intent")) throw new Error(`${label} request must have exactly mode and intent.`);
+  const mode = request.mode;
+  if (typeof mode !== "string" || !REQUEST_MODES.includes(mode)) throw new Error(`${label} request mode is invalid.`);
+  const intent = object(request.intent, `${label} request intent`);
+  if (Object.keys(intent).length !== 2 || !Object.hasOwn(intent, "draftFormat") || !Object.hasOwn(intent, "knowledgeAssertion")) throw new Error(`${label} request intent must have exactly draftFormat and knowledgeAssertion.`);
+  const format = intent.draftFormat;
+  const assertion = intent.knowledgeAssertion;
+  if (format !== null && (typeof format !== "string" || !DRAFT_FORMATS.includes(format))) throw new Error(`${label} request draftFormat is invalid.`);
+  if (assertion !== null && (typeof assertion !== "string" || assertion.trim() !== assertion || Array.from(assertion).length < 3 || assertion.length > 2000)) throw new Error(`${label} request knowledgeAssertion is invalid.`);
+  if ((mode === "draft" || mode === "both") ? format === null : format !== null) throw new Error(`${label} request draftFormat does not fit its mode.`);
+  if ((mode === "ask" || mode === "draft") && assertion !== null) throw new Error(`${label} request knowledgeAssertion does not fit its mode.`);
+  return { mode: mode as ScenarioRequest["mode"], intent: { draftFormat: format as ScenarioRequest["intent"]["draftFormat"], knowledgeAssertion: assertion as string | null } };
 }
 
 export function validateManifest(value: unknown): Scenario[] {
@@ -58,6 +86,7 @@ export function validateManifest(value: unknown): Scenario[] {
     if (!says.length || says.some((question) => !question.trim())) throw new Error(`Scenario ${key} has no question.`);
     strings(scenario.humanReviewCriteria, "Human review criteria");
     object(scenario.expect, "Scenario expectations");
+    if (scenario.request !== undefined) validateScenarioRequest(scenario.request, `Scenario ${key}`);
     if (scenario.company !== undefined) {
       const company = object(scenario.company, "Scenario company");
       nonempty(company.name, "Scenario company.name");
@@ -153,6 +182,15 @@ export function snapshotBaselineManifest(report: unknown, manifestValue: unknown
   return JSON.stringify(manifest);
 }
 
+function failureKinds(cases: ObjectValue[]) {
+  const has = (record: ObjectValue, test: (failure: string) => boolean) => Array.isArray(record.failures) && record.failures.some((f) => typeof f === "string" && test(f));
+  return {
+    judge: cases.filter((record) => has(record, (f) => !CARRIED_PREFIXES.some((prefix) => f.startsWith(prefix)))).length,
+    reviewed: cases.filter((record) => has(record, (f) => f.startsWith("reviewed: "))).length,
+    persona: cases.filter((record) => has(record, (f) => f.startsWith("persona: "))).length,
+  };
+}
+
 function summary(cases: ObjectValue[]) {
   return {
     planned: cases.length,
@@ -162,6 +200,7 @@ function summary(cases: ObjectValue[]) {
     timedOut: cases.filter((record) => record.status === "timed_out").length,
     unfinished: cases.filter((record) => ["unfinished", "running"].includes(String(record.status))).length,
     humanReviewed: 0,
+    failureKinds: failureKinds(cases),
   };
 }
 
@@ -190,7 +229,10 @@ export function rescoreBaseline(reportValue: unknown, originalManifestValue: unk
     const eligible = ELIGIBLE.has(String(record.status));
     const previous = { status: record.status, failures: structuredClone(record.failures), humanReview: record.humanReview, reviewCriteria: structuredClone(record.reviewCriteria) };
     if (eligible) {
-      const failures = strings(options.judge(structuredClone(current), structuredClone(record.outcome as Outcome)), "Corrected judge failures");
+      // The judge's verdict is recomputed; the side checks' are carried: they
+      // were made on the saved outcome too, by instruments this file does not hold.
+      const carried = strings(previous.failures, "Original failures").filter((f) => CARRIED_PREFIXES.some((prefix) => f.startsWith(prefix)));
+      const failures = [...strings(options.judge(structuredClone(current), structuredClone(record.outcome as Outcome)), "Corrected judge failures"), ...carried];
       record.status = failures.length ? "deterministic_fail" : "checks_passed_human_review_pending";
       record.failures = failures;
       record.reviewCriteria = structuredClone(current.humanReviewCriteria);
