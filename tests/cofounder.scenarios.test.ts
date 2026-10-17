@@ -49,7 +49,8 @@ type CaseRecord = {
 
 describe.skipIf(!scenarioRunRequested(process.env))("local behavioral baseline (not database integration)", () => {
   it("runs every repetition serially and saves all results, including unfinished/error cases", async () => {
-    const reportParent = process.env.MAYDAOS_SCENARIO_REPORT_DIR ? resolve(process.env.MAYDAOS_SCENARIO_REPORT_DIR) : tmpdir();
+    // Inside the project, git-ignored: durable, beside the code, never published.
+    const reportParent = resolve(process.env.MAYDAOS_SCENARIO_REPORT_DIR ?? ".measurements");
     mkdirSync(reportParent, { recursive: true, mode: 0o700 });
     const reportDir = mkdtempSync(join(reportParent, "maydaos-baseline-"));
     const reportPath = join(reportDir, "report.json");

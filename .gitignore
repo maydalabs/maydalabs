@@ -48,3 +48,6 @@ next-env.d.ts
 # is the one someone runs by mistake six weeks later; supabase/migrations is
 # the only place schema belongs.
 supabase/APPLY_TO_PRODUCTION.sql
+
+# Scenario measurement reports: full prompts and transcripts, never published.
+.measurements/
