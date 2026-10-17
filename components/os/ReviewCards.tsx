@@ -5,6 +5,8 @@ import type { Locale } from "@/lib/i18n";
 import type { ProposalPayload, KnowledgeDuration, KnowledgeScope } from "@/lib/osReviewBoundary";
 import type { DurableProposal, DurableTurn } from "@/lib/osReviewTypes";
 import { ConfirmedReviewRejection, isReviewGuardReason, type ReviewGuardReason } from "@/lib/osReviewGuard";
+import { OS_RUN_COPY } from "@/components/osCopy";
+import { fill } from "@/lib/i18n";
 
 /* A suggestion is not a saved work item or company knowledge. The server owns
  * identity, authorisation, revision checks and the durable receipt. This view
@@ -116,7 +118,16 @@ const COPY = {
 type Copy = (typeof COPY)[Locale];
 type Action = "save_to_work" | "add_to_company_knowledge" | "revise" | "dismiss";
 type Command = { proposalId: string; revision: number; fingerprint: string; action: Action; payload?: ProposalPayload; knowledgeApproved?: true };
-type Props = { proposals: DurableProposal[]; turns?: Pick<DurableTurn, "id" | "intent">[]; locale: Locale; onChange: () => void; disabled?: boolean; onUncertain?: () => void; onRejected?: () => void; onMutationStart?: () => boolean };
+/* A card an agent run prepared says which run, so a person deciding it
+ * knows the instruction it answers. Only the label differs: it is the same
+ * card, decided the same way, by the same person. */
+export type ReviewRunLink = { id: string; instruction: string };
+type Props = { proposals: DurableProposal[]; turns?: Pick<DurableTurn, "id" | "intent">[]; runs?: ReviewRunLink[]; locale: Locale; onChange: () => void; disabled?: boolean; onUncertain?: () => void; onRejected?: () => void; onMutationStart?: () => boolean };
+
+function fromRunLabel(locale: Locale, instruction: string) {
+  const short = Array.from(instruction.trim());
+  return fill(OS_RUN_COPY[locale].fromRun, { instruction: short.length > 80 ? `${short.slice(0, 79).join("")}…` : short.join("") });
+}
 
 const stack: CSSProperties = { display: "grid", gap: "1rem", minWidth: 0 };
 const textStyle: CSSProperties = { margin: 0, whiteSpace: "pre-wrap", overflowWrap: "anywhere", lineHeight: 1.6 };
@@ -164,7 +175,7 @@ export async function sendReviewCommand(command: Command, request: typeof fetch 
   return proposal as DurableProposal;
 }
 
-export function ReviewCards({ proposals, turns = [], locale, onChange, disabled = false, onUncertain, onRejected, onMutationStart }: Props) {
+export function ReviewCards({ proposals, turns = [], runs = [], locale, onChange, disabled = false, onUncertain, onRejected, onMutationStart }: Props) {
   const headingId = useId();
   const copy = COPY[locale];
   if (!proposals.length) return null;
@@ -174,15 +185,17 @@ export function ReviewCards({ proposals, turns = [], locale, onChange, disabled 
         <h2 id={headingId} style={{ fontSize: "1rem", margin: 0 }}>{copy.heading}</h2>
         <p style={subdued}>{copy.intro}</p>
       </div>
-      {proposals.map((proposal) => (
-        <ReviewCard key={`${proposal.id}:${proposal.revision}:${proposal.fingerprint}:${proposal.status}`} initial={proposal} copy={copy} onChange={onChange} disabled={disabled}
-          readOnly={!turns.some((turn) => turn.id === proposal.turn_id && turn.intent != null)} onUncertain={onUncertain} onRejected={onRejected} onMutationStart={onMutationStart} />
-      ))}
+      {proposals.map((proposal) => {
+        const run = runs.find((candidate) => candidate.id === proposal.turn_id);
+        return <ReviewCard key={`${proposal.id}:${proposal.revision}:${proposal.fingerprint}:${proposal.status}`} initial={proposal} copy={copy} onChange={onChange} disabled={disabled}
+          readOnly={!turns.some((turn) => turn.id === proposal.turn_id && turn.intent != null)} fromRun={run ? fromRunLabel(locale, run.instruction) : null}
+          onUncertain={onUncertain} onRejected={onRejected} onMutationStart={onMutationStart} />;
+      })}
     </section>
   );
 }
 
-function ReviewCard({ initial, copy, onChange, disabled, readOnly, onUncertain, onRejected, onMutationStart }: { initial: DurableProposal; copy: Copy; onChange: () => void; disabled: boolean; readOnly: boolean; onUncertain?: () => void; onRejected?: () => void; onMutationStart?: () => boolean }) {
+function ReviewCard({ initial, copy, onChange, disabled, readOnly, fromRun = null, onUncertain, onRejected, onMutationStart }: { initial: DurableProposal; copy: Copy; onChange: () => void; disabled: boolean; readOnly: boolean; fromRun?: string | null; onUncertain?: () => void; onRejected?: () => void; onMutationStart?: () => boolean }) {
   const [proposal, setProposal] = useState(initial);
   const [editing, setEditing] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
@@ -234,6 +247,7 @@ function ReviewCard({ initial, copy, onChange, disabled, readOnly, onUncertain, 
       <header style={{ ...stack, gap: ".35rem" }}>
         <p style={{ ...subdued, color: "var(--os-accent, #42f5b6)" }}>{copy[proposal.status]} · {copy.revision} {proposal.revision}</p>
         <h3 id={titleId} style={{ fontSize: "1rem", margin: 0 }}>{payload.type === "work" ? copy.work : copy.knowledge}</h3>
+        {fromRun ? <p data-from-run="" style={{ ...subdued, justifySelf: "start", padding: ".15rem .5rem", border: "1px solid var(--os-line-2, #2b3442)", borderRadius: "var(--os-radius-sm, .4rem)" }}>{fromRun}</p> : null}
         <p style={subdued}>{copy.model}</p>
       </header>
 

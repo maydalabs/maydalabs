@@ -25,6 +25,9 @@ type SettingsRow = {
 type Script = {
   claimed: Record<string, unknown>[];
   runs?: { cost_usd: number; company_id: string; workflow_id: string }[];
+  /** What agent runs spent today, by company: their ledger rows and holds. */
+  agentRuns?: Record<string, number>;
+  spendError?: boolean;
   settings?: Record<string, SettingsRow>;
   settingsError?: boolean;
 };
@@ -82,7 +85,18 @@ function fakeAdmin(script: Script) {
     };
     return api;
   };
-  const admin = { from, rpc: async () => ({ data: script.claimed, error: null }) };
+  /* public.os_spent_today, as SQL sums it: today's workflow runs plus what
+   * agent runs spent, for one company or (null) for the platform. */
+  const rpc = async (name: string, args?: Record<string, unknown>) => {
+    if (name !== "os_spent_today") return { data: script.claimed, error: null };
+    calls.push({ table: "os_spent_today", op: "rpc", filters: [["p_company", args?.p_company]] });
+    if (script.spendError) return { data: null, error: { message: "down" } };
+    const company = args?.p_company as string | null;
+    const runs = (script.runs ?? []).filter((row) => company === null || row.company_id === company).reduce((total, row) => total + row.cost_usd, 0);
+    const agentRuns = Object.entries(script.agentRuns ?? {}).filter(([id]) => company === null || id === company).reduce((total, [, usd]) => total + usd, 0);
+    return { data: runs + agentRuns, error: null };
+  };
+  const admin = { from, rpc };
   return { admin: admin as unknown as Parameters<typeof runDueWorkflows>[0], calls };
 }
 
@@ -183,6 +197,24 @@ describe("the worker on the company's own key", () => {
     expect(inserts(calls, "os_runs")).toHaveLength(0);
   });
 
+  it("counts what agent runs spent today against the same daily ceiling", async () => {
+    const { admin, calls } = fakeAdmin({
+      claimed: [workflow("a1", "co-a"), workflow("b1", "co-b")],
+      settings: { "co-a": sealed(), "co-b": sealed() },
+      agentRuns: { "co-a": 2.1, "co-b": 0.4 },
+    });
+    const report = await runDueWorkflows(admin, 5, { env: { MAYDAOS_KEY_SECRET: SECRET }, gather, draft: draftStub() });
+    // No workflow run spent anything today; co-a's agent runs did, past the cap.
+    expect(report.outcomes.map((o) => [o.workflow, o.result, "reason" in o ? o.reason : null])).toEqual([["Workflow a1", "skipped", "daily cap"], ["Workflow b1", "drafted", null]]);
+    expect(calls.filter((c) => c.table === "os_runs" && c.op === "select" && !c.filters.some(([column]) => column === "workflow_id"))).toHaveLength(0);
+  });
+
+  it("refuses to spend when today's total cannot be read", async () => {
+    const { admin } = fakeAdmin({ claimed: [workflow("a1", "co-a")], settings: { "co-a": sealed() }, spendError: true });
+    const report = await runDueWorkflows(admin, 5, { env: { MAYDAOS_KEY_SECRET: SECRET }, gather, draft: draftStub() });
+    expect(report.outcomes).toEqual([{ workflow: "Workflow a1", result: "failed", reason: "spend could not be read" }]);
+  });
+
   it("applies the daily ceiling per company on a company key, and reads the settings once per company", async () => {
     const { admin, calls } = fakeAdmin({
       claimed: [workflow("a1", "co-a"), workflow("a2", "co-a"), workflow("b1", "co-b")],
@@ -192,8 +224,8 @@ describe("the worker on the company's own key", () => {
     const report = await runDueWorkflows(admin, 5, { env: { MAYDAOS_KEY_SECRET: SECRET }, gather, draft: draftStub() });
 
     expect(report.outcomes.map((o) => [o.workflow, o.result])).toEqual([["Workflow a1", "skipped"], ["Workflow a2", "skipped"], ["Workflow b1", "drafted"]]);
-    const capReads = calls.filter((c) => c.table === "os_runs" && c.op === "select" && !c.filters.some(([column]) => column === "workflow_id"));
-    expect(capReads.map((c) => c.filters.find(([column]) => column === "company_id")?.[1])).toEqual(["co-a", "co-a", "co-b"]);
+    const capReads = calls.filter((c) => c.table === "os_spent_today");
+    expect(capReads.map((c) => c.filters.find(([column]) => column === "p_company")?.[1])).toEqual(["co-a", "co-a", "co-b"]);
     expect(calls.filter((c) => c.table === "os_model_settings" && c.filters.some(([column]) => column === "company_id"))).toHaveLength(2);
   });
 

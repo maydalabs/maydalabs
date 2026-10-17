@@ -7,7 +7,7 @@ vi.mock("@/components/os/OsCommandBar", () => ({ OS_ASK_EVENT: "synthetic-ask-ev
 
 const pending = { requestId: "10000000-0000-4000-8000-000000000001", message: "Prepare this exact draft.\nDo not send it.", mode: "draft" as const, intent: { draftFormat: "email" as const, knowledgeAssertion: null } };
 const turn: ReviewSnapshot["turns"][number] = { id: pending.requestId, company_id: "company-one", actor_id: "actor-one", thread_id: "thread-one", person_message_id: "message-one", status: "completed", question: pending.message, mode: "draft", intent: pending.intent, reply: "Synthetic reply", created_at: "2026-09-22T12:00:00Z", updated_at: "2026-09-22T12:01:00Z", history: [] };
-const snapshot: ReviewSnapshot = { companyId: "company-one", actorId: "actor-one", turns: [turn], messages: [], proposals: [] };
+const snapshot: ReviewSnapshot = { companyId: "company-one", actorId: "actor-one", turns: [turn], messages: [], proposals: [], runIds: [] };
 
 describe("pending generation recovery identity", () => {
   it("keeps the exact nonce, question text and mode through JSON reload", () => {

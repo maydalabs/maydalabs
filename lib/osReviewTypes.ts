@@ -20,4 +20,7 @@ export type ReviewSnapshot = {
   messages: { id: string; role: "person" | "cofounder"; body: string }[];
   proposals: DurableProposal[];
   turns: DurableTurn[];
+  /** Which loaded turns are agent runs. A run's turn stays running while it
+   * works, for minutes or days; it is never an answer still streaming. */
+  runIds: string[];
 };

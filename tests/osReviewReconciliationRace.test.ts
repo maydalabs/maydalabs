@@ -85,7 +85,7 @@ describe("only the current reconciliation read may change review state", () => {
 });
 
 describe("RSC refresh cannot silently move a client conversation", () => {
-  const current: ReviewSnapshot = { actorId: "founder-one", companyId: "company-one", messages: [], proposals: [], turns: [] };
+  const current: ReviewSnapshot = { actorId: "founder-one", companyId: "company-one", messages: [], proposals: [], turns: [], runIds: [] };
   it("preserves the chat when a same-identity RSC refresh updates other panes", () => {
     expect(reviewIdentityChanged(current, structuredClone(current))).toBe(false);
   });

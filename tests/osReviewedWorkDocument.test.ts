@@ -70,6 +70,45 @@ describe("reviewed Work documents retain readable source attribution", () => {
       expect(html).not.toContain('<ul class="os-doc-sources"></ul>');
     });
   }
+  describe("a follow-up an agent run prepared", () => {
+    const capture = {
+      id: "read:00000000-0000-4000-8000-0000000000d1", companyId: source.companyId, revision: "b".repeat(64), origin: "record",
+      text: "Invoice 42 for Acme\n\nSent 2 October to Dana; no reply yet.",
+    };
+    const runMetadata = { by: "cofounder", review: { authorship: "model", externallyVerified: false,
+      citations: [{ sourceId: source.id, quote: "Please draft a note." }, { sourceId: capture.id, quote: "Invoice 42 for Acme" }] } };
+
+    for (const locale of ["en", "tr", "fr"] as const) {
+      it(`shows the record it follows up under Existing record, with its revision and cited quote, in ${locale}`, () => {
+        const html = render({ sources: [source, capture], metadata: runMetadata }, locale);
+        const copy = OS_DOCUMENT_COPY[locale];
+        expect(html).toContain(copy.founderSource);
+        expect(html).toContain(copy.recordSource);
+        expect(html).toContain(copy.recordAttribution);
+        expect(html).toMatch(/<blockquote[^>]*>Invoice 42 for Acme<\/blockquote>/);
+        expect(html).toContain(capture.revision);
+        expect(html).toContain("Sent 2 October to Dana; no reply yet.");
+        expect(html).not.toContain("href=");
+      });
+    }
+
+    for (const [name, invalid] of [
+      ["a record source named like a message", { ...capture, id: "00000000-0000-4000-8000-0000000000d1" }],
+      ["a founder source named like a capture", { ...capture, origin: "founder" }],
+      ["a capture with no uuid", { ...capture, id: "read:w1" }],
+      ["a capture with an extra url", { ...capture, url: "https://example.com/forged-source" }],
+      ["a capture in no company", { ...capture, companyId: "other" }],
+      ["a capture with a bad revision", { ...capture, revision: "not-a-digest" }],
+    ] as const) {
+      it(`does not present ${name} as evidence`, () => {
+        const html = render({ sources: [invalid], metadata: runMetadata });
+        expect(html).not.toContain(OS_DOCUMENT_COPY.en.recordSource);
+        expect(html).not.toContain(OS_DOCUMENT_COPY.en.founderSource);
+        expect(html).not.toContain("forged-source");
+      });
+    }
+  });
+
   it("escapes source and quote markup and keeps long text wrap-capable", () => {
     const attack = '<img src=x onerror="alert(1)">';
     const html = render({ sources: [{ ...source, text: attack }], metadata: { ...metadata, review: { ...metadata.review, citations: [{ sourceId: source.id, quote: attack }] } } });

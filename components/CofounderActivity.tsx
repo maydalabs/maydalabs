@@ -1,11 +1,15 @@
 import { OsPaneEmpty } from "@/components/os/OsPaneEmpty";
 import Link from "next/link";
 import { DeleteWorkflowButton, MemberWorkflowForm } from "@/components/MemberWorkflowForm";
+import { AgentRunsLive } from "@/components/os/AgentRunsLive";
 import { OS_ACTIVITY_COPY, OS_DESK_COPY, OS_WORKFLOW_COPY } from "@/components/osCopy";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { OS_MAX_WORKFLOWS_PER_MEMBER, formatUsd, toOsWorkflows, isPauseReason } from "@/lib/os";
 import { localizePath, type Locale } from "@/lib/i18n";
+import { currentCompany } from "@/lib/osCompany";
+import { loadAgentRunsNow } from "@/lib/osAgentRunStore";
+import type { AgentRunView } from "@/lib/osAgentRunTypes";
 
 /* The process surface.
  *
@@ -53,6 +57,21 @@ export async function CofounderActivity({ locale, bare = false }: { locale: Loca
   const workflowCopy = OS_WORKFLOW_COPY[locale];
   const shapes = OS_DESK_COPY[locale].shapes;
 
+  /* On the desk, runs come first: they are what is working right now. Read
+   * with the signed-in client, so RLS and the column grants decide what a
+   * member sees — every run of the company, never a checkpoint or a lease.
+   * A failed read hides the section instead of showing it empty: no runs
+   * and runs that could not be read are different facts. */
+  let runs: { runs: AgentRunView[]; serverNow: number; actorId: string; companyId: string } | null = null;
+  if (bare && claims?.sub) {
+    try {
+      const company = await currentCompany(supabase);
+      if (company) runs = { ...await loadAgentRunsNow(supabase, company.id, claims.sub), actorId: claims.sub, companyId: company.id };
+    } catch {
+      runs = null;
+    }
+  }
+
   return (
     <section className="mayda-stack-lg" aria-labelledby="cofounder-activity">
       {bare ? null : (
@@ -62,8 +81,15 @@ export async function CofounderActivity({ locale, bare = false }: { locale: Loca
         </header>
       )}
 
+      {runs ? (
+        <AgentRunsLive locale={locale} initialRuns={runs.runs} serverNow={runs.serverNow}
+          identity={{ actorId: runs.actorId, companyId: runs.companyId }} />
+      ) : null}
+
+      {/* Under a Runs section a run may be working, so the empty line is
+          about workflows only: "nothing runs" beside "Working" is untrue. */}
       {activity.length === 0 ? (
-        <OsPaneEmpty>{copy.empty}</OsPaneEmpty>
+        <OsPaneEmpty>{runs ? copy.emptyWorkflows : copy.empty}</OsPaneEmpty>
       ) : (
         activity.map((row) => {
           const cadence = (row.cadence ?? "manual") as "manual" | "daily" | "weekly";

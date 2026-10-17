@@ -69,7 +69,7 @@ function render(locale: "en" | "tr" | "fr" = "en", snapshot: ReviewSnapshot = em
   return CofounderApp({ initialSnapshot: snapshot, locale, copy: OS_COFOUNDER_CHAT_COPY[locale], canTalk: true, why: null });
 }
 function emptySnapshot(): ReviewSnapshot {
-  return { companyId: "company-one", actorId: "actor-one", messages: [], proposals: [], turns: [] };
+  return { companyId: "company-one", actorId: "actor-one", messages: [], proposals: [], turns: [], runIds: [] };
 }
 function turn(id: string, question: string, mode: "ask" | "draft" | "knowledge" | "both", status: "running" | "completed" = "completed"): ReviewSnapshot["turns"][number] {
   return { id, question, mode, intent: null, status, company_id: "company-one", actor_id: "actor-one", thread_id: "thread-one", person_message_id: "message-one", reply: null, created_at: "2026-09-23T00:00:00Z", updated_at: "2026-09-23T00:01:00Z", history: [] };

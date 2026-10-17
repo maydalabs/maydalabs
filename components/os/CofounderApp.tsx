@@ -1,15 +1,20 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { OS_ASK_EVENT } from "@/components/os/OsCommandBar";
 import { ReviewCards } from "@/components/os/ReviewCards";
 import { ReviewIntentFields, ReviewIntentSummary } from "@/components/os/ReviewIntentFields";
+import { LiveRunPanel, fetchRunFeed, fetchRunQuote, sendRunStart, type RunQuote, type RunStartOutcome } from "@/components/os/RunPanel";
+import { OS_RUNS_CHANGED_EVENT } from "@/components/os/types";
+import { OS_RUN_COPY } from "@/components/osCopy";
 import { readReviewStream } from "@/lib/osReviewStream";
 import { REVIEW_REQUEST_MODES, parseReviewRequestIntent, reviewIntentEquals, type ReviewRequestMode } from "@/lib/osReviewIntent";
 import type { ReviewWorkKind } from "@/lib/osReviewGuard";
 import type { ReviewSnapshot } from "@/lib/osReviewTypes";
-import type { Locale } from "@/lib/i18n";
+import { fill, type Locale } from "@/lib/i18n";
+import { formatUsd } from "@/lib/os";
+import { RUN_LIMITS } from "@/lib/osAgentRunTypes";
 import { pendingQuestionKey, parseLegacyPendingQuestion, parsePendingQuestion, subscribePending, writePending, type LegacyPendingQuestion, type PendingQuestion } from "@/lib/osReviewPending";
 
 export type ChatMessage = { id: string; role: "person" | "cofounder"; body: string };
@@ -29,6 +34,8 @@ const interruptionCopy = {
   tr: { close: "Yarıda kalan yanıtı kapat", help: "Yanıt yarıda kaldıysa üç dakika sonra kapatabilirsiniz. Bu işlem üretimi yeniden başlatmaz ve kayıtlı önerileri silmez.", other: "Devam eden yanıtı başka bir şirket üyesi başlattı. Yarıda kaldıysa o kişinin kapatması gerekir.", failed: "Yanıt hâlâ çalışıyor olabilir, kapatmak için çok yeni olabilir veya sonuç doğrulanamamış olabilir. Tekrar denemeden önce kayıtlı durumu kontrol edin.", closing: "Kapatılıyor…" },
   fr: { close: "Clore la réponse interrompue", help: "Si une réponse a été interrompue, vous pouvez la clore après trois minutes. Cela ne relance pas la génération et ne supprime pas les propositions enregistrées.", other: "Une réponse en cours appartient à un autre membre de l’entreprise. Cette personne doit la clore si elle a été interrompue.", failed: "La réponse peut encore être en cours, être trop récente pour être close, ou le résultat est incertain. Vérifiez les données enregistrées avant de réessayer.", closing: "Clôture…" },
 };
+
+const runHint: CSSProperties = { margin: 0, color: "var(--os-ink-2)", fontSize: "var(--os-t-small)", lineHeight: 1.5, overflowWrap: "anywhere" };
 
 const STORAGE_UNAVAILABLE = "__maydaos_storage_unavailable__";
 function pendingRaw(key: string | null): string | null {
@@ -125,6 +132,30 @@ export function reviewSnapshotNeedsDeskRefresh(previous: ReviewSnapshot | null, 
       old.record_id === proposal.record_id && old.revision === proposal.revision && old.fingerprint === proposal.fingerprint));
 }
 
+/** A run's turn stays running while the run works — minutes, or days while
+ * it waits for an answer. It is never an answer still streaming, so the
+ * chat's running, interrupted and close-interrupted rules read chat turns
+ * only: a run neither blocks the composer nor offers to be closed as
+ * interrupted (SQL refuses that too: agent_run_cancel_instead). */
+export function chatTurnsOf(snapshot: ReviewSnapshot | null): ReviewSnapshot["turns"] {
+  return snapshot ? snapshot.turns.filter((turn) => !snapshot.runIds.includes(turn.id)) : [];
+}
+
+/** Whether another member has a run open from this conversation. Its
+ * instruction is in the log like any person message, and its reply arrives
+ * only when the run ends — minutes, or days if it waits on that member — so
+ * the window says so instead of leaving the instruction looking unanswered. */
+export function othersOpenRun(snapshot: ReviewSnapshot | null): boolean {
+  return !!snapshot && snapshot.turns.some((turn) => snapshot.runIds.includes(turn.id) && turn.actor_id !== snapshot.actorId && turn.status === "running");
+}
+
+/** The viewer's own runs among the loaded turns, newest first. An open run
+ * keeps its turn running; at most one is open per member (SQL). */
+export function ownRunTurnsOf(snapshot: ReviewSnapshot | null): ReviewSnapshot["turns"] {
+  return snapshot ? snapshot.turns.filter((turn) => snapshot.runIds.includes(turn.id) && turn.actor_id === snapshot.actorId)
+    .sort((a, b) => b.created_at.localeCompare(a.created_at)) : [];
+}
+
 export function CofounderApp({ initialSnapshot, locale, copy, canTalk, why }: {
   initialSnapshot: ReviewSnapshot | null; locale: Locale; copy: CofounderCopy; canTalk: boolean; why: string | null;
 }) {
@@ -145,13 +176,18 @@ export function CofounderApp({ initialSnapshot, locale, copy, canTalk, why }: {
   const [reviewPending, setReviewPending] = useState(false);
   const [identityRejected, setIdentityRejected] = useState(false);
   const [readFence] = useState(createReviewReadFence);
+  const [runQuote, setRunQuote] = useState<RunQuote | null | undefined>(undefined);
+  const [runStarting, setRunStarting] = useState(false);
+  const [startAttempt, setStartAttempt] = useState<{ runId: string; instruction: string; draftFormat: ReviewWorkKind } | null>(null);
   const reviewBusy = useRef(false);
   const busy = useRef(false);
+  const announcing = useRef(false);
   const endRef = useRef<HTMLDivElement>(null);
   const composeRef = useRef<HTMLTextAreaElement>(null);
   const modeHelpId = useId();
   const words = recoveryCopy[locale];
   const interruption = interruptionCopy[locale];
+  const runCopy = OS_RUN_COPY[locale];
   const storageKey = snapshot ? pendingQuestionKey(snapshot.actorId, snapshot.companyId) : null;
   const getPending = useCallback(() => pendingRaw(storageKey), [storageKey]);
   const storedPending = useSyncExternalStore(subscribePending, getPending, noServerPending);
@@ -160,9 +196,14 @@ export function CofounderApp({ initialSnapshot, locale, copy, canTalk, why }: {
   const storageUnavailable = storedPending === STORAGE_UNAVAILABLE;
   const storageInvalid = storedPending !== null && !storageUnavailable && !questionPending && !legacyPending;
   const identityChanged = identityRejected || reviewIdentityChanged(snapshot, initialSnapshot);
-  const running = snapshot?.turns.some((turn) => turn.status === "running") ?? false;
-  const ownRunningTurns = snapshot?.turns.filter((turn) => turn.status === "running" && turn.actor_id === snapshot.actorId) ?? [];
-  const blocked = uncertain || storedPending !== null || running || reviewPending || identityChanged;
+  const chatTurns = chatTurnsOf(snapshot);
+  const running = chatTurns.some((turn) => turn.status === "running");
+  const ownRunningTurns = chatTurns.filter((turn) => turn.status === "running" && turn.actor_id === snapshot?.actorId);
+  const blocked = uncertain || storedPending !== null || running || reviewPending || identityChanged || runStarting;
+  const ownRuns = ownRunTurnsOf(snapshot);
+  const ownOpenRun = ownRuns.find((turn) => turn.status === "running") ?? null;
+  const shownRun = ownOpenRun ?? ownRuns[0] ?? null;
+  const companyId = snapshot?.companyId ?? null;
   const displayedMode = pending && questionPending ? questionPending.mode : mode;
   const displayedFormat = pending && questionPending ? questionPending.intent.draftFormat ?? "" : draftFormat;
   const displayedAssertion = pending && questionPending ? questionPending.intent.knowledgeAssertion ?? "" : knowledgeAssertion;
@@ -186,7 +227,12 @@ export function CofounderApp({ initialSnapshot, locale, copy, canTalk, why }: {
     return () => window.removeEventListener(OS_ASK_EVENT, onAsk);
   }, []);
 
-  const reload = useCallback(async (question?: PendingQuestion) => {
+  /* quiet: a read a run asked for (a card landed, the run ended), not one
+   * the person asked for. It keeps every card's own state — an edit half
+   * typed, a decision in flight — so only new cards mount; it says nothing
+   * when all is well; and a failed quiet read changes nothing, because the
+   * run panel shows the run and the person can still check stored progress. */
+  const reload = useCallback(async (question?: PendingQuestion, quiet = false) => {
     if (identityChanged) return false;
     return readFence.read(async () => {
       const raw = pendingRaw(storageKey);
@@ -197,7 +243,7 @@ export function CofounderApp({ initialSnapshot, locale, copy, canTalk, why }: {
       const response = await fetch(`/api/os/review${targetId ? `?requestId=${encodeURIComponent(targetId)}` : ""}`, { cache: "no-store" });
       if (!response.ok) throw new Error("unavailable");
       const next = await response.json() as ReviewSnapshot;
-      if (!next.companyId || !next.actorId || !Array.isArray(next.messages) || !Array.isArray(next.proposals) || !Array.isArray(next.turns)) throw new Error("invalid");
+      if (!next.companyId || !next.actorId || !Array.isArray(next.messages) || !Array.isArray(next.proposals) || !Array.isArray(next.turns) || !Array.isArray(next.runIds)) throw new Error("invalid");
       // Don't silently adopt another company in a stale tab.
       if (snapshot && (next.companyId !== snapshot.companyId || next.actorId !== snapshot.actorId)) throw new Error("identity_changed");
       return { next, hint, legacy, raw };
@@ -207,14 +253,45 @@ export function CofounderApp({ initialSnapshot, locale, copy, canTalk, why }: {
       const missing = !!(hint || legacy) && !matched;
       setSnapshot(next); setMessages(next.messages); setUncertain(missing); setRetryReady(!!hint && missing);
       setRecoveryCheckedRaw(raw !== null && !matched && !hint ? raw : null);
-      setReadVersion((version) => version + 1);
-      setNotice(legacy && missing ? words.legacy : missing ? words.unresolved : raw !== null && !hint && !legacy && !matched ? words.storage : words.saved);
+      if (!quiet) setReadVersion((version) => version + 1);
+      const said = legacy && missing ? words.legacy : missing ? words.unresolved : raw !== null && !hint && !legacy && !matched ? words.storage : words.saved;
+      if (!quiet || said !== words.saved) setNotice(said);
       // Work, Memory, Record, the Brief and command targets are Server
       // Components. Refresh their RSC data after the stored receipt is read;
       // keep this chat's draft/recovery state and the desk's open windows.
       if (reviewSnapshotNeedsDeskRefresh(snapshot, next)) router.refresh();
-    }, () => { setUncertain(true); setRetryReady(false); setNotice(pendingRaw(storageKey) === STORAGE_UNAVAILABLE ? words.storageUnavailable : words.failed); });
+    }, () => {
+      if (quiet) return;
+      setUncertain(true); setRetryReady(false); setNotice(pendingRaw(storageKey) === STORAGE_UNAVAILABLE ? words.storageUnavailable : words.failed);
+    });
   }, [snapshot, storageKey, words, router, readFence, identityChanged]);
+
+  /* A run moves on its own, so it may ask the window to read again — but
+   * only when the window is calm: never over a streaming answer, a card
+   * decision, a start in flight, or a recovery the person has to settle. Each
+   * of those ends with its own read. */
+  const refreshForRun = useCallback(() => {
+    if (busy.current || reviewBusy.current || uncertain || storedPending !== null || identityChanged) return;
+    void reload(undefined, true);
+  }, [reload, uncertain, storedPending, identityChanged]);
+  const announceRuns = () => {
+    announcing.current = true;
+    try { window.dispatchEvent(new CustomEvent(OS_RUNS_CHANGED_EVENT)); } finally { announcing.current = false; }
+  };
+  useEffect(() => {
+    // Stop, Continue or an answer given in another window (Running) closes or
+    // moves this window's run too. Its own announcements it already read.
+    const onRuns = () => { if (!announcing.current) refreshForRun(); };
+    window.addEventListener(OS_RUNS_CHANGED_EVENT, onRuns);
+    return () => window.removeEventListener(OS_RUNS_CHANGED_EVENT, onRuns);
+  }, [refreshForRun]);
+  useEffect(() => {
+    // What a run would cost, read each time Draft is chosen: the month's spend moves.
+    if (mode !== "draft" || !canTalk || !companyId) return;
+    let live = true;
+    fetchRunQuote().then((quote) => { if (live) setRunQuote(quote); }, () => { if (live) setRunQuote(undefined); });
+    return () => { live = false; };
+  }, [mode, canTalk, companyId]);
 
   const beginReviewMutation = () => {
     if (busy.current || reviewBusy.current || identityChanged) return false;
@@ -304,7 +381,57 @@ export function CofounderApp({ initialSnapshot, locale, copy, canTalk, why }: {
     } catch { setUncertain(true); setNotice(interruption.failed); }
     finally { busy.current = false; setPending(false); setInterrupting(null); }
   }
-  const latestStatus = snapshot?.turns[0]?.status;
+
+  /* Start a run: Draft mode, a chosen format, the instruction in the box.
+   * The same words and format keep the same run id, so a deliberate second
+   * press after a lost response replays that run instead of starting
+   * another; changed words get a new id, and SQL's one-open-run-per-member
+   * rule refuses a second run if the first did begin. The text stays in the
+   * box until a run is confirmed. */
+  const instruction = draft.trim();
+  const runTooLong = instruction.length > RUN_LIMITS.instruction;
+  const canStartRun = canTalk && !pending && !blocked && !!snapshot && mode === "draft" && !!draftFormat && !!instruction && !runTooLong && !ownOpenRun;
+  async function startRun() {
+    if (busy.current || reviewBusy.current || !canStartRun || !snapshot || !draftFormat) return;
+    readFence.invalidate();
+    const attempt = startAttempt && startAttempt.instruction === instruction && startAttempt.draftFormat === draftFormat
+      ? startAttempt : { runId: crypto.randomUUID(), instruction, draftFormat };
+    setStartAttempt(attempt);
+    busy.current = true; setRunStarting(true); setNotice(null);
+    try {
+      let outcome: RunStartOutcome = await sendRunStart(attempt, snapshot);
+      if (outcome.kind === "unconfirmed") {
+        // A lost response may follow a begun run: ask for it by its id first.
+        const found = await fetchRunFeed(attempt.runId).catch(() => null);
+        if (found?.run.mine) outcome = { kind: "started", run: found.run };
+      }
+      if (outcome.kind === "started") {
+        setStartAttempt(null); setDraft(""); setMode("ask"); setDraftFormat(""); setKnowledgeAssertion("");
+        // The instruction is now the person's message in the conversation.
+        await reload();
+        announceRuns();
+      } else if (outcome.kind === "identity_changed") {
+        setIdentityRejected(true);
+      } else if (outcome.kind === "refused") {
+        // Nothing began, so the next press may take a fresh id.
+        setStartAttempt(null);
+        setNotice(outcome.error === "agent_run_active" ? runCopy.active : outcome.error === "budget" ? runCopy.budget
+          : outcome.error === "not_configured" ? copy.notConfigured : `${words.refused} (${outcome.error})`);
+      } else {
+        setNotice(runCopy.unconfirmed);
+      }
+    } finally { busy.current = false; setRunStarting(false); }
+  }
+  const fillFollowUps = () => {
+    setDraft(runCopy.templateFollowUpsText); setDraftFormat("reply"); composeRef.current?.focus();
+  };
+  const runCost = runQuote === undefined || runQuote === null ? null
+    : !runQuote.priced ? runCopy.startCostLocal
+    // SQL refuses a run that could spend less than ten cents, or less than its
+    // first rounds would be held at; the quote is then 0. Say so before the press.
+    : runQuote.maxUsd < 0.1 ? runCopy.budget
+    : fill(runCopy.startCostPriced, { max: formatUsd(runQuote.maxUsd), left: formatUsd(runQuote.leftUsd) });
+  const latestStatus = chatTurns[0]?.status;
   return (
     <div className="os-chat">
       <div className="os-chat-log">
@@ -316,6 +443,7 @@ export function CofounderApp({ initialSnapshot, locale, copy, canTalk, why }: {
         <div ref={endRef} />
       </div>
       {running ? <p role="status" className="os-chat-notice">{words.running}</p> : latestStatus === "failed" ? <p className="os-chat-notice">{words.stopped}</p> : null}
+      {othersOpenRun(snapshot) ? <p role="status" className="os-chat-notice">{runCopy.otherRunOpen}</p> : null}
       {ownRunningTurns.length ? <div style={{ display: "grid", gap: ".6rem", minWidth: 0 }}>
         <p className="os-chat-notice">{interruption.help}</p>
         {ownRunningTurns.map((turn) => <div key={turn.id} style={{ display: "grid", gap: ".4rem", minWidth: 0 }}>
@@ -337,7 +465,13 @@ export function CofounderApp({ initialSnapshot, locale, copy, canTalk, why }: {
       </div> : null}
       {recoveryCheckedRaw === storedPending && (legacyPending || storageInvalid) ? <button type="button" className="mayda-button mayda-button-outline" onClick={discardOldHint}>{words.discard}</button> : null}
       <button type="button" className="mayda-button" disabled={pending || reviewPending || identityChanged} onClick={() => void reload()}>{words.reload}</button>
-      {snapshot ? <ReviewCards key={readVersion} proposals={snapshot.proposals} turns={snapshot.turns} locale={locale} disabled={uncertain || storedPending !== null || pending || reviewPending || identityChanged} onMutationStart={beginReviewMutation} onUncertain={uncertainReviewMutation} onRejected={rejectedReviewMutation} onChange={() => void reconcileReviewMutation()} /> : null}
+      {snapshot && shownRun ? <LiveRunPanel key={shownRun.id} runId={shownRun.id} locale={locale}
+        identity={identityChanged ? null : { actorId: snapshot.actorId, companyId: snapshot.companyId }}
+        knownCards={snapshot.proposals.filter((proposal) => proposal.turn_id === shownRun.id).length} turnOpen={shownRun.status === "running"}
+        onCardsChanged={refreshForRun} onFinished={() => { refreshForRun(); router.refresh(); }} /> : null}
+      {snapshot ? <ReviewCards key={readVersion} proposals={snapshot.proposals} turns={snapshot.turns}
+        runs={snapshot.turns.filter((turn) => snapshot.runIds.includes(turn.id)).map((turn) => ({ id: turn.id, instruction: turn.question }))}
+        locale={locale} disabled={uncertain || storedPending !== null || pending || reviewPending || identityChanged} onMutationStart={beginReviewMutation} onUncertain={uncertainReviewMutation} onRejected={rejectedReviewMutation} onChange={() => void reconcileReviewMutation()} /> : null}
       <form style={{ display: "grid", gap: "var(--os-gap-2)", minWidth: 0 }} onSubmit={(event) => { event.preventDefault(); void send(); }}>
         <fieldset disabled={!canTalk || pending || blocked || !snapshot} aria-describedby={modeHelpId}
           style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
@@ -359,7 +493,19 @@ export function CofounderApp({ initialSnapshot, locale, copy, canTalk, why }: {
             rows={2} maxLength={8000} disabled={!canTalk || pending || blocked || !snapshot}
             onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); void send(); } }} />
           <button type="submit" className="mayda-button" style={{ marginInlineStart: "auto" }} disabled={!canTalk || pending || blocked || !snapshot || !draft.trim() || !composerIntent}>{pending ? copy.sending : copy.modes[mode].submit}</button>
+          {displayedMode === "draft" ? <button type="button" className="mayda-button mayda-button-outline" data-start-run="" disabled={!canStartRun}
+            onClick={() => void startRun()}>{runStarting ? runCopy.starting : runCopy.startRun}</button> : null}
         </div>
+        {displayedMode === "draft" ? <div style={{ display: "grid", gap: ".45rem", minWidth: 0 }}>
+          <p style={runHint}>{runCopy.startHelp}</p>
+          {!draftFormat ? <p style={runHint}>{runCopy.needsFormat}</p> : null}
+          {ownOpenRun ? <p className="os-chat-notice" role="status">{runCopy.active}</p> : null}
+          {runTooLong ? <p className="os-chat-notice" role="alert">{runCopy.tooLong}</p> : null}
+          {runCost ? <p style={runHint}>{runCost}</p> : null}
+          <div><button type="button" className="mayda-button mayda-button-outline" data-run-template="follow-ups"
+            style={{ maxWidth: "100%", whiteSpace: "normal", overflowWrap: "anywhere" }} disabled={!canTalk || pending || blocked || !snapshot}
+            onClick={fillFollowUps}>{runCopy.templateFollowUps}</button></div>
+        </div> : null}
       </form>
     </div>
   );

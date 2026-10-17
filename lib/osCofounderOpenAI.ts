@@ -83,7 +83,7 @@ export function openAiCompatibleTurn(settings: OpenAiCompatibleSettings, fetcher
   if (!isAllowedBaseUrl(settings.baseUrl)) throw new Error("model provider: base URL must be https");
   const endpoint = `${settings.baseUrl.replace(/\/+$/, "")}/chat/completions`;
 
-  return async function* turn({ system, messages, tools, signal }): AsyncIterable<ModelEvent> {
+  return async function* turn({ system, messages, tools, signal, accepted }): AsyncIterable<ModelEvent> {
     signal?.throwIfAborted();
     const toolList = toOpenAiTools(tools);
     const response = await fetcher(endpoint, {
@@ -107,6 +107,8 @@ export function openAiCompatibleTurn(settings: OpenAiCompatibleSettings, fetcher
       // the request and is not repeated.
       throw new Error(`model provider: ${response.status}`);
     }
+    // A 2xx with a body: the provider took the request, which may now be billed.
+    accepted?.();
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();

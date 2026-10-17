@@ -6,6 +6,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient, getVerifiedClaims } from "@/lib/supabase/server";
 import { draftFromSources } from "@/lib/osDraft";
 import { getOsBetaAccess } from "@/lib/osBetaAccess";
+import { spentToday } from "@/lib/osSpentToday";
 import { gatherSources } from "@/lib/osGather";
 import {
   asStandingSources,
@@ -109,15 +110,11 @@ export async function runOsDraftAction(_prev: OsRunState, formData: FormData): P
     };
   }
 
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
-  const { data: todayRuns, error: todayError } = await admin
-    .from("os_runs")
-    .select("cost_usd")
-    .gte("created_at", today.toISOString());
-  if (todayError || !todayRuns) return { status: "error", code: "save_failed" };
-  const spentToday = todayRuns.reduce((total, row) => total + Number(row.cost_usd ?? 0), 0);
-  if (spentToday >= DAILY_USD_CAP) return { status: "error", code: "daily_cap" };
+  // Across everything on the platform's key, agent runs included: they spend
+  // under the same ceiling (lib/osSpentToday.ts).
+  const spent = await spentToday(admin, null);
+  if (spent === null) return { status: "error", code: "save_failed" };
+  if (spent >= DAILY_USD_CAP) return { status: "error", code: "daily_cap" };
 
   const { sources, failures } = await gatherSources(standing, urls, {
     maxSources: workflow.max_sources,

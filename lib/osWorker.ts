@@ -24,6 +24,7 @@ import { pickDraft, type PickedDraft } from "@/lib/osDraftModel";
 import { gatherSources } from "@/lib/osGather";
 import { openKey } from "@/lib/osKeyVault";
 import { costUsdAt, readSealedModelSettings } from "@/lib/osModelSettings";
+import { spentToday } from "@/lib/osSpentToday";
 import {
   asStandingSources,
   monthStart,
@@ -133,11 +134,10 @@ async function resumeKeyed(admin: Admin) {
     .in("company_id", data.map((row) => row.company_id));
 }
 
-async function spentSince(admin: Admin, since: Date, scope: { workflowId?: string; companyId?: string } = {}): Promise<number | null> {
-  let query = admin.from("os_runs").select("cost_usd").gte("created_at", since.toISOString());
-  if (scope.workflowId) query = query.eq("workflow_id", scope.workflowId);
-  if (scope.companyId) query = query.eq("company_id", scope.companyId);
-  const { data, error } = await query;
+/* A workflow's own spend since a moment: its monthly budget. The day's
+ * ceiling is everyone's and is read from lib/osSpentToday.ts. */
+async function spentSince(admin: Admin, since: Date, workflowId: string): Promise<number | null> {
+  const { data, error } = await admin.from("os_runs").select("cost_usd").gte("created_at", since.toISOString()).eq("workflow_id", workflowId);
   if (error || !data) return null;
   return data.reduce((total, row) => total + Number(row.cost_usd ?? 0), 0);
 }
@@ -240,20 +240,20 @@ export async function runDueWorkflows(
     // The daily ceiling is read fresh inside the loop: five workflows in one
     // tick could otherwise blow through it together, each having checked a
     // total that did not yet include the others. On a company's key the
-    // ceiling is the company's; on the platform's it is everyone's.
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-    const spentToday = await spentSince(admin, today, picked.price ? { companyId } : {});
-    if (spentToday === null) {
+    // ceiling is the company's; on the platform's it is the platform's day:
+    // every workflow run, and every agent run on the platform's key. Agent
+    // runs spend under the same ceiling, so the total is theirs too.
+    const spent = await spentToday(admin, picked.price ? companyId : null);
+    if (spent === null) {
       outcomes.push({ workflow: label, result: "failed", reason: "spend could not be read" });
       continue;
     }
-    if (spentToday >= DAILY_USD_CAP) {
+    if (spent >= DAILY_USD_CAP) {
       outcomes.push({ workflow: label, result: "skipped", reason: "daily cap" });
       continue;
     }
 
-    const spentThisMonth = await spentSince(admin, monthStart(), { workflowId: workflow.id });
+    const spentThisMonth = await spentSince(admin, monthStart(), workflow.id);
     if (spentThisMonth === null) {
       outcomes.push({ workflow: label, result: "failed", reason: "spend could not be read" });
       continue;

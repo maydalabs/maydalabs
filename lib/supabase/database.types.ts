@@ -261,6 +261,259 @@ export type Database = {
         }
         Relationships: []
       }
+      os_agent_run_reads: {
+        Row: {
+          company_id: string
+          created_at: string
+          due_on: string | null
+          id: string
+          item_id: string
+          item_updated_at: string
+          kind: string
+          lane: string
+          ref: string
+          required_action: string | null
+          run_id: string
+          source_text: string
+          status: string
+          title: string
+          waiting_days: number
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          due_on?: string | null
+          id?: string
+          item_id: string
+          item_updated_at: string
+          kind: string
+          lane: string
+          ref: string
+          required_action?: string | null
+          run_id: string
+          source_text: string
+          status: string
+          title: string
+          waiting_days: number
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          due_on?: string | null
+          id?: string
+          item_id?: string
+          item_updated_at?: string
+          kind?: string
+          lane?: string
+          ref?: string
+          required_action?: string | null
+          run_id?: string
+          source_text?: string
+          status?: string
+          title?: string
+          waiting_days?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_agent_run_reads_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_agent_run_reads_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "os_agent_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      os_agent_run_rounds: {
+        Row: {
+          company_id: string
+          hold_usd: number
+          reserved_at: string
+          round: number
+          run_id: string
+        }
+        Insert: {
+          company_id: string
+          hold_usd: number
+          reserved_at?: string
+          round: number
+          run_id: string
+        }
+        Update: {
+          company_id?: string
+          hold_usd?: number
+          reserved_at?: string
+          round?: number
+          run_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_agent_run_rounds_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "os_agent_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      os_agent_run_usage: {
+        Row: {
+          company_id: string
+          cost_usd: number
+          estimated: boolean
+          input_tokens: number
+          output_tokens: number
+          recorded_at: string
+          round: number
+          run_id: string
+        }
+        Insert: {
+          company_id: string
+          cost_usd: number
+          estimated?: boolean
+          input_tokens: number
+          output_tokens: number
+          recorded_at?: string
+          round: number
+          run_id: string
+        }
+        Update: {
+          company_id?: string
+          cost_usd?: number
+          estimated?: boolean
+          input_tokens?: number
+          output_tokens?: number
+          recorded_at?: string
+          round?: number
+          run_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_agent_run_usage_run_id_round_fkey"
+            columns: ["run_id", "round"]
+            isOneToOne: true
+            referencedRelation: "os_agent_run_rounds"
+            referencedColumns: ["run_id", "round"]
+          },
+        ]
+      }
+      os_agent_runs: {
+        Row: {
+          actor_id: string
+          answer: string | null
+          answered_at: string | null
+          asked: boolean
+          cards: number
+          ceiling_usd: number
+          checkpoint: Json
+          company_id: string
+          cost_usd: number
+          created_at: string
+          finished_at: string | null
+          id: string
+          input_tokens: number
+          item_reads: number
+          lease_id: string | null
+          lease_until: string | null
+          model_label: string
+          output_tokens: number
+          payer: string
+          plan: Json | null
+          priced: boolean
+          progress: Json
+          question: Json | null
+          rounds: number
+          seq: number
+          slices: number
+          status: string
+          stop_reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          actor_id: string
+          answer?: string | null
+          answered_at?: string | null
+          asked?: boolean
+          cards?: number
+          ceiling_usd: number
+          checkpoint?: Json
+          company_id: string
+          cost_usd?: number
+          created_at?: string
+          finished_at?: string | null
+          id: string
+          input_tokens?: number
+          item_reads?: number
+          lease_id?: string | null
+          lease_until?: string | null
+          model_label: string
+          output_tokens?: number
+          payer: string
+          plan?: Json | null
+          priced: boolean
+          progress?: Json
+          question?: Json | null
+          rounds?: number
+          seq?: number
+          slices?: number
+          status?: string
+          stop_reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          actor_id?: string
+          answer?: string | null
+          answered_at?: string | null
+          asked?: boolean
+          cards?: number
+          ceiling_usd?: number
+          checkpoint?: Json
+          company_id?: string
+          cost_usd?: number
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          input_tokens?: number
+          item_reads?: number
+          lease_id?: string | null
+          lease_until?: string | null
+          model_label?: string
+          output_tokens?: number
+          payer?: string
+          plan?: Json | null
+          priced?: boolean
+          progress?: Json
+          question?: Json | null
+          rounds?: number
+          seq?: number
+          slices?: number
+          status?: string
+          stop_reason?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_agent_runs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "os_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "os_agent_runs_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "os_review_turns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       os_approvals: {
         Row: {
           action: string
@@ -1920,6 +2173,118 @@ export type Database = {
         Args: { p_action: string; p_item_id: string }
         Returns: boolean
       }
+      os_agent_run_cancel: {
+        Args: { p_actor: string; p_company: string; p_id: string }
+        Returns: Json
+      }
+      os_agent_run_finish: {
+        Args: {
+          p_actor: string
+          p_company: string
+          p_faults: number
+          p_id: string
+          p_lease: string
+          p_refused: number
+          p_seq: number
+          p_status: string
+          p_stop_reason: string
+          p_text: string
+        }
+        Returns: Json
+      }
+      os_agent_run_propose: {
+        Args: {
+          p_actor: string
+          p_company: string
+          p_id: string
+          p_lease: string
+          p_payload: Json
+          p_proposal: string
+          p_read: string
+        }
+        Returns: Json
+      }
+      os_agent_run_read: {
+        Args: {
+          p_actor: string
+          p_company: string
+          p_id: string
+          p_item: string
+          p_lease: string
+          p_ref: string
+        }
+        Returns: Json
+      }
+      os_agent_run_release: {
+        Args: {
+          p_actor: string
+          p_company: string
+          p_id: string
+          p_lease: string
+        }
+        Returns: Json
+      }
+      os_agent_run_resume: {
+        Args: {
+          p_action: string
+          p_actor: string
+          p_answer: string
+          p_company: string
+          p_id: string
+          p_lease_seconds: number
+          p_seq: number
+        }
+        Returns: Json
+      }
+      os_agent_run_round: {
+        Args: {
+          p_actor: string
+          p_company: string
+          p_daily_cap: number
+          p_id: string
+          p_lease: string
+          p_projected_usd: number
+          p_seq: number
+        }
+        Returns: Json
+      }
+      os_agent_run_start: {
+        Args: {
+          p_actor: string
+          p_cap_usd: number
+          p_company: string
+          p_daily_cap: number
+          p_draft_format: string
+          p_id: string
+          p_instruction: string
+          p_lease_seconds: number
+          p_min_usd: number
+          p_model_label: string
+          p_payer: string
+        }
+        Returns: Json
+      }
+      os_agent_run_step: {
+        Args: {
+          p_actor: string
+          p_company: string
+          p_id: string
+          p_lease: string
+          p_patch: Json
+          p_seq: number
+        }
+        Returns: Json
+      }
+      os_agent_run_usage: {
+        Args: {
+          p_cost: number
+          p_id: string
+          p_input: number
+          p_output: number
+          p_round: number
+        }
+        Returns: Json
+      }
       os_chat_spent_this_month: {
         Args: { p_company_id: string }
         Returns: number
@@ -2030,6 +2395,7 @@ export type Database = {
         Returns: Json
       }
       os_spend_credit: { Args: { p_user_id: string }; Returns: number }
+      os_spent_today: { Args: { p_company: string }; Returns: number }
     }
     Enums: {
       [_ in never]: never

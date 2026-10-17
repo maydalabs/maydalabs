@@ -19,6 +19,10 @@ export type OsWindowKey = OsAppId | OsDocumentKey;
 
 export const OS_OPEN_ITEM_EVENT = "maydaos:open-item";
 export const OS_OPEN_APP_EVENT = "maydaos:open-app";
+/* A run was started, continued, answered or stopped from one window: every
+ * other view of runs (the co-founder's panel, Running) reads again. It
+ * carries nothing; each view asks the server for what it shows. */
+export const OS_RUNS_CHANGED_EVENT = "maydaos:runs-changed";
 
 export function documentKey(itemId: string): OsDocumentKey {
   return `item:${itemId}`;

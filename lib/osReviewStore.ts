@@ -188,9 +188,19 @@ export async function loadReviewSnapshot(db: Db, companyId: string, actorId: str
     if (m.role !== "person" && m.role !== "cofounder") throw new Error("review_invalid_transcript");
     return { id: m.id, role: m.role, body: m.body };
   }).reverse();
+  // Agent runs among the loaded turns, through the same RLS (20261017200000:
+  // this read must deploy after that migration). A failed read is not "none".
+  const turnIds = turns.data!.map((turn) => turn.id);
+  let runIds: string[] = [];
+  if (turnIds.length) {
+    const runs = await db.from("os_agent_runs").select("id").eq("company_id", companyId).in("id", turnIds);
+    if (runs.error || !Array.isArray(runs.data)) throw new Error("review_read_unavailable");
+    runIds = runs.data.map((run) => run.id).filter((id) => turnIds.includes(id));
+  }
   return { companyId, actorId, messages: chat,
     proposals: proposals.data!.map((item) => proposalReceipt(item, { companyId, actorId })),
     turns: turns.data!.map((item) => turnReceipt(item, { companyId })),
+    runIds,
   };
 }
 

@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { CofounderApp } from "@/components/os/CofounderApp";
 import { REVIEW_INTENT_COPY, ReviewIntentFields, ReviewIntentSummary } from "@/components/os/ReviewIntentFields";
-import { OS_COFOUNDER_CHAT_COPY } from "@/components/osCopy";
+import { OS_COFOUNDER_CHAT_COPY, OS_RUN_COPY } from "@/components/osCopy";
 import type { ReviewSnapshot } from "@/lib/osReviewTypes";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
@@ -11,7 +11,7 @@ vi.mock("@/components/os/OsCommandBar", () => ({ OS_ASK_EVENT: "synthetic-ask-ev
 vi.mock("@/components/os/ReviewCards", () => ({ ReviewCards: () => null }));
 
 const snapshot: ReviewSnapshot = {
-  companyId: "synthetic-company", actorId: "synthetic-actor", messages: [], turns: [], proposals: [],
+  companyId: "synthetic-company", actorId: "synthetic-actor", messages: [], turns: [], proposals: [], runIds: [],
 };
 
 describe("co-founder request composer", () => {
@@ -35,6 +35,29 @@ describe("co-founder request composer", () => {
     expect(describedBy).toBeTruthy();
     expect(html).toContain(`<p id="${describedBy}"`);
     expect(html).toContain("flex-wrap:wrap");
+  });
+
+  it.each(["en", "tr", "fr"] as const)("offers Start a run only once Draft is chosen, in %s", (locale) => {
+    const html = renderToStaticMarkup(createElement(CofounderApp, { initialSnapshot: snapshot, locale, copy: OS_COFOUNDER_CHAT_COPY[locale], canTalk: true, why: null }));
+    expect(html).not.toContain(OS_RUN_COPY[locale].startRun);
+    expect(html).not.toContain(OS_RUN_COPY[locale].startHelp);
+  });
+
+  it("does not treat a running agent run's turn as an answer still streaming", () => {
+    const copy = OS_COFOUNDER_CHAT_COPY.en;
+    const turn: ReviewSnapshot["turns"][number] = {
+      id: "synthetic-run", company_id: "synthetic-company", actor_id: "synthetic-actor", thread_id: "synthetic-thread", person_message_id: "synthetic-message",
+      status: "running", question: "Prepare follow-ups.", mode: "draft", intent: { draftFormat: "reply", knowledgeAssertion: null }, reply: null,
+      created_at: "2026-10-17T10:00:00Z", updated_at: "2026-10-17T10:00:00Z", history: [],
+    };
+    const asRun = renderToStaticMarkup(createElement(CofounderApp, { initialSnapshot: { ...snapshot, turns: [turn], runIds: [turn.id] }, locale: "en", copy, canTalk: true, why: null }));
+    expect(asRun).not.toContain("Close interrupted answer");
+    expect(asRun).not.toContain("An answer has not finished saving");
+    expect(asRun).not.toMatch(/<textarea[^>]*disabled=""/);
+    // The same turn, were it a chat answer, would still hold the composer.
+    const asChat = renderToStaticMarkup(createElement(CofounderApp, { initialSnapshot: { ...snapshot, turns: [turn] }, locale: "en", copy, canTalk: true, why: null }));
+    expect(asChat).toContain("Close interrupted answer");
+    expect(asChat).toMatch(/<textarea[^>]*disabled=""/);
   });
 });
 

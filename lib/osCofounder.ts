@@ -4,6 +4,7 @@ import { pauseReasonText } from "@/lib/os";
 import type { Database } from "@/lib/supabase/database.types";
 import { MEMORY_REVIEW_COLUMNS, memoryCandidateFilter, memoryRows, inspectMemoryReview } from "@/lib/osReviewedMemory";
 import type { ReviewRequestMode, ReviewRequestIntent } from "@/lib/osReviewIntent";
+import { RUN_TOOL_DEFINITIONS, type RunToolName } from "@/lib/osAgentRunToolDefs";
 
 /* The co-founder.
  *
@@ -38,9 +39,14 @@ export type ModelTurn = (args: {
   messages: { role: "user" | "assistant"; content: unknown }[];
   tools?: readonly CofounderToolName[];
   signal?: AbortSignal;
+  /* Called once the provider has taken the request — its 2xx response
+   * began — before any event. A priced adapter must call it: an agent run
+   * ledgers a call that failed before it at zero (refused, nothing billed)
+   * and one that failed after it at its hold. The chat loop does not ask. */
+  accepted?: () => void;
 }) => AsyncIterable<ModelEvent>;
 
-export type CofounderToolName = "file_work" | "remember" | "propose_work" | "propose_knowledge";
+export type CofounderToolName = "file_work" | "remember" | "propose_work" | "propose_knowledge" | RunToolName;
 
 export const FILE_WORK_TOOL = {
   name: "file_work",
@@ -105,7 +111,7 @@ export const PROPOSE_KNOWLEDGE_TOOL = {
   }, required: ["kind", "scope", "duration"] },
 };
 export function cofounderTools(names: readonly CofounderToolName[] = ["file_work", "remember"]) {
-  return [FILE_WORK_TOOL, REMEMBER_TOOL, PROPOSE_WORK_TOOL, PROPOSE_KNOWLEDGE_TOOL].filter((tool) => names.includes(tool.name as CofounderToolName));
+  return [FILE_WORK_TOOL, REMEMBER_TOOL, PROPOSE_WORK_TOOL, PROPOSE_KNOWLEDGE_TOOL, ...RUN_TOOL_DEFINITIONS].filter((tool) => names.includes(tool.name as CofounderToolName));
 }
 
 const reviewModeInstruction: Record<ReviewRequestMode, string> = {

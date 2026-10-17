@@ -1,8 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cofounderTools, type CofounderToolName, type ModelEvent, type ModelTurn } from "@/lib/osCofounder";
-import { localTurn } from "@/lib/osCofounderLocal";
+import { localTurn, toOllamaTools } from "@/lib/osCofounderLocal";
 import { anthropicTurn } from "@/lib/osCofounderModel";
 import { OS_MODEL } from "@/lib/os";
+import { toOpenAiTools } from "@/lib/osCofounderOpenAI";
+import { reviewToolsForIntent } from "@/lib/osReviewIntent";
+import { runReviewedTurn } from "@/lib/osReviewedTurn";
+import { RUN_TOOL_DEFINITIONS, RUN_TOOL_NAMES } from "@/lib/osAgentRunToolDefs";
 
 const sdk = vi.hoisted(() => ({ stream: vi.fn() }));
 
@@ -173,5 +177,53 @@ describe("paid adapter tool availability through a mocked SDK", () => {
       { type: "done", stopReason: "tool_use", inputTokens: 47, outputTokens: 11 },
     ]);
     expect(stream.finalMessage).toHaveBeenCalledTimes(1);
+  });
+});
+
+/* The run tools are wired into the same seam so the three adapters can send
+ * them, and into nothing else: every existing selection is what it was, and
+ * the chat loop still refuses a run tool by name. */
+describe("agent run tools in the shared seam", () => {
+  it("resolve each of the six run names to its own definition", () => {
+    for (const name of RUN_TOOL_NAMES) {
+      const [tool] = cofounderTools([name]);
+      expect(tool).toBe(RUN_TOOL_DEFINITIONS.find((definition) => definition.name === name));
+    }
+    expect(cofounderTools([...RUN_TOOL_NAMES]).map((tool) => tool.name)).toEqual([...RUN_TOOL_NAMES]);
+    expect(toOllamaTools(["search_record"])[0].function.name).toBe("search_record");
+    expect(toOpenAiTools(["propose_draft"])[0].function.parameters).toMatchObject({ additionalProperties: false, required: ["ref", "title", "body"] });
+  });
+
+  it("leave the default and every chat selection unchanged", () => {
+    expect(cofounderTools().map((tool) => tool.name)).toEqual(["file_work", "remember"]);
+    expect(cofounderTools(["propose_work", "propose_knowledge"]).map((tool) => tool.name)).toEqual(["propose_work", "propose_knowledge"]);
+    expect(reviewToolsForIntent("ask", { draftFormat: null, knowledgeAssertion: null })).toEqual([]);
+    expect(reviewToolsForIntent("draft", { draftFormat: "reply", knowledgeAssertion: null })).toEqual(["propose_work"]);
+    expect(reviewToolsForIntent("knowledge", { draftFormat: null, knowledgeAssertion: "Invoices are due in 14 days." })).toEqual(["propose_knowledge"]);
+    expect(reviewToolsForIntent("both", { draftFormat: "note", knowledgeAssertion: "Invoices are due in 14 days." })).toEqual(["propose_work", "propose_knowledge"]);
+  });
+
+  it("are refused by name in the chat loop, which runs none of them", async () => {
+    const turn: ModelTurn = async function* ({ messages }) {
+      if (messages.length === 1) {
+        yield { type: "tool", id: "t1", name: "search_record", input: {} };
+        yield { type: "tool", id: "t2", name: "propose_draft", input: { ref: "w1", title: "T", body: "B" } };
+        yield { type: "done", stopReason: "tool_use", inputTokens: 1, outputTokens: 1 };
+      } else {
+        yield { type: "text", text: "I can only prepare review suggestions here." };
+        yield { type: "done", stopReason: "end_turn", inputTokens: 1, outputTokens: 1 };
+      }
+    };
+    const propose = vi.fn();
+    const events: { type: string; reason?: string }[] = [];
+    for await (const event of runReviewedTurn({
+      mode: "draft", intent: { draftFormat: "reply", knowledgeAssertion: null }, source: { id: "message-1", text: "Prepare a reply." },
+      system: "s", history: [{ role: "person", body: "Prepare a reply." }], turn, priced: false, propose,
+    })) events.push(event);
+    expect(propose).not.toHaveBeenCalled();
+    expect(events.filter((event) => event.type === "refused").map((event) => event.reason)).toEqual([
+      "This action is unavailable. The co-founder can only prepare review proposals; it cannot save, approve, execute or send them.",
+      "This action is unavailable. The co-founder can only prepare review proposals; it cannot save, approve, execute or send them.",
+    ]);
   });
 });

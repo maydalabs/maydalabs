@@ -69,7 +69,7 @@ function proposal(): DurableProposal {
   };
 }
 function snapshot(): ReviewSnapshot {
-  return { companyId: "company-one", actorId: "actor-one", messages: [], proposals: [proposal()], turns: [] };
+  return { companyId: "company-one", actorId: "actor-one", messages: [], proposals: [proposal()], turns: [], runIds: [] };
 }
 function cardHarness(initial = proposal(), capturedIntent = true) {
   const callbacks = { onChange: vi.fn(), onUncertain: vi.fn(), onRejected: vi.fn(), onMutationStart: vi.fn(() => true) };

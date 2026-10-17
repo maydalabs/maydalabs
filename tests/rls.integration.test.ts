@@ -26,6 +26,8 @@ import {
 } from "@/lib/osCofounder";
 import { runCofounderTurn } from "@/lib/osCofounderRun";
 import { currentCompany } from "@/lib/osCompany";
+import { listMemory, openCardItems, readEvents, searchRecord } from "@/lib/osAgentRunReads";
+import { AGENT_RUN_PUBLIC_COLUMNS } from "@/lib/osAgentRunTypes";
 
 /* A model that says exactly what a test needs it to say, one scripted round
  * at a time. The loop above it — tool calls, capping, accounting — is the
@@ -2807,6 +2809,147 @@ describe.skipIf(!isLocalStack)("row-level security", () => {
       const write = await outsider.from("os_company_members").update({ address_as: "Theirs" }, { count: "exact" }).eq("company_id", companyId).eq("user_id", idB);
       expect(write.error).toBeNull();
       expect(write.count).toBe(0);
+    });
+  });
+
+  /* Agent runs (20261017200000): every member of the company may watch a
+   * run, nobody else sees it, and nothing signed in can write a run, a
+   * capture or a ledger row, or call a run RPC. Runs are begun here through
+   * the service role, as the route does after verifying claims. Dedicated
+   * people, because a run's turn and message reference them for good: the
+   * conversation is append-only, so these rows outlive the suite, as the
+   * conversation describes' rows already do. */
+  describe("agent runs", () => {
+    const runId = crypto.randomUUID();
+    let companyId: string;
+    let otherCompanyId: string;
+    let owner: Db;
+    let member: Db;
+    let outsider: Db;
+    let ownerId: string;
+    let itemId: string;
+    let lease: string;
+
+    async function person(label: string) {
+      const email = `rls-runs-${label}-${suffix}@example.com`;
+      const created = await admin.auth.admin.createUser({ email, password, email_confirm: true });
+      const client = anonClient();
+      await client.auth.signInWithPassword({ email, password });
+      return { id: created.data.user!.id, client };
+    }
+
+    beforeAll(async () => {
+      const [o, m, x] = await Promise.all([person("owner"), person("member"), person("outsider")]);
+      ownerId = o.id; owner = o.client; member = m.client; outsider = x.client;
+      const { data: company } = await admin.from("os_companies").insert({ name: `Runs Co ${suffix}`, what_we_do: "We test runs." }).select("id").single();
+      const { data: other } = await admin.from("os_companies").insert({ name: `Other Runs Co ${suffix}` }).select("id").single();
+      companyId = company!.id;
+      otherCompanyId = other!.id;
+      await admin.from("os_company_members").insert([
+        { company_id: companyId, user_id: o.id, role: "owner" },
+        { company_id: companyId, user_id: m.id, role: "member" },
+        { company_id: otherCompanyId, user_id: x.id, role: "owner" },
+      ]);
+      const { data: item } = await admin.from("os_work_items").insert({
+        company_id: companyId, lane: "sales", kind: "reply", title: "Follow up with the Bornova buyer", status: "review", required_action: "send",
+        notes: "Waiting on the buyer about invoice INV-104.", updated_at: new Date(Date.now() - 9 * 86_400_000).toISOString(),
+      }).select("id").single();
+      itemId = item!.id;
+      const started = await admin.rpc("os_agent_run_start", {
+        p_id: runId, p_company: companyId, p_actor: o.id, p_instruction: "Prepare follow-ups for everything waiting more than a week.",
+        p_draft_format: "reply", p_payer: "local", p_model_label: "local:fixture", p_cap_usd: 1, p_daily_cap: 2, p_min_usd: 0, p_lease_seconds: 600,
+      });
+      expect(started.error).toBeNull();
+      lease = (started.data as { lease: string }).lease;
+      const read = await admin.rpc("os_agent_run_read", { p_id: runId, p_company: companyId, p_actor: o.id, p_lease: lease, p_item: itemId, p_ref: "w1" });
+      expect(read.error).toBeNull();
+      const round = await admin.rpc("os_agent_run_round", { p_id: runId, p_company: companyId, p_actor: o.id, p_lease: lease, p_seq: 1, p_projected_usd: 0, p_daily_cap: 2 });
+      expect(round.error).toBeNull();
+      expect((await admin.rpc("os_agent_run_usage", { p_id: runId, p_round: 1, p_input: 100, p_output: 10, p_cost: 0 })).error).toBeNull();
+    });
+
+    afterAll(async () => {
+      await admin.rpc("os_agent_run_cancel", { p_id: runId, p_company: companyId, p_actor: ownerId });
+    });
+
+    it("lets every member of the company watch the run, its captures, its holds and its ledger", async () => {
+      for (const client of [owner, member]) {
+        const { data, error } = await client.from("os_agent_runs").select(AGENT_RUN_PUBLIC_COLUMNS).eq("company_id", companyId);
+        expect(error).toBeNull();
+        expect(data).toHaveLength(1);
+        expect(data![0]).toMatchObject({ id: runId, status: "running", item_reads: 1, rounds: 1, input_tokens: 100 });
+        const reads = await client.from("os_agent_run_reads").select("ref, title, source_text").eq("run_id", runId);
+        expect(reads.data).toEqual([{ ref: "w1", title: "Follow up with the Bornova buyer", source_text: "Follow up with the Bornova buyer\n\nWaiting on the buyer about invoice INV-104." }]);
+        const usage = await client.from("os_agent_run_usage").select("round, cost_usd, estimated").eq("run_id", runId);
+        expect(usage.data).toEqual([{ round: 1, cost_usd: 0, estimated: false }]);
+        const holds = await client.from("os_agent_run_rounds").select("round, hold_usd").eq("run_id", runId);
+        expect(holds.data).toEqual([{ round: 1, hold_usd: 0 }]);
+      }
+    });
+
+    it("shows a member of another company nothing at all", async () => {
+      for (const table of ["os_agent_runs", "os_agent_run_reads", "os_agent_run_rounds", "os_agent_run_usage"] as const) {
+        const { data, error } = await outsider.from(table).select("company_id").eq("company_id", companyId);
+        expect(error).toBeNull();
+        expect(data ?? []).toHaveLength(0);
+      }
+      const { data } = await anonClient().from("os_agent_runs").select("id");
+      expect(data ?? []).toHaveLength(0);
+    });
+
+    it("never lets a signed-in role read the checkpoint or the lease token", async () => {
+      for (const column of ["checkpoint", "lease_id", "*"]) {
+        const { error } = await owner.from("os_agent_runs").select(column).eq("id", runId);
+        expect(error?.code, column).toBe("42501");
+      }
+    });
+
+    it("lets no signed-in role write a run, a capture or a ledger row, the run's starter included", async () => {
+      const insert = await owner.from("os_agent_runs").insert({ id: crypto.randomUUID(), company_id: companyId, actor_id: ownerId, payer: "local", priced: false, model_label: "x", ceiling_usd: 0 });
+      expect(insert.error?.code).toBe("42501");
+      const update = await owner.from("os_agent_runs").update({ status: "completed" }).eq("id", runId).select("id");
+      expect(update.error?.code).toBe("42501");
+      const remove = await owner.from("os_agent_runs").delete().eq("id", runId).select("id");
+      expect(remove.error?.code).toBe("42501");
+      const capture = await owner.from("os_agent_run_reads").insert({ run_id: runId, company_id: companyId, item_id: itemId, ref: "w2", title: "t", lane: "sales", kind: "reply", status: "review", waiting_days: 0, item_updated_at: new Date().toISOString(), source_text: "t" });
+      expect(capture.error?.code).toBe("42501");
+      const ledger = await owner.from("os_agent_run_usage").insert({ run_id: runId, round: 2, company_id: companyId, input_tokens: 0, output_tokens: 0, cost_usd: 0 });
+      expect(ledger.error?.code).toBe("42501");
+      const hold = await owner.from("os_agent_run_rounds").insert({ run_id: runId, round: 2, company_id: companyId, hold_usd: 0 });
+      expect(hold.error?.code).toBe("42501");
+      const { data } = await admin.from("os_agent_runs").select("status, seq").eq("id", runId).single();
+      expect(data).toEqual({ status: "running", seq: 2 });
+    });
+
+    it("keeps every run RPC for the service role", async () => {
+      const calls = [
+        owner.rpc("os_agent_run_cancel", { p_id: runId, p_company: companyId, p_actor: ownerId }),
+        owner.rpc("os_agent_run_start", { p_id: crypto.randomUUID(), p_company: companyId, p_actor: ownerId, p_instruction: "x", p_draft_format: "reply", p_payer: "local", p_model_label: "x", p_cap_usd: 1, p_daily_cap: 2, p_min_usd: 0, p_lease_seconds: 600 }),
+        owner.rpc("os_agent_run_usage", { p_id: runId, p_round: 1, p_input: 0, p_output: 0, p_cost: 0 }),
+        owner.rpc("os_agent_run_release", { p_id: runId, p_company: companyId, p_actor: ownerId, p_lease: lease }),
+        member.rpc("os_spent_today", { p_company: companyId }),
+        member.rpc("os_agent_run_resume", { p_id: runId, p_company: companyId, p_actor: ownerId, p_seq: 2, p_action: "continue", p_answer: null as unknown as string, p_lease_seconds: 600 }),
+      ];
+      for (const result of await Promise.all(calls)) expect(result.error?.code).toBe("42501");
+      const { data } = await admin.from("os_agent_runs").select("status").eq("id", runId).single();
+      expect(data!.status).toBe("running");
+    });
+
+    it("counts run spend in the member's monthly chat spend", async () => {
+      const { data, error } = await member.rpc("os_chat_spent_this_month", { p_company_id: companyId });
+      expect(error).toBeNull();
+      expect(Number(data)).toBe(0);
+      const outside = await outsider.rpc("os_chat_spent_this_month", { p_company_id: companyId });
+      expect(Number(outside.data)).toBe(0);
+    });
+
+    it("reads the real schema with the columns the run's tools select", async () => {
+      const search = await searchRecord(admin, companyId, 10_000);
+      expect(search.rows.map((row) => row.id)).toContain(itemId);
+      expect(search.openTotal).toBe(1);
+      await expect(readEvents(admin, itemId, 10_000)).resolves.toEqual(expect.any(Array));
+      await expect(listMemory(admin, companyId, new Date().toISOString().slice(0, 10), 10_000)).resolves.toMatchObject({ rows: [], complete: true });
+      await expect(openCardItems(admin, companyId, 10_000)).resolves.toEqual(new Set());
     });
   });
 });

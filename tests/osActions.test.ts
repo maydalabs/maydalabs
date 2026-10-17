@@ -31,22 +31,24 @@ describe("beta actions cannot be invoked by public accounts", () => {
 });
 
 describe("workflow spend reads fail closed", () => {
-  function prepare(month: { data: { cost_usd: number }[] | null; error: unknown }, day = { data: [] as { cost_usd: number }[], error: null as unknown }) {
+  function prepare(month: { data: { cost_usd: number }[] | null; error: unknown }, day = { data: 0 as number | null, error: null as unknown }) {
     const workflow = {
       id: "00000000-0000-4000-8000-000000000001", name: "Review workflow",
       active: true, monthly_budget_usd: 5, standing_sources: [], max_sources: 5,
     };
     const scoped = { from: () => ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: workflow }) }) }) }) };
     mocks.access.mockResolvedValue({ allowed: true, claims: { sub: "reviewer" }, supabase: scoped });
-    const gte = vi.fn().mockResolvedValueOnce(month).mockResolvedValueOnce(day);
+    const gte = vi.fn().mockResolvedValueOnce(month);
     const select = () => ({ eq: () => ({ gte }), gte });
-    mocks.admin.mockReturnValue({ from: () => ({ select }) });
+    // Today's total, workflows and agent runs alike, from public.os_spent_today.
+    const rpc = vi.fn(async (name: string, args: unknown) => { void name; void args; return day; });
+    mocks.admin.mockReturnValue({ from: () => ({ select }), rpc });
     mocks.gather.mockResolvedValue({ sources: [], failures: [] });
     const form = new FormData();
     form.set("topic", "Budget regression test");
     form.set("workflowId", workflow.id);
     form.set("sources", "https://example.com/source");
-    return { form, gte };
+    return { form, gte, rpc };
   }
 
   it.each([
@@ -62,16 +64,24 @@ describe("workflow spend reads fail closed", () => {
   });
 
   it("also refuses a failed daily usage read", async () => {
-    const { form } = prepare({ data: [], error: null }, { data: [], error: { message: "timeout" } });
+    const { form } = prepare({ data: [], error: null }, { data: null, error: { message: "timeout" } });
     expect(await runOsDraftAction({ status: "idle" }, form)).toEqual({ status: "error", code: "save_failed" });
     expect(mocks.gather).not.toHaveBeenCalled();
     expect(mocks.draft).not.toHaveBeenCalled();
   });
 
   it("allows verified empty usage to reach source gathering", async () => {
-    const { form } = prepare({ data: [], error: null });
+    const { form, rpc } = prepare({ data: [], error: null });
     expect(await runOsDraftAction({ status: "idle" }, form)).toMatchObject({ status: "error", code: "no_sources" });
     expect(mocks.gather).toHaveBeenCalledOnce();
+    expect(mocks.draft).not.toHaveBeenCalled();
+    expect(rpc).toHaveBeenCalledExactlyOnceWith("os_spent_today", { p_company: null });
+  });
+
+  it("stops at the daily cap when agent runs have spent it today", async () => {
+    const { form } = prepare({ data: [], error: null }, { data: 2.05, error: null });
+    expect(await runOsDraftAction({ status: "idle" }, form)).toEqual({ status: "error", code: "daily_cap" });
+    expect(mocks.gather).not.toHaveBeenCalled();
     expect(mocks.draft).not.toHaveBeenCalled();
   });
 });

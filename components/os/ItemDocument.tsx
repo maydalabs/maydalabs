@@ -44,7 +44,7 @@ export type ItemEvent = {
 };
 
 type Source = { url?: string; title?: string; chars?: number };
-type CapturedSource = { id: string; companyId: string; revision: string; text: string; origin: "founder"; quotes: string[] };
+type CapturedSource = { id: string; companyId: string; revision: string; text: string; origin: "founder" | "record"; quotes: string[] };
 type Outcome = { kind?: string; url?: string; note?: string; at?: string };
 
 function asOutcomes(value: unknown): Outcome[] {
@@ -68,21 +68,28 @@ function record(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
 
+/* Two kinds of captured source, each with its own exact identity: the
+ * founder's message (its uuid), and — on a follow-up an agent run prepared —
+ * the Work item as the run read it ("read:" and the capture's uuid; captures
+ * are append-only, so the text here is what the run saw, not today's row).
+ * Anything else is neither, and is not shown as evidence. */
+const UUID = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i;
+const CAPTURE_ID = /^read:[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i;
+
 function capturedSources(value: unknown, metadata: unknown): CapturedSource[] {
   if (!Array.isArray(value)) return [];
   const review = record(metadata) && record(metadata.review) ? metadata.review : null;
   const citations = review?.authorship === "model" && review.externallyVerified === false && Array.isArray(review.citations) ? review.citations : [];
-  const uuid = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i;
   return value.flatMap((source): CapturedSource[] => {
-    if (!record(source) || Object.keys(source).length !== 5 || source.origin !== "founder" ||
-      typeof source.id !== "string" || !uuid.test(source.id) ||
-      typeof source.companyId !== "string" || !uuid.test(source.companyId) ||
+    if (!record(source) || Object.keys(source).length !== 5 || (source.origin !== "founder" && source.origin !== "record") ||
+      typeof source.id !== "string" || !(source.origin === "founder" ? UUID : CAPTURE_ID).test(source.id) ||
+      typeof source.companyId !== "string" || !UUID.test(source.companyId) ||
       typeof source.revision !== "string" || !/^[\da-f]{64}$/i.test(source.revision) ||
       typeof source.text !== "string" || !source.text.trim() || source.text.length > 40000) return [];
     const text = source.text;
     const quotes = citations.flatMap((citation): string[] => record(citation) && citation.sourceId === source.id &&
       typeof citation.quote === "string" && !!citation.quote.trim() && text.includes(citation.quote) ? [citation.quote] : []);
-    return [{ id: source.id, companyId: source.companyId, revision: source.revision, text, origin: "founder", quotes: [...new Set(quotes)] }];
+    return [{ id: source.id, companyId: source.companyId, revision: source.revision, text, origin: source.origin, quotes: [...new Set(quotes)] }];
   });
 }
 
@@ -229,8 +236,8 @@ export function ItemDocument({ locale, item, events }: { locale: Locale; item: I
           <ul className="os-doc-sources">
             {captured.map((source, index) => (
               <li key={`captured:${source.id}:${index}`} style={{ display: "grid", gap: ".55rem", minWidth: 0, overflowWrap: "anywhere" }}>
-                <strong>{copy.founderSource}</strong>
-                <p className="os-doc-quiet" style={{ margin: 0 }}>{copy.sourceAttribution}</p>
+                <strong>{source.origin === "record" ? copy.recordSource : copy.founderSource}</strong>
+                <p className="os-doc-quiet" style={{ margin: 0 }}>{source.origin === "record" ? copy.recordAttribution : copy.sourceAttribution}</p>
                 {(source.quotes.length ? source.quotes : [source.text]).map((quote, quoteIndex) => (
                   <blockquote key={quoteIndex} style={{ margin: 0, paddingLeft: ".75rem", borderLeft: "2px solid var(--os-line)", whiteSpace: "pre-wrap" }}>{quote}</blockquote>
                 ))}

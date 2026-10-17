@@ -11,7 +11,7 @@ const proposal: DurableProposal = {
     citations: [{ sourceId: "message-one", quote: "Prepare a draft." }] },
   sources: [{ id: "message-one", companyId: "company-one", revision: "source-one", origin: "founder", text: "Prepare a draft." }],
 };
-const initial: ReviewSnapshot = { companyId: "company-one", actorId: "actor-one", proposals: [proposal], turns: [], messages: [] };
+const initial: ReviewSnapshot = { companyId: "company-one", actorId: "actor-one", proposals: [proposal], turns: [], messages: [], runIds: [] };
 const saved: DurableProposal = { ...proposal, status: "saved", record_id: "record-one" };
 const snapshot = (proposals: DurableProposal[]): ReviewSnapshot => ({ ...initial, proposals });
 

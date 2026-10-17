@@ -39,10 +39,38 @@ export function isCofounderConfigured(env: Env = process.env, companyHasChoice =
   return companyHasChoice || Boolean(env.MAYDAOS_ANTHROPIC_API_KEY) || localModelSettings(env) !== null;
 }
 
-export function anthropicTurn(settings: { apiKey: string; model: string }): ModelTurn {
-  const client = new Anthropic({ apiKey: settings.apiKey });
+/* The longest a server-requested retry wait may hold a call: the SDK's own
+ * longest back-off. The SDK obeys retry-after with no limit, and its sleep
+ * ignores the abort signal, so a rate limit asking for a minute would outlast
+ * an agent run's round timeout — and a refusal, which bills nothing, would be
+ * charged as a call that never reported. Capped, the last refusal always
+ * arrives as an error inside the round, and a chat turn is never held past its
+ * own time limit by a header either. */
+export const RETRY_WAIT_CAP_MS = 8_000;
 
-  return async function* turn({ system, messages, tools, signal }): AsyncIterable<ModelEvent> {
+export function boundedRetryFetch(capMs: number = RETRY_WAIT_CAP_MS): typeof fetch {
+  return async (input, init) => {
+    // Read at call time, so a stubbed global fetch is the one used.
+    const response = await globalThis.fetch(input, init);
+    if (response.ok) return response;
+    const millis = response.headers.get("retry-after-ms");
+    const seconds = response.headers.get("retry-after");
+    const requested = millis !== null ? Number(millis)
+      : seconds === null ? null
+      : Number.isFinite(Number(seconds)) ? Number(seconds) * 1000
+      : Date.parse(seconds) - Date.now();
+    if (requested === null || !(requested > capMs)) return response;
+    const headers = new Headers(response.headers);
+    headers.set("retry-after-ms", String(capMs));
+    headers.delete("retry-after");
+    return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+  };
+}
+
+export function anthropicTurn(settings: { apiKey: string; model: string; retryWaitCapMs?: number }): ModelTurn {
+  const client = new Anthropic({ apiKey: settings.apiKey, fetch: boundedRetryFetch(settings.retryWaitCapMs) });
+
+  return async function* turn({ system, messages, tools, signal, accepted }): AsyncIterable<ModelEvent> {
     const stream = client.messages.stream({
       model: settings.model,
       max_tokens: 2000,
@@ -50,6 +78,10 @@ export function anthropicTurn(settings: { apiKey: string; model: string }): Mode
       tools: cofounderTools(tools),
       messages: messages as Anthropic.MessageParam[],
     }, { signal });
+    /* 'connect' is the SDK's 2xx response, after any retries: the request
+     * was taken and may be billed. A 429 or 529, a refused request or a
+     * failed connection throws before it. */
+    if (accepted) stream.on("connect", accepted);
 
     for await (const event of stream) {
       if (event.type === "content_block_delta" && event.delta.type === "text_delta") {

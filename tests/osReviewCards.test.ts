@@ -122,6 +122,51 @@ describe("review cards: readable review before any write", () => {
   });
 });
 
+describe("review cards: a card an agent run prepared", () => {
+  const capture = "read:00000000-0000-4000-8000-0000000000d1";
+  const runCard: DurableProposal = {
+    ...base, id: "run-card", turn_id: "synthetic-run",
+    payload: { type: "work", title: "Follow up on invoice 42", body: "Hello Dana,\nA short follow-up on invoice 42.", lane: "finance", kind: "reply", outwardAction: "send",
+      citations: [{ sourceId: "founder-message", quote: "Prepare follow-ups." }, { sourceId: capture, quote: "Invoice 42 for Acme" }] },
+    sources: [
+      { id: "founder-message", companyId: "synthetic-company", revision: "f".repeat(64), text: "Prepare follow-ups.", origin: "founder" },
+      { id: capture, companyId: "synthetic-company", revision: "e".repeat(64), text: "Invoice 42 for Acme\n\nSent 2 October; no reply yet.", origin: "record" },
+    ],
+  };
+  const turns = [{ id: "synthetic-run", intent: { draftFormat: "reply" as const, knowledgeAssertion: null } }];
+  const renderRun = (instruction: string, locale: Locale = "en", proposals = [runCard]) =>
+    renderToStaticMarkup(createElement(ReviewCards, { proposals, turns, runs: [{ id: "synthetic-run", instruction }], locale, onChange: () => undefined }));
+
+  it.each([["en", "From the run: "], ["tr", "Görevden: "], ["fr", "Issue de la mission : "]] as const)("names the run it came from in %s", (locale, label) => {
+    expect(renderRun("Prepare follow-ups.", locale)).toContain(`${label}Prepare follow-ups.`);
+  });
+
+  it("keeps the same decision controls and shows both sources, the record under Existing record", () => {
+    const html = renderRun("Prepare follow-ups.");
+    expect(html).toContain(">Save to Work</button>");
+    expect(html).not.toMatch(/disabled="">Save to Work<\/button>/);
+    expect(html).toContain(">Edit suggestion</button>");
+    expect(html).toContain(">Dismiss</button>");
+    expect(html).toContain("Founder’s message");
+    expect(html).toContain("Existing record");
+    expect(html).toContain("Sent 2 October; no reply yet.");
+    expect(html).toContain("e".repeat(64));
+  });
+
+  it("cuts a long instruction to eighty characters", () => {
+    const html = renderRun("y".repeat(200));
+    expect(html).toContain(`From the run: ${"y".repeat(79)}…`);
+    expect(html).not.toContain("y".repeat(80));
+  });
+
+  it("labels nothing that a run did not prepare", () => {
+    const html = renderToStaticMarkup(createElement(ReviewCards, { proposals: [base], turns: [{ id: base.turn_id, intent: { draftFormat: "email", knowledgeAssertion: null } }],
+      runs: [{ id: "synthetic-run", instruction: "Prepare follow-ups." }], locale: "en", onChange: () => undefined }));
+    expect(html).not.toContain("From the run");
+    expect(html).not.toContain("data-from-run");
+  });
+});
+
 describe("review command transport: never automatically retries", () => {
   it.each(REVIEW_GUARD_REASONS)("recognizes the explicit refusal %s without an automatic retry", async (reason) => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response({ error: "review_rejected", reason }, 422));
